@@ -2,25 +2,32 @@
 
 **Keep your application secure** - Understand Merlin's security features including SQL injection protection, CSRF tokens, password hashing, encryption helpers, and secure session management. Learn security best practices and common pitfalls to avoid.
 
-Merlin ships with secure-by-default query building and optional encryption helpers.
-
 ## SQL Injection Protection
 
-Merlin's query builder uses prepared statements by default, automatically protecting against SQL injection. You rarely need to think about it - just use the builder API.
+Merlin supports two ways of passing values into queries:
 
-Use `Query`/`Model::query()` APIs and bind parameters.
+### Bound parameters
+
+Only values passed through ->bind() remain real PDO parameters and offer full SQL‑injection protection.
 
 ```php
-// Safe (bound)
-$user = User::query()
-    ->where('email = :email', ['email' => $inputEmail])
-    ->first();
-
-// Also safe (value escaped/bound by builder)
-$user = User::query()->where('email', $inputEmail)->first();
+User::query()
+    ->where('email = :email')
+    ->bind(['email' => $email])
+    ->firstModel();
 ```
 
-Avoid string-concatenated SQL for user input.
+### Inline values
+
+Values passed directly to where() are safely escaped and inserted into the SQL string, but not bound as real parameters.
+
+```php
+User::query()
+    ->where('email = :email', ['email' => $email])
+    ->firstModel();
+```
+
+Use bind() for any user‑provided or dynamic input.
 
 ## Password Storage
 

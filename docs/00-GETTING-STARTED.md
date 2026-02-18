@@ -23,9 +23,9 @@ your-project/
 │   ├── Controllers/
 │   ├── Models/
 │   ├── Tasks/
-│   └── views/
 ├── public/
-│   └── index.php
+│   ├── index.php
+├── views/
 ├── console.php
 └── composer.json
 ```
@@ -49,7 +49,7 @@ use Merlin\Mvc\Router;
 // Initialize application context, database, and view path
 $ctx = AppContext::instance();
 $ctx->db = new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass');
-$ctx->getView()->setPath(__DIR__ . '/../app/views');
+$ctx->getView()->setPath(__DIR__ . '/../views');
 
 // Set up routing
 $router = new Router();
@@ -190,6 +190,39 @@ composer dump-autoload
 ```
 
 to update the autoloader.
+
+## Web Server Configuration
+
+When deploying your application, the web server should forward requests to `public/index.php`. Here is an example how Nginx configuration could look:
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    root /var/www/your-app/public;
+
+    # Forward all requests that don't match actual files to index.php
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP handler
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php-fpm.sock; # Adjust if using TCP
+        # fastcgi_pass 127.0.0.1:9000; # Alternative if using TCP
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Hide dot files
+    location ~ /\. {
+        deny all;
+    }
+}
+```
+
+The directive `try_files $uri $uri/ /index.php?$query_string;` ensures that all non-file requests are forwarded to your `public/index.php` bootstrap file.
 
 ## Next Steps
 

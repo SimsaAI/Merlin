@@ -665,14 +665,18 @@ class Query extends Condition
 
     /**
      * Execute SELECT query and return ResultSet or return SQL string if returnSql is enabled
+     * @param array|string|null $columns Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names.
      * @return ResultSet|string
      * @throws Exception
      */
-    public function select(): ResultSet|string
+    public function select(array|string|null $columns = null): ResultSet|string
     {
         $this->isReadQuery = true;
         $this->hasResultSet = true;
 
+        if ($columns !== null) {
+            $this->columns($columns);
+        }
         $query = $this->compileSelect();
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
@@ -976,7 +980,9 @@ class Query extends Condition
             if (empty($this->bindParams)) {
                 throw new LogicException('No values or bind parameters set');
             }
-            $columns = array_keys($this->bindParams);
+            $columns = !empty($this->columns)
+                ? $this->columns
+                : array_keys($this->bindParams);
         } else {
             if (!empty($this->bindParams)) {
                 throw new LogicException('Cannot use bind parameters when values are set');
@@ -1199,6 +1205,22 @@ class Query extends Condition
                 } else {
                     $statement .= $value;
                 }
+                $sep = ',';
+            }
+        } elseif (!empty($this->columns)) {
+            $sep = '';
+            foreach ($this->columns as $column) {
+                $pos = strpos($column, '=');
+                if ($pos > 0) {
+                    $value = ltrim(substr($column, $pos + 1));
+                    $column = rtrim(substr($column, 0, $pos));
+                } else {
+                    $value = ":$column";
+                }
+                $statement .= $sep;
+                $statement .= $this->protectIdentifier($column, self::PI_COLUMN);
+                $statement .= '=';
+                $statement .= $value;
                 $sep = ',';
             }
         } elseif (!empty($this->bindParams)) {
@@ -1555,6 +1577,21 @@ class Query extends Condition
     {
         return $this->bindParams +
             array_slice($this->autoBindParams, 0, $this->paramCounter);
+    }
+
+    /**
+     * Create a paginator for the current query
+     * @param int $page Page number (1-based)
+     * @param int $pageSize Number of items per page
+     * @param bool $reverse Whether to reverse the order of results (for efficient deep pagination)
+     * @return Paginator
+     */
+    public function paginate(
+        int $page = 1,
+        int $pageSize = 30,
+        bool $reverse = false
+    ): Paginator {
+        return new Paginator($this, $page, $pageSize, $reverse);
     }
 
     /**

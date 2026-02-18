@@ -7,7 +7,7 @@ require_once __DIR__ . '/TestDatabase.php';
 use Merlin\Db\Sql;
 use PHPUnit\Framework\TestCase;
 
-class SqlTest extends TestCase
+class SqlNodeTest extends TestCase
 {
     // Helper: serialize a Sql value via Condition and return the RHS expression
     private function serializeViaCondition($value): string

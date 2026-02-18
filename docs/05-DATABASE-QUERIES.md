@@ -42,6 +42,7 @@ The query builder provides a fluent interface for constructing SELECT queries. C
 $users = Query::new()
     ->table('users', 'u')
     ->columns(['u.id', 'u.username', 'u.email'])
+    ->where('u.created_at >', '2024-01-01')
     ->where('u.status', 'active')
     ->orderBy('u.created_at DESC')
     ->limit(20)
@@ -51,21 +52,25 @@ $users = Query::new()
 $user = Query::new()
     ->table('users')
     ->where('id', 5)
-    ->first();
+    ->firstModel();
 ```
 
 ## WHERE Styles
 
-Merlin supports two where clause styles to accommodate different preferences. Both are equally safe and use prepared statements behind the scenes.
-
-Both styles are supported:
+Merlin supports three where clause styles to accommodate different preferences. All are equally safe and use prepared statements behind the scenes.
 
 ```php
-// Condition + bind params (Phalcon style)
-User::query()->where('email = :email', ['email' => 'a@example.com'])->first();
+// Condition + inline values (values are escaped and inserted into SQL)
+User::query()->where('email = :email', ['email' => 'a@example.com'])->firstModel();
 
-// Column/value (CodeIgniter style)
-User::query()->where('email', 'a@example.com')->first();
+// Condition + bound parameters (values remain real PDO parameters)
+User::query()->where('email = :email')->bind(['email' => 'a@example.com'])->firstModel();
+
+// Column/value pair also inline (escaped and inserted into SQL)
+User::query()->where('email', 'a@example.com')->firstModel();
+
+// Column/value pair supporting operators
+User::query()->where('email <>', 'a@example.com')->firstModel();
 ```
 
 ## JOIN, GROUP, HAVING
@@ -101,6 +106,12 @@ $id = User::query()->insert([
     'email' => 'john@example.com',
 ]);
 
+// INSERT with bound parameters
+$id = User::query()->bind([
+    'username' => 'john',
+    'email' => 'john@example.com',
+])->insert();
+
 // UPSERT
 User::query()->upsert([
     'id' => 1,
@@ -108,22 +119,81 @@ User::query()->upsert([
     'email' => 'john@example.com',
 ]);
 
+// UPSERT with bound parameters
+User::query()->bind([
+    'id' => 1,
+    'username' => 'john',
+    'email' => 'john@example.com',
+])->upsert();
+
 // UPDATE
 $affected = User::query()
     ->where('id', 1)
     ->update(['email' => 'john.new@example.com']);
 
+// UPDATE with bound parameters
+$affected = User::query()
+    ->where('id', 1)
+    ->bind(['email' => 'john.new@example.com'])
+    ->update();
+
 // DELETE
 $deleted = User::query()
     ->where('status', 'inactive')
+    ->delete();
+
+// DELETE with bound parameters
+$deleted = User::query()
+    ->where('status = :status')
+    ->bind(['status' => 'inactive'])
     ->delete();
 ```
 
 ## EXISTS / COUNT
 
 ```php
+// Simple where with inline value
 $exists = User::query()->where('email', 'john@example.com')->exists();
 $total = User::query()->where('status', 'active')->count();
+
+// With bound parameters
+$exists = User::query()->where('email = :email')->bind(['email' => 'john@example.com'])->exists();
+$total = User::query()->where('status = :status')->bind(['status' => 'active'])->count();
+```
+
+## Pagination with Paginator
+
+Use `Merlin\Db\Paginator` to paginate any query builder. The paginator runs a count() query first, then fetches the requested page using `LIMIT/OFFSET`.
+
+```php
+$paginator = User::query()
+    ->where('status', 'active')
+    ->orderBy('created_at DESC')
+    ->paginate(page: 2, pageSize: 20);
+
+$items = $paginator->execute();
+
+$meta = [
+    'currentPage' => $paginator->getCurrentPage(),
+    'totalPages' => $paginator->getTotalPages(),
+    'totalItems' => $paginator->getTotalItems(),
+    'firstItem' => $paginator->getFirstItemPos(),
+    'lastItem' => $paginator->getLastItemPos(),
+    'pageSize' => $paginator->getPageSize(),
+];
+```
+
+You can enable reverse pagination using the third argument. It does not change your original ORDER BY. It only flips how pages are calculated, so page 1 returns the last items instead of the first ones.
+
+```php
+// Messages sorted oldest → newest
+$messages = Query::new()
+    ->table('messages')
+    ->where('room_id', 15)
+    ->orderBy('id ASC')
+    ->paginate(page: 1, pageSize: 3, reverse: true)
+    ->execute();
+// Returns the LAST 3 messages, not the first 3.
 ```
 
 ## Returning SQL Without Executing

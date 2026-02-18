@@ -64,6 +64,8 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 - Multibyte String extension (`ext-mbstring`)
 - Optional: Sodium or OpenSSL extension for advanced encryption features
 
+(PDO driver support is implemented for MySQL, PostgreSQL and SQLite. Other drivers may work but are not officially tested.)
+
 ## Installation
 
 Install via Composer:
@@ -145,7 +147,10 @@ $exists = User::exists(['email' => 'john@example.com']);
 
 // Query with conditions
 $users = User::query()
+    // Column/value style
     ->where('status', 'active')
+    // Inline parameters
+    ->where('status = :status', ['status' => 'active'])
     ->orderBy('created_at DESC')
     ->limit(10)
     ->select();
@@ -174,15 +179,13 @@ use Merlin\Db\Query;
 
 $results = Query::new()
     ->table('orders o')
-    ->join('LEFT JOIN users u ON o.user_id = u.id')
+    ->join('users u', 'o.user_id = u.id')
     ->where('o.status', 'completed')
-    ->where('o.total > ?', [100])
+    ->where('o.total >', 100)
     ->groupBy('u.id')
-    ->having('COUNT(*) > ?', [5])
+    ->having('COUNT(*) >', 5)
     ->select(['u.username', 'COUNT(*) as order_count', 'SUM(o.total) as total_spent']);
 ```
-
-### CLI Tasks
 
 ### CLI Tasks
 
@@ -239,13 +242,13 @@ your-project/
 │   ├── Models/          # Database models
 │   ├── Tasks/           # CLI tasks
 │   ├── Middleware/      # Custom middleware
-│   └── views/           # View templates
+├── config/
+│   └── database.php     # Configuration files
 ├── public/
 │   ├── index.php        # Web entry point
 │   ├── css/
 │   └── js/
-├── config/
-│   └── database.php     # Configuration files
+├── views/               # View templates
 ├── console.php          # CLI entry point
 ├── composer.json
 └── .gitignore

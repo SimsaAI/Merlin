@@ -74,7 +74,7 @@ use Merlin\AppContext;
 use Merlin\Mvc\ViewEngine;
 
 AppContext::instance()->view = (new ViewEngine())
-    ->setPath(__DIR__ . '/../app/views')
+    ->setPath(__DIR__ . '/../views')
     ->setExtension('php')
     ->setLayout('layouts/main');
 ```

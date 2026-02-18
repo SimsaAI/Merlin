@@ -7,7 +7,7 @@ namespace Merlin\Db;
 class Paginator
 {
     protected Query $builder;
-    protected int $limit;
+    protected int $pageSize;
     protected int $page;
     protected bool $reverse;
 
@@ -19,18 +19,18 @@ class Paginator
     public function __construct(
         Query $builder,
         int $page = 1,
-        int $limit = 30,
+        int $pageSize = 30,
         bool $reverse = false
     ) {
         $this->builder = $builder;
-        $this->limit = max(1, $limit);
+        $this->pageSize = max(1, $pageSize);
         $this->page = max(1, $page);
         $this->reverse = $reverse;
     }
 
-    public function getLimit(): int
+    public function getPageSize(): int
     {
-        return $this->limit;
+        return $this->pageSize;
     }
 
     public function getTotalItems(): int
@@ -62,14 +62,14 @@ class Paginator
     {
         // Count query
         $this->totalItems = $this->builder->count();
-        $this->totalPages = $this->limit ? (int) ceil($this->totalItems / $this->limit) : 1;
+        $this->totalPages = $this->pageSize ? (int) ceil($this->totalItems / $this->pageSize) : 1;
 
-        $offset = ($this->page - 1) * $this->limit;
-        $queryLimit = $this->limit;
+        $offset = ($this->page - 1) * $this->pageSize;
+        $queryLimit = $this->pageSize;
         $queryOffset = $offset;
 
         if ($this->reverse) {
-            $queryOffset = $this->totalItems - $offset - $this->limit;
+            $queryOffset = $this->totalItems - $offset - $this->pageSize;
             if ($queryOffset < 0) {
                 $queryLimit += $queryOffset;
                 $queryOffset = 0;
