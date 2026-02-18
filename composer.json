@@ -1,15 +1,28 @@
 {
-  "name": "osiramen/php-corelib",
-  "description": "Small, simple, and fast PHP Framework for MVC Apps influenced by Phalcon and Codeigniter",
+  "name": "simsaai/merlin",
+  "description": "A lightweight, fast PHP framework for building MVC web applications and CLI tools. Influenced by Phalcon, CodeIgniter and Laravel, Merlin provides a minimal yet complete toolkit for modern PHP development.",
   "type": "library",
+  "version": "1.0",
   "require": {
     "php": ">=8.0",
-    "psr/log": "^3.0"
+    "ext-mbstring": "*",
+    "ext-pdo": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
   },
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "CoreLib\\": "src/"
+      "Merlin\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Merlin\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
   }
 }
