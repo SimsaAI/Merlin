@@ -33,7 +33,7 @@ class AppContext
     public ?Cookies $cookies = null;
 
     /** @var RoutingResult|null The current resolved routing information. */
-    public ?RoutingResult $routing = null;
+    public ?RoutingResult $route = null;
 
     // --- Singleton ---
 
@@ -145,7 +145,7 @@ class AppContext
      */
     public function getRouting(): ?RoutingResult
     {
-        return $this->routing;
+        return $this->route;
     }
 }
 

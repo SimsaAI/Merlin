@@ -35,7 +35,7 @@ This is a compact reference for the most-used public APIs in Merlin. For detaile
 - `getDefaultAction(): string`
 
 `dispatch()` resolves the controller/action from route info, stores the result in
-`AppContext->routing`, then executes the middleware pipeline and controller action.
+`AppContext->route`, then executes the middleware pipeline and controller action.
 `RoutingResult->params` is built from non-routing `vars` plus `vars['params']`, while
 `vars['params']` remains the raw wildcard payload.
 

@@ -1,6 +1,6 @@
 {
   "name": "simsaai/merlin",
-  "description": "A lightweight, fast PHP framework for building MVC web applications and CLI tools. Influenced by Phalcon, CodeIgniter and Laravel, Merlin provides a minimal yet complete toolkit for modern PHP development.",
+  "description": "A lightweight, fast PHP framework for building modern MVC web applications and CLI tools. Merlin combines the best ideas from frameworks like Phalcon, CodeIgniter, and Laravel into a minimal yet powerful toolkit.",
   "type": "library",
   "version": "1.0",
   "require": {

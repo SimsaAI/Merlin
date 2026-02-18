@@ -34,10 +34,10 @@ It is a singleton via `AppContext::instance()`.
 ### MVC Layer
 
 - `Router` matches URI + method to route patterns, extracting parameters
-- `Dispatcher` resolves controllers, executes middleware pipeline, invokes actions, and stores route info in `AppContext->routing`
+- `Dispatcher` resolves controllers, executes middleware pipeline, invokes actions, and stores route info in `AppContext->route`
 - `Controller` provides access to request/context plus lifecycle hooks
 - `ViewEngine` renders templates, layouts, and namespaced views
-- `RoutingResult` (in `AppContext->routing`) contains resolved route information accessible anywhere
+- `RoutingResult` (in `AppContext->route`) contains resolved route information accessible anywhere
 
 ### Data Layer
 

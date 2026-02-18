@@ -153,7 +153,7 @@ class Dispatcher
             ? $namespace . '\\' . $controllerName
             : $controllerName;
 
-        $this->context->routing = new RoutingResult(
+        $this->context->route = new RoutingResult(
             $controllerClass,
             $actionName,
             $namespace,

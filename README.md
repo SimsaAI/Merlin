@@ -380,6 +380,10 @@ Merlin draws inspiration from:
 - **CodeIgniter** - Simplicity and developer-friendly APIs
 - **Laravel** - Elegant syntax and query builder design
 
+## About the Name
+
+Merlins are small falcons known for their speed, agility, and hunting precision. These characteristics reflect the goals of the Merlin framework: a lightweight, fast, and focused MVC system. The name is also a deliberate reference to Phalcon, which strongly influenced Merlin’s design.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.

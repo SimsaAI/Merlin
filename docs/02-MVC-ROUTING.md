@@ -159,20 +159,20 @@ $dispatcher->setDefaultAction('indexAction'); // Default: 'indexAction'
 
 ## Route Information in AppContext
 
-When the Dispatcher processes a route, it stores the routing information in `AppContext->routing` as a `RoutingResult` object. This makes the current route accessible throughout your application:
+When the Dispatcher processes a route, it stores the routing information in `AppContext->route` as a `RoutingResult` object. This makes the current route accessible throughout your application:
 
 ```php
 // In any controller, middleware, or service:
-$routing = AppContext::instance()->routing;
+$route = AppContext::instance()->route;
 
 // Access route details:
-$controller = $routing->controller; // Full controller class name
-$action = $routing->action; // Action method name
-$namespace = $routing->namespace; // Resolved namespace
-$vars = $routing->vars; // All route variables
-$params = $routing->params; // Parameters passed to action
-$groups = $routing->groups; // Middleware groups
-$override = $routing->override; // Handler overrides
+$controller = $route->controller; // Full controller class name
+$action = $route->action; // Action method name
+$namespace = $route->namespace; // Resolved namespace
+$vars = $route->vars; // All route variables
+$params = $route->params; // Parameters passed to action
+$groups = $route->groups; // Middleware groups
+$override = $route->override; // Handler overrides
 ```
 
 ## Important Notes
@@ -180,7 +180,7 @@ $override = $routing->override; // Handler overrides
 - Router focuses purely on pattern matching - no namespace or defaults
 - Dispatcher handles controller resolution, defaults, and namespace logic
 - Use `Router::match(...)` then `Dispatcher::dispatch(...)`
-- Route info is stored in `AppContext->routing` during dispatch
+- Route info is stored in `AppContext->route` during dispatch
 
 ## Dispatcher Argument Resolution
 
@@ -216,7 +216,7 @@ $routeInfo = [
 
 $dispatcher->dispatch($routeInfo);
 
-// Stored in AppContext->routing:
+// Stored in AppContext->route:
 // vars['params'] => ['x', 'y']
 // params         => [42, 'x', 'y']
 ```
