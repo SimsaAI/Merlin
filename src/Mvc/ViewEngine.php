@@ -232,32 +232,43 @@ class ViewEngine
             throw new \RuntimeException("Empty view name");
         }
 
-        if (str_contains($view, '::')) {
+        $ns = \strstr($view, '::', true);
+        if ($ns !== false) {
             // namespaced view
-            [$ns, $name] = explode('::', $view, 2);
+            $name = \substr($view, \strlen($ns) + 2);
 
             if (!isset($this->namespaces[$ns])) {
                 throw new \RuntimeException("Unknown view namespace: $ns");
             }
 
-            return $this->namespaces[$ns] . '/' . str_replace('.', '/', $name) . $this->extension;
+            return $this->namespaces[$ns] . '/' . \str_replace('.', '/', $name) . $this->extension;
         }
 
-        // absolute path?
-        $isAbsolute =
-            str_starts_with($view, '/') ||
-            str_starts_with($view, '\\\\') ||
-            strlen($view) >= 3 && ctype_alpha($view[0]) && $view[1] === ':' && ($view[2] === '/' || $view[2] === '\\');
+        $len = \strlen($view);
 
-        if ($isAbsolute) {
+        if ($view[0] === '/') {
+            // absolute unix path
             $path = $view;
+
+        } elseif ($view[1] === ':' && $len >= 3 && ($view[2] === '/' || $view[2] === '\\') && \ctype_alpha($view[0])) {
+            // absolute windows path: C:/foo or C:\foo
+            $path = $view;
+
+        } elseif ($view[0] === '\\' && $len >= 2 && $view[1] === '\\') {
+            // absolute UNC path: \\server\share
+            $path = $view;
+
+        } elseif ($view[0] === '.') {
+            // treat as literal relative path: ./partials/header or ../shared/footer
+            $path = $this->path . '/' . $view;
+
         } else {
-            // relative view name, resolve to path
-            $relative = str_replace('.', '/', $view);
+            // relative view name, resolve to path using dot-notation
+            $relative = \str_replace('.', '/', $view);
             $path = $this->path . '/' . $relative;
         }
 
-        if (!str_ends_with($path, $this->extension)) {
+        if (!\str_ends_with($path, $this->extension)) {
             $path .= $this->extension;
         }
         return $path;

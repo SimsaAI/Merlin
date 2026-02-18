@@ -94,6 +94,32 @@ class PageController extends Controller
 }
 ```
 
+## View Name Resolution
+
+The ViewEngine resolves view names to filesystem paths using the following rules:
+
+**Relative view names** use dot-notation that gets converted to directory separators:
+
+- `users.index` becomes `users/index.php`
+- `home.index` becomes `home/index.php`
+- `admin.users.edit` becomes `admin/users/edit.php`
+
+**Namespaced views** use `namespace::view.name` syntax where dots after `::` are also converted:
+
+- `admin::dashboard.index` becomes `{namespace-path}/dashboard/index.php`
+- `partials::user.card` becomes `{namespace-path}/user/card.php`
+
+**Relative paths starting with a dot** are used as literal paths (not converted):
+
+- `./partials/header` stays as `./partials/header.php`
+- `../shared/footer` stays as `../shared/footer.php`
+
+**Absolute paths** are used as-is without conversion:
+
+- `/var/www/views/custom.php` (Unix)
+- `C:/app/views/custom.php` (Windows)
+- `\\server\share\views\custom.php` (UNC)
+
 ## View Variables
 
 ```php
@@ -110,7 +136,7 @@ $html = $view->render('user/index');
 $view = $this->view();
 $view->addNamespace('admin', __DIR__ . '/../app/views/admin');
 
-echo $view->render('admin::dashboard/index');
+echo $view->render('admin::dashboard.index');
 ```
 
 ## Middleware Setup
