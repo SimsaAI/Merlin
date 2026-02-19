@@ -17,13 +17,14 @@ use Merlin\Mvc\Model;
 // ============================================================================
 // Basic Setup: Single Database Connection
 // ============================================================================
+$dbManager = AppContext::instance()->dbManager();
 
 // For simple setups, just create a single connection - it will be used for both reads and writes
-AppContext::instance()->db = new Database(
+$dbManager->set('default', fn() => new Database(
     'mysql:host=localhost;dbname=myapp',
     'root',
     'secret'
-);
+));
 
 // This connection is automatically set as the default instance
 // All queries will use this connection
@@ -34,18 +35,18 @@ AppContext::instance()->db = new Database(
 // ============================================================================
 
 // 1. Create the primary (write) connection
-AppContext::instance()->dbWrite = new Database(
+$dbManager->set('write', fn() => new Database(
     'mysql:host=primary.example.com;dbname=myapp',
     'root',
     'secret'
-);
+));
 
 // 2. Create the read replica connection
-AppContext::instance()->dbRead = new Database(
+$dbManager->set('read', fn() => new Database(
     'mysql:host=replica.example.com;dbname=myapp',
     'readonly',
     'secret'
-);
+));
 
 // Now queries are automatically routed:
 // - SELECT queries → read replica
@@ -94,18 +95,10 @@ class AnalyticsEvent extends Model
     public string $data;
 }
 
-// Configure per-model connections (static methods)
-AnalyticsEvent::setDefaultReadConnection(new Database(
-    'mysql:host=analytics-replica.example.com;dbname=analytics',
-    'readonly',
-    'secret'
-));
-
-AnalyticsEvent::setDefaultWriteConnection(new Database(
-    'mysql:host=analytics-primary.example.com;dbname=analytics',
-    'root',
-    'secret'
-));
+// Configure per-model roles (static methods)
+AnalyticsEvent::setDefaultRole('analytics');
+//AnalyticsEvent::setDefaultReadRole('analytics_read');
+//AnalyticsEvent::setDefaultWriteRole('analytics_write');
 
 // This model now uses its own database connections
 $event = AnalyticsEvent::find(456);  // → analytics replica

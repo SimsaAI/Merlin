@@ -25,7 +25,7 @@ class ModelTest extends TestCase
     public function testStateSaveLoadAndHasChanged(): void
     {
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
 
         $m = new DummyModel();
         $m->id = null;
@@ -46,7 +46,7 @@ class ModelTest extends TestCase
     public function testCreatePopulatesIdAndUpdatesState(): void
     {
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
         // Simulate DB returning the inserted row
         $db->setMockResults([
             [
@@ -69,7 +69,7 @@ class ModelTest extends TestCase
     public function testUpdateExecutesAndClearsChanges(): void
     {
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
         // Create the model first so a state exists, then change and update
         $db->setMockResults([
             [

@@ -38,7 +38,7 @@ class RouterModernContractTest extends TestCase
         $this->assertArrayNotHasKey('id', $withoutId['vars']);
 
         $this->assertNotNull($withId);
-        $this->assertSame(42, $withId['vars']['id']);
+        $this->assertSame('42', $withId['vars']['id']);
     }
 
     public function testOptionalTypedSegmentRejectsInvalidValue(): void

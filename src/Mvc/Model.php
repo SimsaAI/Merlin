@@ -514,55 +514,55 @@ abstract class Model
 	 *  CONNECTIONS
 	 * ------------------------------------------------------------- */
 
-	/**
-	 * Per-model default read connections
-	 * @var array<string, Database>
-	 */
-	protected static array $defaultReadConnections = [];
+	protected static array $defaultReadRoles = [];
+	protected static array $defaultWriteRoles = [];
 
-	/**
-	 * Per-model default write connections
-	 * @var array<string, Database>
-	 */
-	protected static array $defaultWriteConnections = [];
-
-	/**
-	 * Set the default read connection for this model class
-	 */
-	public static function setDefaultReadConnection(Database $db): void
+	public static function setDefaultRole(string $role): void
 	{
-		self::$defaultReadConnections[static::class] = $db;
+		self::$defaultReadRoles[static::class] = $role;
+		self::$defaultWriteRoles[static::class] = $role;
 	}
 
-	/**
-	 * Set the default write connection for this model class
-	 */
-	public static function setDefaultWriteConnection(Database $db): void
+	public static function setDefaultReadRole(string $role): void
 	{
-		self::$defaultWriteConnections[static::class] = $db;
+		self::$defaultReadRoles[static::class] = $role;
 	}
 
-	/**
-	 * Get the read connection for this model instance, falling back to
-	 * app context defaults.
-	 */
+	public static function setDefaultWriteRole(string $role): void
+	{
+		self::$defaultWriteRoles[static::class] = $role;
+	}
+
+	protected function connectionRole(string $type): string
+	{
+		$map = $type === 'read'
+			? static::$defaultReadRoles
+			: static::$defaultWriteRoles;
+
+		// Check for specific model role
+		if (isset($map[static::class])) {
+			return $map[static::class];
+		}
+
+		// Check for base model role
+		if (isset($map[self::class])) {
+			return $map[self::class];
+		}
+
+		// Fallback to default role
+		return $type;
+	}
+
 	public function readConnection(): Database
 	{
-		return
-			self::$defaultReadConnections[static::class] ??
-			self::$defaultReadConnections[self::class] ??
-			AppContext::instance()->getReadDb();
+		$role = $this->connectionRole('read');
+		return AppContext::instance()->dbManager()->getOrDefault($role);
 	}
 
-	/**
-	 * Get the write connection for this model instance, falling back to
-	 * app context defaults.
-	 */
 	public function writeConnection(): Database
 	{
-		return
-			self::$defaultWriteConnections[static::class] ??
-			self::$defaultWriteConnections[self::class] ??
-			AppContext::instance()->getWriteDb();
+		$role = $this->connectionRole('write');
+		return AppContext::instance()->dbManager()->getOrDefault($role);
 	}
+
 }

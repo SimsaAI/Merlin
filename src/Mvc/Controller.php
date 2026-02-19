@@ -2,18 +2,16 @@
 namespace Merlin\Mvc;
 
 use Merlin\AppContext;
+use Merlin\Http\Cookies;
+use Merlin\Http\Request;
 use Merlin\Http\Session;
 use Merlin\Http\Response;
-use Merlin\Http\Request;
 
 /**
  * MVC Controller class
  */
 abstract class Controller
 {
-	protected Request $request;
-	protected AppContext $context;
-
 	/**
 	 * Controller-wide middleware
 	 * Example:
@@ -35,17 +33,6 @@ abstract class Controller
 	 * ];
 	 */
 	protected array $actionMiddleware = [];
-
-	public function __construct(?AppContext $context = null)
-	{
-		$this->context = $context ?? AppContext::instance();
-		$this->request = $this->context->getRequest();
-		$this->onInit();
-	}
-
-	protected function onInit(): void
-	{
-	}
 
 	public function beforeAction(string $action = null, array $params = []): ?Response
 	{
@@ -69,19 +56,29 @@ abstract class Controller
 		return $this->actionMiddleware[$action] ?? [];
 	}
 
-	public function getContext(): AppContext
+	// --- Helpers ---
+
+	protected function context(): AppContext
 	{
-		return $this->context;
+		return AppContext::instance();
+	}
+	protected function request(): Request
+	{
+		return $this->context()->request();
 	}
 
 	protected function view(): ViewEngine
 	{
-		return $this->context->getView();
+		return $this->context()->view();
 	}
 
 	protected function session(): ?Session
 	{
-		return $this->context->getSession();
+		return $this->context()->session();
 	}
 
+	protected function cookies(): Cookies
+	{
+		return $this->context()->cookies();
+	}
 }

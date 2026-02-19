@@ -122,15 +122,15 @@ class DynamicTargetController extends Controller
 
 class RoutingStateController extends Controller
 {
-    public function fromOverride($id = null, $args = null, $p0 = null, $p1 = null)
+    public function fromOverride($id = null, $args = null, ...$params)
     {
-        $routing = $this->getContext()->getRouting();
+        $route = $this->context()->route();
         return [
-            'controller' => $routing->controller ?? null,
-            'action' => $routing->action ?? null,
-            'groups' => $routing->groups ?? null,
-            'vars' => $routing->vars ?? null,
-            'actionArgs' => $routing->actionArgs ?? null,
+            'controller' => $route->controller ?? null,
+            'action' => $route->action ?? null,
+            'groups' => $route->groups ?? null,
+            'vars' => $route->vars ?? null,
+            'params' => $route->params ?? null,
         ];
     }
 }
@@ -265,41 +265,9 @@ class DispatcherTest extends TestCase
     public function testDispatcherStoresNormalizedRoutingInContext(): void
     {
         $context = new AppContext();
-        $disp = new Dispatcher($context);
+        AppContext::setInstance($context); // Ensure singleton instance is used
+        $disp = new Dispatcher();
         $disp->setBaseNamespace('Merlin\\Tests\\Mvc');
-
-        $res = $disp->dispatch([
-            'vars' => [
-                'id' => 42,
-                'controller' => 'routing-state',
-                'action' => 'from-override',
-                'params' => ['x', 'y'],
-            ],
-            'override' => [
-                'controller' => 'RoutingStateController',
-                'action' => 'fromOverride',
-                'namespace' => 'Merlin\\Tests\\Mvc',
-            ],
-        ]);
-
-        $this->assertEquals('application/json', $this->responseHeaders($res)['Content-Type']);
-        $payload = json_decode($this->responseBody($res), true);
-        $this->assertEquals(null, $payload['groups']);
-        $this->assertEquals(42, $payload['vars']['id']);
-
-        $stored = $context->getRouting();
-        $this->assertNotNull($stored);
-        $this->assertSame(null, $stored->groups);
-        $this->assertSame('Merlin\\Tests\\Mvc\\RoutingStateController', $stored->controller);
-        $this->assertSame('fromOverride', $stored->action);
-        $this->assertSame(['x', 'y'], $stored->vars['params']);
-        $this->assertSame([42, 'x', 'y'], $stored->params);
-    }
-
-    public function testOnlyParamsWildcardIsPassedToActionParameters(): void
-    {
-        $context = new AppContext();
-        $disp = new Dispatcher($context);
 
         $res = $disp->dispatch([
             'vars' => [
@@ -316,13 +284,44 @@ class DispatcherTest extends TestCase
         ]);
 
         $this->assertEquals('application/json', $this->responseHeaders($res)['Content-Type']);
+        $payload = json_decode($this->responseBody($res), true);
+        $this->assertEquals([], $payload['groups']);
+        $this->assertEquals(42, $payload['vars']['id']);
 
-        $stored = $context->getRouting();
+        $stored = $context->route();
         $this->assertNotNull($stored);
-        $this->assertSame([
-            0 => 42,
-            1 => ['x', 'y'],
-        ], $stored->params);
+        $this->assertSame([], $stored->groups);
+        $this->assertSame('Merlin\\Tests\\Mvc\\RoutingStateController', $stored->controller);
+        $this->assertSame('fromOverride', $stored->action);
         $this->assertSame(['x', 'y'], $stored->vars['args']);
+        $this->assertSame([42, ['x', 'y']], $stored->params);
+    }
+
+    public function testOnlyParamsWildcardIsPassedToActionParameters(): void
+    {
+        $context = new AppContext();
+        AppContext::setInstance($context); // Ensure singleton instance is used
+        $disp = new Dispatcher();
+
+        $res = $disp->dispatch([
+            'vars' => [
+                'id' => 42,
+                'controller' => 'routing-state',
+                'action' => 'from-override',
+                'params' => ['x', 'y'],
+            ],
+            'override' => [
+                'controller' => 'RoutingStateController',
+                'action' => 'fromOverride',
+                'namespace' => 'Merlin\\Tests\\Mvc',
+            ],
+        ]);
+
+        $this->assertEquals('application/json', $this->responseHeaders($res)['Content-Type']);
+
+        $stored = $context->route();
+        $this->assertNotNull($stored);
+        $this->assertSame([42, null, 'x', 'y'], $stored->params);
+        $this->assertSame(['x', 'y'], $stored->vars['params']);
     }
 }

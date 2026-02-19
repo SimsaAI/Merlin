@@ -1,0 +1,11 @@
+# 🧩 Merlin\Cli\Exceptions\TaskNotFoundException
+
+## 🔐 Properties
+
+- `protected 🎲 mixed $message`
+- `protected 🎲 mixed $code`
+- `protected 🎲 mixed $file`
+- `protected 🎲 mixed $line`
+
+## 🚀 Public methods
+

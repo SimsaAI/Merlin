@@ -1,39 +1,46 @@
 <?php
 namespace Merlin;
 
+use RuntimeException;
 use Merlin\Db\Database;
 use Merlin\Http\Cookies;
 use Merlin\Http\Session;
 use Merlin\Mvc\ViewEngine;
+use Merlin\Db\DatabaseManager;
 use Merlin\Http\Request as HttpRequest;
 
 class AppContext
 {
-    /** @var Database|null Default database connection. Can be used for both read and write if dbRead and dbWrite are not set.
-     */
-    public ?Database $db = null;
+    public function __construct()
+    {
+        $this->registerDefaultServices();
+    }
 
-    /** @var Database|null Read-only database connection. Falls back to the default database if not set.
-     */
-    public ?Database $dbRead = null;
+    protected function registerDefaultServices(): void
+    {
+        $this->services = [
+            Session::class => fn() => $this->session(),
+            Cookies::class => fn() => $this->cookies(),
+            HttpRequest::class => fn() => $this->request(),
+            ViewEngine::class => fn() => $this->view(),
+            DatabaseManager::class => fn() => $this->dbManager(),
+            AppContext::class => fn() => $this,
+        ];
+    }
 
-    /** @var Database|null Write-only database connection. Falls back to the default database if not set.
-     */
-    public ?Database $dbWrite = null;
+    protected array $services = [];
 
-    /** @var HttpRequest|null The current HTTP request. */
-    public ?HttpRequest $request = null;
+    protected ?HttpRequest $request = null;
 
-    /** @var ViewEngine|null The view engine for rendering templates. */
-    public ?ViewEngine $view = null;
+    protected ?ViewEngine $view = null;
 
-    /** @var Session|null The session manager. */
-    public ?Session $session = null;
+    protected ?Session $session = null;
 
-    public ?Cookies $cookies = null;
+    protected ?Cookies $cookies = null;
 
-    /** @var RoutingResult|null The current resolved routing information. */
-    public ?RoutingResult $route = null;
+    protected ?ResolvedRoute $route = null;
+
+    protected DatabaseManager $dbManager;
 
     // --- Singleton ---
 
@@ -68,7 +75,7 @@ class AppContext
      *
      * @return HttpRequest The HttpRequest instance.
      */
-    public function getRequest(): HttpRequest
+    public function request(): HttpRequest
     {
         return $this->request ??= new HttpRequest();
     }
@@ -78,7 +85,7 @@ class AppContext
      *
      * @return ViewEngine The ViewEngine instance.
      */
-    public function getView(): ViewEngine
+    public function view(): ViewEngine
     {
         return $this->view ??= new ViewEngine();
     }
@@ -88,76 +95,182 @@ class AppContext
      *
      * @return Cookies The Cookies instance.
      */
-    public function getCookies(): Cookies
+    public function cookies(): Cookies
     {
         return $this->cookies ??= new Cookies();
     }
 
 
+    public function dbManager(): DatabaseManager
+    {
+        return $this->dbManager ??= new DatabaseManager();
+    }
+
     // --- Critical Services ---
-
-    /**
-     * Get the default Database instance. If it doesn't exist, an exception will be thrown.
-     *
-     * @return Database The default Database instance.
-     * @throws \RuntimeException If the default Database is not configured.
-     */
-    public function getDb(): Database
-    {
-        if ($this->db === null) {
-            throw new \RuntimeException("Default DB not configured");
-        }
-        return $this->db;
-    }
-
-    /**
-     * Get the read Database instance. If it doesn't exist, it will fall back to the default Database.
-     *
-     * @return Database The read Database instance.
-     * @throws \RuntimeException If neither the read Database nor the default Database is configured.
-     */
-    public function getReadDb(): Database
-    {
-        return $this->dbRead ?? $this->getDb();
-    }
-
-    /**
-     * Get the write Database instance. If it doesn't exist, it will fall back to the default Database.
-     *
-     * @return Database The write Database instance.
-     * @throws \RuntimeException If neither the write Database nor the default Database is configured.
-     */
-    public function getWriteDb(): Database
-    {
-        return $this->dbWrite ?? $this->getDb();
-    }
 
     /**
      * Get the Session instance.
      */
-    public function getSession(): ?Session
+    public function session(): ?Session
     {
         return $this->session;
     }
 
     /**
-     * Get the current routing information.
+     * Get the current resolved route information.
      */
-    public function getRouting(): ?RoutingResult
+    public function route(): ?ResolvedRoute
     {
         return $this->route;
     }
+
+    /**
+     * Set the current resolved route information.
+     *
+     * @param ResolvedRoute $route The resolved route to set in the context.
+     */
+    public function setRoute(ResolvedRoute $route): void
+    {
+        $this->route = $route;
+    }
+
+    // --- Service Container (optional) ---
+
+    public function set(string $id, object $service): void
+    {
+        $this->services[$id] = $service;
+    }
+
+    public function has(string $id): bool
+    {
+        return isset($this->services[$id]);
+    }
+
+    public function get(string $id): object
+    {
+        if (isset($this->services[$id])) {
+            return $this->services[$id];
+        }
+
+        if (class_exists($id)) {
+            return $this->services[$id] = $this->build($id);
+        }
+
+        throw new RuntimeException("Service not found: $id");
+    }
+
+    public function tryGet(string $id): ?object
+    {
+        if (isset($this->services[$id])) {
+            return $this->services[$id];
+        }
+
+        if (class_exists($id)) {
+            return $this->services[$id] = $this->build($id);
+        }
+
+        return null;
+    }
+
+    public function getOrNull(string $id): ?object
+    {
+        return $this->services[$id] ?? null;
+    }
+
+    protected function build(string $class): object
+    {
+        $ref = new \ReflectionClass($class);
+
+        // No constructor -> simple instantiation
+        if (!$ref->getConstructor()) {
+            return new $class();
+        }
+
+        $args = [];
+
+        foreach ($ref->getConstructor()->getParameters() as $param) {
+
+            $typeObj = $param->getType();
+            $types = [];
+
+            // Extract all possible types (Named, Union, Intersection)
+            if ($typeObj instanceof \ReflectionNamedType) {
+                $types[] = $typeObj->getName();
+            } elseif ($typeObj instanceof \ReflectionUnionType) {
+                foreach ($typeObj->getTypes() as $t) {
+                    if ($t instanceof \ReflectionNamedType) {
+                        $types[] = $t->getName();
+                    }
+                }
+            } else {
+                throw new RuntimeException(
+                    "Unsupported parameter type for \${$param->getName()} in $class constructor"
+                );
+            }
+
+            // Try to resolve via DI (AppContext)
+            foreach ($types as $t) {
+
+                // If service is registered
+                if ($this->has($t)) {
+                    $args[] = $this->get($t);
+                    continue 2; // next parameter
+                }
+
+                // If class exists -> auto-wire
+                if (class_exists($t)) {
+                    $args[] = $this->get($t);
+                    continue 2;
+                }
+
+                // Built-in types (int, string, etc.) are not supported here
+            }
+
+            // Default value
+            if ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+                continue;
+            }
+
+            // Nullable
+            if ($param->allowsNull()) {
+                $args[] = null;
+                continue;
+            }
+
+            throw new Exception(
+                "Cannot resolve constructor parameter \${$param->getName()} for $class"
+            );
+        }
+
+        return new $class(...$args);
+    }
 }
 
-class RoutingResult
+/**
+ * Class ResolvedRoute
+ *
+ * Represents the fully resolved route and execution context used by the
+ * dispatcher to invoke the matched controller and action.
+ *
+ * This includes:
+ * - the effective namespace (after applying route group namespaces)
+ * - the resolved controller class
+ * - the resolved action method name
+ * - the resolved action method parameters
+ * - route variables extracted from the URL
+ * - route middleware groups
+ * - route overrides (e.g. controller/action)
+ */
+class ResolvedRoute
 {
     public function __construct(
+        public ?string $namespace,
         public string $controller,
         public string $action,
-        public ?string $namespace,
-        public array $vars,
         public array $params,
-        public ?array $groups,
+        public array $vars,
+        public array $groups,
         public array $override
     ) {
     }

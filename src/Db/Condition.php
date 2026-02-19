@@ -104,7 +104,7 @@ class Condition
 	 */
 	protected function getDb(): Database
 	{
-		return $this->db ?? AppContext::instance()->getDb();
+		return $this->db ?? AppContext::instance()->dbManager()->default();
 	}
 
 	/**

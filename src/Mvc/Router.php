@@ -11,7 +11,6 @@ class Router
     protected array $static = [];   // [method][path] => ['handler'=>..., 'namespace'=>...]
     protected array $groups = [];   // [method][firstSegment] => [route, ...]
     protected array $types = [];    // type validators
-    protected bool $parseParams = true;
     protected array $middlewareGroupStack = [];
     protected array $prefixGroupStack = [];
     protected array $namedRoutes = []; // [name] => ['tokens'=>...]
@@ -38,27 +37,6 @@ class Router
             },
             '*' => fn($v) => true,
         ];
-    }
-
-    /**
-     * Check if automatic parameter parsing is enabled. When enabled, the router will attempt to convert parameter values to int, float, bool or null if they match the corresponding string patterns. This can be useful to avoid manual parsing in your controller actions.
-     *
-     * @return bool True if automatic parameter parsing is enabled, false otherwise
-     */
-    public function shouldParseParams(): bool
-    {
-        return $this->parseParams;
-    }
-
-    /**
-     * Enable or disable automatic parsing of parameters. When enabled, the router will attempt to convert parameter values to int, float, bool or null if they match the corresponding string patterns. This can be useful to avoid manual parsing in your controller actions.
-     *
-     * @param bool $parseParams Set to true to enable automatic parameter parsing, false to disable
-     */
-    public function setParseParams(bool $parseParams): static
-    {
-        $this->parseParams = $parseParams;
-        return $this;
     }
 
     /**
@@ -605,10 +583,6 @@ class Router
         array $groups,
     ): array {
 
-        if ($this->parseParams) {
-            $params = $this->parseRouteValues($params);
-        }
-
         if ($handler === null) {
             $override = [];
         } elseif (\is_array($handler)) {
@@ -635,43 +609,6 @@ class Router
             'override' => $override,
             'groups' => $groups,
         ];
-    }
-
-
-    protected function parseRouteValues(array $values): array
-    {
-        static $conversionMap = [
-        'true' => true,
-        'on' => true,
-        'yes' => true,
-        'false' => false,
-        'off' => false,
-        'no' => false,
-        'null' => null,
-        ];
-
-        foreach ($values as $key => $value) {
-            if (\is_array($value)) {
-                $values[$key] = $this->parseRouteValues($value);
-                continue;
-            }
-
-            $value = \trim($value);
-
-            if (\is_numeric($value)) {
-                $values[$key] = $value + 0; // Convert to int or float as appropriate
-                continue;
-            }
-
-            $value = \strtolower($value);
-            if (isset($conversionMap[$value])) {
-                $values[$key] = $conversionMap[$value];
-                continue;
-            }
-
-        }
-
-        return $values;
     }
 
 }

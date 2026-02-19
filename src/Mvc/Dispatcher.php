@@ -3,7 +3,7 @@
 namespace Merlin\Mvc;
 
 use Merlin\AppContext;
-use Merlin\RoutingResult;
+use Merlin\ResolvedRoute;
 use Merlin\Http\Response;
 use InvalidArgumentException;
 use Merlin\Mvc\Exceptions\ActionNotFoundException;
@@ -15,9 +15,9 @@ class Dispatcher
 
     protected AppContext $context;
 
-    public function __construct(?AppContext $context = null)
+    public function __construct()
     {
-        $this->context = $context ?? AppContext::instance();
+        $this->context = AppContext::instance();
         $this->baseNamespace = 'App\\Controllers';
     }
 
@@ -38,13 +38,22 @@ class Dispatcher
     protected string $baseNamespace;
     protected string $defaultController = "IndexController";
     protected string $defaultAction = "indexAction";
-
-
+    /**
+     * Get the base namespace for controllers.
+     *
+     * @return string The base namespace for controllers.
+     */
     public function getBaseNamespace(): string
     {
         return $this->baseNamespace;
     }
 
+    /**
+     * Set the base namespace for controllers. This namespace will be prefixed to all controller class names when dispatching.
+     *
+     * @param string $baseNamespace The base namespace for controllers (e.g. "App\\Controllers")
+     * @return $this
+     */
     public function setBaseNamespace(string $baseNamespace): static
     {
         $this->baseNamespace = rtrim($baseNamespace, '\\');
@@ -101,25 +110,19 @@ class Dispatcher
         return $this;
     }
 
+    /**
+     * Dispatch a request to the appropriate controller and action based on the provided routing information. This method will determine the controller class and action method to invoke, build the middleware pipeline, and execute the controller action, returning the resulting Response.
+     * @param array $routeInfo
+     * @throws ControllerNotFoundException
+     * @throws InvalidControllerException
+     * @throws ActionNotFoundException
+     * @return Response
+     */
     public function dispatch(array $routeInfo): Response
     {
-        $groups = $routeInfo['groups'] ?? null;
-        $vars = $routeInfo['vars'] ?? null;
-        $override = $routeInfo['override'] ?? null;
-        $params = $vars;
-        unset(
-            $params['controller'],
-            $params['action'],
-            $params['namespace'],
-            $params['params'],
-        );
-        if (!empty($params)) {
-            if (isset($vars['params']))
-                $params += (array) ($vars['params'] ?? null);
-            $params = array_values($params);
-        } else {
-            $params = (array) ($vars['params'] ?? null);
-        }
+        $groups = $routeInfo['groups'] ?? [];
+        $vars = $routeInfo['vars'] ?? [];
+        $override = $routeInfo['override'] ?? [];
 
         if (isset($override['namespace'])) {
             $namespace = rtrim((string) $override['namespace'], '\\');
@@ -153,31 +156,31 @@ class Dispatcher
             ? $namespace . '\\' . $controllerName
             : $controllerName;
 
-        $this->context->route = new RoutingResult(
-            $controllerClass,
-            $actionName,
-            $namespace,
-            $vars,
-            $params,
-            $groups,
-            $override
-        );
-
-        if (!class_exists($controllerClass)) {
-            throw new ControllerNotFoundException("Controller {$controllerClass} not found");
-        }
-
-        $controller = $this->controllerFactory
-            ? ($this->controllerFactory)($controllerClass, $this->context)
-            : new $controllerClass($this->context);
+        /**
+         * @var Controller $controller
+         */
+        $controller = $this->context->get($controllerClass);
 
         if (!$controller instanceof Controller) {
             throw new InvalidControllerException("{$controllerClass} is not a Controller");
         }
 
-        if (!method_exists($controller, $actionName)) {
-            throw new ActionNotFoundException("Action {$controllerClass}->{$actionName} not found");
-        }
+        $params = $this->resolveActionArguments(
+            $controller,
+            $actionName,
+            $vars,
+            $this->context
+        );
+
+        $this->context->setRoute(new ResolvedRoute(
+            $namespace,
+            $controllerClass,
+            $actionName,
+            $params,
+            $vars,
+            $groups,
+            $override
+        ));
 
         $pipeline = $this->buildPipeline(
             $controller,
@@ -191,6 +194,151 @@ class Dispatcher
 
         return $response ?? Response::status(204);
     }
+
+    protected function resolveActionArguments(
+        object $controller,
+        string $action,
+        array $routeParams,
+        AppContext $context
+    ): array {
+
+        try {
+            $ref = new \ReflectionMethod($controller, $action);
+        } catch (\ReflectionException $e) {
+            throw new ActionNotFoundException("Action " . \get_class($controller) . "->{$action} not found", previous: $e);
+        }
+        $args = [];
+
+        foreach ($ref->getParameters() as $index => $param) {
+
+            $name = $param->getName();
+            $typeObj = $param->getType();
+
+            // Extract type names (for union types)
+            $types = [];
+
+            if ($typeObj instanceof \ReflectionNamedType) {
+                $types[] = $typeObj->getName();
+            } elseif ($typeObj instanceof \ReflectionUnionType) {
+                foreach ($typeObj->getTypes() as $t) {
+                    if ($t instanceof \ReflectionNamedType) {
+                        $types[] = $t->getName();
+                    }
+                }
+            } elseif ($typeObj !== null) {
+                throw new \RuntimeException(
+                    "Unsupported parameter type for \${$name} for " . \get_class($controller) . "->{$action}()"
+                );
+            }
+
+            // Route parameters (by name)
+            if (isset($routeParams[$name])) {
+                $value = $routeParams[$name];
+
+                // Variadic wildcard support 
+                if ($param->isVariadic()) {
+                    $array = (array) $value;
+                    foreach ($array as $value) {
+                        $args[] = $value;
+                    }
+                    continue;
+                }
+
+                // Type conversion for simple built-in types
+                if (!empty($types)) {
+                    $value = $this->castValueToType($value, $types);
+                }
+
+                $args[] = $value;
+                continue;
+            }
+
+            // DI auto-resolve by type hint
+            if (!empty($types)) {
+                foreach ($types as $t) {
+
+                    // If type is registered in AppContext, use it
+                    if ($context->has($t)) {
+                        $args[] = $context->get($t);
+                        continue 2; // next parameter
+                    }
+
+                    // If type is a class → Auto-Wiring
+                    if (class_exists($t)) {
+                        $args[] = $context->get($t);
+                        continue 2;
+                    }
+
+                }
+            }
+
+            // Variadic parameter → empty array
+            if ($param->isVariadic()) {
+                continue;
+            }
+
+            // Default value from signature
+            if ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+                continue;
+            }
+
+            // Nullable parameter → null
+            if ($param->allowsNull()) {
+                $args[] = null;
+                continue;
+            }
+
+            // Not resolved → Exception
+            throw new \RuntimeException("Cannot resolve parameter \${$name} for action {$action}()");
+        }
+
+        return $args;
+    }
+
+    protected function castValueToType(mixed $value, array $types): mixed
+    {
+        foreach ($types as $t) {
+
+            switch ($t) {
+
+                case 'int':
+                    if (\ctype_digit((string) $value)) {
+                        return (int) $value;
+                    }
+                    break;
+
+                case 'float':
+                    if (\is_numeric((string) $value)) {
+                        return (float) $value;
+                    }
+                    break;
+
+                case 'bool':
+                    // true/false/1/0/yes/no/on/off
+                    $filtered = \filter_var((string) $value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                    if ($filtered !== null) {
+                        return $filtered;
+                    }
+                    break;
+
+                case 'string':
+                    return (string) $value;
+
+                case 'array':
+                    if (\is_array($value)) {
+                        return $value;
+                    }
+                    break;
+
+                case 'mixed':
+                    return $value;
+            }
+        }
+
+        return $value;
+    }
+
 
     protected function camelize(string $string, bool $beginUpper = true): string
     {
@@ -347,7 +495,7 @@ class Dispatcher
             throw new \UnexpectedValueException("Unsupported controller action return type: " . \get_debug_type($result));
     }
 
-    /** @var null|callable(string, AppContext): Controller */
+    /** @var null|callable(string): Controller */
     protected $controllerFactory = null;
 
     public function setControllerFactory(callable $factory): void

@@ -168,7 +168,7 @@ class Query extends Condition
     }
 
     /**
-     * Factory method to create a new Query instance. Can optionally pass a Database connection to use for this query, or a Model to automatically set the table and connection.
+     * Factory method to create a new Query instance. Can optionally pass a Database connection to use for this query.
      * @param Database|null $db
      * @return static
      */
@@ -195,8 +195,8 @@ class Query extends Condition
         }
 
         return $this->isReadQuery
-            ? AppContext::instance()->getReadDb()
-            : AppContext::instance()->getWriteDb();
+            ? AppContext::instance()->dbManager()->getOrDefault('read')
+            : AppContext::instance()->dbManager()->getOrDefault('write');
     }
 
     /* -------------------------------------------------------------
@@ -1576,7 +1576,7 @@ class Query extends Condition
     public function getBindings(): array
     {
         return $this->bindParams +
-            array_slice($this->autoBindParams, 0, $this->paramCounter);
+            \array_slice($this->autoBindParams, 0, $this->paramCounter);
     }
 
     /**
@@ -1607,9 +1607,7 @@ class Query extends Condition
         // This prevents parameter accumulation if the builder is reused
         $this->paramCounter = 0;
 
-        $db = $this->db ?? ($this->isReadQuery
-            ? AppContext::instance()->getReadDb()
-            : AppContext::instance()->getWriteDb());
+        $db = $this->getDb();
 
         $result = $db->query($query, $bindParams);
 

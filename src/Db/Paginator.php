@@ -2,7 +2,7 @@
 namespace Merlin\Db;
 
 /**
- * Paginator for the Query
+ * Paginator class for paginating database query results.
  */
 class Paginator
 {
@@ -16,6 +16,14 @@ class Paginator
     protected int $firstItemPos = 0;
     protected int $lastItemPos = 0;
 
+    /** 
+     * Create a new Paginator instance.
+     *
+     * @param Query $builder The Query builder instance to paginate.
+     * @param int $page The current page number.
+     * @param int $pageSize The number of items per page.
+     * @param bool $reverse Whether to reverse the order of items.
+     */
     public function __construct(
         Query $builder,
         int $page = 1,
@@ -28,36 +36,72 @@ class Paginator
         $this->reverse = $reverse;
     }
 
+    /**
+     * Get the page size (number of items per page).
+     *
+     * @return int The page size.
+     */
     public function getPageSize(): int
     {
         return $this->pageSize;
     }
 
+    /**
+     * Get the total number of items across all pages.
+     *
+     * @return int The total number of items.
+     */
     public function getTotalItems(): int
     {
         return $this->totalItems;
     }
 
+    /**
+     * Get the total number of pages.
+     *
+     * @return int The total number of pages.
+     */
     public function getTotalPages(): int
     {
         return $this->totalPages;
     }
 
+    /**
+     * Get the current page number.
+     *
+     * @return int The current page number.
+     */
     public function getCurrentPage(): int
     {
         return $this->page;
     }
 
+    /**
+     * Get the position of the first item in the current page (1-based index).
+     *
+     * @return int The position of the first item in the current page.
+     */
     public function getFirstItemPos(): int
     {
         return $this->firstItemPos;
     }
 
+    /**
+     * Get the position of the last item in the current page (1-based index).
+     *
+     * @return int The position of the last item in the current page.
+     */
     public function getLastItemPos(): int
     {
         return $this->lastItemPos;
     }
 
+    /**
+     * Execute the paginated query and return the items for the current page.
+     *
+     * @param int $fetchMode The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT).
+     * @return array The items for the current page.
+     */
     public function execute($fetchMode = \PDO::FETCH_DEFAULT): array
     {
         // Count query

@@ -25,7 +25,7 @@ $db = new Database(
     'secret'
 );
 
-AppContext::instance()->db = $db;
+AppContext::instance()->dbManager()->set('default', $db);
 
 
 // ============================================================================

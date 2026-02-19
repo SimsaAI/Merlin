@@ -19,7 +19,8 @@ class SelectBuilderTest extends TestCase
         Query::useModels(false);
 
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::setInstance(new AppContext());
+        AppContext::instance()->dbManager()->set('default', $db);
         $sb = new Query($db);
 
         // Use Condition for JOIN to get identifier protection
@@ -40,13 +41,14 @@ class SelectBuilderTest extends TestCase
 
     public function testConditionResolvesModelToTableAlias(): void
     {
+        AppContext::setInstance(new AppContext());
         Query::useModels(true);
         Query::setModelMapping(new ModelMapping([
             'Model' => ['source' => 'user', 'schema' => null],
         ]));
 
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
         $sb = new Query($db);
 
         $sb->table('Model')
@@ -69,6 +71,7 @@ class SelectBuilderTest extends TestCase
 
     public function testModelColumnResolutionWithJoinsAndSqlComposition(): void
     {
+        AppContext::setInstance(new AppContext());
         // Test the documentation example: Model.column notation in SelectBuilder with JOINs and Sql composition
         // This is crucial: verifies Model.column resolves to correct table identifiers throughout the query
 
@@ -79,7 +82,7 @@ class SelectBuilderTest extends TestCase
         ]));
 
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
         $sb = new Query($db);
 
         // Build the query from documentation:
@@ -123,9 +126,10 @@ class SelectBuilderTest extends TestCase
 
     public function testReusableConditionResolvesPerQueryContext(): void
     {
+        AppContext::setInstance(new AppContext());
         Query::useModels(true);
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
 
         $reusable = Condition::new()
             ->where('Model.id', 1)
@@ -166,13 +170,14 @@ class SelectBuilderTest extends TestCase
 
     public function testReusableJoinConditionResolvesPerModelMapping(): void
     {
+        AppContext::setInstance(new AppContext());
         Query::useModels(true);
         Query::setModelMapping(new ModelMapping([
             'User' => ['source' => 'users', 'schema' => null],
             'Order' => ['source' => 'orders', 'schema' => null],
         ]));
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
 
         $joinCondition = Condition::new()->where('User.id = Order.user_id');
 
@@ -208,9 +213,10 @@ class SelectBuilderTest extends TestCase
 
     public function testReusableBoundConditionResolvesPerModelMapping(): void
     {
+        AppContext::setInstance(new AppContext());
         Query::useModels(true);
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
 
         $bound = Condition::new()
             ->where('Model.status = :status')
@@ -251,9 +257,10 @@ class SelectBuilderTest extends TestCase
 
     public function testReusableBoundJoinConditionResolvesPerModelMapping(): void
     {
+        AppContext::setInstance(new AppContext());
         Query::useModels(true);
         $db = new TestPgDatabase();
-        AppContext::instance()->db = $db;
+        AppContext::instance()->dbManager()->set('default', $db);
 
         $joinCondition = Condition::new()
             ->where('User.id = Order.user_id')
