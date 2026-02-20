@@ -152,7 +152,7 @@ Dispatch a request to the appropriate controller and action based on the provide
 - [InvalidControllerException](Mvc_Exceptions_InvalidControllerException.md)
 - ActionNotFoundException
 
-### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L501)
+### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L500)
 
 `public function setControllerFactory(callable $factory): void`
 

@@ -60,7 +60,7 @@
         <g transform="matrix(1,0,0,1,259.974,327.009)">
             <g id="g8">
                 <g id="text8">
-                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">db • dbRead • dbW<tspan x="158.011px 164.227px " y="0px 0px ">ri</tspan>te • request • view • session • cookies</text>
+                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">dbManager roles (default/read/write) • request • view • session • cookies</text>
                 </g>
             </g>
         </g>
@@ -154,14 +154,14 @@
                 <text id="text191" serif:id="text19" x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">Data Layer</text>
             </g>
         </g>
-        <g id="text22" transform="matrix(1,0,0,1,644.7,621.16)">
+                    <g id="text22" transform="matrix(1,0,0,1,644.7,621.16)">
             <g id="g23">
                 <g id="text221" serif:id="text22">
                     <g transform="matrix(1,0,0,1,-78.2512,0)">
                         <text x="-122.154px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Model (Active Record style) +</text>
                     </g>
                     <g transform="matrix(1,0,0,1,-78.2512,23.3334)">
-                        <text x="-108.591px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Query (ﬂuent SQL<tspan x="41.152px 46.339px " y="0px 0px "> b</tspan>uilder)</text>
+                        <text x="-108.591px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Query (fluent SQL builder — uses DB roles)</text>
                     </g>
                 </g>
             </g>
@@ -179,14 +179,14 @@
                 </g>
             </g>
         </g>
-        <g id="text25" transform="matrix(1,0,0,1,626.576,770.336)">
+                    <g id="text25" transform="matrix(1,0,0,1,626.576,770.336)">
             <g id="g25">
                 <g id="text251" serif:id="text25">
                     <g transform="matrix(1,0,0,1,-60.2904,0)">
-                        <text x="-107.215px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Read/W<tspan x="-40.122px -33.906px " y="0px 0px ">ri</tspan>te separation via</text>
+                        <text x="-107.215px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Read/Write separation via</text>
                     </g>
                     <g transform="matrix(1,0,0,1,-60.2904,23.3334)">
-                        <text x="-85.44px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">dbRead and dbW<tspan x="59.509px 65.725px " y="0px 0px ">ri</tspan>te</text>
+                        <text x="-85.44px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">DatabaseManager roles (read/write)</text>
                     </g>
                 </g>
             </g>

@@ -20,21 +20,25 @@ Merlin is organized into distinct layers, each handling a specific concern. Unde
 
 ### `AppContext`
 
-Central runtime context for shared services:
+Central runtime context and service container – accessed as a singleton via `AppContext::instance()`.
 
-- `db`, `dbRead`, `dbWrite` - Database connections
-- `request` - HTTP request object
-- `view` - View engine instance
-- `session` - Session manager
-- `cookies` - Cookie manager
-- `routing` - Current route information (populated by Dispatcher)
+Built-in lazy service accessors:
 
-It is a singleton via `AppContext::instance()`.
+| Method        | Returns                                                |
+| ------------- | ------------------------------------------------------ |
+| `request()`   | `Merlin\Http\Request`                                  |
+| `view()`      | `Merlin\Mvc\ViewEngine`                                |
+| `session()`   | `Merlin\Http\Session\|null`                            |
+| `cookies()`   | `Merlin\Http\Cookies`                                  |
+| `dbManager()` | `Merlin\Db\DatabaseManager`                            |
+| `route()`     | `Merlin\ResolvedRoute\|null` – populated by Dispatcher |
+
+Custom services can be registered with `$ctx->set($id, $service)` and retrieved with `$ctx->get($id)`. Auto-wiring is supported: unregistered class names are instantiated via reflection with their constructor dependencies resolved recursively from the container.
 
 ### MVC Layer
 
 - `Router` matches URI + method to route patterns, extracting parameters
-- `Dispatcher` resolves controllers, executes middleware pipeline, invokes actions, and stores route info in `AppContext->route`
+- `Dispatcher` is instantiated without arguments; obtains `AppContext` internally. It resolves controllers via DI (`AppContext::get()`), executes the middleware pipeline, injects action parameters (route vars or DI), and stores route info via `AppContext::setRoute()`
 - `Controller` provides access to request/context plus lifecycle hooks
 - `ViewEngine` renders templates, layouts, and namespaced views
 - `RoutingResult` (in `AppContext->route`) contains resolved route information accessible anywhere
@@ -93,15 +97,29 @@ Write operations are terminal builder calls (`insert`, `upsert`, `update`, `dele
 
 ## Read/Write Separation
 
-Merlin supports replica setups:
+Merlin supports replica setups through `DatabaseManager` roles.
 
-- Reads use `AppContext::dbRead` (fallback: `db`)
-- Writes use `AppContext::dbWrite` (fallback: `db`)
+Register named connections in bootstrap:
 
-Models can override defaults per class with:
+```php
+$mgr = $ctx->dbManager();
+$mgr->set('write', new Database('mysql:host=primary;dbname=app', 'rw', 'secret'));
+$mgr->set('read',  fn() => new Database('mysql:host=replica;dbname=app', 'ro', 'secret'));
+```
 
-- `setDefaultReadConnection()`
-- `setDefaultWriteConnection()`
+Models read from the `read` role and write to the `write` role by default, falling back to the registered default when the role is absent. Per-model overrides:
+
+```php
+User::setDefaultReadRole('replica');
+User::setDefaultWriteRole('primary');
+User::setDefaultRole('analytics'); // both read + write
+```
+
+For single-database apps, register one connection under any name – models fall through to the default automatically:
+
+```php
+$ctx->dbManager()->set('default', new Database(...));
+```
 
 ## Extensibility Points
 

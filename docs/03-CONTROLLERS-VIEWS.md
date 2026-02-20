@@ -71,12 +71,11 @@ Configure view service in bootstrap:
 
 ```php
 use Merlin\AppContext;
-use Merlin\Mvc\ViewEngine;
 
-AppContext::instance()->view = (new ViewEngine())
-    ->setPath(__DIR__ . '/../views')
-    ->setExtension('php')
-    ->setLayout('layouts/main');
+$view = AppContext::instance()->view();
+$view->setPath(__DIR__ . '/../views');
+$view->setExtension('php');
+$view->setLayout('layouts/main');
 ```
 
 Render in controller:

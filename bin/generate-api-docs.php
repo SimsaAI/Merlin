@@ -2,11 +2,18 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
-use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock\Tags\Deprecated as DeprecatedTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param as ParamTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_ as ReturnTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws as ThrowsTag;
-use phpDocumentor\Reflection\DocBlock\Tags\Deprecated as DeprecatedTag;
+use phpDocumentor\Reflection\DocBlockFactory;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
+use ReflectionClassConstant;
+use ReflectionMethod;
+use ReflectionProperty;
+use Throwable;
 
 $srcDir = 'src';
 $docsDir = 'docs/api';

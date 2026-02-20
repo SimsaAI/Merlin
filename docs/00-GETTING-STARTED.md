@@ -46,26 +46,29 @@ use Merlin\Http\Response;
 use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
-// Initialize application context, database, and view path
+// Initialize application context
 $ctx = AppContext::instance();
-$ctx->db = new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass');
-$ctx->getView()->setPath(__DIR__ . '/../views');
+
+// Register database connection(s)
+$ctx->dbManager()->set('default', new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass'));
+
+// Configure view engine
+$ctx->view()->setPath(__DIR__ . '/../views');
 
 // Set up routing
 $router = new Router();
 $router->add('GET', '/', 'IndexController::indexAction');
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction')->setName('user.view');
 
-// Configure dispatcher with namespace and defaults
-$dispatcher = new Dispatcher($ctx);
+// Configure dispatcher with namespace and defaults (no constructor args – uses AppContext internally)
+$dispatcher = new Dispatcher();
 $dispatcher->setBaseNamespace('App\\Controllers');
 $dispatcher->setDefaultController('IndexController');
 $dispatcher->setDefaultAction('indexAction');
 
 // Get the current request URI and method
-$request = $ctx->getRequest();
-$path = $request->getPath();
-$method = $request->getMethod();
+$path   = $ctx->request()->getPath();
+$method = $ctx->request()->getMethod();
 
 // Match the route and dispatch
 $route = $router->match($path, $method);

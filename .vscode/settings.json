@@ -1,7 +1,7 @@
 {
   "runOnSave.commands": [
     {
-      "globMatch": "src/*.php",
+      "globMatch": "src/**/*.php",
       "command": "php bin/generate-api-docs.php",
       "runIn": "backend"
     }

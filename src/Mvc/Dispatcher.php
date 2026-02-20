@@ -413,8 +413,7 @@ class Dispatcher
         $core = fn() => $this->invokeController(
             $controller,
             $action,
-            $params,
-            $context
+            $params
         );
 
         // If no middleware, return direct controller invocation
@@ -463,7 +462,7 @@ class Dispatcher
         return new $mw();
     }
 
-    protected function invokeController(Controller $controller, string $action, array $params, AppContext $context): Response
+    protected function invokeController(Controller $controller, string $action, array $params): Response
     {
         $before = $controller->beforeAction($action, $params);
         if ($before instanceof Response) {

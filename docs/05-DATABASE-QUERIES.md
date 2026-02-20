@@ -13,11 +13,11 @@ Before running queries, configure database connection(s) in your application con
 use Merlin\AppContext;
 use Merlin\Db\Database;
 
-AppContext::instance()->db = new Database(
+AppContext::instance()->dbManager()->set('default', new Database(
     'mysql:host=localhost;dbname=myapp',
     'user',
     'pass'
-);
+));
 ```
 
 ## Query Entry Points
@@ -210,7 +210,7 @@ $sql = User::query()
 Use `Merlin\Db\Database` transaction methods:
 
 ```php
-$db = AppContext::instance()->getWriteDb();
+$db = AppContext::instance()->dbManager()->get('write');
 
 $db->begin();
 try {

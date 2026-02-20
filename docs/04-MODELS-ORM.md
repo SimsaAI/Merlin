@@ -110,22 +110,36 @@ $user = User::updateOrCreate(
 
 ## Read/Write Connections
 
-Global configuration via `AppContext`:
+Database connections are managed by `DatabaseManager` using named **roles**. Register connections in your bootstrap:
 
 ```php
 use Merlin\AppContext;
 use Merlin\Db\Database;
 
-$ctx = AppContext::instance();
-$ctx->dbWrite = new Database('mysql:host=primary;dbname=myapp', 'rw', 'secret');
-$ctx->dbRead = new Database('mysql:host=replica;dbname=myapp', 'ro', 'secret');
+$mgr = AppContext::instance()->dbManager();
+// Direct instance
+$mgr->set('write', new Database('mysql:host=primary;dbname=myapp', 'rw', 'secret'));
+// Lazy factory example
+$mgr->set('read',  fn() => new Database('mysql:host=replica;dbname=myapp', 'ro', 'secret'));
 ```
 
-Per-model override:
+Models read from the `read` role and write to the `write` role by default, falling back to the registered default when a role is absent.
+
+Per-model override using role names:
 
 ```php
-User::setDefaultReadConnection($replicaDb);
-User::setDefaultWriteConnection($primaryDb);
+// Both read and write to the same role
+User::setDefaultRole('analytics');
+
+// Fine-grained
+User::setDefaultReadRole('replica');
+User::setDefaultWriteRole('primary');
+```
+
+For a single-database setup, register one connection – models fall through to the default:
+
+```php
+AppContext::instance()->dbManager()->set('default', new Database(...));
 ```
 
 ## Related
