@@ -47,7 +47,7 @@ Get the HttpRequest instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [Request](Request.md)
+- Type: [Request](Http_Request.md)
 - Description: The HttpRequest instance.
 
 ### view() · [source](../../src/AppContext.php#L88)
@@ -58,7 +58,7 @@ Get the ViewEngine instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [ViewEngine](ViewEngine.md)
+- Type: [ViewEngine](Mvc_ViewEngine.md)
 - Description: The ViewEngine instance.
 
 ### cookies() · [source](../../src/AppContext.php#L98)
@@ -69,7 +69,7 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [Cookies](Cookies.md)
+- Type: [Cookies](Http_Cookies.md)
 - Description: The Cookies instance.
 
 ### dbManager() · [source](../../src/AppContext.php#L104)
@@ -78,7 +78,7 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [DatabaseManager](DatabaseManager.md)
+- Type: [DatabaseManager](Db_DatabaseManager.md)
 
 ### session() · [source](../../src/AppContext.php#L114)
 
@@ -88,7 +88,7 @@ Get the Session instance.
 
 **➡️ Return value**
 
-- Type: [Session](Session.md)|null
+- Type: [Session](Http_Session.md)|null
 
 ### setSession() · [source](../../src/AppContext.php#L124)
 
@@ -100,7 +100,7 @@ Set the Session instance.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$session` | [Session](Session.md) | - | The Session instance to set in the context. |
+| `$session` | [Session](Http_Session.md) | - | The Session instance to set in the context. |
 
 **➡️ Return value**
 

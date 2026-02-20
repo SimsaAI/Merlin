@@ -57,7 +57,7 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 **➡️ Return value**
 
-- Type: [Query](Query.md)
+- Type: [Query](Db_Query.md)
 
 ### create() · [source](../../src/Mvc/Model.php#L77)
 
@@ -163,7 +163,7 @@ Finds a model by its ID(s) or throws an exception if not found
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)  if the model is not found
+- Exception  if the model is not found
 
 ### findOne() · [source](../../src/Mvc/Model.php#L209)
 
@@ -196,7 +196,7 @@ Find all models matching the given conditions. If no conditions are provided, it
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)
+- Type: [ResultSet](Db_ResultSet.md)
 - Description: The found model instances as a ResultSet
 
 ### exists() · [source](../../src/Mvc/Model.php#L237)
@@ -367,7 +367,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **➡️ Return value**
 
-- Type: [Database](Database.md)
+- Type: [Database](Db_Database.md)
 
 ### writeConnection() · [source](../../src/Mvc/Model.php#L562)
 
@@ -375,5 +375,5 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **➡️ Return value**
 
-- Type: [Database](Database.md)
+- Type: [Database](Db_Database.md)
 

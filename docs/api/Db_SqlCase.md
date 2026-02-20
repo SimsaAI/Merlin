@@ -47,5 +47,5 @@ Finalize and return CASE expression as Sql
 
 **➡️ Return value**
 
-- Type: [Sql](Sql.md)
+- Type: [Sql](Db_Sql.md)
 

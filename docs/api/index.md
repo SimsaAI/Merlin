@@ -7,59 +7,59 @@
 - [AppContext](AppContext.md) `Merlin\AppContext`
 - [ResolvedRoute](ResolvedRoute.md) `Merlin\ResolvedRoute`
 - [Crypt](Crypt.md) `Merlin\Crypt`
-- [Exception](Exception.md) `Merlin\Mvc\Exception`
+- [Exception](Exception.md) `Merlin\Exception`
 
 ### `Merlin\Cli`
 
-- [Console](Console.md) `Merlin\Cli\Console`
-- [Exception](Exception.md) `Merlin\Mvc\Exception`
-- [Task](Task.md) `Merlin\Cli\Task`
+- [Console](Cli_Console.md) `Merlin\Cli\Console`
+- [Exception](Cli_Exception.md) `Merlin\Cli\Exception`
+- [Task](Cli_Task.md) `Merlin\Cli\Task`
 
 ### `Merlin\Cli\Exceptions`
 
-- [ActionNotFoundException](ActionNotFoundException.md) `Merlin\Mvc\Exceptions\ActionNotFoundException`
-- [InvalidTaskException](InvalidTaskException.md) `Merlin\Cli\Exceptions\InvalidTaskException`
-- [TaskNotFoundException](TaskNotFoundException.md) `Merlin\Cli\Exceptions\TaskNotFoundException`
+- [ActionNotFoundException](Cli_Exceptions_ActionNotFoundException.md) `Merlin\Cli\Exceptions\ActionNotFoundException`
+- [InvalidTaskException](Cli_Exceptions_InvalidTaskException.md) `Merlin\Cli\Exceptions\InvalidTaskException`
+- [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md) `Merlin\Cli\Exceptions\TaskNotFoundException`
 
 ### `Merlin\Db`
 
-- [Condition](Condition.md) `Merlin\Db\Condition`
-- [Database](Database.md) `Merlin\Db\Database`
-- [DatabaseManager](DatabaseManager.md) `Merlin\Db\DatabaseManager`
-- [Exception](Exception.md) `Merlin\Mvc\Exception`
-- [Paginator](Paginator.md) `Merlin\Db\Paginator`
-- [Query](Query.md) `Merlin\Db\Query`
-- [ResultSet](ResultSet.md) `Merlin\Db\ResultSet`
-- [Sql](Sql.md) `Merlin\Db\Sql`
-- [SqlCase](SqlCase.md) `Merlin\Db\SqlCase`
+- [Condition](Db_Condition.md) `Merlin\Db\Condition`
+- [Database](Db_Database.md) `Merlin\Db\Database`
+- [DatabaseManager](Db_DatabaseManager.md) `Merlin\Db\DatabaseManager`
+- [Exception](Db_Exception.md) `Merlin\Db\Exception`
+- [Paginator](Db_Paginator.md) `Merlin\Db\Paginator`
+- [Query](Db_Query.md) `Merlin\Db\Query`
+- [ResultSet](Db_ResultSet.md) `Merlin\Db\ResultSet`
+- [Sql](Db_Sql.md) `Merlin\Db\Sql`
+- [SqlCase](Db_SqlCase.md) `Merlin\Db\SqlCase`
 
 ### `Merlin\Db\Exceptions`
 
-- [TransactionLostException](TransactionLostException.md) `Merlin\Db\Exceptions\TransactionLostException`
+- [TransactionLostException](Db_Exceptions_TransactionLostException.md) `Merlin\Db\Exceptions\TransactionLostException`
 
 ### `Merlin\Http`
 
-- [Cookie](Cookie.md) `Merlin\Http\Cookie`
-- [Cookies](Cookies.md) `Merlin\Http\Cookies`
-- [Request](Request.md) `Merlin\Http\Request`
-- [Response](Response.md) `Merlin\Http\Response`
-- [Session](Session.md) `Merlin\Http\Session`
-- [SessionMiddleware](SessionMiddleware.md) `Merlin\Http\SessionMiddleware`
-- [UploadedFile](UploadedFile.md) `Merlin\Http\UploadedFile`
+- [Cookie](Http_Cookie.md) `Merlin\Http\Cookie`
+- [Cookies](Http_Cookies.md) `Merlin\Http\Cookies`
+- [Request](Http_Request.md) `Merlin\Http\Request`
+- [Response](Http_Response.md) `Merlin\Http\Response`
+- [Session](Http_Session.md) `Merlin\Http\Session`
+- [SessionMiddleware](Http_SessionMiddleware.md) `Merlin\Http\SessionMiddleware`
+- [UploadedFile](Http_UploadedFile.md) `Merlin\Http\UploadedFile`
 
 ### `Merlin\Mvc`
 
-- [Controller](Controller.md) `Merlin\Mvc\Controller`
-- [Dispatcher](Dispatcher.md) `Merlin\Mvc\Dispatcher`
-- [Exception](Exception.md) `Merlin\Mvc\Exception`
-- [Model](Model.md) `Merlin\Mvc\Model`
-- [ModelMapping](ModelMapping.md) `Merlin\Mvc\ModelMapping`
-- [Router](Router.md) `Merlin\Mvc\Router`
-- [ViewEngine](ViewEngine.md) `Merlin\Mvc\ViewEngine`
+- [Controller](Mvc_Controller.md) `Merlin\Mvc\Controller`
+- [Dispatcher](Mvc_Dispatcher.md) `Merlin\Mvc\Dispatcher`
+- [Exception](Mvc_Exception.md) `Merlin\Mvc\Exception`
+- [Model](Mvc_Model.md) `Merlin\Mvc\Model`
+- [ModelMapping](Mvc_ModelMapping.md) `Merlin\Mvc\ModelMapping`
+- [Router](Mvc_Router.md) `Merlin\Mvc\Router`
+- [ViewEngine](Mvc_ViewEngine.md) `Merlin\Mvc\ViewEngine`
 
 ### `Merlin\Mvc\Exceptions`
 
-- [ActionNotFoundException](ActionNotFoundException.md) `Merlin\Mvc\Exceptions\ActionNotFoundException`
-- [ControllerNotFoundException](ControllerNotFoundException.md) `Merlin\Mvc\Exceptions\ControllerNotFoundException`
-- [InvalidControllerException](InvalidControllerException.md) `Merlin\Mvc\Exceptions\InvalidControllerException`
+- [ActionNotFoundException](Mvc_Exceptions_ActionNotFoundException.md) `Merlin\Mvc\Exceptions\ActionNotFoundException`
+- [ControllerNotFoundException](Mvc_Exceptions_ControllerNotFoundException.md) `Merlin\Mvc\Exceptions\ControllerNotFoundException`
+- [InvalidControllerException](Mvc_Exceptions_InvalidControllerException.md) `Merlin\Mvc\Exceptions\InvalidControllerException`
 

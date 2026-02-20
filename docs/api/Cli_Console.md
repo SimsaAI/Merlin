@@ -110,6 +110,6 @@
 
 **⚠️ Throws**
 
-- [TaskNotFoundException](TaskNotFoundException.md)
-- [ActionNotFoundException](ActionNotFoundException.md)
+- [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md)
+- ActionNotFoundException
 

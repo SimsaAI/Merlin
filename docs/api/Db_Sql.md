@@ -202,7 +202,7 @@ CASE expression builder
 
 **➡️ Return value**
 
-- Type: [SqlCase](SqlCase.md)
+- Type: [SqlCase](Db_SqlCase.md)
 - Description: Fluent builder for CASE expressions
 
 ### as() · [source](../../src/Db/Sql.php#L210)

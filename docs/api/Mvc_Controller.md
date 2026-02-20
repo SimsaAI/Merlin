@@ -19,7 +19,7 @@ MVC Controller class
 
 **➡️ Return value**
 
-- Type: [Response](Response.md)|null
+- Type: [Response](Http_Response.md)|null
 
 ### afterAction() · [source](../../src/Mvc/Controller.php#L42)
 
@@ -34,7 +34,7 @@ MVC Controller class
 
 **➡️ Return value**
 
-- Type: [Response](Response.md)|null
+- Type: [Response](Http_Response.md)|null
 
 ### getMiddleware() · [source](../../src/Mvc/Controller.php#L49)
 

@@ -27,7 +27,7 @@ Create a new database connection using the provided DSN, credentials and options
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### connect() · [source](../../src/Db/Database.php#L83)
 
@@ -41,7 +41,7 @@ Establish a new PDO connection using the current configuration
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### addListener() · [source](../../src/Db/Database.php#L99)
 
@@ -110,7 +110,7 @@ Execute a SQL query with optional parameters and return the resulting statement 
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### prepare() · [source](../../src/Db/Database.php#L194)
 
@@ -130,7 +130,7 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### execute() · [source](../../src/Db/Database.php#L221)
 
@@ -148,7 +148,7 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### selectRow() · [source](../../src/Db/Database.php#L386)
 
@@ -255,7 +255,7 @@ Rollback the current transaction or to a savepoint if nesting is enabled and sup
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### quote() · [source](../../src/Db/Database.php#L576)
 
@@ -303,7 +303,7 @@ Create a new Query builder instance associated with this database connection.
 
 **➡️ Return value**
 
-- Type: [Query](Query.md)
+- Type: [Query](Db_Query.md)
 
 ### getDriver() · [source](../../src/Db/Database.php#L634)
 

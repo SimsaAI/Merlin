@@ -32,7 +32,7 @@ Set the model mapping instance to use for resolving model class names to table n
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$modelMapping` | [ModelMapping](ModelMapping.md)\|null | - |  |
+| `$modelMapping` | [ModelMapping](Mvc_ModelMapping.md)\|null | - |  |
 
 **➡️ Return value**
 
@@ -48,8 +48,8 @@ Constructor. Can optionally pass a Database connection to use for this query, or
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$db` | [Database](Database.md)\|null | `null` |  |
-| `$model` | [Model](Model.md)\|null | `null` |  |
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
+| `$model` | [Model](Mvc_Model.md)\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -65,7 +65,7 @@ Factory method to create a new Query instance. Can optionally pass a Database co
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$db` | [Database](Database.md)\|null | `null` |  |
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -90,7 +90,7 @@ Set the table for this query. Can be either a table name or a model class name. 
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### columns() · [source](../../src/Db/Query.php#L229)
 
@@ -221,8 +221,8 @@ Add a JOIN clause to the query
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
-| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 | `$type` | string\|null | `null` |  |
 
 **➡️ Return value**
@@ -231,7 +231,7 @@ Add a JOIN clause to the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### innerJoin() · [source](../../src/Db/Query.php#L419)
 
@@ -244,8 +244,8 @@ Adds an INNER join to the query
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
-| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -253,7 +253,7 @@ Adds an INNER join to the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### leftJoin() · [source](../../src/Db/Query.php#L432)
 
@@ -266,8 +266,8 @@ Adds a LEFT join to the query
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
-| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -275,7 +275,7 @@ Adds a LEFT join to the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### rightJoin() · [source](../../src/Db/Query.php#L445)
 
@@ -288,8 +288,8 @@ Adds a RIGHT join to the query
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
-| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -297,7 +297,7 @@ Adds a RIGHT join to the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### crossJoin() · [source](../../src/Db/Query.php#L458)
 
@@ -310,8 +310,8 @@ Adds a CROSS join to the query
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
-| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -319,7 +319,7 @@ Adds a CROSS join to the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### orderBy() · [source](../../src/Db/Query.php#L468)
 
@@ -536,7 +536,7 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### toSql() · [source](../../src/Db/Query.php#L660)
 
@@ -550,7 +550,7 @@ Compile and return the SQL string for this query without executing it
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### select() · [source](../../src/Db/Query.php#L672)
 
@@ -566,11 +566,11 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)|string
+- Type: [ResultSet](Db_ResultSet.md)|string
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### first() · [source](../../src/Db/Query.php#L697)
 
@@ -580,12 +580,12 @@ Execute SELECT query and return first model or null or return SQL string if retu
 
 **➡️ Return value**
 
-- Type: [Model](Model.md)|string|null
+- Type: [Model](Mvc_Model.md)|string|null
 - Description: First model, or SQL string, or null if no results
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### insert() · [source](../../src/Db/Query.php#L712)
 
@@ -601,12 +601,12 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)|array|string|bool
+- Type: [ResultSet](Db_ResultSet.md)|array|string|bool
 - Description: Insert ID, true on success, or SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### upsert() · [source](../../src/Db/Query.php#L723)
 
@@ -622,12 +622,12 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)|array|string|bool
+- Type: [ResultSet](Db_ResultSet.md)|array|string|bool
 - Description: Insert ID, true on success, or SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### update() · [source](../../src/Db/Query.php#L764)
 
@@ -643,12 +643,12 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)|array|string|int
+- Type: [ResultSet](Db_ResultSet.md)|array|string|int
 - Description: Number of affected rows or SQL string, or row of returning clause
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### delete() · [source](../../src/Db/Query.php#L792)
 
@@ -658,12 +658,12 @@ Execute DELETE query
 
 **➡️ Return value**
 
-- Type: [ResultSet](ResultSet.md)|array|string|int
+- Type: [ResultSet](Db_ResultSet.md)|array|string|int
 - Description: Number of affected rows, SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### truncate() · [source](../../src/Db/Query.php#L815)
 
@@ -678,7 +678,7 @@ Execute TRUNCATE query or return SQL string if returnSql is enabled
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### exists() · [source](../../src/Db/Query.php#L834)
 
@@ -692,7 +692,7 @@ Check if any rows exist matching the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### count() · [source](../../src/Db/Query.php#L858)
 
@@ -707,7 +707,7 @@ Count rows matching the query
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### getBindings() · [source](../../src/Db/Query.php#L1576)
 
@@ -735,7 +735,7 @@ Create a paginator for the current query
 
 **➡️ Return value**
 
-- Type: [Paginator](Paginator.md)
+- Type: [Paginator](Db_Paginator.md)
 
 ### getRowCount() · [source](../../src/Db/Query.php#L1637)
 

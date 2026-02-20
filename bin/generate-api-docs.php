@@ -31,8 +31,12 @@ foreach ($iterator as $file) {
             foreach ($matches[1] as $className) {
                 $fqcn = $namespace . $className;
                 if (class_exists($fqcn)) {
-                    $allClasses[$className] = $fqcn;
-                    $namespacedClasses[substr($namespace, 0, -1)][] = $className;
+                    $ns = substr($namespace, 0, -1);
+                    $allClasses[$fqcn] = [
+                        'short' => $className,
+                        'namespace' => $ns,
+                    ];
+                    $namespacedClasses[$ns][] = $fqcn;
                 }
             }
         }
@@ -44,24 +48,37 @@ echo "📝 Generating docs for " . count($allClasses) . " classes...\n";
 // Build class registry: maps FQCN and short name -> metadata for link generation.
 // All src links are relative from docs/api/ (two levels up to project root).
 $classRegistry = [];
-foreach ($allClasses as $shortName => $fqcn) {
+$shortNameCounts = [];
+foreach ($allClasses as $classMeta) {
+    $shortName = $classMeta['short'];
+    $shortNameCounts[$shortName] = ($shortNameCounts[$shortName] ?? 0) + 1;
+}
+
+foreach ($allClasses as $fqcn => $classMeta) {
+    $shortName = $classMeta['short'];
     $ref = new ReflectionClass($fqcn);
     $absFile = $ref->getFileName();
     $relFromRoot = str_replace('\\', '/', substr($absFile, strlen($projectRoot) + 1));
     $srcLink = '../../' . $relFromRoot;
+    $docFile = makeDocFileName($fqcn);
     $classRegistry[$fqcn] = [
         'short' => $shortName,
         'srcLink' => $srcLink . '#L' . $ref->getStartLine(),
         'srcFile' => $srcLink,
-        'docLink' => $shortName . '.md',
+        'docLink' => $docFile,
     ];
-    // Also index by short name for quick docblock type lookups
-    $classRegistry[$shortName] = &$classRegistry[$fqcn];
+    // Also index by short name only if unique
+    if (($shortNameCounts[$shortName] ?? 0) === 1) {
+        $classRegistry[$shortName] = &$classRegistry[$fqcn];
+    }
 }
 
 // Generate index
 if (!is_dir($docsDir)) {
     mkdir($docsDir, 0755, true);
+}
+foreach (glob($docsDir . '/*.md') as $oldDocFile) {
+    @unlink($oldDocFile);
 }
 $indexContent = "# Merlin MVC API\n\n## Classes overview\n\n";
 $sep = '';
@@ -69,18 +86,18 @@ foreach ($namespacedClasses as $namespace => $classes) {
     $indexContent .= $sep;
     $sep = "\n";
     $indexContent .= "### `{$namespace}`\n\n";
-    foreach ($classes as $class) {
-        $fqcn = $allClasses[$class];
-        $indexContent .= "- [{$class}]({$class}.md) `{$fqcn}`\n";
+    foreach ($classes as $fqcn) {
+        $class = $allClasses[$fqcn]['short'];
+        $indexContent .= "- [{$class}](" . makeDocFileName($fqcn) . ") `{$fqcn}`\n";
     }
 }
 file_put_contents("$docsDir/index.md", $indexContent . "\n");
 
 // Individual class docs
-foreach ($allClasses as $class) {
+foreach ($allClasses as $class => $classMeta) {
     $reflector = new ReflectionClass($class);
     $md = generateClassDoc($reflector, $docFactory, $classRegistry);
-    $filename = basename(str_replace('\\', '/', $class)) . '.md';
+    $filename = makeDocFileName($class);
     file_put_contents("$docsDir/$filename", $md);
     echo "  ✓ {$filename}\n";
 }
@@ -272,6 +289,19 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
 }
 
 /* ---------------- Helpers ---------------- */
+
+function makeDocFileName(string $fqcn): string
+{
+    $parts = explode('\\', ltrim($fqcn, '\\'));
+    if (count($parts) > 1 && $parts[0] === 'Merlin') {
+        array_shift($parts);
+    }
+    $parts = array_map(
+        fn(string $part): string => preg_replace('/[^A-Za-z0-9_]/', '_', $part),
+        $parts
+    );
+    return implode('_', $parts) . '.md';
+}
 
 /**
  * Convert a type string (may contain | or & separators) into markdown with

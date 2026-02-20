@@ -31,7 +31,7 @@
 
 **➡️ Return value**
 
-- Type: [Cookie](Cookie.md)
+- Type: [Cookie](Http_Cookie.md)
 
 ### set() · [source](../../src/Http/Cookies.php#L22)
 
@@ -51,7 +51,7 @@
 
 **➡️ Return value**
 
-- Type: [Cookie](Cookie.md)
+- Type: [Cookie](Http_Cookie.md)
 
 ### delete() · [source](../../src/Http/Cookies.php#L36)
 

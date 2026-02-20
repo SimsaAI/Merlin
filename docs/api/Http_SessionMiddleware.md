@@ -24,5 +24,5 @@ response is sent.
 
 **➡️ Return value**
 
-- Type: [Response](Response.md)|null
+- Type: [Response](Http_Response.md)|null
 

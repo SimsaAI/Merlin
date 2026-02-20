@@ -210,7 +210,7 @@ and captures the output buffer.
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)  If the view file cannot be resolved.
+- Exception  If the view file cannot be resolved.
 
 ### renderLayout() · [source](../../src/Mvc/ViewEngine.php#L205)
 

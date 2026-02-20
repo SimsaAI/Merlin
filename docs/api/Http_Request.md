@@ -434,7 +434,7 @@ Get an uploaded file for a given key. Returns an UploadedFile object or null if 
 
 **➡️ Return value**
 
-- Type: [UploadedFile](UploadedFile.md)|null
+- Type: [UploadedFile](Http_UploadedFile.md)|null
 
 ### getFiles() · [source](../../src/Http/Request.php#L526)
 

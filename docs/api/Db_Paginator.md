@@ -16,7 +16,7 @@ Create a new Paginator instance.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$builder` | [Query](Query.md) | - | The Query builder instance to paginate. |
+| `$builder` | [Query](Db_Query.md) | - | The Query builder instance to paginate. |
 | `$page` | int | `1` | The current page number. |
 | `$pageSize` | int | `30` | The number of items per page. |
 | `$reverse` | bool | `false` | Whether to reverse the order of items. |

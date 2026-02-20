@@ -33,7 +33,7 @@ Encrypt a value using the specified cipher
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### decrypt() · [source](../../src/Crypt.php#L50)
 
@@ -56,7 +56,7 @@ Decrypt a value using the specified cipher
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### hasSodium() · [source](../../src/Crypt.php#L70)
 
@@ -90,5 +90,5 @@ Get the best available cipher (prefers Sodium over OpenSSL)
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 

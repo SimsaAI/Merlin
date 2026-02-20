@@ -144,13 +144,13 @@ Dispatch a request to the appropriate controller and action based on the provide
 
 **➡️ Return value**
 
-- Type: [Response](Response.md)
+- Type: [Response](Http_Response.md)
 
 **⚠️ Throws**
 
-- [ControllerNotFoundException](ControllerNotFoundException.md)
-- [InvalidControllerException](InvalidControllerException.md)
-- [ActionNotFoundException](ActionNotFoundException.md)
+- [ControllerNotFoundException](Mvc_Exceptions_ControllerNotFoundException.md)
+- [InvalidControllerException](Mvc_Exceptions_InvalidControllerException.md)
+- ActionNotFoundException
 
 ### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L501)
 

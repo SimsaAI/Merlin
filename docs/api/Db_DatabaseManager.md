@@ -19,7 +19,7 @@ Define a database connection for a specific role.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role (e.g. "default", "analytics") |
-| `$factory` | [Database](Database.md)\|callable | - | A factory callable that returns a Database instance, or a Database instance directly |
+| `$factory` | [Database](Db_Database.md)\|callable | - | A factory callable that returns a Database instance, or a Database instance directly |
 
 **➡️ Return value**
 
@@ -76,7 +76,7 @@ Get the Database instance for a specific role.
 
 **➡️ Return value**
 
-- Type: [Database](Database.md)
+- Type: [Database](Db_Database.md)
 - Description: The Database instance for the specified role
 
 **⚠️ Throws**
@@ -97,7 +97,7 @@ Get the Database instance for a specific role, or the default if the role is not
 
 **➡️ Return value**
 
-- Type: [Database](Database.md)
+- Type: [Database](Db_Database.md)
 - Description: The Database instance for the specified role, or the default if not defined
 
 **⚠️ Throws**
@@ -112,7 +112,7 @@ Get the default Database instance.
 
 **➡️ Return value**
 
-- Type: [Database](Database.md)
+- Type: [Database](Db_Database.md)
 - Description: The default Database instance
 
 **⚠️ Throws**

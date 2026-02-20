@@ -12,11 +12,11 @@
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$connection` | [Database](Database.md) | - |  |
+| `$connection` | [Database](Db_Database.md) | - |  |
 | `$statement` | PDOStatement | - |  |
 | `$sqlStatement` | string\|null | `null` |  |
 | `$boundParams` | array\|null | `null` |  |
-| `$model` | [Model](Model.md)\|null | `null` |  |
+| `$model` | [Model](Mvc_Model.md)\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -145,7 +145,7 @@ Get the next model from the result set, or false if there are no more models. Th
 
 **➡️ Return value**
 
-- Type: [Model](Model.md)|null
+- Type: [Model](Mvc_Model.md)|null
 
 ### firstModel() · [source](../../src/Db/ResultSet.php#L179)
 
@@ -155,7 +155,7 @@ Get first model or object from result set.
 
 **➡️ Return value**
 
-- Type: [Model](Model.md)|null
+- Type: [Model](Mvc_Model.md)|null
 
 ### allModels() · [source](../../src/Db/ResultSet.php#L201)
 

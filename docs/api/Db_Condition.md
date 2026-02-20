@@ -40,7 +40,7 @@ Create a new Condition builder instance
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$db` | [Database](Database.md)\|null | `null` |  |
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -54,7 +54,7 @@ Create a new Condition builder instance
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$db` | [Database](Database.md)\|null | `null` |  |
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -62,7 +62,7 @@ Create a new Condition builder instance
 
 **⚠️ Throws**
 
-- [Exception](Exception.md)
+- Exception
 
 ### injectModelResolver() · [source](../../src/Db/Condition.php#L142)
 
@@ -90,7 +90,7 @@ Appends a condition to the current conditions using an AND operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Condition](Condition.md)\|string | - |  |
+| `$condition` | [Condition](Db_Condition.md)\|string | - |  |
 | `$value` | mixed | `null` |  |
 | `$escape` | bool | `true` |  |
 
@@ -108,7 +108,7 @@ Appends a condition to the current conditions using a OR operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Condition](Condition.md)\|string | - |  |
+| `$condition` | [Condition](Db_Condition.md)\|string | - |  |
 | `$value` | mixed | `null` |  |
 | `$escape` | bool | `true` |  |
 
@@ -266,7 +266,7 @@ Appends an HAVING condition to the current conditions using AND operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$condition` | [Sql](Db_Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
 
 **➡️ Return value**
@@ -283,7 +283,7 @@ Appends an NOT HAVING condition to the current conditions using AND operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$condition` | [Sql](Db_Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
 
 **➡️ Return value**
@@ -300,7 +300,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$condition` | [Sql](Db_Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
 
 **➡️ Return value**
@@ -315,7 +315,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$condition` | [Sql](Db_Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
 
 **➡️ Return value**

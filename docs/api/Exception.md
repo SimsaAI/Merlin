@@ -1,6 +1,6 @@
 # 🧩 Exception
 
-**Full name:** [Merlin\Mvc\Exception](../../src/Mvc/Exception.php)
+**Full name:** [Merlin\Exception](../../src/Exception.php)
 
 ## 🚀 Public methods
 
