@@ -22,18 +22,18 @@ Encrypt a value using the specified cipher
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | The value to encrypt |
-| `$key` | 🎲 `mixed` | - | The encryption key (at least 32 bytes recommended) |
-| `$cipher` | 🎲 `mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
+| `$value` | mixed | - | The value to encrypt |
+| `$key` | mixed | - | The encryption key (at least 32 bytes recommended) |
+| `$cipher` | mixed | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 - Description: Base64-encoded encrypted value
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### decrypt() · [source](../../src/Crypt.php#L50)
 
@@ -45,18 +45,18 @@ Decrypt a value using the specified cipher
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | The base64-encoded encrypted value |
-| `$key` | 🎲 `mixed` | - | The encryption key |
-| `$cipher` | 🎲 `mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
+| `$value` | mixed | - | The base64-encoded encrypted value |
+| `$key` | mixed | - | The encryption key |
+| `$cipher` | mixed | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 - Description: The decrypted value or null on failure
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### hasSodium() · [source](../../src/Crypt.php#L70)
 
@@ -66,7 +66,7 @@ Check if Sodium is available
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### hasOpenSSL() · [source](../../src/Crypt.php#L80)
 
@@ -76,7 +76,7 @@ Check if OpenSSL is available
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### getAvailableCipher() · [source](../../src/Crypt.php#L91)
 
@@ -86,9 +86,9 @@ Get the best available cipher (prefers Sodium over OpenSSL)
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 

@@ -4,16 +4,16 @@
 
 ## 🔐 Properties
 
-- `protected` [🧩`Database`](Database.md) `$db` · [source](../../src/Db/ResultSet.php)
-- `protected` `PDOStatement` `$statement` · [source](../../src/Db/ResultSet.php)
-- `protected` 🔤 `string`|`null` `$sqlStatement` · [source](../../src/Db/ResultSet.php)
-- `protected` 📦 `array`|`null` `$boundParams` · [source](../../src/Db/ResultSet.php)
-- `protected` 🔤 `string`|`null` `$modelClass` · [source](../../src/Db/ResultSet.php)
-- `protected` 🔢 `int` `$fetchMode` · [source](../../src/Db/ResultSet.php)
-- `protected` 🎲 `mixed` `$firstObject` · [source](../../src/Db/ResultSet.php)
-- `protected` 🎲 `mixed` `$currentRow` · [source](../../src/Db/ResultSet.php)
-- `protected` 🔢 `int` `$position` · [source](../../src/Db/ResultSet.php)
-- `protected` ⚙️ `bool` `$initialized` · [source](../../src/Db/ResultSet.php)
+- `protected` [Database](Database.md) `$db` · [source](../../src/Db/ResultSet.php)
+- `protected` PDOStatement `$statement` · [source](../../src/Db/ResultSet.php)
+- `protected` string|null `$sqlStatement` · [source](../../src/Db/ResultSet.php)
+- `protected` array|null `$boundParams` · [source](../../src/Db/ResultSet.php)
+- `protected` string|null `$modelClass` · [source](../../src/Db/ResultSet.php)
+- `protected` int `$fetchMode` · [source](../../src/Db/ResultSet.php)
+- `protected` mixed `$firstObject` · [source](../../src/Db/ResultSet.php)
+- `protected` mixed `$currentRow` · [source](../../src/Db/ResultSet.php)
+- `protected` int `$position` · [source](../../src/Db/ResultSet.php)
+- `protected` bool `$initialized` · [source](../../src/Db/ResultSet.php)
 
 ## 🚀 Public methods
 
@@ -25,15 +25,15 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$connection` | [🧩`Database`](Database.md) | - |  |
-| `$statement` | `PDOStatement` | - |  |
-| `$sqlStatement` | 🔤 `string`\|`null` | `null` |  |
-| `$boundParams` | 📦 `array`\|`null` | `null` |  |
-| `$model` | [🧩`Model`](Model.md)\|`null` | `null` |  |
+| `$connection` | [Database](Database.md) | - |  |
+| `$statement` | PDOStatement | - |  |
+| `$sqlStatement` | string\|null | `null` |  |
+| `$boundParams` | array\|null | `null` |  |
+| `$model` | [Model](Model.md)\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### fetch() · [source](../../src/Db/ResultSet.php#L47)
 
@@ -43,7 +43,7 @@ Fetch next row as object or array depending on fetch mode.
 
 **➡️ Return value**
 
-- Type: 🧱 `object`|📦 `array`|`false`
+- Type: object|array|false
 
 ### fetchArray() · [source](../../src/Db/ResultSet.php#L57)
 
@@ -53,7 +53,7 @@ Fetch next row as associative array.
 
 **➡️ Return value**
 
-- Type: 📦 `array`|`false`
+- Type: array|false
 
 ### fetchObject() · [source](../../src/Db/ResultSet.php#L67)
 
@@ -63,7 +63,7 @@ Fetch next row as object.
 
 **➡️ Return value**
 
-- Type: 🧱 `object`|`false`
+- Type: object|false
 
 ### fetchColumn() · [source](../../src/Db/ResultSet.php#L77)
 
@@ -75,11 +75,11 @@ Fetch next row as a single column value.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$column` | 🔢 `int` | `0` |  |
+| `$column` | int | `0` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### fetchAllColumns() · [source](../../src/Db/ResultSet.php#L88)
 
@@ -91,11 +91,11 @@ Fetch all values from a single column.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$column` | 🔢 `int` | `0` |  |
+| `$column` | int | `0` |  |
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### fetchAll() · [source](../../src/Db/ResultSet.php#L100)
 
@@ -107,12 +107,12 @@ Fetch all rows as objects or arrays depending on fetch mode.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$fetchMode` | 🔢 `int` | `0` | Override fetch mode for this call (optional) |
-| `$columnIndex` | 🔢 `int` | `0` | Column index for PDO::FETCH_COLUMN mode (optional) |
+| `$fetchMode` | int | `0` | Override fetch mode for this call (optional) |
+| `$columnIndex` | int | `0` | Column index for PDO::FETCH_COLUMN mode (optional) |
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### setFetchMode() · [source](../../src/Db/ResultSet.php#L111)
 
@@ -124,11 +124,11 @@ Set the default fetch mode for this result set.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$fetchMode` | 🔢 `int` | - | One of the PDO::FETCH_* constants |
+| `$fetchMode` | int | - | One of the PDO::FETCH_* constants |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### allArrays() · [source](../../src/Db/ResultSet.php#L120)
 
@@ -138,7 +138,7 @@ Return all rows as associative arrays.
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### allObjects() · [source](../../src/Db/ResultSet.php#L131)
 
@@ -148,7 +148,7 @@ Return all rows as objects.
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### nextModel() · [source](../../src/Db/ResultSet.php#L142)
 
@@ -158,7 +158,7 @@ Get the next model from the result set, or false if there are no more models. Th
 
 **➡️ Return value**
 
-- Type: [🧩`Model`](Model.md)|`null`
+- Type: [Model](Model.md)|null
 
 ### firstModel() · [source](../../src/Db/ResultSet.php#L179)
 
@@ -168,7 +168,7 @@ Get first model or object from result set.
 
 **➡️ Return value**
 
-- Type: [🧩`Model`](Model.md)|`null`
+- Type: [Model](Model.md)|null
 
 ### allModels() · [source](../../src/Db/ResultSet.php#L201)
 
@@ -178,7 +178,7 @@ Get all remaining models or objects from result set.
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### getSql() · [source](../../src/Db/ResultSet.php#L219)
 
@@ -188,7 +188,7 @@ Return the SQL statement that was executed to produce this result set, if availa
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|`null`
+- Type: string|null
 
 ### getBindings() · [source](../../src/Db/ResultSet.php#L228)
 
@@ -198,7 +198,7 @@ Return the variables that were bound to the SQL statement, if available.
 
 **➡️ Return value**
 
-- Type: 📦 `array`|`null`
+- Type: array|null
 
 ### reexecute() · [source](../../src/Db/ResultSet.php#L237)
 
@@ -208,7 +208,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### rewind() · [source](../../src/Db/ResultSet.php#L252)
 
@@ -216,7 +216,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### current() · [source](../../src/Db/ResultSet.php#L257)
 
@@ -224,7 +224,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### key() · [source](../../src/Db/ResultSet.php#L266)
 
@@ -232,7 +232,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 
 ### next() · [source](../../src/Db/ResultSet.php#L271)
 
@@ -240,7 +240,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### valid() · [source](../../src/Db/ResultSet.php#L277)
 
@@ -248,7 +248,7 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 
 ### count() · [source](../../src/Db/ResultSet.php#L282)
 
@@ -256,5 +256,5 @@ Execute the query again to repopulate the result set.
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 

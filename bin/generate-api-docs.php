@@ -274,10 +274,11 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
  * @param string $mode 'doc' = link to API .md page, 'src' = link to source file
  * @param bool $decorate Whether to decorate unrecognized types with emojis and backticks
  */
-function linkType(string $typeStr, array $classRegistry, string $mode = 'doc', bool $decorate = true): string
+function linkType(string $typeStr, array $classRegistry, string $mode = 'doc', bool $decorate = false): string
 {
     if ($typeStr === '')
         return '';
+    $decorate = false;
 
     // Split on | and & while keeping the delimiters
     $parts = preg_split('/([|&])/', $typeStr, -1, PREG_SPLIT_DELIM_CAPTURE);

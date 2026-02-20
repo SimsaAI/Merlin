@@ -4,11 +4,11 @@
 
 ## 🔐 Properties
 
-- `protected` 🔤 `string` `$name` · [source](../../src/Http/UploadedFile.php)
-- `protected` 🔤 `string` `$type` · [source](../../src/Http/UploadedFile.php)
-- `protected` 🔤 `string` `$tmpName` · [source](../../src/Http/UploadedFile.php)
-- `protected` 🔢 `int` `$error` · [source](../../src/Http/UploadedFile.php)
-- `protected` 🔢 `int` `$size` · [source](../../src/Http/UploadedFile.php)
+- `protected` string `$name` · [source](../../src/Http/UploadedFile.php)
+- `protected` string `$type` · [source](../../src/Http/UploadedFile.php)
+- `protected` string `$tmpName` · [source](../../src/Http/UploadedFile.php)
+- `protected` int `$error` · [source](../../src/Http/UploadedFile.php)
+- `protected` int `$size` · [source](../../src/Http/UploadedFile.php)
 
 ## 🚀 Public methods
 
@@ -20,15 +20,15 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
-| `$type` | 🔤 `string` | - |  |
-| `$tmpName` | 🔤 `string` | - |  |
-| `$error` | 🔢 `int` | - |  |
-| `$size` | 🔢 `int` | - |  |
+| `$name` | string | - |  |
+| `$type` | string | - |  |
+| `$tmpName` | string | - |  |
+| `$error` | int | - |  |
+| `$size` | int | - |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### getClientFilename() · [source](../../src/Http/UploadedFile.php#L16)
 
@@ -36,7 +36,7 @@
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### getClientMediaType() · [source](../../src/Http/UploadedFile.php#L21)
 
@@ -44,7 +44,7 @@
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### getSize() · [source](../../src/Http/UploadedFile.php#L26)
 
@@ -52,7 +52,7 @@
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 
 ### isValid() · [source](../../src/Http/UploadedFile.php#L31)
 
@@ -60,7 +60,7 @@
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 
 ### moveTo() · [source](../../src/Http/UploadedFile.php#L36)
 
@@ -70,9 +70,9 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$targetPath` | 🔤 `string` | - |  |
+| `$targetPath` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 

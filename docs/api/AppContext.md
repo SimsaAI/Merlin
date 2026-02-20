@@ -4,14 +4,14 @@
 
 ## 🔐 Properties
 
-- `protected` 📦 `array` `$services` · [source](../../src/AppContext.php)
-- `protected` [🧩`Request`](Request.md)|`null` `$request` · [source](../../src/AppContext.php)
-- `protected` [🧩`ViewEngine`](ViewEngine.md)|`null` `$view` · [source](../../src/AppContext.php)
-- `protected` [🧩`Session`](Session.md)|`null` `$session` · [source](../../src/AppContext.php)
-- `protected` [🧩`Cookies`](Cookies.md)|`null` `$cookies` · [source](../../src/AppContext.php)
-- `protected` [🧩`ResolvedRoute`](ResolvedRoute.md)|`null` `$route` · [source](../../src/AppContext.php)
-- `protected` [🧩`DatabaseManager`](DatabaseManager.md) `$dbManager` · [source](../../src/AppContext.php)
-- `protected static` [🧩`AppContext`](AppContext.md)|`null` `$instance` · [source](../../src/AppContext.php)
+- `protected` array `$services` · [source](../../src/AppContext.php)
+- `protected` [Request](Request.md)|null `$request` · [source](../../src/AppContext.php)
+- `protected` [ViewEngine](ViewEngine.md)|null `$view` · [source](../../src/AppContext.php)
+- `protected` [Session](Session.md)|null `$session` · [source](../../src/AppContext.php)
+- `protected` [Cookies](Cookies.md)|null `$cookies` · [source](../../src/AppContext.php)
+- `protected` [ResolvedRoute](ResolvedRoute.md)|null `$route` · [source](../../src/AppContext.php)
+- `protected` [DatabaseManager](DatabaseManager.md) `$dbManager` · [source](../../src/AppContext.php)
+- `protected static` [AppContext](AppContext.md)|null `$instance` · [source](../../src/AppContext.php)
 
 ## 🚀 Public methods
 
@@ -21,7 +21,7 @@
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### instance() · [source](../../src/AppContext.php#L55)
 
@@ -31,7 +31,7 @@ Get the singleton instance of AppContext. If it doesn't exist, it will be create
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: The singleton instance of AppContext.
 
 ### setInstance() · [source](../../src/AppContext.php#L66)
@@ -44,11 +44,11 @@ Set the singleton instance of AppContext. This can be used to inject a custom co
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$instance` | [🧩`AppContext`](AppContext.md) | - | The AppContext instance to set as the singleton. |
+| `$instance` | [AppContext](AppContext.md) | - | The AppContext instance to set as the singleton. |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### request() · [source](../../src/AppContext.php#L78)
 
@@ -58,7 +58,7 @@ Get the HttpRequest instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [🧩`Request`](Request.md)
+- Type: [Request](Request.md)
 - Description: The HttpRequest instance.
 
 ### view() · [source](../../src/AppContext.php#L88)
@@ -69,7 +69,7 @@ Get the ViewEngine instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [🧩`ViewEngine`](ViewEngine.md)
+- Type: [ViewEngine](ViewEngine.md)
 - Description: The ViewEngine instance.
 
 ### cookies() · [source](../../src/AppContext.php#L98)
@@ -80,7 +80,7 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [🧩`Cookies`](Cookies.md)
+- Type: [Cookies](Cookies.md)
 - Description: The Cookies instance.
 
 ### dbManager() · [source](../../src/AppContext.php#L104)
@@ -89,7 +89,7 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: [🧩`DatabaseManager`](DatabaseManager.md)
+- Type: [DatabaseManager](DatabaseManager.md)
 
 ### session() · [source](../../src/AppContext.php#L114)
 
@@ -99,7 +99,7 @@ Get the Session instance.
 
 **➡️ Return value**
 
-- Type: [🧩`Session`](Session.md)|`null`
+- Type: [Session](Session.md)|null
 
 ### route() · [source](../../src/AppContext.php#L122)
 
@@ -109,7 +109,7 @@ Get the current resolved route information.
 
 **➡️ Return value**
 
-- Type: [🧩`ResolvedRoute`](ResolvedRoute.md)|`null`
+- Type: [ResolvedRoute](ResolvedRoute.md)|null
 
 ### setRoute() · [source](../../src/AppContext.php#L132)
 
@@ -121,11 +121,11 @@ Set the current resolved route information.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$route` | [🧩`ResolvedRoute`](ResolvedRoute.md) | - | The resolved route to set in the context. |
+| `$route` | [ResolvedRoute](ResolvedRoute.md) | - | The resolved route to set in the context. |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### set() · [source](../../src/AppContext.php#L145)
 
@@ -137,12 +137,12 @@ Register a service instance in the context.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🔤 `string` | - | The identifier for the service (usually the class name). |
-| `$service` | 🧱 `object` | - | The service instance to register. |
+| `$id` | string | - | The identifier for the service (usually the class name). |
+| `$service` | object | - | The service instance to register. |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### has() · [source](../../src/AppContext.php#L156)
 
@@ -154,11 +154,11 @@ Check if a service is registered in the context.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🔤 `string` | - | The identifier of the service to check. |
+| `$id` | string | - | The identifier of the service to check. |
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if the service is registered, false otherwise.
 
 ### get() · [source](../../src/AppContext.php#L168)
@@ -171,16 +171,16 @@ Get a service instance from the context. If the service is not registered but th
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
+| `$id` | string | - | The identifier of the service to retrieve. |
 
 **➡️ Return value**
 
-- Type: 🧱 `object`
+- Type: object
 - Description: The service instance associated with the given identifier.
 
 **⚠️ Throws**
 
-- `RuntimeException`  If the service is not found and cannot be auto-wired.
+- RuntimeException  If the service is not found and cannot be auto-wired.
 
 ### tryGet() · [source](../../src/AppContext.php#L187)
 
@@ -192,11 +192,11 @@ Try to get a service instance from the context. If the service is not registered
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
+| `$id` | string | - | The identifier of the service to retrieve. |
 
 **➡️ Return value**
 
-- Type: 🧱 `object`|`null`
+- Type: object|null
 - Description: The service instance associated with the given identifier, or null if not found.
 
 ### getOrNull() · [source](../../src/AppContext.php#L206)
@@ -209,10 +209,10 @@ Get a service instance from the context if it exists, or null if it does not exi
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
+| `$id` | string | - | The identifier of the service to retrieve. |
 
 **➡️ Return value**
 
-- Type: 🧱 `object`|`null`
+- Type: object|null
 - Description: The service instance associated with the given identifier, or null if not found.
 

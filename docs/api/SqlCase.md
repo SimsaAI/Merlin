@@ -6,8 +6,8 @@ Fluent builder for CASE expressions
 
 ## 🔐 Properties
 
-- `protected` 📦 `array` `$whenClauses` · [source](../../src/Db/Sql.php)
-- `protected` 🎲 `mixed` `$elseValue` · [source](../../src/Db/Sql.php)
+- `protected` array `$whenClauses` · [source](../../src/Db/Sql.php)
+- `protected` mixed `$elseValue` · [source](../../src/Db/Sql.php)
 
 ## 🚀 Public methods
 
@@ -21,12 +21,12 @@ Add WHEN condition THEN result clause
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🎲 `mixed` | - | Condition (scalar or Sql instance) |
-| `$then` | 🎲 `mixed` | - | Result value (scalar or Sql instance) |
+| `$condition` | mixed | - | Condition (scalar or Sql instance) |
+| `$then` | mixed | - | Result value (scalar or Sql instance) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### else() · [source](../../src/Db/Sql.php#L425)
 
@@ -38,11 +38,11 @@ Set ELSE default value
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | Default value (scalar or Sql instance) |
+| `$value` | mixed | - | Default value (scalar or Sql instance) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### end() · [source](../../src/Db/Sql.php#L435)
 
@@ -52,5 +52,5 @@ Finalize and return CASE expression as Sql
 
 **➡️ Return value**
 
-- Type: [🧩`Sql`](Sql.md)
+- Type: [Sql](Sql.md)
 

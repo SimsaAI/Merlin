@@ -18,13 +18,13 @@ This includes:
 
 ## 🔐 Properties
 
-- `public` 🔤 `string`|`null` `$namespace` · [source](../../src/AppContext.php)
-- `public` 🔤 `string` `$controller` · [source](../../src/AppContext.php)
-- `public` 🔤 `string` `$action` · [source](../../src/AppContext.php)
-- `public` 📦 `array` `$params` · [source](../../src/AppContext.php)
-- `public` 📦 `array` `$vars` · [source](../../src/AppContext.php)
-- `public` 📦 `array` `$groups` · [source](../../src/AppContext.php)
-- `public` 📦 `array` `$override` · [source](../../src/AppContext.php)
+- `public` string|null `$namespace` · [source](../../src/AppContext.php)
+- `public` string `$controller` · [source](../../src/AppContext.php)
+- `public` string `$action` · [source](../../src/AppContext.php)
+- `public` array `$params` · [source](../../src/AppContext.php)
+- `public` array `$vars` · [source](../../src/AppContext.php)
+- `public` array `$groups` · [source](../../src/AppContext.php)
+- `public` array `$override` · [source](../../src/AppContext.php)
 
 ## 🚀 Public methods
 
@@ -36,15 +36,15 @@ This includes:
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$namespace` | 🔤 `string`\|`null` | - |  |
-| `$controller` | 🔤 `string` | - |  |
-| `$action` | 🔤 `string` | - |  |
-| `$params` | 📦 `array` | - |  |
-| `$vars` | 📦 `array` | - |  |
-| `$groups` | 📦 `array` | - |  |
-| `$override` | 📦 `array` | - |  |
+| `$namespace` | string\|null | - |  |
+| `$controller` | string | - |  |
+| `$action` | string | - |  |
+| `$params` | array | - |  |
+| `$vars` | array | - |  |
+| `$groups` | array | - |  |
+| `$override` | array | - |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 

@@ -4,9 +4,9 @@
 
 ## 🔐 Properties
 
-- `protected` 🔢 `int` `$status` · [source](../../src/Http/Response.php)
-- `protected` 📦 `array` `$headers` · [source](../../src/Http/Response.php)
-- `protected` 🔤 `string` `$body` · [source](../../src/Http/Response.php)
+- `protected` int `$status` · [source](../../src/Http/Response.php)
+- `protected` array `$headers` · [source](../../src/Http/Response.php)
+- `protected` string `$body` · [source](../../src/Http/Response.php)
 
 ## 🚀 Public methods
 
@@ -18,13 +18,13 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$status` | 🔢 `int` | `200` |  |
-| `$headers` | 📦 `array` | `[]` |  |
-| `$body` | 🔤 `string` | `''` |  |
+| `$status` | int | `200` |  |
+| `$headers` | array | `[]` |  |
+| `$body` | string | `''` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### setStatus() · [source](../../src/Http/Response.php#L13)
 
@@ -34,11 +34,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$code` | 🔢 `int` | - |  |
+| `$code` | int | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### setHeader() · [source](../../src/Http/Response.php#L19)
 
@@ -48,12 +48,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | 🔤 `string` | - |  |
-| `$value` | 🔤 `string` | - |  |
+| `$key` | string | - |  |
+| `$value` | string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### write() · [source](../../src/Http/Response.php#L25)
 
@@ -63,11 +63,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$text` | 🔤 `string` | - |  |
+| `$text` | string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### send() · [source](../../src/Http/Response.php#L31)
 
@@ -75,7 +75,7 @@
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### json() · [source](../../src/Http/Response.php#L42)
 
@@ -85,12 +85,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$data` | 🎲 `mixed` | - |  |
-| `$status` | 🔢 `int` | `200` |  |
+| `$data` | mixed | - |  |
+| `$status` | int | `200` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### text() · [source](../../src/Http/Response.php#L51)
 
@@ -100,12 +100,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$text` | 🔤 `string` | - |  |
-| `$status` | 🔢 `int` | `200` |  |
+| `$text` | string | - |  |
+| `$status` | int | `200` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### html() · [source](../../src/Http/Response.php#L60)
 
@@ -115,12 +115,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$html` | 🔤 `string` | - |  |
-| `$status` | 🔢 `int` | `200` |  |
+| `$html` | string | - |  |
+| `$status` | int | `200` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### redirect() · [source](../../src/Http/Response.php#L69)
 
@@ -130,12 +130,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$url` | 🔤 `string` | - |  |
-| `$status` | 🔢 `int` | `302` |  |
+| `$url` | string | - |  |
+| `$status` | int | `302` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### status() · [source](../../src/Http/Response.php#L78)
 
@@ -145,9 +145,9 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$status` | 🔢 `int` | - |  |
+| `$status` | int | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 

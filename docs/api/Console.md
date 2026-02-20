@@ -4,10 +4,10 @@
 
 ## 🔐 Properties
 
-- `protected` 🔤 `string` `$defaultTask` · [source](../../src/Cli/Console.php)
-- `protected` 🔤 `string` `$defaultAction` · [source](../../src/Cli/Console.php)
-- `protected` 🔤 `string` `$namespace` · [source](../../src/Cli/Console.php)
-- `protected` ⚙️ `bool` `$parseParams` · [source](../../src/Cli/Console.php)
+- `protected` string `$defaultTask` · [source](../../src/Cli/Console.php)
+- `protected` string `$defaultAction` · [source](../../src/Cli/Console.php)
+- `protected` string `$namespace` · [source](../../src/Cli/Console.php)
+- `protected` bool `$parseParams` · [source](../../src/Cli/Console.php)
 
 ## 🚀 Public methods
 
@@ -17,7 +17,7 @@
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### setDefaultTask() · [source](../../src/Cli/Console.php#L24)
 
@@ -27,11 +27,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultTask` | 🔤 `string` | - |  |
+| `$defaultTask` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### getDefaultAction() · [source](../../src/Cli/Console.php#L32)
 
@@ -39,7 +39,7 @@
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### setDefaultAction() · [source](../../src/Cli/Console.php#L37)
 
@@ -49,11 +49,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultAction` | 🔤 `string` | - |  |
+| `$defaultAction` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### getNamespace() · [source](../../src/Cli/Console.php#L45)
 
@@ -61,7 +61,7 @@
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### setNamespace() · [source](../../src/Cli/Console.php#L50)
 
@@ -71,11 +71,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$namespace` | 🔤 `string` | - |  |
+| `$namespace` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### shouldParseParams() · [source](../../src/Cli/Console.php#L61)
 
@@ -83,7 +83,7 @@
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 
 ### setParseParams() · [source](../../src/Cli/Console.php#L66)
 
@@ -93,11 +93,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$parseParams` | ⚙️ `bool` | - |  |
+| `$parseParams` | bool | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### process() · [source](../../src/Cli/Console.php#L79)
 
@@ -107,16 +107,16 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$task` | 🔤 `string`\|`null` | `null` |  |
-| `$action` | 🔤 `string`\|`null` | `null` |  |
-| `$params` | 📦 `array` | `[]` |  |
+| `$task` | string\|null | `null` |  |
+| `$action` | string\|null | `null` |  |
+| `$params` | array | `[]` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 **⚠️ Throws**
 
-- [🧩`TaskNotFoundException`](TaskNotFoundException.md)
-- [🧩`ActionNotFoundException`](ActionNotFoundException.md)
+- [TaskNotFoundException](TaskNotFoundException.md)
+- [ActionNotFoundException](ActionNotFoundException.md)
 

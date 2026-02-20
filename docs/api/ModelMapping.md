@@ -6,7 +6,7 @@ Class to map models
 
 ## 🔐 Properties
 
-- `private` 📦 `array` `$mapping` · [source](../../src/Mvc/ModelMapping.php)
+- `private` array `$mapping` · [source](../../src/Mvc/ModelMapping.php)
 
 ## 🚀 Public methods
 
@@ -20,11 +20,11 @@ ModelMapping constructor.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$mapping` | 📦 `array`\|`null` | `null` |  |
+| `$mapping` | array\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### add() · [source](../../src/Mvc/ModelMapping.php#L31)
 
@@ -36,13 +36,13 @@ Add model mapping
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
-| `$source` | 🔤 `string`\|`null` | `null` |  |
-| `$schema` | 🔤 `string`\|`null` | `null` |  |
+| `$name` | string | - |  |
+| `$source` | string\|null | `null` |  |
+| `$schema` | string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### get() · [source](../../src/Mvc/ModelMapping.php#L52)
 
@@ -54,11 +54,11 @@ Get model mapping by name
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
+| `$name` | string | - |  |
 
 **➡️ Return value**
 
-- Type: 📦 `array`|`null`
+- Type: array|null
 
 ### getAll() · [source](../../src/Mvc/ModelMapping.php#L62)
 
@@ -68,7 +68,7 @@ Get all model mapping
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L76)
 
@@ -84,10 +84,10 @@ Multiple separators are unified into a single underscore, and duplicate undersco
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | The input string to convert. |
+| `$name` | string | - | The input string to convert. |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: The converted snake_case string.
 

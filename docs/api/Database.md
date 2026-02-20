@@ -6,17 +6,17 @@ Class Database
 
 ## 🔐 Properties
 
-- `protected` 🔤 `string` `$connectString` · [source](../../src/Db/Database.php)
-- `protected` 🔤 `string` `$user` · [source](../../src/Db/Database.php)
-- `protected` 🔤 `string` `$driverName` · [source](../../src/Db/Database.php)
-- `protected` 🔤 `string` `$pass` · [source](../../src/Db/Database.php)
-- `protected` 📦 `array` `$options` · [source](../../src/Db/Database.php)
-- `protected` `PDO` `$pdo` · [source](../../src/Db/Database.php)
-- `protected` `PDOStatement` `$statement` · [source](../../src/Db/Database.php)
-- `protected` 🔢 `int` `$transactionLevel` · [source](../../src/Db/Database.php)
-- `protected` 🔤 `string` `$quoteChar` · [source](../../src/Db/Database.php)
-- `protected` 📦 `array`|⚙️ `bool` `$autoReconnect` · [source](../../src/Db/Database.php)
-- `protected` 📦 `array` `$listeners` · [source](../../src/Db/Database.php)
+- `protected` string `$connectString` · [source](../../src/Db/Database.php)
+- `protected` string `$user` · [source](../../src/Db/Database.php)
+- `protected` string `$driverName` · [source](../../src/Db/Database.php)
+- `protected` string `$pass` · [source](../../src/Db/Database.php)
+- `protected` array `$options` · [source](../../src/Db/Database.php)
+- `protected` PDO `$pdo` · [source](../../src/Db/Database.php)
+- `protected` PDOStatement `$statement` · [source](../../src/Db/Database.php)
+- `protected` int `$transactionLevel` · [source](../../src/Db/Database.php)
+- `protected` string `$quoteChar` · [source](../../src/Db/Database.php)
+- `protected` array|bool `$autoReconnect` · [source](../../src/Db/Database.php)
+- `protected` array `$listeners` · [source](../../src/Db/Database.php)
 
 ## 🚀 Public methods
 
@@ -30,18 +30,18 @@ Create a new database connection using the provided DSN, credentials and options
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$dsn` | 🔤 `string` | - |  |
-| `$user` | 🔤 `string` | `''` |  |
-| `$pass` | 🔤 `string` | `''` |  |
-| `$options` | 📦 `array` | `[]` |  |
+| `$dsn` | string | - |  |
+| `$user` | string | `''` |  |
+| `$pass` | string | `''` |  |
+| `$options` | array | `[]` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### connect() · [source](../../src/Db/Database.php#L83)
 
@@ -51,11 +51,11 @@ Establish a new PDO connection using the current configuration
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### addListener() · [source](../../src/Db/Database.php#L99)
 
@@ -67,11 +67,11 @@ Add an event listener for database events
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$listener` | `callable` | - | A callable that receives the event name and relevant data |
+| `$listener` | callable | - | A callable that receives the event name and relevant data |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### setAutoReconnect() · [source](../../src/Db/Database.php#L122)
 
@@ -83,17 +83,17 @@ Configure automatic reconnection behavior with detailed options
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$enabled` | ⚙️ `bool` | `true` | Enable or disable auto-reconnect |
-| `$maxAttempts` | 🔢 `int` | `0` | Maximum number of retry attempts (0 for unlimited) |
-| `$retryDelay` | 🌡️ `float` | `1` | Initial delay between retries in seconds |
-| `$backoffMultiplier` | 🌡️ `float` | `2` | Multiplier for exponential backoff |
-| `$maxRetryDelay` | 🌡️ `float` | `30` | Maximum delay between retries in seconds |
-| `$jitter` | ⚙️ `bool` | `true` | Whether to add random jitter to retry delays |
-| `$onReconnect` | `callable`\|`null` | `null` | Optional callback invoked on successful reconnect (receives attempt number and db instance) |
+| `$enabled` | bool | `true` | Enable or disable auto-reconnect |
+| `$maxAttempts` | int | `0` | Maximum number of retry attempts (0 for unlimited) |
+| `$retryDelay` | float | `1` | Initial delay between retries in seconds |
+| `$backoffMultiplier` | float | `2` | Multiplier for exponential backoff |
+| `$maxRetryDelay` | float | `30` | Maximum delay between retries in seconds |
+| `$jitter` | bool | `true` | Whether to add random jitter to retry delays |
+| `$onReconnect` | callable\|null | `null` | Optional callback invoked on successful reconnect (receives attempt number and db instance) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### getAutoReconnect() · [source](../../src/Db/Database.php#L147)
 
@@ -103,7 +103,7 @@ Get auto-reconnect configuration
 
 **➡️ Return value**
 
-- Type: 📦 `array`|⚙️ `bool`
+- Type: array|bool
 
 ### query() · [source](../../src/Db/Database.php#L159)
 
@@ -115,16 +115,16 @@ Execute a SQL query with optional parameters and return the resulting statement 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$query` | 🔤 `string` | - | SQL query to execute |
-| `$params` | 📦 `array`\|`null` | `null` | Optional parameters for prepared statements |
+| `$query` | string | - | SQL query to execute |
+| `$params` | array\|null | `null` | Optional parameters for prepared statements |
 
 **➡️ Return value**
 
-- Type: `PDOStatement`|⚙️ `bool`
+- Type: PDOStatement|bool
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### prepare() · [source](../../src/Db/Database.php#L194)
 
@@ -136,15 +136,15 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$query` | 🔤 `string` | - | SQL query to prepare |
+| `$query` | string | - | SQL query to prepare |
 
 **➡️ Return value**
 
-- Type: `PDOStatement`|⚙️ `bool`
+- Type: PDOStatement|bool
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### execute() · [source](../../src/Db/Database.php#L221)
 
@@ -154,15 +154,15 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$params` | 📦 `array` | `[]` |  |
+| `$params` | array | `[]` |  |
 
 **➡️ Return value**
 
-- Type: `PDOStatement`|⚙️ `bool`
+- Type: PDOStatement|bool
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### selectRow() · [source](../../src/Db/Database.php#L386)
 
@@ -174,13 +174,13 @@ Fetch a single row from the database as object, associative array, or numeric ar
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$query` | 🔤 `string` | - |  |
-| `$params` | 📦 `array`\|`null` | `null` |  |
-| `$fetchMode` | 🔢 `int` | `0` |  |
+| `$query` | string | - |  |
+| `$params` | array\|null | `null` |  |
+| `$fetchMode` | int | `0` |  |
 
 **➡️ Return value**
 
-- Type: 📦 `array`|⚙️ `bool`
+- Type: array|bool
 
 ### selectAll() · [source](../../src/Db/Database.php#L401)
 
@@ -192,13 +192,13 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$query` | 🔤 `string` | - |  |
-| `$params` | 📦 `array`\|`null` | `null` |  |
-| `$fetchMode` | 🔢 `int` | `0` |  |
+| `$query` | string | - |  |
+| `$params` | array\|null | `null` |  |
+| `$fetchMode` | int | `0` |  |
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### rowCount() · [source](../../src/Db/Database.php#L412)
 
@@ -206,7 +206,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 
 ### lastInsertId() · [source](../../src/Db/Database.php#L420)
 
@@ -216,12 +216,12 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$table` | 🔤 `string`\|`null` | `null` |  |
-| `$field` | 🔤 `string`\|`null` | `null` |  |
+| `$table` | string\|null | `null` |  |
+| `$field` | string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|⚙️ `bool`
+- Type: string|bool
 
 ### begin() · [source](../../src/Db/Database.php#L448)
 
@@ -231,11 +231,11 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$nesting` | ⚙️ `bool` | `true` |  |
+| `$nesting` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🔢 `int`|⚙️ `bool`
+- Type: int|bool
 
 ### commit() · [source](../../src/Db/Database.php#L485)
 
@@ -245,11 +245,11 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$nesting` | ⚙️ `bool` | `true` |  |
+| `$nesting` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🔢 `int`|⚙️ `bool`
+- Type: int|bool
 
 ### rollback() · [source](../../src/Db/Database.php#L531)
 
@@ -261,15 +261,15 @@ Rollback the current transaction or to a savepoint if nesting is enabled and sup
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$nesting` | ⚙️ `bool` | `true` | Whether to use savepoints for nested transactions (if supported by the driver) |
+| `$nesting` | bool | `true` | Whether to use savepoints for nested transactions (if supported by the driver) |
 
 **➡️ Return value**
 
-- Type: 🔢 `int`|⚙️ `bool`
+- Type: int|bool
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### quote() · [source](../../src/Db/Database.php#L576)
 
@@ -281,11 +281,11 @@ Quote a string for use in a query.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$str` | 🔤 `string`\|`null` | - |  |
+| `$str` | string\|null | - |  |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|⚙️ `bool`
+- Type: string|bool
 
 ### quoteIdentifier() · [source](../../src/Db/Database.php#L589)
 
@@ -295,11 +295,11 @@ Quote a string for use in a query.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$args` | 🔤 `string`\|`null` | - | ...?string $args |
+| `$args` | string\|null | - | ...?string $args |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### getInternalConnection() · [source](../../src/Db/Database.php#L617)
 
@@ -307,7 +307,7 @@ Quote a string for use in a query.
 
 **➡️ Return value**
 
-- Type: `PDO`|`null`
+- Type: PDO|null
 
 ### builder() · [source](../../src/Db/Database.php#L626)
 
@@ -317,7 +317,7 @@ Create a new Query builder instance associated with this database connection.
 
 **➡️ Return value**
 
-- Type: [🧩`Query`](Query.md)
+- Type: [Query](Query.md)
 
 ### getDriver() · [source](../../src/Db/Database.php#L634)
 
@@ -325,5 +325,5 @@ Create a new Query builder instance associated with this database connection.
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 

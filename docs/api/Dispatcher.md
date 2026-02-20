@@ -4,13 +4,13 @@
 
 ## 🔐 Properties
 
-- `protected` [🧩`AppContext`](AppContext.md) `$context` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 📦 `array` `$globalMiddleware` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 📦 `array` `$middlewareGroups` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 🔤 `string` `$baseNamespace` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 🔤 `string` `$defaultController` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 🔤 `string` `$defaultAction` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` 🎲 `mixed` `$controllerFactory` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` [AppContext](AppContext.md) `$context` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` array `$globalMiddleware` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` array `$middlewareGroups` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` string `$baseNamespace` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` string `$defaultController` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` string `$defaultAction` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` mixed `$controllerFactory` · [source](../../src/Mvc/Dispatcher.php)
 
 ## 🚀 Public methods
 
@@ -20,7 +20,7 @@
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L26)
 
@@ -30,11 +30,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$mw` | `Merlin\Mvc\MiddlewareInterface` | - |  |
+| `$mw` | Merlin\Mvc\MiddlewareInterface | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L33)
 
@@ -44,12 +44,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
-| `$middleware` | 📦 `array` | - |  |
+| `$name` | string | - |  |
+| `$middleware` | array | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L46)
 
@@ -59,7 +59,7 @@ Get the base namespace for controllers.
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: The base namespace for controllers.
 
 ### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L57)
@@ -72,11 +72,11 @@ Set the base namespace for controllers. This namespace will be prefixed to all c
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$baseNamespace` | 🔤 `string` | - | The base namespace for controllers (e.g. "App\\Controllers") |
+| `$baseNamespace` | string | - | The base namespace for controllers (e.g. "App\\Controllers") |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L68)
 
@@ -86,7 +86,7 @@ Get the default controller name used when a route doesn't provide one.
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: Default controller class name (without namespace)
 
 ### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L79)
@@ -99,15 +99,15 @@ Set the default controller name.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultController` | 🔤 `string` | - | Controller class name to use as default |
+| `$defaultController` | string | - | Controller class name to use as default |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- `InvalidArgumentException`  If given name is empty
+- InvalidArgumentException  If given name is empty
 
 ### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L93)
 
@@ -117,7 +117,7 @@ Get the default action name used when a route doesn't provide one.
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: Default action method name
 
 ### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L104)
@@ -130,15 +130,15 @@ Set the default action name.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultAction` | 🔤 `string` | - | Action method name to use as default |
+| `$defaultAction` | string | - | Action method name to use as default |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- `InvalidArgumentException`  If given name is empty
+- InvalidArgumentException  If given name is empty
 
 ### dispatch() · [source](../../src/Mvc/Dispatcher.php#L121)
 
@@ -150,17 +150,17 @@ Dispatch a request to the appropriate controller and action based on the provide
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$routeInfo` | 📦 `array` | - |  |
+| `$routeInfo` | array | - |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Response`](Response.md)
+- Type: [Response](Response.md)
 
 **⚠️ Throws**
 
-- [🧩`ControllerNotFoundException`](ControllerNotFoundException.md)
-- [🧩`InvalidControllerException`](InvalidControllerException.md)
-- [🧩`ActionNotFoundException`](ActionNotFoundException.md)
+- [ControllerNotFoundException](ControllerNotFoundException.md)
+- [InvalidControllerException](InvalidControllerException.md)
+- [ActionNotFoundException](ActionNotFoundException.md)
 
 ### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L501)
 
@@ -170,9 +170,9 @@ Dispatch a request to the appropriate controller and action based on the provide
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$factory` | `callable` | - |  |
+| `$factory` | callable | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 

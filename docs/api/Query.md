@@ -12,43 +12,43 @@ Unified query builder for SELECT, INSERT, UPDATE, DELETE operations
 
 ## 🔐 Properties
 
-- `protected static` ⚙️ `bool` `$useModels` · [source](../../src/Db/Query.php)
-- `protected static` 📦 `array` `$modelCache` · [source](../../src/Db/Query.php)
-- `protected static` [🧩`ModelMapping`](ModelMapping.md)|`null` `$modelMapping` · [source](../../src/Db/Query.php)
-- `protected` [🧩`Model`](Model.md)|`null` `$model` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$bindParams` · [source](../../src/Db/Query.php)
-- `protected` 🔢 `int` `$limit` · [source](../../src/Db/Query.php)
-- `protected` 🔢 `int` `$offset` · [source](../../src/Db/Query.php)
-- `protected` 🔢 `int` `$rowCount` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$isReadQuery` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$hasResultSet` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array`|`null` `$columns` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$joins` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$orderBy` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$values` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$getModelDb` · [source](../../src/Db/Query.php)
-- `protected` 🔤 `string`|`null` `$table` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$returnSql` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$groupBy` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$forUpdate` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$sharedLock` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$distinct` · [source](../../src/Db/Query.php)
-- `protected` 🔤 `string` `$preColumnInjection` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$replaceInto` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$ignore` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$updateValues` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$updateValuesIsList` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array`|🔤 `string` `$conflictTarget` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array`|🔤 `string`|`null` `$returning` · [source](../../src/Db/Query.php)
-- `protected` [🧩`Database`](Database.md)|`null` `$db` · [source](../../src/Db/Query.php)
-- `protected` 🔤 `string` `$condition` · [source](../../src/Db/Query.php)
-- `protected` ⚙️ `bool` `$needOperator` · [source](../../src/Db/Query.php)
-- `protected` 🔢 `int` `$paramCounter` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$autoBindParams` · [source](../../src/Db/Query.php)
-- `protected` 🎲 `mixed` `$modelResolver` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$tableCache` · [source](../../src/Db/Query.php)
-- `protected` 📦 `array` `$deferredModelPrefixes` · [source](../../src/Db/Query.php)
-- `protected` 🔤 `string`|`null` `$finalCondition` · [source](../../src/Db/Query.php)
+- `protected static` bool `$useModels` · [source](../../src/Db/Query.php)
+- `protected static` array `$modelCache` · [source](../../src/Db/Query.php)
+- `protected static` [ModelMapping](ModelMapping.md)|null `$modelMapping` · [source](../../src/Db/Query.php)
+- `protected` [Model](Model.md)|null `$model` · [source](../../src/Db/Query.php)
+- `protected` array `$bindParams` · [source](../../src/Db/Query.php)
+- `protected` int `$limit` · [source](../../src/Db/Query.php)
+- `protected` int `$offset` · [source](../../src/Db/Query.php)
+- `protected` int `$rowCount` · [source](../../src/Db/Query.php)
+- `protected` bool `$isReadQuery` · [source](../../src/Db/Query.php)
+- `protected` bool `$hasResultSet` · [source](../../src/Db/Query.php)
+- `protected` array|null `$columns` · [source](../../src/Db/Query.php)
+- `protected` array `$joins` · [source](../../src/Db/Query.php)
+- `protected` array `$orderBy` · [source](../../src/Db/Query.php)
+- `protected` array `$values` · [source](../../src/Db/Query.php)
+- `protected` bool `$getModelDb` · [source](../../src/Db/Query.php)
+- `protected` string|null `$table` · [source](../../src/Db/Query.php)
+- `protected` bool `$returnSql` · [source](../../src/Db/Query.php)
+- `protected` array `$groupBy` · [source](../../src/Db/Query.php)
+- `protected` bool `$forUpdate` · [source](../../src/Db/Query.php)
+- `protected` bool `$sharedLock` · [source](../../src/Db/Query.php)
+- `protected` bool `$distinct` · [source](../../src/Db/Query.php)
+- `protected` string `$preColumnInjection` · [source](../../src/Db/Query.php)
+- `protected` bool `$replaceInto` · [source](../../src/Db/Query.php)
+- `protected` bool `$ignore` · [source](../../src/Db/Query.php)
+- `protected` array `$updateValues` · [source](../../src/Db/Query.php)
+- `protected` bool `$updateValuesIsList` · [source](../../src/Db/Query.php)
+- `protected` array|string `$conflictTarget` · [source](../../src/Db/Query.php)
+- `protected` array|string|null `$returning` · [source](../../src/Db/Query.php)
+- `protected` [Database](Database.md)|null `$db` · [source](../../src/Db/Query.php)
+- `protected` string `$condition` · [source](../../src/Db/Query.php)
+- `protected` bool `$needOperator` · [source](../../src/Db/Query.php)
+- `protected` int `$paramCounter` · [source](../../src/Db/Query.php)
+- `protected` array `$autoBindParams` · [source](../../src/Db/Query.php)
+- `protected` mixed `$modelResolver` · [source](../../src/Db/Query.php)
+- `protected` array `$tableCache` · [source](../../src/Db/Query.php)
+- `protected` array `$deferredModelPrefixes` · [source](../../src/Db/Query.php)
+- `protected` string|null `$finalCondition` · [source](../../src/Db/Query.php)
 
 ## 🚀 Public methods
 
@@ -62,11 +62,11 @@ Enable or disable automatic model resolution for queries. If enabled, the query 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$useModels` | ⚙️ `bool` | - |  |
+| `$useModels` | bool | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### setModelMapping() · [source](../../src/Db/Query.php#L65)
 
@@ -78,11 +78,11 @@ Set the model mapping instance to use for resolving model class names to table n
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$modelMapping` | [🧩`ModelMapping`](ModelMapping.md)\|`null` | - |  |
+| `$modelMapping` | [ModelMapping](ModelMapping.md)\|null | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### __construct() · [source](../../src/Db/Query.php#L161)
 
@@ -94,12 +94,12 @@ Constructor. Can optionally pass a Database connection to use for this query, or
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$db` | [🧩`Database`](Database.md)\|`null` | `null` |  |
-| `$model` | [🧩`Model`](Model.md)\|`null` | `null` |  |
+| `$db` | [Database](Database.md)\|null | `null` |  |
+| `$model` | [Model](Model.md)\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### new() · [source](../../src/Db/Query.php#L175)
 
@@ -111,11 +111,11 @@ Factory method to create a new Query instance. Can optionally pass a Database co
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$db` | [🧩`Database`](Database.md)\|`null` | `null` |  |
+| `$db` | [Database](Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### table() · [source](../../src/Db/Query.php#L213)
 
@@ -127,16 +127,16 @@ Set the table for this query. Can be either a table name or a model class name. 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | Table name or model class name |
-| `$alias` | 🔤 `string`\|`null` | `null` | Optional table alias |
+| `$name` | string | - | Table name or model class name |
+| `$alias` | string\|null | `null` | Optional table alias |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### columns() · [source](../../src/Db/Query.php#L229)
 
@@ -148,11 +148,11 @@ Set columns for SELECT queries. Can be either a comma-separated string or an arr
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$columns` | 📦 `array`\|🔤 `string` | - |  |
+| `$columns` | array\|string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### limit() · [source](../../src/Db/Query.php#L246)
 
@@ -165,12 +165,12 @@ Set the LIMIT and optional OFFSET for SELECT queries
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$limit` | 🔢 `int` | - |  |
-| `$offset` | 🔢 `int` | `0` |  |
+| `$limit` | int | - |  |
+| `$offset` | int | `0` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### offset() · [source](../../src/Db/Query.php#L258)
 
@@ -182,11 +182,11 @@ Sets an OFFSET clause for SELECT queries
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$offset` | 🔢 `int` | - |  |
+| `$offset` | int | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### values() · [source](../../src/Db/Query.php#L272)
 
@@ -200,12 +200,12 @@ Adds values for INSERT or UPDATE queries. Can be either:
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$values` | 🧱 `object`\|📦 `array` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$values` | object\|array | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### bulkValues() · [source](../../src/Db/Query.php#L296)
 
@@ -219,12 +219,12 @@ Each item in the list should be an array of column => value pairs.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$valuesList` | 📦 `array` | `[]` |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$valuesList` | array | `[]` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### hasValues() · [source](../../src/Db/Query.php#L316)
 
@@ -234,7 +234,7 @@ Check if any values have been set for this query
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 
 ### set() · [source](../../src/Db/Query.php#L330)
 
@@ -248,13 +248,13 @@ Set a value for INSERT or UPDATE queries. Can be either:
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$column` | 📦 `array`\|🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | `null` |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$column` | array\|string | - |  |
+| `$value` | mixed | `null` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### join() · [source](../../src/Db/Query.php#L361)
 
@@ -266,18 +266,18 @@ Add a JOIN clause to the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$model` | 🔤 `string` | - |  |
-| `$alias` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$conditions` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$type` | 🔤 `string`\|`null` | `null` |  |
+| `$model` | string | - |  |
+| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$type` | string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### innerJoin() · [source](../../src/Db/Query.php#L419)
 
@@ -289,17 +289,17 @@ Adds an INNER join to the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$model` | 🔤 `string` | - |  |
-| `$alias` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$conditions` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
+| `$model` | string | - |  |
+| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### leftJoin() · [source](../../src/Db/Query.php#L432)
 
@@ -311,17 +311,17 @@ Adds a LEFT join to the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$model` | 🔤 `string` | - |  |
-| `$alias` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$conditions` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
+| `$model` | string | - |  |
+| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### rightJoin() · [source](../../src/Db/Query.php#L445)
 
@@ -333,17 +333,17 @@ Adds a RIGHT join to the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$model` | 🔤 `string` | - |  |
-| `$alias` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$conditions` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
+| `$model` | string | - |  |
+| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### crossJoin() · [source](../../src/Db/Query.php#L458)
 
@@ -355,17 +355,17 @@ Adds a CROSS join to the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$model` | 🔤 `string` | - |  |
-| `$alias` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
-| `$conditions` | [🧩`Condition`](Condition.md)\|🔤 `string`\|`null` | `null` |  |
+| `$model` | string | - |  |
+| `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### orderBy() · [source](../../src/Db/Query.php#L468)
 
@@ -377,11 +377,11 @@ Set ORDER BY clause
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$orderBy` | 📦 `array`\|🔤 `string` | - |  |
+| `$orderBy` | array\|string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### bind() · [source](../../src/Db/Query.php#L481)
 
@@ -393,11 +393,11 @@ Bind parameters for prepared statements. Can be either an associative array or a
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$bindParams` | 🧱 `object`\|📦 `array` | - |  |
+| `$bindParams` | object\|array | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### returnSql() · [source](../../src/Db/Query.php#L495)
 
@@ -409,11 +409,11 @@ Set whether to return the SQL string instead of executing the query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$returnSql` | ⚙️ `bool` | `true` |  |
+| `$returnSql` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### distinct() · [source](../../src/Db/Query.php#L510)
 
@@ -425,11 +425,11 @@ Set DISTINCT modifier for SELECT queries
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$distinct` | ⚙️ `bool` | - |  |
+| `$distinct` | bool | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### injectBeforeColumns() · [source](../../src/Db/Query.php#L521)
 
@@ -441,11 +441,11 @@ Set a string to be injected before the column list in SELECT queries (e.g. for S
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$inject` | 🔤 `string` | - |  |
+| `$inject` | string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### groupBy() · [source](../../src/Db/Query.php#L532)
 
@@ -457,11 +457,11 @@ Set GROUP BY clause
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$groupBy` | 📦 `array`\|🔤 `string` | - |  |
+| `$groupBy` | array\|string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### forUpdate() · [source](../../src/Db/Query.php#L545)
 
@@ -473,11 +473,11 @@ Sets a FOR UPDATE clause (MySQL/PostgreSQL) or FOR SHARE (PostgreSQL)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$forUpdate` | ⚙️ `bool` | - |  |
+| `$forUpdate` | bool | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### sharedLock() · [source](../../src/Db/Query.php#L556)
 
@@ -489,11 +489,11 @@ Sets a LOCK IN SHARE MODE / FOR SHARE clause (MySQL/PostgreSQL)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$sharedLock` | ⚙️ `bool` | - |  |
+| `$sharedLock` | bool | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### replace() · [source](../../src/Db/Query.php#L571)
 
@@ -505,11 +505,11 @@ Mark this as a REPLACE INTO operation (MySQL/SQLite)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$replace` | ⚙️ `bool` | `true` |  |
+| `$replace` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### ignore() · [source](../../src/Db/Query.php#L582)
 
@@ -521,11 +521,11 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$ignore` | ⚙️ `bool` | `true` |  |
+| `$ignore` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### updateValues() · [source](../../src/Db/Query.php#L596)
 
@@ -539,12 +539,12 @@ Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$updateValues` | 📦 `array` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$updateValues` | array | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### conflict() · [source](../../src/Db/Query.php#L627)
 
@@ -558,11 +558,11 @@ Set conflict target for ON CONFLICT clause (PostgreSQL). Can be either:
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$columnsOrConstraint` | 📦 `array`\|🔤 `string` | - |  |
+| `$columnsOrConstraint` | array\|string | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### returning() · [source](../../src/Db/Query.php#L639)
 
@@ -574,15 +574,15 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$columns` | 📦 `array`\|🔤 `string`\|`null` | - |  |
+| `$columns` | array\|string\|null | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### toSql() · [source](../../src/Db/Query.php#L660)
 
@@ -592,11 +592,11 @@ Compile and return the SQL string for this query without executing it
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### select() · [source](../../src/Db/Query.php#L672)
 
@@ -608,15 +608,15 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$columns` | 📦 `array`\|🔤 `string`\|`null` | `null` | Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names. |
+| `$columns` | array\|string\|null | `null` | Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names. |
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)|🔤 `string`
+- Type: [ResultSet](ResultSet.md)|string
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### first() · [source](../../src/Db/Query.php#L697)
 
@@ -626,12 +626,12 @@ Execute SELECT query and return first model or null or return SQL string if retu
 
 **➡️ Return value**
 
-- Type: [🧩`Model`](Model.md)|🔤 `string`|`null`
+- Type: [Model](Model.md)|string|null
 - Description: First model, or SQL string, or null if no results
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### insert() · [source](../../src/Db/Query.php#L712)
 
@@ -643,16 +643,16 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$data` | 📦 `array`\|`null` | `null` | Data to insert |
+| `$data` | array\|null | `null` | Data to insert |
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)|📦 `array`|🔤 `string`|⚙️ `bool`
+- Type: [ResultSet](ResultSet.md)|array|string|bool
 - Description: Insert ID, true on success, or SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### upsert() · [source](../../src/Db/Query.php#L723)
 
@@ -664,16 +664,16 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$data` | 📦 `array`\|`null` | `null` | Data to insert |
+| `$data` | array\|null | `null` | Data to insert |
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)|📦 `array`|🔤 `string`|⚙️ `bool`
+- Type: [ResultSet](ResultSet.md)|array|string|bool
 - Description: Insert ID, true on success, or SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### update() · [source](../../src/Db/Query.php#L764)
 
@@ -685,16 +685,16 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$data` | 📦 `array`\|`null` | `null` | Data to update |
+| `$data` | array\|null | `null` | Data to update |
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)|📦 `array`|🔤 `string`|🔢 `int`
+- Type: [ResultSet](ResultSet.md)|array|string|int
 - Description: Number of affected rows or SQL string, or row of returning clause
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### delete() · [source](../../src/Db/Query.php#L792)
 
@@ -704,12 +704,12 @@ Execute DELETE query
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)|📦 `array`|🔤 `string`|🔢 `int`
+- Type: [ResultSet](ResultSet.md)|array|string|int
 - Description: Number of affected rows, SQL string, or result of returning clause
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### truncate() · [source](../../src/Db/Query.php#L815)
 
@@ -719,12 +719,12 @@ Execute TRUNCATE query or return SQL string if returnSql is enabled
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|🔢 `int`
+- Type: string|int
 - Description: Number of affected rows or SQL string
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### exists() · [source](../../src/Db/Query.php#L834)
 
@@ -734,11 +734,11 @@ Check if any rows exist matching the query
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|⚙️ `bool`
+- Type: string|bool
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### count() · [source](../../src/Db/Query.php#L858)
 
@@ -748,12 +748,12 @@ Count rows matching the query
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|🔢 `int`
+- Type: string|int
 - Description: Number of matching rows or SQL string
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### getBindings() · [source](../../src/Db/Query.php#L1576)
 
@@ -763,7 +763,7 @@ Get bind parameters
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### paginate() · [source](../../src/Db/Query.php#L1589)
 
@@ -775,13 +775,13 @@ Create a paginator for the current query
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$page` | 🔢 `int` | `1` | Page number (1-based) |
-| `$pageSize` | 🔢 `int` | `30` | Number of items per page |
-| `$reverse` | ⚙️ `bool` | `false` | Whether to reverse the order of results (for efficient deep pagination) |
+| `$page` | int | `1` | Page number (1-based) |
+| `$pageSize` | int | `30` | Number of items per page |
+| `$reverse` | bool | `false` | Whether to reverse the order of results (for efficient deep pagination) |
 
 **➡️ Return value**
 
-- Type: [🧩`Paginator`](Paginator.md)
+- Type: [Paginator](Paginator.md)
 
 ### getRowCount() · [source](../../src/Db/Query.php#L1637)
 
@@ -791,5 +791,5 @@ Return the number of affected rows for write operations or the number of rows in
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 

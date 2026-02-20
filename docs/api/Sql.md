@@ -25,12 +25,12 @@ Sql::param() creates bind parameters explicitly
 
 ## 🔐 Properties
 
-- `protected` 🔢 `int` `$type` · [source](../../src/Db/Sql.php)
-- `protected` 🎲 `mixed` `$value` · [source](../../src/Db/Sql.php)
-- `protected` 📦 `array` `$args` · [source](../../src/Db/Sql.php)
-- `protected` 🔤 `string`|`null` `$cast` · [source](../../src/Db/Sql.php)
-- `protected` 📦 `array` `$bindParams` · [source](../../src/Db/Sql.php)
-- `protected` ⚙️ `bool` `$mustResolve` · [source](../../src/Db/Sql.php)
+- `protected` int `$type` · [source](../../src/Db/Sql.php)
+- `protected` mixed `$value` · [source](../../src/Db/Sql.php)
+- `protected` array `$args` · [source](../../src/Db/Sql.php)
+- `protected` string|null `$cast` · [source](../../src/Db/Sql.php)
+- `protected` array `$bindParams` · [source](../../src/Db/Sql.php)
+- `protected` bool `$mustResolve` · [source](../../src/Db/Sql.php)
 
 ## 🚀 Public methods
 
@@ -45,11 +45,11 @@ Supports Model.column syntax for automatic table resolution
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | Column name (simple or Model.column format) |
+| `$name` | string | - | Column name (simple or Model.column format) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### param() · [source](../../src/Db/Sql.php#L92)
 
@@ -61,11 +61,11 @@ Bind parameter reference
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | Parameter name (without colons) |
+| `$name` | string | - | Parameter name (without colons) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### func() · [source](../../src/Db/Sql.php#L103)
 
@@ -77,12 +77,12 @@ SQL function call
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | Function name |
-| `$args` | 📦 `array` | `[]` | Function arguments (scalars or Sql instances) |
+| `$name` | string | - | Function name |
+| `$args` | array | `[]` | Function arguments (scalars or Sql instances) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### cast() · [source](../../src/Db/Sql.php#L114)
 
@@ -94,12 +94,12 @@ Type cast (driver-specific syntax)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | Value to cast (scalar or Sql) |
-| `$type` | 🔤 `string` | - | Target type name |
+| `$value` | mixed | - | Value to cast (scalar or Sql) |
+| `$type` | string | - | Target type name |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### pgArray() · [source](../../src/Db/Sql.php#L124)
 
@@ -111,11 +111,11 @@ PostgreSQL array literal
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$values` | 📦 `array` | - | Array elements (scalars or Sql instances) |
+| `$values` | array | - | Array elements (scalars or Sql instances) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### csList() · [source](../../src/Db/Sql.php#L134)
 
@@ -127,11 +127,11 @@ Comma-separated list (for IN clauses)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$values` | 📦 `array` | - | List elements (scalars or Sql instances) |
+| `$values` | array | - | List elements (scalars or Sql instances) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### raw() · [source](../../src/Db/Sql.php#L145)
 
@@ -143,12 +143,12 @@ Raw SQL (unescaped, passed through as-is)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$sql` | 🔤 `string` | - | Raw SQL string |
-| `$bindParams` | 📦 `array` | `[]` | Optional bind parameters ['param_name' => value] |
+| `$sql` | string | - | Raw SQL string |
+| `$bindParams` | array | `[]` | Optional bind parameters ['param_name' => value] |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### value() · [source](../../src/Db/Sql.php#L157)
 
@@ -160,11 +160,11 @@ Literal value (will be properly quoted/escaped)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | Value to serialize as SQL literal |
+| `$value` | mixed | - | Value to serialize as SQL literal |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### json() · [source](../../src/Db/Sql.php#L167)
 
@@ -176,11 +176,11 @@ JSON value (serialized as JSON literal)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | 🎲 `mixed` | - | Value to encode as JSON |
+| `$value` | mixed | - | Value to encode as JSON |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### concat() · [source](../../src/Db/Sql.php#L179)
 
@@ -194,11 +194,11 @@ MySQL: uses CONCAT() function
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$parts` | 🎲 `mixed` | - | Parts to concatenate (scalars or Sql instances) |
+| `$parts` | mixed | - | Parts to concatenate (scalars or Sql instances) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### expr() · [source](../../src/Db/Sql.php#L191)
 
@@ -212,11 +212,11 @@ Plain strings are treated as raw SQL tokens (not serialized)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$parts` | 🎲 `mixed` | - | Expression parts (strings are raw, use Sql instances for values) |
+| `$parts` | mixed | - | Expression parts (strings are raw, use Sql instances for values) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### case() · [source](../../src/Db/Sql.php#L200)
 
@@ -226,7 +226,7 @@ CASE expression builder
 
 **➡️ Return value**
 
-- Type: [🧩`SqlCase`](SqlCase.md)
+- Type: [SqlCase](SqlCase.md)
 - Description: Fluent builder for CASE expressions
 
 ### as() · [source](../../src/Db/Sql.php#L210)
@@ -239,11 +239,11 @@ Add alias to this expression (returns aliased node)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$alias` | 🔤 `string` | - | Column alias |
+| `$alias` | string | - | Column alias |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: New Sql node with alias
 
 ### getBindParams() · [source](../../src/Db/Sql.php#L219)
@@ -254,7 +254,7 @@ Get bind parameters associated with this node
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 - Description: Associative array of bind parameters
 
 ### toSql() · [source](../../src/Db/Sql.php#L281)
@@ -267,13 +267,13 @@ Serialize node to SQL string
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$driver` | 🔤 `string` | - | Database driver (mysql, pgsql, sqlite) |
-| `$serialize` | `callable` | - | Callback for serializing scalar values<br>Signature: fn(mixed $value, bool $param = false): string |
-| `$protectIdentifier` | `callable`\|`null` | `null` | Callback for identifier resolution and quoting<br>Signature: fn(string $identifier, ?string $alias = null, int $mode = 0): string<br>If not provided, falls back to simple driver-based quoting |
+| `$driver` | string | - | Database driver (mysql, pgsql, sqlite) |
+| `$serialize` | callable | - | Callback for serializing scalar values<br>Signature: fn(mixed $value, bool $param = false): string |
+| `$protectIdentifier` | callable\|null | `null` | Callback for identifier resolution and quoting<br>Signature: fn(string $identifier, ?string $alias = null, int $mode = 0): string<br>If not provided, falls back to simple driver-based quoting |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: SQL fragment
 
 ### __toString() · [source](../../src/Db/Sql.php#L390)
@@ -282,5 +282,5 @@ Serialize node to SQL string
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 

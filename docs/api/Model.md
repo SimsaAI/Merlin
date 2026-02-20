@@ -4,10 +4,10 @@
 
 ## 🔐 Properties
 
-- `protected` 🎲 `mixed` `$__state__` · [source](../../src/Mvc/Model.php)
-- `protected static` 📦 `array` `$excludedPropertiesCache` · [source](../../src/Mvc/Model.php)
-- `protected static` 📦 `array` `$defaultReadRoles` · [source](../../src/Mvc/Model.php)
-- `protected static` 📦 `array` `$defaultWriteRoles` · [source](../../src/Mvc/Model.php)
+- `protected` mixed `$__state__` · [source](../../src/Mvc/Model.php)
+- `protected static` array `$excludedPropertiesCache` · [source](../../src/Mvc/Model.php)
+- `protected static` array `$defaultReadRoles` · [source](../../src/Mvc/Model.php)
+- `protected static` array `$defaultWriteRoles` · [source](../../src/Mvc/Model.php)
 
 ## 🚀 Public methods
 
@@ -21,7 +21,7 @@ Override this method if you want to specify a custom source.
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 
 ### schema() · [source](../../src/Mvc/Model.php#L36)
 
@@ -33,7 +33,7 @@ Override this method if you want to specify a schema (e.g. for PostgreSQL).
 
 **➡️ Return value**
 
-- Type: 🔤 `string`|`null`
+- Type: string|null
 
 ### idFields() · [source](../../src/Mvc/Model.php#L46)
 
@@ -45,7 +45,7 @@ Override this method if your model has a different primary key or composite keys
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 - Description: List of primary key field names
 
 ### query() · [source](../../src/Mvc/Model.php#L61)
@@ -60,11 +60,11 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$alias` | 🔤 `string`\|`null` | `null` | Optional alias for the model in the query |
+| `$alias` | string\|null | `null` | Optional alias for the model in the query |
 
 **➡️ Return value**
 
-- Type: [🧩`Query`](Query.md)
+- Type: [Query](Query.md)
 
 ### create() · [source](../../src/Mvc/Model.php#L77)
 
@@ -76,11 +76,11 @@ Create a new model instance with the given values and save it to the database. R
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$values` | 📦 `array` | - | Associative array of field values to set on the new model |
+| `$values` | array | - | Associative array of field values to set on the new model |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: The created model instance
 
 ### forceCreate() · [source](../../src/Mvc/Model.php#L94)
@@ -93,11 +93,11 @@ Force create a new model instance with the given values, bypassing any checks fo
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$values` | 📦 `array` | - | Associative array of field values to set on the new model |
+| `$values` | array | - | Associative array of field values to set on the new model |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: The created model instance
 
 ### firstOrCreate() · [source](../../src/Mvc/Model.php#L114)
@@ -110,12 +110,12 @@ Find the first model matching the given conditions or create a new one with the 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | - | Associative array of field conditions to find the model |
-| `$values` | 📦 `array` | `[]` | Additional values to set on the model if it needs to be created (merged with conditions) |
+| `$conditions` | array | - | Associative array of field conditions to find the model |
+| `$values` | array | `[]` | Additional values to set on the model if it needs to be created (merged with conditions) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: The found or created model instance
 
 ### updateOrCreate() · [source](../../src/Mvc/Model.php#L131)
@@ -128,12 +128,12 @@ Find the first model matching the given conditions or update it with the provide
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | - | Associative array of field conditions to find the model |
-| `$values` | 📦 `array` | `[]` | Values to set on the model if found (updated) or merged with conditions if created |
+| `$conditions` | array | - | Associative array of field conditions to find the model |
+| `$values` | array | `[]` | Values to set on the model if found (updated) or merged with conditions if created |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: The found, updated, or created model instance
 
 ### find() · [source](../../src/Mvc/Model.php#L155)
@@ -146,11 +146,11 @@ Finds a model by its ID(s)
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🎲 `mixed` | - | Single ID value or array of ID values (for composite keys) |
+| `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`|`null`
+- Type: static|null
 
 ### findOrFail() · [source](../../src/Mvc/Model.php#L195)
 
@@ -162,15 +162,15 @@ Finds a model by its ID(s) or throws an exception if not found
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | 🎲 `mixed` | - | Single ID value or array of ID values (for composite keys) |
+| `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)  if the model is not found
+- [Exception](Exception.md)  if the model is not found
 
 ### findOne() · [source](../../src/Mvc/Model.php#L209)
 
@@ -182,11 +182,11 @@ Finds the first model matching the given conditions or returns null if none foun
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | - | Associative array of field conditions to find the model |
+| `$conditions` | array | - | Associative array of field conditions to find the model |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`|`null`
+- Type: static|null
 - Description: The found model instance or null if not found
 
 ### findAll() · [source](../../src/Mvc/Model.php#L223)
@@ -199,11 +199,11 @@ Find all models matching the given conditions. If no conditions are provided, it
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | `[]` | Associative array of field conditions to find the models |
+| `$conditions` | array | `[]` | Associative array of field conditions to find the models |
 
 **➡️ Return value**
 
-- Type: [🧩`ResultSet`](ResultSet.md)
+- Type: [ResultSet](ResultSet.md)
 - Description: The found model instances as a ResultSet
 
 ### exists() · [source](../../src/Mvc/Model.php#L237)
@@ -216,11 +216,11 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | - | Associative array of field conditions to check for existence |
+| `$conditions` | array | - | Associative array of field conditions to check for existence |
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if a matching model exists, false otherwise
 
 ### count() · [source](../../src/Mvc/Model.php#L251)
@@ -233,11 +233,11 @@ Count the number of models matching the given conditions. Returns the count as a
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$conditions` | 📦 `array` | `[]` | Associative array of field conditions to count |
+| `$conditions` | array | `[]` | Associative array of field conditions to count |
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The count of matching models
 
 ### saveState() · [source](../../src/Mvc/Model.php#L270)
@@ -248,7 +248,7 @@ Save the current state of the model for change tracking. This method clones the 
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### loadState() · [source](../../src/Mvc/Model.php#L280)
 
@@ -258,7 +258,7 @@ Load the saved state of the model back into the current instance. This method co
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### getState() · [source](../../src/Mvc/Model.php#L298)
 
@@ -268,7 +268,7 @@ Get the saved state object for this model. This returns the clone of the model t
 
 **➡️ Return value**
 
-- Type: 🧩 `static`|`null`
+- Type: static|null
 - Description: The saved state object or null if no state saved
 
 ### hasChanged() · [source](../../src/Mvc/Model.php#L351)
@@ -279,7 +279,7 @@ Check if any fields have changed since the last saveState() call. This compares 
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if any fields have changed, false otherwise
 
 ### save() · [source](../../src/Mvc/Model.php#L364)
@@ -290,7 +290,7 @@ Save the model to the database. If the model has all ID fields set, it performs 
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if the model was saved (inserted or updated), false if there were no changes to save
 
 ### insert() · [source](../../src/Mvc/Model.php#L392)
@@ -301,7 +301,7 @@ Insert the model as a new record in the database. This method performs an INSERT
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if the model was inserted successfully
 
 ### update() · [source](../../src/Mvc/Model.php#L407)
@@ -312,7 +312,7 @@ Update the existing record in the database with any changed fields. This method 
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if the model was updated successfully, false if there were no changes to update
 
 ### delete() · [source](../../src/Mvc/Model.php#L500)
@@ -323,7 +323,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if the model was deleted successfully
 
 ### setDefaultRole() · [source](../../src/Mvc/Model.php#L520)
@@ -334,11 +334,11 @@ Delete the model from the database. This method requires that all ID fields are 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$role` | 🔤 `string` | - |  |
+| `$role` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### setDefaultReadRole() · [source](../../src/Mvc/Model.php#L526)
 
@@ -348,11 +348,11 @@ Delete the model from the database. This method requires that all ID fields are 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$role` | 🔤 `string` | - |  |
+| `$role` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### setDefaultWriteRole() · [source](../../src/Mvc/Model.php#L531)
 
@@ -362,11 +362,11 @@ Delete the model from the database. This method requires that all ID fields are 
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$role` | 🔤 `string` | - |  |
+| `$role` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### readConnection() · [source](../../src/Mvc/Model.php#L556)
 
@@ -374,7 +374,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **➡️ Return value**
 
-- Type: [🧩`Database`](Database.md)
+- Type: [Database](Database.md)
 
 ### writeConnection() · [source](../../src/Mvc/Model.php#L562)
 
@@ -382,5 +382,5 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **➡️ Return value**
 
-- Type: [🧩`Database`](Database.md)
+- Type: [Database](Database.md)
 

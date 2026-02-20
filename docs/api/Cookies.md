@@ -4,7 +4,7 @@
 
 ## 🔐 Properties
 
-- `protected` 📦 `array` `$cookies` · [source](../../src/Http/Cookies.php)
+- `protected` array `$cookies` · [source](../../src/Http/Cookies.php)
 
 ## 🚀 Public methods
 
@@ -16,12 +16,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
-| `$default` | 🎲 `mixed` | `null` |  |
+| `$name` | string | - |  |
+| `$default` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### cookie() · [source](../../src/Http/Cookies.php#L16)
 
@@ -31,11 +31,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
+| `$name` | string | - |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Cookie`](Cookie.md)
+- Type: [Cookie](Cookie.md)
 
 ### set() · [source](../../src/Http/Cookies.php#L22)
 
@@ -45,17 +45,17 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$expires` | 🔢 `int` | `0` |  |
-| `$path` | 🔤 `string` | `'/'` |  |
-| `$domain` | 🔤 `string` | `''` |  |
-| `$secure` | ⚙️ `bool` | `false` |  |
-| `$httpOnly` | ⚙️ `bool` | `true` |  |
+| `$name` | string | - |  |
+| `$value` | mixed | - |  |
+| `$expires` | int | `0` |  |
+| `$path` | string | `'/'` |  |
+| `$domain` | string | `''` |  |
+| `$secure` | bool | `false` |  |
+| `$httpOnly` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Cookie`](Cookie.md)
+- Type: [Cookie](Cookie.md)
 
 ### delete() · [source](../../src/Http/Cookies.php#L36)
 
@@ -65,11 +65,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - |  |
+| `$name` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### sendAll() · [source](../../src/Http/Cookies.php#L45)
 
@@ -77,5 +77,5 @@
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 

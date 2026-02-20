@@ -4,7 +4,7 @@
 
 ## 🔐 Properties
 
-- `private` 📦 `array` `$store` · [source](../../src/Http/Session.php)
+- `private` array `$store` · [source](../../src/Http/Session.php)
 
 ## 🚀 Public methods
 
@@ -16,11 +16,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$store` | 📦 `array` | - |  |
+| `$store` | array | - |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### get() · [source](../../src/Http/Session.php#L10)
 
@@ -30,12 +30,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | 🔤 `string` | - |  |
-| `$default` | 🎲 `mixed` | `null` |  |
+| `$key` | string | - |  |
+| `$default` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### set() · [source](../../src/Http/Session.php#L15)
 
@@ -45,12 +45,12 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
+| `$key` | string | - |  |
+| `$value` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### remove() · [source](../../src/Http/Session.php#L20)
 
@@ -60,11 +60,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | 🔤 `string` | - |  |
+| `$key` | string | - |  |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### has() · [source](../../src/Http/Session.php#L25)
 
@@ -74,11 +74,11 @@
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | 🔤 `string` | - |  |
+| `$key` | string | - |  |
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 
 ### clear() · [source](../../src/Http/Session.php#L30)
 
@@ -86,5 +86,5 @@
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 

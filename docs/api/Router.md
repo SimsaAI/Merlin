@@ -4,13 +4,13 @@
 
 ## 🔐 Properties
 
-- `protected` 📦 `array` `$static` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array` `$groups` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array` `$types` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array` `$middlewareGroupStack` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array` `$prefixGroupStack` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array` `$namedRoutes` · [source](../../src/Mvc/Router.php)
-- `protected` 📦 `array`|`null` `$lastAddedTokens` · [source](../../src/Mvc/Router.php)
+- `protected` array `$static` · [source](../../src/Mvc/Router.php)
+- `protected` array `$groups` · [source](../../src/Mvc/Router.php)
+- `protected` array `$types` · [source](../../src/Mvc/Router.php)
+- `protected` array `$middlewareGroupStack` · [source](../../src/Mvc/Router.php)
+- `protected` array `$prefixGroupStack` · [source](../../src/Mvc/Router.php)
+- `protected` array `$namedRoutes` · [source](../../src/Mvc/Router.php)
+- `protected` array|null `$lastAddedTokens` · [source](../../src/Mvc/Router.php)
 
 ## 🚀 Public methods
 
@@ -22,7 +22,7 @@ Create a new Router instance.
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### addType() · [source](../../src/Mvc/Router.php#L54)
 
@@ -36,12 +36,12 @@ Predefined types include 'int', 'alpha', 'alnum', 'uuid', and '*' (matches anyth
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | The type name (e.g., 'slug', 'email') |
-| `$validator` | `callable` | - | Function that validates a string value, returns bool |
+| `$name` | string | - | The type name (e.g., 'slug', 'email') |
+| `$validator` | callable | - | Function that validates a string value, returns bool |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: For method chaining
 
 ### add() · [source](../../src/Mvc/Router.php#L68)
@@ -54,13 +54,13 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$method` | 📦 `array`\|🔤 `string`\|`null` | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods) |
-| `$pattern` | 🔤 `string` | - | Route pattern (e.g., '/blog/{slug}', '/{:controller}/{:action}/{:params}') |
-| `$handler` | 📦 `array`\|🔤 `string`\|`null` | `null` | Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'. |
+| `$method` | array\|string\|null | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods) |
+| `$pattern` | string | - | Route pattern (e.g., '/blog/{slug}', '/{:controller}/{:action}/{:params}') |
+| `$handler` | array\|string\|null | `null` | Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'. |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: For method chaining
 
 ### setName() · [source](../../src/Mvc/Router.php#L113)
@@ -73,16 +73,16 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | The name to assign to the route |
+| `$name` | string | - | The name to assign to the route |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 - Description: For method chaining
 
 **⚠️ Throws**
 
-- `LogicException`  If no route has been added yet or if the last added route is invalid
+- LogicException  If no route has been added yet or if the last added route is invalid
 
 ### hasNamedRoute() · [source](../../src/Mvc/Router.php#L132)
 
@@ -94,11 +94,11 @@ Check if a named route exists.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | The name of the route to check |
+| `$name` | string | - | The name of the route to check |
 
 **➡️ Return value**
 
-- Type: ⚙️ `bool`
+- Type: bool
 - Description: True if a route with the given name exists, false otherwise
 
 ### urlFor() · [source](../../src/Mvc/Router.php#L146)
@@ -111,18 +111,18 @@ Generate a URL for a named route, substituting parameters as needed.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 🔤 `string` | - | The name of the route to generate a URL for |
-| `$params` | 📦 `array` | `[]` | Associative array of parameter values to substitute into the route pattern |
-| `$query` | 📦 `array` | `[]` | Optional associative array of query parameters to append to the URL |
+| `$name` | string | - | The name of the route to generate a URL for |
+| `$params` | array | `[]` | Associative array of parameter values to substitute into the route pattern |
+| `$query` | array | `[]` | Optional associative array of query parameters to append to the URL |
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 - Description: The generated URL path (e.g., "/blog/hello-world?ref=homepage")
 
 **⚠️ Throws**
 
-- `RuntimeException`  If no route with the given name exists or if required parameters are missing/invalid
+- RuntimeException  If no route with the given name exists or if required parameters are missing/invalid
 
 ### prefix() · [source](../../src/Mvc/Router.php#L173)
 
@@ -134,12 +134,12 @@ Define a group of routes that share a common URI prefix. This allows you to orga
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$prefix` | 🔤 `string` | - | URI prefix for the group (e.g., "/admin") |
-| `$callback` | `callable` | - | Function that receives the router instance to define routes within the group |
+| `$prefix` | string | - | URI prefix for the group (e.g., "/admin") |
+| `$callback` | callable | - | Function that receives the router instance to define routes within the group |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### middleware() · [source](../../src/Mvc/Router.php#L192)
 
@@ -151,12 +151,12 @@ Add group of middleware to be applied to all routes defined within the group. Th
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | 📦 `array`\|🔤 `string` | - | Middleware group name (e.g., "auth") |
-| `$callback` | `callable` | - | Function that receives the router instance to define routes within the group |
+| `$name` | array\|string | - | Middleware group name (e.g., "auth") |
+| `$callback` | callable | - | Function that receives the router instance to define routes within the group |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### match() · [source](../../src/Mvc/Router.php#L428)
 
@@ -168,11 +168,11 @@ Attempt to match the given URI and HTTP method against the registered routes.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$uri` | 🔤 `string` | - | The request URI (path) to match, e.g. "/blog/hello-world" |
-| `$method` | 🔤 `string` | `'GET'` | The HTTP method, e.g. "GET", "POST" |
+| `$uri` | string | - | The request URI (path) to match, e.g. "/blog/hello-world" |
+| `$method` | string | `'GET'` | The HTTP method, e.g. "GET", "POST" |
 
 **➡️ Return value**
 
-- Type: 📦 `array`|`null`
+- Type: array|null
 - Description: If a match is found, returns an array with keys 'vars', 'override', 'groups', 'wildcards'. Otherwise, returns null.
 

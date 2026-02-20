@@ -36,15 +36,15 @@ $c = Condition::create()
 
 ## 🔐 Properties
 
-- `protected` [🧩`Database`](Database.md)|`null` `$db` · [source](../../src/Db/Condition.php)
-- `protected` 🔤 `string` `$condition` · [source](../../src/Db/Condition.php)
-- `protected` ⚙️ `bool` `$needOperator` · [source](../../src/Db/Condition.php)
-- `protected` 🔢 `int` `$paramCounter` · [source](../../src/Db/Condition.php)
-- `protected` 📦 `array` `$autoBindParams` · [source](../../src/Db/Condition.php)
-- `protected` 🎲 `mixed` `$modelResolver` · [source](../../src/Db/Condition.php)
-- `protected` 📦 `array` `$tableCache` · [source](../../src/Db/Condition.php)
-- `protected` 📦 `array` `$deferredModelPrefixes` · [source](../../src/Db/Condition.php)
-- `protected` 🔤 `string`|`null` `$finalCondition` · [source](../../src/Db/Condition.php)
+- `protected` [Database](Database.md)|null `$db` · [source](../../src/Db/Condition.php)
+- `protected` string `$condition` · [source](../../src/Db/Condition.php)
+- `protected` bool `$needOperator` · [source](../../src/Db/Condition.php)
+- `protected` int `$paramCounter` · [source](../../src/Db/Condition.php)
+- `protected` array `$autoBindParams` · [source](../../src/Db/Condition.php)
+- `protected` mixed `$modelResolver` · [source](../../src/Db/Condition.php)
+- `protected` array `$tableCache` · [source](../../src/Db/Condition.php)
+- `protected` array `$deferredModelPrefixes` · [source](../../src/Db/Condition.php)
+- `protected` string|null `$finalCondition` · [source](../../src/Db/Condition.php)
 
 ## 🚀 Public methods
 
@@ -58,11 +58,11 @@ Create a new Condition builder instance
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$db` | [🧩`Database`](Database.md)\|`null` | `null` |  |
+| `$db` | [Database](Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### __construct() · [source](../../src/Db/Condition.php#L95)
 
@@ -72,15 +72,15 @@ Create a new Condition builder instance
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$db` | [🧩`Database`](Database.md)\|`null` | `null` |  |
+| `$db` | [Database](Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 **⚠️ Throws**
 
-- [🧩`Exception`](Exception.md)
+- [Exception](Exception.md)
 
 ### injectModelResolver() · [source](../../src/Db/Condition.php#L142)
 
@@ -92,11 +92,11 @@ Inject model resolver from Query builder
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$resolver` | `callable` | - | Callable that takes model name and returns table name |
+| `$resolver` | callable | - | Callable that takes model name and returns table name |
 
 **➡️ Return value**
 
-- Type: `void`
+- Type: void
 
 ### where() · [source](../../src/Db/Condition.php#L182)
 
@@ -108,13 +108,13 @@ Appends a condition to the current conditions using an AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Condition`](Condition.md)\|🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | `null` |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$condition` | [Condition](Condition.md)\|string | - |  |
+| `$value` | mixed | `null` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orWhere() · [source](../../src/Db/Condition.php#L194)
 
@@ -126,13 +126,13 @@ Appends a condition to the current conditions using a OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Condition`](Condition.md)\|🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | `null` |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$condition` | [Condition](Condition.md)\|string | - |  |
+| `$value` | mixed | `null` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### betweenWhere() · [source](../../src/Db/Condition.php#L261)
 
@@ -144,13 +144,13 @@ Appends a BETWEEN condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$minimum` | 🎲 `mixed` | - |  |
-| `$maximum` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$minimum` | mixed | - |  |
+| `$maximum` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### notBetweenWhere() · [source](../../src/Db/Condition.php#L273)
 
@@ -162,13 +162,13 @@ Appends a NOT BETWEEN condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$minimum` | 🎲 `mixed` | - |  |
-| `$maximum` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$minimum` | mixed | - |  |
+| `$maximum` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orBetweenWhere() · [source](../../src/Db/Condition.php#L285)
 
@@ -180,13 +180,13 @@ Appends a BETWEEN condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$minimum` | 🎲 `mixed` | - |  |
-| `$maximum` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$minimum` | mixed | - |  |
+| `$maximum` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orNotBetweenWhere() · [source](../../src/Db/Condition.php#L297)
 
@@ -198,13 +198,13 @@ Appends a NOT BETWEEN condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$minimum` | 🎲 `mixed` | - |  |
-| `$maximum` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$minimum` | mixed | - |  |
+| `$maximum` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### inWhere() · [source](../../src/Db/Condition.php#L332)
 
@@ -216,12 +216,12 @@ Appends an IN condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$values` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### notInWhere() · [source](../../src/Db/Condition.php#L343)
 
@@ -233,12 +233,12 @@ Appends an NOT IN condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$values` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orInWhere() · [source](../../src/Db/Condition.php#L354)
 
@@ -250,12 +250,12 @@ Appends an IN condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$values` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orNotInWhere() · [source](../../src/Db/Condition.php#L365)
 
@@ -267,12 +267,12 @@ Appends an NOT IN condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | 🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | - |  |
+| `$condition` | string | - |  |
+| `$values` | mixed | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### having() · [source](../../src/Db/Condition.php#L404)
 
@@ -284,12 +284,12 @@ Appends an HAVING condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Sql`](Sql.md)\|🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | `null` |  |
+| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$values` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### notHaving() · [source](../../src/Db/Condition.php#L415)
 
@@ -301,12 +301,12 @@ Appends an NOT HAVING condition to the current conditions using AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Sql`](Sql.md)\|🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | `null` |  |
+| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$values` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orHaving() · [source](../../src/Db/Condition.php#L426)
 
@@ -318,12 +318,12 @@ Appends an HAVING condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Sql`](Sql.md)\|🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | `null` |  |
+| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$values` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orNotHaving() · [source](../../src/Db/Condition.php#L436)
 
@@ -333,12 +333,12 @@ Appends an HAVING condition to the current conditions using OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$condition` | [🧩`Sql`](Sql.md)\|🔤 `string` | - |  |
-| `$values` | 🎲 `mixed` | `null` |  |
+| `$condition` | [Sql](Sql.md)\|string | - |  |
+| `$values` | mixed | `null` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### likeWhere() · [source](../../src/Db/Condition.php#L474)
 
@@ -350,13 +350,13 @@ Appends a LIKE condition to the current condition
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### andLikeWhere() · [source](../../src/Db/Condition.php#L487)
 
@@ -368,13 +368,13 @@ Appends a LIKE condition to the current condition using an AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orLikeWhere() · [source](../../src/Db/Condition.php#L500)
 
@@ -386,13 +386,13 @@ Appends a LIKE condition to the current condition using an OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### notLikeWhere() · [source](../../src/Db/Condition.php#L513)
 
@@ -404,13 +404,13 @@ Appends a NOT LIKE condition to the current condition
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### andNotLikeWhere() · [source](../../src/Db/Condition.php#L526)
 
@@ -422,13 +422,13 @@ Appends a NOT LIKE condition to the current condition using an AND operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orNotLikeWhere() · [source](../../src/Db/Condition.php#L539)
 
@@ -440,13 +440,13 @@ Appends a NOT LIKE condition to the current condition using an OR operator
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$identifier` | 🔤 `string` | - |  |
-| `$value` | 🎲 `mixed` | - |  |
-| `$escape` | ⚙️ `bool` | `true` |  |
+| `$identifier` | string | - |  |
+| `$value` | mixed | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### groupStart() · [source](../../src/Db/Condition.php#L576)
 
@@ -456,7 +456,7 @@ Starts a new group by adding an opening parenthesis to the WHERE clause of the q
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orGroupStart() · [source](../../src/Db/Condition.php#L590)
 
@@ -466,7 +466,7 @@ Starts a new group by adding an opening parenthesis to the WHERE clause of the q
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### notGroupStart() · [source](../../src/Db/Condition.php#L604)
 
@@ -476,7 +476,7 @@ Starts a new group by adding an opening parenthesis to the WHERE clause of the q
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### orNotGroupStart() · [source](../../src/Db/Condition.php#L618)
 
@@ -486,7 +486,7 @@ Starts a new group by adding an opening parenthesis to the WHERE clause of the q
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### groupEnd() · [source](../../src/Db/Condition.php#L632)
 
@@ -496,7 +496,7 @@ Ends the current group by adding an closing parenthesis to the WHERE clause of t
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### noop() · [source](../../src/Db/Condition.php#L643)
 
@@ -506,7 +506,7 @@ No operator function. Useful to build flexible chains
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### bind() · [source](../../src/Db/Condition.php#L979)
 
@@ -518,11 +518,11 @@ Replace placeholders in the condition with actual values
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$bindParams` | 📦 `array` | - |  |
+| `$bindParams` | array | - |  |
 
 **➡️ Return value**
 
-- Type: 🧩 `static`
+- Type: static
 
 ### toSql() · [source](../../src/Db/Condition.php#L997)
 
@@ -532,5 +532,5 @@ Get the condition
 
 **➡️ Return value**
 
-- Type: 🔤 `string`
+- Type: string
 

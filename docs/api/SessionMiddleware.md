@@ -19,10 +19,10 @@ response is sent.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$context` | [🧩`AppContext`](AppContext.md) | - |  |
-| `$next` | `callable` | - |  |
+| `$context` | [AppContext](AppContext.md) | - |  |
+| `$next` | callable | - |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Response`](Response.md)|`null`
+- Type: [Response](Response.md)|null
 

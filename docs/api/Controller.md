@@ -6,8 +6,8 @@ MVC Controller class
 
 ## 🔐 Properties
 
-- `protected` 📦 `array` `$middleware` · [source](../../src/Mvc/Controller.php)
-- `protected` 📦 `array` `$actionMiddleware` · [source](../../src/Mvc/Controller.php)
+- `protected` array `$middleware` · [source](../../src/Mvc/Controller.php)
+- `protected` array `$actionMiddleware` · [source](../../src/Mvc/Controller.php)
 
 ## 🚀 Public methods
 
@@ -19,12 +19,12 @@ MVC Controller class
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$action` | 🔤 `string`\|`null` | `null` |  |
-| `$params` | 📦 `array` | `[]` |  |
+| `$action` | string\|null | `null` |  |
+| `$params` | array | `[]` |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Response`](Response.md)|`null`
+- Type: [Response](Response.md)|null
 
 ### afterAction() · [source](../../src/Mvc/Controller.php#L42)
 
@@ -34,12 +34,12 @@ MVC Controller class
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$action` | 🔤 `string`\|`null` | `null` |  |
-| `$params` | 📦 `array` | `[]` |  |
+| `$action` | string\|null | `null` |  |
+| `$params` | array | `[]` |  |
 
 **➡️ Return value**
 
-- Type: [🧩`Response`](Response.md)|`null`
+- Type: [Response](Response.md)|null
 
 ### getMiddleware() · [source](../../src/Mvc/Controller.php#L49)
 
@@ -47,7 +47,7 @@ MVC Controller class
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 
 ### getActionMiddleware() · [source](../../src/Mvc/Controller.php#L54)
 
@@ -57,9 +57,9 @@ MVC Controller class
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$action` | 🔤 `string` | - |  |
+| `$action` | string | - |  |
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 

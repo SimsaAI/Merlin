@@ -6,14 +6,14 @@ Paginator class for paginating database query results.
 
 ## 🔐 Properties
 
-- `protected` [🧩`Query`](Query.md) `$builder` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$pageSize` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$page` · [source](../../src/Db/Paginator.php)
-- `protected` ⚙️ `bool` `$reverse` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$totalItems` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$totalPages` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$firstItemPos` · [source](../../src/Db/Paginator.php)
-- `protected` 🔢 `int` `$lastItemPos` · [source](../../src/Db/Paginator.php)
+- `protected` [Query](Query.md) `$builder` · [source](../../src/Db/Paginator.php)
+- `protected` int `$pageSize` · [source](../../src/Db/Paginator.php)
+- `protected` int `$page` · [source](../../src/Db/Paginator.php)
+- `protected` bool `$reverse` · [source](../../src/Db/Paginator.php)
+- `protected` int `$totalItems` · [source](../../src/Db/Paginator.php)
+- `protected` int `$totalPages` · [source](../../src/Db/Paginator.php)
+- `protected` int `$firstItemPos` · [source](../../src/Db/Paginator.php)
+- `protected` int `$lastItemPos` · [source](../../src/Db/Paginator.php)
 
 ## 🚀 Public methods
 
@@ -27,14 +27,14 @@ Create a new Paginator instance.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$builder` | [🧩`Query`](Query.md) | - | The Query builder instance to paginate. |
-| `$page` | 🔢 `int` | `1` | The current page number. |
-| `$pageSize` | 🔢 `int` | `30` | The number of items per page. |
-| `$reverse` | ⚙️ `bool` | `false` | Whether to reverse the order of items. |
+| `$builder` | [Query](Query.md) | - | The Query builder instance to paginate. |
+| `$page` | int | `1` | The current page number. |
+| `$pageSize` | int | `30` | The number of items per page. |
+| `$reverse` | bool | `false` | Whether to reverse the order of items. |
 
 **➡️ Return value**
 
-- Type: 🎲 `mixed`
+- Type: mixed
 
 ### getPageSize() · [source](../../src/Db/Paginator.php#L44)
 
@@ -44,7 +44,7 @@ Get the page size (number of items per page).
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The page size.
 
 ### getTotalItems() · [source](../../src/Db/Paginator.php#L54)
@@ -55,7 +55,7 @@ Get the total number of items across all pages.
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The total number of items.
 
 ### getTotalPages() · [source](../../src/Db/Paginator.php#L64)
@@ -66,7 +66,7 @@ Get the total number of pages.
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The total number of pages.
 
 ### getCurrentPage() · [source](../../src/Db/Paginator.php#L74)
@@ -77,7 +77,7 @@ Get the current page number.
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The current page number.
 
 ### getFirstItemPos() · [source](../../src/Db/Paginator.php#L84)
@@ -88,7 +88,7 @@ Get the position of the first item in the current page (1-based index).
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The position of the first item in the current page.
 
 ### getLastItemPos() · [source](../../src/Db/Paginator.php#L94)
@@ -99,7 +99,7 @@ Get the position of the last item in the current page (1-based index).
 
 **➡️ Return value**
 
-- Type: 🔢 `int`
+- Type: int
 - Description: The position of the last item in the current page.
 
 ### execute() · [source](../../src/Db/Paginator.php#L105)
@@ -112,10 +112,10 @@ Execute the paginated query and return the items for the current page.
 
 | 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$fetchMode` | 🎲 `mixed` | `0` | The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT). |
+| `$fetchMode` | mixed | `0` | The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT). |
 
 **➡️ Return value**
 
-- Type: 📦 `array`
+- Type: array
 - Description: The items for the current page.
 
