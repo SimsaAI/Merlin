@@ -134,18 +134,37 @@ class AppContext
         $this->route = $route;
     }
 
-    // --- Service Container (optional) ---
+    // --- Service Container ---
 
+    /**
+     * Register a service instance in the context.
+     *
+     * @param string $id The identifier for the service (usually the class name).
+     * @param object $service The service instance to register.
+     */
     public function set(string $id, object $service): void
     {
         $this->services[$id] = $service;
     }
 
+    /**
+     * Check if a service is registered in the context.
+     *
+     * @param string $id The identifier of the service to check.
+     * @return bool True if the service is registered, false otherwise.
+     */
     public function has(string $id): bool
     {
         return isset($this->services[$id]);
     }
 
+    /**
+     * Get a service instance from the context. If the service is not registered but the identifier is a class name, it will attempt to auto-wire and instantiate it.
+     *
+     * @param string $id The identifier of the service to retrieve.
+     * @return object The service instance associated with the given identifier.
+     * @throws RuntimeException If the service is not found and cannot be auto-wired.
+     */
     public function get(string $id): object
     {
         if (isset($this->services[$id])) {
@@ -159,6 +178,12 @@ class AppContext
         throw new RuntimeException("Service not found: $id");
     }
 
+    /**
+     * Try to get a service instance from the context. If the service is not registered but the identifier is a class name, it will attempt to auto-wire and instantiate it. Returns null if the service is not found and cannot be auto-wired.
+     *
+     * @param string $id The identifier of the service to retrieve.
+     * @return object|null The service instance associated with the given identifier, or null if not found.
+     */
     public function tryGet(string $id): ?object
     {
         if (isset($this->services[$id])) {
@@ -172,6 +197,12 @@ class AppContext
         return null;
     }
 
+    /**
+     * Get a service instance from the context if it exists, or null if it does not exist. This method does not attempt to auto-wire or instantiate classes.
+     *
+     * @param string $id The identifier of the service to retrieve.
+     * @return object|null The service instance associated with the given identifier, or null if not found.
+     */
     public function getOrNull(string $id): ?object
     {
         return $this->services[$id] ?? null;

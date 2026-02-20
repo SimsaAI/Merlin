@@ -1,62 +1,64 @@
-# 🧩 Merlin\Mvc\ViewEngine
+# 🧩 ViewEngine
+
+**Full name:** [Merlin\Mvc\ViewEngine](../../src/Mvc/ViewEngine.php)
 
 ## 🔐 Properties
 
-- `protected 🔤 string $extension`
-- `protected 📦 array $namespaces`
-- `protected 🔤 string $path`
-- `protected 🔢 int $renderDepth`
-- `protected string|null $layout`
-- `protected 📦 array $vars`
+- `protected` 🔤 `string` `$extension` · [source](../../src/Mvc/ViewEngine.php)
+- `protected` 📦 `array` `$namespaces` · [source](../../src/Mvc/ViewEngine.php)
+- `protected` 🔤 `string` `$path` · [source](../../src/Mvc/ViewEngine.php)
+- `protected` 🔢 `int` `$renderDepth` · [source](../../src/Mvc/ViewEngine.php)
+- `protected` 🔤 `string`|`null` `$layout` · [source](../../src/Mvc/ViewEngine.php)
+- `protected` 📦 `array` `$vars` · [source](../../src/Mvc/ViewEngine.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/Mvc/ViewEngine.php#L18)
 
-`public function __construct(array $vars = []) : mixed`
+`public function __construct(array $vars = []): mixed`
 
 Create a new ViewEngine instance.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$vars` | `📦 array` | `[]` | Initial variables available to all views. |
+| `$vars` | 📦 `array` | `[]` | Initial variables available to all views. |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `setExtension()`
+### setExtension() · [source](../../src/Mvc/ViewEngine.php#L29)
 
-`public function setExtension(string $ext) : static`
+`public function setExtension(string $ext): static`
 
 Set the view file extension for this instance.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$ext` | `🔤 string` | `` | Extension with or without a leading dot. |
+| `$ext` | 🔤 `string` | - | Extension with or without a leading dot. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `getExtension()`
+### getExtension() · [source](../../src/Mvc/ViewEngine.php#L43)
 
-`public function getExtension() : string`
+`public function getExtension(): string`
 
 Get the effective file extension used when resolving templates.
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Extension including leading dot or empty string.
 
-### `addNamespace()`
+### addNamespace() · [source](../../src/Mvc/ViewEngine.php#L57)
 
-`public function addNamespace(string $name, string $path) : static`
+`public function addNamespace(string $name, string $path): static`
 
 Add a namespace for view resolution.
 
@@ -64,56 +66,56 @@ Views can be referenced using the syntax "namespace::view.name".
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` | Namespace name to register. |
-| `$path` | `🔤 string` | `` | Filesystem path corresponding to the namespace. |
+| `$name` | 🔤 `string` | - | Namespace name to register. |
+| `$path` | 🔤 `string` | - | Filesystem path corresponding to the namespace. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `getNamespaces()`
+### getNamespaces() · [source](../../src/Mvc/ViewEngine.php#L68)
 
-`public function getNamespaces() : array`
+`public function getNamespaces(): array`
 
 Get the currently registered view namespaces.
 
 **➡️ Return value**
 
-- Type: `array`
+- Type: 📦 `array`
 - Description: Associative array of namespace => path mappings.
 
-### `setPath()`
+### setPath() · [source](../../src/Mvc/ViewEngine.php#L80)
 
-`public function setPath(string $path) : static`
+`public function setPath(string $path): static`
 
 Set the base path for resolving relative view names.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$path` | `🔤 string` | `` | Base directory for views. |
+| `$path` | 🔤 `string` | - | Base directory for views. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `getPath()`
+### getPath() · [source](../../src/Mvc/ViewEngine.php#L91)
 
-`public function getPath() : string`
+`public function getPath(): string`
 
 Get the currently configured base path for view resolution.
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Base directory for views.
 
-### `setLayout()`
+### setLayout() · [source](../../src/Mvc/ViewEngine.php#L105)
 
-`public function setLayout(string|null $layout) : static`
+`public function setLayout(string|null $layout): static`
 
 Set the layout template name to be used when calling `render()`.
 
@@ -122,45 +124,45 @@ rendered view output.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$layout` | `string\|null` | `` | Layout view name or null to disable. |
+| `$layout` | 🔤 `string`\|`null` | - | Layout view name or null to disable. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `getLayout()`
+### getLayout() · [source](../../src/Mvc/ViewEngine.php#L116)
 
-`public function getLayout() : string|null`
+`public function getLayout(): string|null`
 
 Get the currently configured layout view name.
 
 **➡️ Return value**
 
-- Type: `string|null`
+- Type: 🔤 `string`|`null`
 - Description: Layout name or null when none set.
 
-### `setVar()`
+### setVar() · [source](../../src/Mvc/ViewEngine.php#L128)
 
-`public function setVar(string $name, mixed $value) : static`
+`public function setVar(string $name, mixed $value): static`
 
 Set a single view variable.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` | Variable name available inside templates. |
-| `$value` | `🎲 mixed` | `` | Value assigned to the variable. |
+| `$name` | 🔤 `string` | - | Variable name available inside templates. |
+| `$value` | 🎲 `mixed` | - | Value assigned to the variable. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `setVars()`
+### setVars() · [source](../../src/Mvc/ViewEngine.php#L142)
 
-`public function setVars(array $vars) : static`
+`public function setVars(array $vars): static`
 
 Merge multiple variables into the view's variable set.
 
@@ -168,35 +170,35 @@ Later values override earlier ones for the same keys.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$vars` | `📦 array` | `` | Associative array of variables. |
+| `$vars` | 📦 `array` | - | Associative array of variables. |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `render()`
+### render() · [source](../../src/Mvc/ViewEngine.php#L155)
 
-`public function render(string $view, array $vars = []) : string`
+`public function render(string $view, array $vars = []): string`
 
 Render a view (and optional layout) and echo the result.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$view` | `🔤 string` | `` | View name to render. |
-| `$vars` | `📦 array` | `[]` | Additional variables for this render call. |
+| `$view` | 🔤 `string` | - | View name to render. |
+| `$vars` | 📦 `array` | `[]` | Additional variables for this render call. |
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Rendered content.
 
-### `renderPartial()`
+### renderPartial() · [source](../../src/Mvc/ViewEngine.php#L177)
 
-`public function renderPartial(string $view, array $vars = []) : string`
+`public function renderPartial(string $view, array $vars = []): string`
 
 Render a partial view template and return the generated output.
 
@@ -205,23 +207,23 @@ and captures the output buffer.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$view` | `🔤 string` | `` | View name to resolve and render. |
-| `$vars` | `📦 array` | `[]` | Variables for this render call. |
+| `$view` | 🔤 `string` | - | View name to resolve and render. |
+| `$vars` | 📦 `array` | `[]` | Variables for this render call. |
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Rendered HTML/output.
 
 **⚠️ Throws**
 
-- \Exception If the view file cannot be resolved.
+- [🧩`Exception`](Exception.md)  If the view file cannot be resolved.
 
-### `renderLayout()`
+### renderLayout() · [source](../../src/Mvc/ViewEngine.php#L205)
 
-`public function renderLayout(string $layout, string $content, array $vars = []) : string`
+`public function renderLayout(string $layout, string $content, array $vars = []): string`
 
 Render a layout template wrapping provided content.
 
@@ -229,26 +231,26 @@ The layout receives the content in the `content` variable.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$layout` | `🔤 string` | `` | Layout view name. |
-| `$content` | `🔤 string` | `` | Previously rendered content. |
-| `$vars` | `📦 array` | `[]` | Additional variables to pass to the layout. |
+| `$layout` | 🔤 `string` | - | Layout view name. |
+| `$content` | 🔤 `string` | - | Previously rendered content. |
+| `$vars` | 📦 `array` | `[]` | Additional variables to pass to the layout. |
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Rendered layout output.
 
-### `getRenderDepth()`
+### getRenderDepth() · [source](../../src/Mvc/ViewEngine.php#L217)
 
-`public function getRenderDepth() : int`
+`public function getRenderDepth(): int`
 
 Get current render nesting depth. Useful to detect top-level renders
 (depth 0) when deciding whether to apply a layout.
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: Current render depth (0 = top-level).
 

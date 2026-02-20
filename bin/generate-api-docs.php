@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+﻿#!/usr/bin/env php
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -10,6 +10,7 @@ use phpDocumentor\Reflection\DocBlock\Tags\Deprecated as DeprecatedTag;
 
 $srcDir = 'src';
 $docsDir = 'docs/api';
+$projectRoot = dirname(__DIR__);
 
 echo "🔍 Scanning $srcDir...\n";
 
@@ -29,14 +30,9 @@ foreach ($iterator as $file) {
             }
             foreach ($matches[1] as $className) {
                 $fqcn = $namespace . $className;
-                // Attempt autoloading; class_exists loads via Composer autoloader
                 if (class_exists($fqcn)) {
                     $allClasses[$className] = $fqcn;
                     $namespacedClasses[substr($namespace, 0, -1)][] = $className;
-                } else {
-                    // optional fallback (commented out because side effects possible)
-                    // require_once $file->getPathname();
-                    // if (class_exists($fqcn)) $allClasses[$fqcn] = $fqcn;
                 }
             }
         }
@@ -44,6 +40,24 @@ foreach ($iterator as $file) {
 }
 
 echo "📝 Generating docs for " . count($allClasses) . " classes...\n";
+
+// Build class registry: maps FQCN and short name -> metadata for link generation.
+// All src links are relative from docs/api/ (two levels up to project root).
+$classRegistry = [];
+foreach ($allClasses as $shortName => $fqcn) {
+    $ref = new ReflectionClass($fqcn);
+    $absFile = $ref->getFileName();
+    $relFromRoot = str_replace('\\', '/', substr($absFile, strlen($projectRoot) + 1));
+    $srcLink = '../../' . $relFromRoot;
+    $classRegistry[$fqcn] = [
+        'short' => $shortName,
+        'srcLink' => $srcLink . '#L' . $ref->getStartLine(),
+        'srcFile' => $srcLink,
+        'docLink' => $shortName . '.md',
+    ];
+    // Also index by short name for quick docblock type lookups
+    $classRegistry[$shortName] = &$classRegistry[$fqcn];
+}
 
 // Generate index
 if (!is_dir($docsDir)) {
@@ -55,7 +69,6 @@ foreach ($namespacedClasses as $namespace => $classes) {
     $indexContent .= $sep;
     $sep = "\n";
     $indexContent .= "### `{$namespace}`\n\n";
-    $lastNamespace = $namespace;
     foreach ($classes as $class) {
         $fqcn = $allClasses[$class];
         $indexContent .= "- [{$class}]({$class}.md) `{$fqcn}`\n";
@@ -66,7 +79,7 @@ file_put_contents("$docsDir/index.md", $indexContent . "\n");
 // Individual class docs
 foreach ($allClasses as $class) {
     $reflector = new ReflectionClass($class);
-    $md = generateClassDoc($reflector, $docFactory);
+    $md = generateClassDoc($reflector, $docFactory, $classRegistry);
     $filename = basename(str_replace('\\', '/', $class)) . '.md';
     file_put_contents("$docsDir/$filename", $md);
     echo "  ✓ {$filename}\n";
@@ -76,9 +89,15 @@ echo "✅ API docs ready: $docsDir/\n";
 
 /* ---------------- Functions ---------------- */
 
-function generateClassDoc(ReflectionClass $reflector, $docFactory)
+function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classRegistry): string
 {
-    $md = "# 🧩 {$reflector->getName()}\n\n";
+    $shortName = $reflector->getShortName();
+    $fqcn = $reflector->getName();
+
+    $srcInfo = $classRegistry[$fqcn] ?? null;
+    $classLink = $srcInfo ? "[{$fqcn}]({$srcInfo['srcFile']})" : "`{$fqcn}`";
+    $md = "# 🧩 {$shortName}\n\n";
+    $md .= "**Full name:** {$classLink}\n\n";
 
     // Class DocComment
     if ($doc = $reflector->getDocComment()) {
@@ -95,7 +114,6 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory)
                 $md .= "**🛑 Deprecated**: " . safeTagToString($tag) . "\n\n";
             }
         } catch (Throwable $e) {
-            // If DocBlock cannot be parsed, fallback to raw text
             $md .= trim(cleanDocBlock($doc)) . "\n\n";
         }
     }
@@ -117,9 +135,13 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory)
         foreach ($props as $prop) {
             $vis = getVisibility($prop);
             $static = $prop->isStatic() ? ' static' : '';
-            $type = formatReflectionType($prop->getType());
-            $type = decorateType($type);
-            $md .= "- `{$vis}{$static} {$type} \${$prop->getName()}`\n";
+            $typeStr = formatReflectionType($prop->getType());
+            $linkedType = linkType($typeStr, $classRegistry, 'doc');
+            $propSrcLink = ($srcInfo && method_exists($prop, 'getStartLine'))
+                ? ($srcInfo['srcFile'] . '#L' . $prop->getStartLine())
+                : ($srcInfo ? $srcInfo['srcFile'] : null);
+            $srcRef = $propSrcLink ? " · [source]($propSrcLink)" : '';
+            $md .= "- `{$vis}{$static}` {$linkedType} `\${$prop->getName()}`{$srcRef}\n";
         }
         $md .= "\n";
     }
@@ -129,28 +151,35 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory)
     foreach ($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
         if ($method->class !== $reflector->name)
             continue;
-        $md .= generateMethodDoc($method, $docFactory);
+        $md .= generateMethodDoc($method, $docFactory, $classRegistry);
     }
 
     return $md;
 }
 
-function generateMethodDoc(ReflectionMethod $method, $docFactory)
+function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRegistry): string
 {
-    $md = "### `{$method->getName()}()`\n\n";
+    $classSrcInfo = $classRegistry[$method->class] ?? null;
+    $methodSrcLink = $classSrcInfo ? ($classSrcInfo['srcFile'] . '#L' . $method->getStartLine()) : null;
+    $srcBadge = $methodSrcLink ? " · [source]({$methodSrcLink})" : '';
+    $md = "### {$method->getName()}(){$srcBadge}\n\n";
 
-    // Signature
+    // Build linked signature
     $vis = getVisibility($method);
     $static = $method->isStatic() ? ' static' : '';
-    $params = [];
+    $linkedParams = [];
     foreach ($method->getParameters() as $p) {
-        $params[] = formatParameterSignature($p);
+        $linkedParams[] = formatParameter($p);
     }
-    $returnType = formatReflectionType($method->getReturnType());
-    $signature = "`{$vis}{$static} function {$method->getName()}(" . implode(', ', $params) . ") : {$returnType}`";
-    $md .= $signature . "\n\n";
+    $returnTypeStr = formatReflectionType($method->getReturnType());
+    $linkedReturn = linkType($returnTypeStr, $classRegistry, 'doc', true);
 
-    // DocBlock via phpDocumentor
+    // Signature: wrap keywords/name in backticks; types rendered as inline links
+    $md .= "`{$vis}{$static} function {$method->getName()}(";
+    $md .= implode(', ', $linkedParams);
+    $md .= "): $returnTypeStr`\n\n";
+
+    // DocBlock
     $doc = $method->getDocComment() ?: '';
     $block = null;
     if ($doc) {
@@ -167,34 +196,38 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory)
                 $md .= "**🛑 Deprecated**: " . safeTagToString($tag) . "\n\n";
             }
         } catch (Throwable $e) {
-            // fallback: raw cleaned docblock
             $raw = cleanDocBlock($doc);
             if ($raw)
                 $md .= $raw . "\n\n";
         }
     }
 
-    // Parameters table with multiline descriptions
+    // Parameters table
     if ($method->getNumberOfParameters() > 0) {
         $md .= "**🧭 Parameters**\n\n";
-        $md .= "| Name | Type | Default | Description |\n";
+        $md .= "| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |\n";
         $md .= "|---|---|---|---|\n";
         $paramTags = $block ? $block->getTagsByName('param') : [];
         $paramTagMap = mapParamTags($paramTags);
         foreach ($method->getParameters() as $p) {
             $name = '$' . $p->getName();
-            $type = formatReflectionType($p->getType());
-            $type = decorateType($type);
-            $type = str_replace('|', '\\|', $type); // escape pipe for markdown
-            $default = $p->isDefaultValueAvailable() ? formatDefaultValue($p->getDefaultValue()) : '';
+            $typeStr = formatReflectionType($p->getType());
+            // Escape union | separators for table cells, without touching link syntax
+            $linkedTypeForTable = escapeTablePipes(linkType($typeStr, $classRegistry, 'doc'));
+            $default = $p->isDefaultValueAvailable() ? formatDefaultValue($p->getDefaultValue()) : null;
             $desc = $paramTagMap[$p->getName()] ?? $paramTagMap[$p->getPosition()] ?? '';
             $desc = $desc ? str_replace("\n", "<br>", trim($desc)) : '';
-            $md .= "| `{$name}` | `{$type}` | `{$default}` | {$desc} |\n";
+            if (isset($default)) {
+                $default = "`{$default}`";
+            } else {
+                $default = '-';
+            }
+            $md .= "| `{$name}` | {$linkedTypeForTable} | {$default} | {$desc} |\n";
         }
         $md .= "\n";
     }
 
-    // Return
+    // Return value
     $returnDesc = '';
     if ($block && $block->hasTag('return')) {
         $ret = current($block->getTagsByName('return'));
@@ -205,7 +238,7 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory)
         }
     }
     $md .= "**➡️ Return value**\n\n";
-    $md .= "- Type: `{$returnType}`\n";
+    $md .= "- Type: " . $linkedReturn . "\n";
     if ($returnDesc) {
         $md .= "- Description: " . str_replace("\n", "<br>", $returnDesc) . "\n";
     }
@@ -216,7 +249,10 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory)
         $md .= "**⚠️ Throws**\n\n";
         foreach ($block->getTagsByName('throws') as $t) {
             if ($t instanceof ThrowsTag) {
-                $md .= "- " . trim((string) $t->getType()) . " " . trim((string) $t->getDescription()) . "\n";
+                $exTypeStr = ltrim(trim((string) $t->getType()), '\\');
+                $exDesc = trim((string) $t->getDescription());
+                $linkedExType = linkType($exTypeStr, $classRegistry, 'doc');
+                $md .= "- " . $linkedExType . ($exDesc ? "  " . $exDesc : "") . "\n";
             } else {
                 $md .= "- " . safeTagToString($t) . "\n";
             }
@@ -227,27 +263,120 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory)
     return $md;
 }
 
-/* ---------------- Helper ---------------- */
+/* ---------------- Helpers ---------------- */
+
+/**
+ * Convert a type string (may contain | or & separators) into markdown with
+ * inline links for known Merlin classes. Unrecognised types pass through
+ * decorateType() which adds emojis for primitives and backtick-wraps the rest.
+ */
+/**
+ * @param string $mode 'doc' = link to API .md page, 'src' = link to source file
+ * @param bool $decorate Whether to decorate unrecognized types with emojis and backticks
+ */
+function linkType(string $typeStr, array $classRegistry, string $mode = 'doc', bool $decorate = true): string
+{
+    if ($typeStr === '')
+        return '';
+
+    // Split on | and & while keeping the delimiters
+    $parts = preg_split('/([|&])/', $typeStr, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $result = '';
+    foreach ($parts as $part) {
+        if ($part === '|' || $part === '&') {
+            $result .= $part;
+            continue;
+        }
+        $part = trim($part);
+        $lookup = ltrim($part, '\\');    // strip leading \ from docblock FQCNs
+
+        if (isset($classRegistry[$lookup])) {
+            $info = $classRegistry[$lookup];
+            $target = $mode === 'src' ? $info['srcLink'] : $info['docLink'];
+            $name = $info['short'];
+            if ($decorate) {
+                $name = "🧩`{$name}`";
+            }
+            $result .= "[{$name}]({$target})";
+        } else {
+            $result .= $decorate ? decorateType($part) : $part;
+        }
+    }
+    return $result;
+}
+
+/**
+ * Escape only the union/intersection | separators for use inside a markdown
+ * table cell, without touching | characters inside link URL parentheses.
+ */
+function escapeTablePipes(string $linkedType): string
+{
+    $result = '';
+    $depth = 0;
+    for ($i = 0, $len = strlen($linkedType); $i < $len; $i++) {
+        $ch = $linkedType[$i];
+        if ($ch === '(') {
+            $depth++;
+            $result .= $ch;
+        } elseif ($ch === ')') {
+            $depth--;
+            $result .= $ch;
+        } elseif ($ch === '|' && $depth === 0) {
+            $result .= '\|';
+        } else {
+            $result .= $ch;
+        }
+    }
+    return $result;
+}
+
+/**
+ * Format a single method parameter as a linked-type + `$name` fragment
+ * suitable for embedding inline in the signature line.
+ */
+function formatLinkedParameter(ReflectionParameter $p, array $classRegistry): string
+{
+    $typeStr = formatReflectionType($p->getType());
+    $linkedType = $typeStr ? linkType($typeStr, $classRegistry, 'doc', false) : '';
+    $byRef = $p->isPassedByReference() ? '&' : '';
+    $variadic = $p->isVariadic() ? '...' : '';
+    $namePart = '`' . $byRef . $variadic . '$' . $p->getName();
+    if ($p->isDefaultValueAvailable() && !$p->isVariadic()) {
+        $namePart .= ' = ' . formatDefaultValue($p->getDefaultValue());
+    }
+    $namePart .= '`';
+    return $linkedType ? ($linkedType . ' ' . $namePart) : $namePart;
+}
+
+function formatParameter(ReflectionParameter $p): string
+{
+    $typeStr = formatReflectionType($p->getType());
+    $byRef = $p->isPassedByReference() ? '&' : '';
+    $variadic = $p->isVariadic() ? '...' : '';
+    $namePart = $byRef . $variadic . '$' . $p->getName();
+    if ($p->isDefaultValueAvailable() && !$p->isVariadic()) {
+        $namePart .= ' = ' . formatDefaultValue($p->getDefaultValue());
+    }
+    return $typeStr ? ($typeStr . ' ' . $namePart) : $namePart;
+}
 
 function mapParamTags(array $paramTags): array
 {
     $map = [];
     foreach ($paramTags as $tag) {
         if ($tag instanceof ParamTag) {
-            $varName = $tag->getVariableName(); // e.g. '$id' or 'id'
+            $varName = $tag->getVariableName();
             $desc = (string) $tag->getDescription();
             $varName = $varName ? ltrim($varName, '$') : null;
             if ($varName) {
                 $map[$varName] = $desc;
             } else {
-                $map[] = $desc; // positional fallback
+                $map[] = $desc;
             }
         } else {
-            // Fallback: tag not parsed as Param (InvalidTag etc.)
             $text = trim(safeTagToString($tag));
-            if ($text === '') {
+            if ($text === '')
                 continue;
-            }
             if (preg_match('/^\$?([a-zA-Z0-9_]+)\b(.*)$/s', $text, $m)) {
                 $name = $m[1];
                 $desc = trim($m[2]);
@@ -275,7 +404,6 @@ function cleanDocBlock(string $doc): string
 {
     $clean = preg_replace('/^\s*\/\*\*|\*\/\s*$/', '', $doc);
     $clean = preg_replace('/^\s*\*\s?/m', '', trim($clean));
-    // Remove tags
     $clean = preg_replace('/@[\w]+\s+.*$/ms', '', $clean);
     return trim($clean);
 }
@@ -315,22 +443,6 @@ function formatReflectionType(?ReflectionType $type): string
     return 'mixed';
 }
 
-function formatParameterSignature(ReflectionParameter $p): string
-{
-    $parts = [];
-    $type = $p->getType();
-    if ($type)
-        $parts[] = formatReflectionType($type);
-    $byRef = $p->isPassedByReference() ? '&' : '';
-    $variadic = $p->isVariadic() ? '...' : '';
-    $name = '$' . $p->getName();
-    $default = '';
-    if ($p->isDefaultValueAvailable() && !$p->isVariadic()) {
-        $default = ' = ' . formatDefaultValue($p->getDefaultValue());
-    }
-    return implode(' ', array_filter([$parts ? implode(' ', $parts) : null, $byRef . $variadic . $name])) . $default;
-}
-
 function formatDefaultValue($value): string
 {
     if (is_null($value))
@@ -358,14 +470,18 @@ function getVisibility(ReflectionMethod|ReflectionProperty $r): string
 function decorateType(string $type): string
 {
     return match ($type) {
-        'string' => "🔤 $type",
-        'int' => "🔢 $type",
-        'float' => "🌡️ $type",
-        'bool' => "⚙️ $type",
-        'array' => "📦 $type",
-        'object' => "🧱 $type",
-        'mixed' => "🎲 $type",
-        'null' => "∅ $type",
-        default => $type,
+        'string' => "🔤 `string`",
+        'int' => "🔢 `int`",
+        'float' => "🌡️ `float`",
+        'bool' => "⚙️ `bool`",
+        'array' => "📦 `array`",
+        'object' => "🧱 `object`",
+        'mixed' => "🎲 `mixed`",
+        'null' => "`null`",
+        'void' => "`void`",
+        'never' => "`never`",
+        'self' => "🧩 `self`",
+        'static' => "🧩 `static`",
+        default => "`{$type}`",
     };
 }

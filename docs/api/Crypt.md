@@ -1,4 +1,6 @@
-# 🧩 Merlin\Crypt
+# 🧩 Crypt
+
+**Full name:** [Merlin\Crypt](../../src/Crypt.php)
 
 Simple encryption utility supporting Sodium and OpenSSL
 
@@ -10,83 +12,83 @@ Simple encryption utility supporting Sodium and OpenSSL
 
 ## 🚀 Public methods
 
-### `encrypt()`
+### encrypt() · [source](../../src/Crypt.php#L26)
 
-`public static function encrypt($value, $key, $cipher = 'auto') : mixed`
+`public static function encrypt(mixed $value, mixed $key, mixed $cipher = 'auto'): mixed`
 
 Encrypt a value using the specified cipher
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | `🎲 mixed` | `` | The value to encrypt |
-| `$key` | `🎲 mixed` | `` | The encryption key (at least 32 bytes recommended) |
-| `$cipher` | `🎲 mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
+| `$value` | 🎲 `mixed` | - | The value to encrypt |
+| `$key` | 🎲 `mixed` | - | The encryption key (at least 32 bytes recommended) |
+| `$cipher` | 🎲 `mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 - Description: Base64-encoded encrypted value
 
 **⚠️ Throws**
 
-- \Exception 
+- [🧩`Exception`](Exception.md)
 
-### `decrypt()`
+### decrypt() · [source](../../src/Crypt.php#L50)
 
-`public static function decrypt($value, $key, $cipher = 'auto') : mixed`
+`public static function decrypt(mixed $value, mixed $key, mixed $cipher = 'auto'): mixed`
 
 Decrypt a value using the specified cipher
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | `🎲 mixed` | `` | The base64-encoded encrypted value |
-| `$key` | `🎲 mixed` | `` | The encryption key |
-| `$cipher` | `🎲 mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
+| `$value` | 🎲 `mixed` | - | The base64-encoded encrypted value |
+| `$key` | 🎲 `mixed` | - | The encryption key |
+| `$cipher` | 🎲 `mixed` | `'auto'` | The cipher to use: 'chacha20-poly1305', 'aes-256-gcm', or 'auto' |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 - Description: The decrypted value or null on failure
 
 **⚠️ Throws**
 
-- \Exception 
+- [🧩`Exception`](Exception.md)
 
-### `hasSodium()`
+### hasSodium() · [source](../../src/Crypt.php#L70)
 
-`public static function hasSodium() : mixed`
+`public static function hasSodium(): mixed`
 
 Check if Sodium is available
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `hasOpenSSL()`
+### hasOpenSSL() · [source](../../src/Crypt.php#L80)
 
-`public static function hasOpenSSL() : mixed`
+`public static function hasOpenSSL(): mixed`
 
 Check if OpenSSL is available
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `getAvailableCipher()`
+### getAvailableCipher() · [source](../../src/Crypt.php#L91)
 
-`public static function getAvailableCipher() : mixed`
+`public static function getAvailableCipher(): mixed`
 
 Get the best available cipher (prefers Sodium over OpenSSL)
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
 **⚠️ Throws**
 
-- \Exception 
+- [🧩`Exception`](Exception.md)
 

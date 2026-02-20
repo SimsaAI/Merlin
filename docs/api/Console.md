@@ -1,120 +1,122 @@
-# 🧩 Merlin\Cli\Console
+# 🧩 Console
+
+**Full name:** [Merlin\Cli\Console](../../src/Cli/Console.php)
 
 ## 🔐 Properties
 
-- `protected 🔤 string $defaultTask`
-- `protected 🔤 string $defaultAction`
-- `protected 🔤 string $namespace`
-- `protected ⚙️ bool $parseParams`
+- `protected` 🔤 `string` `$defaultTask` · [source](../../src/Cli/Console.php)
+- `protected` 🔤 `string` `$defaultAction` · [source](../../src/Cli/Console.php)
+- `protected` 🔤 `string` `$namespace` · [source](../../src/Cli/Console.php)
+- `protected` ⚙️ `bool` `$parseParams` · [source](../../src/Cli/Console.php)
 
 ## 🚀 Public methods
 
-### `getDefaultTask()`
+### getDefaultTask() · [source](../../src/Cli/Console.php#L19)
 
-`public function getDefaultTask() : string`
+`public function getDefaultTask(): string`
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 
-### `setDefaultTask()`
+### setDefaultTask() · [source](../../src/Cli/Console.php#L24)
 
-`public function setDefaultTask(string $defaultTask) : void`
+`public function setDefaultTask(string $defaultTask): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultTask` | `🔤 string` | `` |  |
+| `$defaultTask` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `getDefaultAction()`
+### getDefaultAction() · [source](../../src/Cli/Console.php#L32)
 
-`public function getDefaultAction() : string`
+`public function getDefaultAction(): string`
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 
-### `setDefaultAction()`
+### setDefaultAction() · [source](../../src/Cli/Console.php#L37)
 
-`public function setDefaultAction(string $defaultAction) : void`
+`public function setDefaultAction(string $defaultAction): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultAction` | `🔤 string` | `` |  |
+| `$defaultAction` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `getNamespace()`
+### getNamespace() · [source](../../src/Cli/Console.php#L45)
 
-`public function getNamespace() : string`
+`public function getNamespace(): string`
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 
-### `setNamespace()`
+### setNamespace() · [source](../../src/Cli/Console.php#L50)
 
-`public function setNamespace(string $namespace) : void`
+`public function setNamespace(string $namespace): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$namespace` | `🔤 string` | `` |  |
+| `$namespace` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `shouldParseParams()`
+### shouldParseParams() · [source](../../src/Cli/Console.php#L61)
 
-`public function shouldParseParams() : bool`
+`public function shouldParseParams(): bool`
 
 **➡️ Return value**
 
-- Type: `bool`
+- Type: ⚙️ `bool`
 
-### `setParseParams()`
+### setParseParams() · [source](../../src/Cli/Console.php#L66)
 
-`public function setParseParams(bool $parseParams) : void`
+`public function setParseParams(bool $parseParams): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$parseParams` | `⚙️ bool` | `` |  |
+| `$parseParams` | ⚙️ `bool` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `process()`
+### process() · [source](../../src/Cli/Console.php#L79)
 
-`public function process(string|null $task = null, string|null $action = null, array $params = []) : mixed`
+`public function process(string|null $task = null, string|null $action = null, array $params = []): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$task` | `string\|null` | `null` |  |
-| `$action` | `string\|null` | `null` |  |
-| `$params` | `📦 array` | `[]` |  |
+| `$task` | 🔤 `string`\|`null` | `null` |  |
+| `$action` | 🔤 `string`\|`null` | `null` |  |
+| `$params` | 📦 `array` | `[]` |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
 **⚠️ Throws**
 
-- \TaskNotFoundException 
-- \ActionNotFoundException 
+- [🧩`TaskNotFoundException`](TaskNotFoundException.md)
+- [🧩`ActionNotFoundException`](ActionNotFoundException.md)
 

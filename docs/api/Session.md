@@ -1,86 +1,88 @@
-# 🧩 Merlin\Http\Session
+# 🧩 Session
+
+**Full name:** [Merlin\Http\Session](../../src/Http/Session.php)
 
 ## 🔐 Properties
 
-- `private 📦 array $store`
+- `private` 📦 `array` `$store` · [source](../../src/Http/Session.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/Http/Session.php#L6)
 
-`public function __construct(array &$store) : mixed`
+`public function __construct(array &$store): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$store` | `📦 array` | `` |  |
+| `$store` | 📦 `array` | - |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `get()`
+### get() · [source](../../src/Http/Session.php#L10)
 
-`public function get(string $key, mixed $default = null) : mixed`
+`public function get(string $key, mixed $default = null): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | `🔤 string` | `` |  |
-| `$default` | `🎲 mixed` | `null` |  |
+| `$key` | 🔤 `string` | - |  |
+| `$default` | 🎲 `mixed` | `null` |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `set()`
+### set() · [source](../../src/Http/Session.php#L15)
 
-`public function set(string $key, mixed $value) : void`
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$key` | `🔤 string` | `` |  |
-| `$value` | `🎲 mixed` | `` |  |
-
-**➡️ Return value**
-
-- Type: `void`
-
-### `remove()`
-
-`public function remove(string $key) : void`
+`public function set(string $key, mixed $value): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | `🔤 string` | `` |  |
+| `$key` | 🔤 `string` | - |  |
+| `$value` | 🎲 `mixed` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `has()`
+### remove() · [source](../../src/Http/Session.php#L20)
 
-`public function has(string $key) : bool`
+`public function remove(string $key): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | `🔤 string` | `` |  |
+| `$key` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
-- Type: `bool`
+- Type: `void`
 
-### `clear()`
+### has() · [source](../../src/Http/Session.php#L25)
 
-`public function clear() : void`
+`public function has(string $key): bool`
+
+**🧭 Parameters**
+
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+|---|---|---|---|
+| `$key` | 🔤 `string` | - |  |
+
+**➡️ Return value**
+
+- Type: ⚙️ `bool`
+
+### clear() · [source](../../src/Http/Session.php#L30)
+
+`public function clear(): void`
 
 **➡️ Return value**
 

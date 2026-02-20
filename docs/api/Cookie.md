@@ -1,233 +1,235 @@
-# 🧩 Merlin\Http\Cookie
+# 🧩 Cookie
+
+**Full name:** [Merlin\Http\Cookie](../../src/Http/Cookie.php)
 
 ## 🔐 Properties
 
-- `protected 🔤 string $name`
-- `protected 🎲 mixed $value`
-- `protected ⚙️ bool $loaded`
-- `protected 🔢 int $expires`
-- `protected 🔤 string $path`
-- `protected 🔤 string $domain`
-- `protected ⚙️ bool $secure`
-- `protected ⚙️ bool $httpOnly`
-- `protected ⚙️ bool $encrypted`
-- `protected 🔤 string $cipher`
-- `protected string|null $key`
+- `protected` 🔤 `string` `$name` · [source](../../src/Http/Cookie.php)
+- `protected` 🎲 `mixed` `$value` · [source](../../src/Http/Cookie.php)
+- `protected` ⚙️ `bool` `$loaded` · [source](../../src/Http/Cookie.php)
+- `protected` 🔢 `int` `$expires` · [source](../../src/Http/Cookie.php)
+- `protected` 🔤 `string` `$path` · [source](../../src/Http/Cookie.php)
+- `protected` 🔤 `string` `$domain` · [source](../../src/Http/Cookie.php)
+- `protected` ⚙️ `bool` `$secure` · [source](../../src/Http/Cookie.php)
+- `protected` ⚙️ `bool` `$httpOnly` · [source](../../src/Http/Cookie.php)
+- `protected` ⚙️ `bool` `$encrypted` · [source](../../src/Http/Cookie.php)
+- `protected` 🔤 `string` `$cipher` · [source](../../src/Http/Cookie.php)
+- `protected` 🔤 `string`|`null` `$key` · [source](../../src/Http/Cookie.php)
 
 ## 🚀 Public methods
 
-### `make()`
+### make() · [source](../../src/Http/Cookie.php#L38)
 
-`public static function make(string $name, mixed $value = null, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true) : static`
+`public static function make(string $name, mixed $value = null, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): static`
 
 Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` | The name of the cookie. |
-| `$value` | `🎲 mixed` | `null` | The value of the cookie (optional). |
-| `$expires` | `🔢 int` | `0` | Expiration timestamp (optional). |
-| `$path` | `🔤 string` | `'/'` | Path for which the cookie is valid (optional). |
-| `$domain` | `🔤 string` | `''` | Domain for which the cookie is valid (optional). |
-| `$secure` | `⚙️ bool` | `false` | Whether the cookie should only be sent over HTTPS (optional). |
-| `$httpOnly` | `⚙️ bool` | `true` | Whether the cookie should be inaccessible to JavaScript (optional). |
+| `$name` | 🔤 `string` | - | The name of the cookie. |
+| `$value` | 🎲 `mixed` | `null` | The value of the cookie (optional). |
+| `$expires` | 🔢 `int` | `0` | Expiration timestamp (optional). |
+| `$path` | 🔤 `string` | `'/'` | Path for which the cookie is valid (optional). |
+| `$domain` | 🔤 `string` | `''` | Domain for which the cookie is valid (optional). |
+| `$secure` | ⚙️ `bool` | `false` | Whether the cookie should only be sent over HTTPS (optional). |
+| `$httpOnly` | ⚙️ `bool` | `true` | Whether the cookie should be inaccessible to JavaScript (optional). |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 - Description: A new Cookie instance.
 
-### `__construct()`
+### __construct() · [source](../../src/Http/Cookie.php#L52)
 
-`public function __construct(string $name, mixed $value = null, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true) : mixed`
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
-| `$value` | `🎲 mixed` | `null` |  |
-| `$expires` | `🔢 int` | `0` |  |
-| `$path` | `🔤 string` | `'/'` |  |
-| `$domain` | `🔤 string` | `''` |  |
-| `$secure` | `⚙️ bool` | `false` |  |
-| `$httpOnly` | `⚙️ bool` | `true` |  |
-
-**➡️ Return value**
-
-- Type: `mixed`
-
-### `value()`
-
-`public function value(mixed $default = null) : mixed`
+`public function __construct(string $name, mixed $value = null, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$default` | `🎲 mixed` | `null` |  |
+| `$name` | 🔤 `string` | - |  |
+| `$value` | 🎲 `mixed` | `null` |  |
+| `$expires` | 🔢 `int` | `0` |  |
+| `$path` | 🔤 `string` | `'/'` |  |
+| `$domain` | 🔤 `string` | `''` |  |
+| `$secure` | ⚙️ `bool` | `false` |  |
+| `$httpOnly` | ⚙️ `bool` | `true` |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `set()`
+### value() · [source](../../src/Http/Cookie.php#L77)
 
-`public function set(mixed $value) : static`
+`public function value(mixed $default = null): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$value` | `🎲 mixed` | `` |  |
+| `$default` | 🎲 `mixed` | `null` |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🎲 `mixed`
 
-### `send()`
+### set() · [source](../../src/Http/Cookie.php#L99)
 
-`public function send() : static`
+`public function set(mixed $value): static`
+
+**🧭 Parameters**
+
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+|---|---|---|---|
+| `$value` | 🎲 `mixed` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `delete()`
+### send() · [source](../../src/Http/Cookie.php#L108)
 
-`public function delete() : void`
+`public function send(): static`
+
+**➡️ Return value**
+
+- Type: 🧩 `static`
+
+### delete() · [source](../../src/Http/Cookie.php#L129)
+
+`public function delete(): void`
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `encrypted()`
+### encrypted() · [source](../../src/Http/Cookie.php#L144)
 
-`public function encrypted(bool $state = true) : static`
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$state` | `⚙️ bool` | `true` |  |
-
-**➡️ Return value**
-
-- Type: `static`
-
-### `cipher()`
-
-`public function cipher(string $cipher) : static`
+`public function encrypted(bool $state = true): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$cipher` | `🔤 string` | `` |  |
+| `$state` | ⚙️ `bool` | `true` |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `key()`
+### cipher() · [source](../../src/Http/Cookie.php#L150)
 
-`public function key(string|null $key) : static`
+`public function cipher(string $cipher): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$key` | `string\|null` | `` |  |
+| `$cipher` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `name()`
+### key() · [source](../../src/Http/Cookie.php#L156)
 
-`public function name() : string`
-
-**➡️ Return value**
-
-- Type: `string`
-
-### `expires()`
-
-`public function expires(int $timestamp) : static`
+`public function key(string|null $key): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$timestamp` | `🔢 int` | `` |  |
+| `$key` | 🔤 `string`\|`null` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `path()`
+### name() · [source](../../src/Http/Cookie.php#L183)
 
-`public function path(string $path) : static`
+`public function name(): string`
+
+**➡️ Return value**
+
+- Type: 🔤 `string`
+
+### expires() · [source](../../src/Http/Cookie.php#L188)
+
+`public function expires(int $timestamp): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$path` | `🔤 string` | `` |  |
+| `$timestamp` | 🔢 `int` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `domain()`
+### path() · [source](../../src/Http/Cookie.php#L194)
 
-`public function domain(string $domain) : static`
+`public function path(string $path): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$domain` | `🔤 string` | `` |  |
+| `$path` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `secure()`
+### domain() · [source](../../src/Http/Cookie.php#L200)
 
-`public function secure(bool $state) : static`
+`public function domain(string $domain): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$state` | `⚙️ bool` | `` |  |
+| `$domain` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `httpOnly()`
+### secure() · [source](../../src/Http/Cookie.php#L206)
 
-`public function httpOnly(bool $state) : static`
+`public function secure(bool $state): static`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$state` | `⚙️ bool` | `` |  |
+| `$state` | ⚙️ `bool` | - |  |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `__toString()`
+### httpOnly() · [source](../../src/Http/Cookie.php#L212)
 
-`public function __toString() : string`
+`public function httpOnly(bool $state): static`
+
+**🧭 Parameters**
+
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+|---|---|---|---|
+| `$state` | ⚙️ `bool` | - |  |
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🧩 `static`
+
+### __toString() · [source](../../src/Http/Cookie.php#L218)
+
+`public function __toString(): string`
+
+**➡️ Return value**
+
+- Type: 🔤 `string`
 

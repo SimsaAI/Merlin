@@ -1,198 +1,218 @@
-# 🧩 Merlin\AppContext
+# 🧩 AppContext
+
+**Full name:** [Merlin\AppContext](../../src/AppContext.php)
 
 ## 🔐 Properties
 
-- `protected 📦 array $services`
-- `protected Merlin\Http\Request|null $request`
-- `protected Merlin\Mvc\ViewEngine|null $view`
-- `protected Merlin\Http\Session|null $session`
-- `protected Merlin\Http\Cookies|null $cookies`
-- `protected Merlin\ResolvedRoute|null $route`
-- `protected Merlin\Db\DatabaseManager $dbManager`
-- `protected static Merlin\AppContext|null $instance`
+- `protected` 📦 `array` `$services` · [source](../../src/AppContext.php)
+- `protected` [🧩`Request`](Request.md)|`null` `$request` · [source](../../src/AppContext.php)
+- `protected` [🧩`ViewEngine`](ViewEngine.md)|`null` `$view` · [source](../../src/AppContext.php)
+- `protected` [🧩`Session`](Session.md)|`null` `$session` · [source](../../src/AppContext.php)
+- `protected` [🧩`Cookies`](Cookies.md)|`null` `$cookies` · [source](../../src/AppContext.php)
+- `protected` [🧩`ResolvedRoute`](ResolvedRoute.md)|`null` `$route` · [source](../../src/AppContext.php)
+- `protected` [🧩`DatabaseManager`](DatabaseManager.md) `$dbManager` · [source](../../src/AppContext.php)
+- `protected static` [🧩`AppContext`](AppContext.md)|`null` `$instance` · [source](../../src/AppContext.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/AppContext.php#L14)
 
-`public function __construct() : mixed`
+`public function __construct(): mixed`
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `instance()`
+### instance() · [source](../../src/AppContext.php#L55)
 
-`public static function instance() : static`
+`public static function instance(): static`
 
 Get the singleton instance of AppContext. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 - Description: The singleton instance of AppContext.
 
-### `setInstance()`
+### setInstance() · [source](../../src/AppContext.php#L66)
 
-`public static function setInstance(Merlin\AppContext $instance) : void`
+`public static function setInstance(Merlin\AppContext $instance): void`
 
 Set the singleton instance of AppContext. This can be used to inject a custom context, for example in tests.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$instance` | `Merlin\AppContext` | `` | The AppContext instance to set as the singleton. |
+| `$instance` | [🧩`AppContext`](AppContext.md) | - | The AppContext instance to set as the singleton. |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `request()`
+### request() · [source](../../src/AppContext.php#L78)
 
-`public function request() : Merlin\Http\Request`
+`public function request(): Merlin\Http\Request`
 
 Get the HttpRequest instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Request`
+- Type: [🧩`Request`](Request.md)
 - Description: The HttpRequest instance.
 
-### `view()`
+### view() · [source](../../src/AppContext.php#L88)
 
-`public function view() : Merlin\Mvc\ViewEngine`
+`public function view(): Merlin\Mvc\ViewEngine`
 
 Get the ViewEngine instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: `Merlin\Mvc\ViewEngine`
+- Type: [🧩`ViewEngine`](ViewEngine.md)
 - Description: The ViewEngine instance.
 
-### `cookies()`
+### cookies() · [source](../../src/AppContext.php#L98)
 
-`public function cookies() : Merlin\Http\Cookies`
+`public function cookies(): Merlin\Http\Cookies`
 
 Get the Cookies instance. If it doesn't exist, it will be created.
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Cookies`
+- Type: [🧩`Cookies`](Cookies.md)
 - Description: The Cookies instance.
 
-### `dbManager()`
+### dbManager() · [source](../../src/AppContext.php#L104)
 
-`public function dbManager() : Merlin\Db\DatabaseManager`
+`public function dbManager(): Merlin\Db\DatabaseManager`
 
 **➡️ Return value**
 
-- Type: `Merlin\Db\DatabaseManager`
+- Type: [🧩`DatabaseManager`](DatabaseManager.md)
 
-### `session()`
+### session() · [source](../../src/AppContext.php#L114)
 
-`public function session() : Merlin\Http\Session|null`
+`public function session(): Merlin\Http\Session|null`
 
 Get the Session instance.
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Session|null`
+- Type: [🧩`Session`](Session.md)|`null`
 
-### `route()`
+### route() · [source](../../src/AppContext.php#L122)
 
-`public function route() : Merlin\ResolvedRoute|null`
+`public function route(): Merlin\ResolvedRoute|null`
 
 Get the current resolved route information.
 
 **➡️ Return value**
 
-- Type: `Merlin\ResolvedRoute|null`
+- Type: [🧩`ResolvedRoute`](ResolvedRoute.md)|`null`
 
-### `setRoute()`
+### setRoute() · [source](../../src/AppContext.php#L132)
 
-`public function setRoute(Merlin\ResolvedRoute $route) : void`
+`public function setRoute(Merlin\ResolvedRoute $route): void`
 
 Set the current resolved route information.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$route` | `Merlin\ResolvedRoute` | `` | The resolved route to set in the context. |
+| `$route` | [🧩`ResolvedRoute`](ResolvedRoute.md) | - | The resolved route to set in the context. |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `set()`
+### set() · [source](../../src/AppContext.php#L145)
 
-`public function set(string $id, object $service) : void`
+`public function set(string $id, object $service): void`
+
+Register a service instance in the context.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | `🔤 string` | `` |  |
-| `$service` | `🧱 object` | `` |  |
+| `$id` | 🔤 `string` | - | The identifier for the service (usually the class name). |
+| `$service` | 🧱 `object` | - | The service instance to register. |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `has()`
+### has() · [source](../../src/AppContext.php#L156)
 
-`public function has(string $id) : bool`
+`public function has(string $id): bool`
 
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$id` | `🔤 string` | `` |  |
-
-**➡️ Return value**
-
-- Type: `bool`
-
-### `get()`
-
-`public function get(string $id) : object`
+Check if a service is registered in the context.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | `🔤 string` | `` |  |
+| `$id` | 🔤 `string` | - | The identifier of the service to check. |
 
 **➡️ Return value**
 
-- Type: `object`
+- Type: ⚙️ `bool`
+- Description: True if the service is registered, false otherwise.
 
-### `tryGet()`
+### get() · [source](../../src/AppContext.php#L168)
 
-`public function tryGet(string $id) : object|null`
+`public function get(string $id): object`
+
+Get a service instance from the context. If the service is not registered but the identifier is a class name, it will attempt to auto-wire and instantiate it.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | `🔤 string` | `` |  |
+| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
 
 **➡️ Return value**
 
-- Type: `object|null`
+- Type: 🧱 `object`
+- Description: The service instance associated with the given identifier.
 
-### `getOrNull()`
+**⚠️ Throws**
 
-`public function getOrNull(string $id) : object|null`
+- `RuntimeException`  If the service is not found and cannot be auto-wired.
+
+### tryGet() · [source](../../src/AppContext.php#L187)
+
+`public function tryGet(string $id): object|null`
+
+Try to get a service instance from the context. If the service is not registered but the identifier is a class name, it will attempt to auto-wire and instantiate it. Returns null if the service is not found and cannot be auto-wired.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$id` | `🔤 string` | `` |  |
+| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
 
 **➡️ Return value**
 
-- Type: `object|null`
+- Type: 🧱 `object`|`null`
+- Description: The service instance associated with the given identifier, or null if not found.
+
+### getOrNull() · [source](../../src/AppContext.php#L206)
+
+`public function getOrNull(string $id): object|null`
+
+Get a service instance from the context if it exists, or null if it does not exist. This method does not attempt to auto-wire or instantiate classes.
+
+**🧭 Parameters**
+
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+|---|---|---|---|
+| `$id` | 🔤 `string` | - | The identifier of the service to retrieve. |
+
+**➡️ Return value**
+
+- Type: 🧱 `object`|`null`
+- Description: The service instance associated with the given identifier, or null if not found.
 

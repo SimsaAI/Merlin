@@ -1,174 +1,176 @@
-# 🧩 Merlin\Mvc\Dispatcher
+# 🧩 Dispatcher
+
+**Full name:** [Merlin\Mvc\Dispatcher](../../src/Mvc/Dispatcher.php)
 
 ## 🔐 Properties
 
-- `protected Merlin\AppContext $context`
-- `protected 📦 array $globalMiddleware`
-- `protected 📦 array $middlewareGroups`
-- `protected 🔤 string $baseNamespace`
-- `protected 🔤 string $defaultController`
-- `protected 🔤 string $defaultAction`
-- `protected 🎲 mixed $controllerFactory`
+- `protected` [🧩`AppContext`](AppContext.md) `$context` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 📦 `array` `$globalMiddleware` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 📦 `array` `$middlewareGroups` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 🔤 `string` `$baseNamespace` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 🔤 `string` `$defaultController` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 🔤 `string` `$defaultAction` · [source](../../src/Mvc/Dispatcher.php)
+- `protected` 🎲 `mixed` `$controllerFactory` · [source](../../src/Mvc/Dispatcher.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/Mvc/Dispatcher.php#L18)
 
-`public function __construct() : mixed`
+`public function __construct(): mixed`
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `addMiddleware()`
+### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L26)
 
-`public function addMiddleware(Merlin\Mvc\MiddlewareInterface $mw) : void`
+`public function addMiddleware(Merlin\Mvc\MiddlewareInterface $mw): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$mw` | `Merlin\Mvc\MiddlewareInterface` | `` |  |
+| `$mw` | `Merlin\Mvc\MiddlewareInterface` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `defineMiddlewareGroup()`
+### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L33)
 
-`public function defineMiddlewareGroup(string $name, array $middleware) : void`
+`public function defineMiddlewareGroup(string $name, array $middleware): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
-| `$middleware` | `📦 array` | `` |  |
+| `$name` | 🔤 `string` | - |  |
+| `$middleware` | 📦 `array` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `getBaseNamespace()`
+### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L46)
 
-`public function getBaseNamespace() : string`
+`public function getBaseNamespace(): string`
 
 Get the base namespace for controllers.
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: The base namespace for controllers.
 
-### `setBaseNamespace()`
+### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L57)
 
-`public function setBaseNamespace(string $baseNamespace) : static`
+`public function setBaseNamespace(string $baseNamespace): static`
 
 Set the base namespace for controllers. This namespace will be prefixed to all controller class names when dispatching.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$baseNamespace` | `🔤 string` | `` | The base namespace for controllers (e.g. "App\\Controllers") |
+| `$baseNamespace` | 🔤 `string` | - | The base namespace for controllers (e.g. "App\\Controllers") |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
-### `getDefaultController()`
+### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L68)
 
-`public function getDefaultController() : string`
+`public function getDefaultController(): string`
 
 Get the default controller name used when a route doesn't provide one.
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Default controller class name (without namespace)
 
-### `setDefaultController()`
+### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L79)
 
-`public function setDefaultController(string $defaultController) : static`
+`public function setDefaultController(string $defaultController): static`
 
 Set the default controller name.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultController` | `🔤 string` | `` | Controller class name to use as default |
+| `$defaultController` | 🔤 `string` | - | Controller class name to use as default |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
 **⚠️ Throws**
 
-- \InvalidArgumentException If given name is empty
+- `InvalidArgumentException`  If given name is empty
 
-### `getDefaultAction()`
+### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L93)
 
-`public function getDefaultAction() : string`
+`public function getDefaultAction(): string`
 
 Get the default action name used when a route doesn't provide one.
 
 **➡️ Return value**
 
-- Type: `string`
+- Type: 🔤 `string`
 - Description: Default action method name
 
-### `setDefaultAction()`
+### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L104)
 
-`public function setDefaultAction(string $defaultAction) : static`
+`public function setDefaultAction(string $defaultAction): static`
 
 Set the default action name.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$defaultAction` | `🔤 string` | `` | Action method name to use as default |
+| `$defaultAction` | 🔤 `string` | - | Action method name to use as default |
 
 **➡️ Return value**
 
-- Type: `static`
+- Type: 🧩 `static`
 
 **⚠️ Throws**
 
-- \InvalidArgumentException If given name is empty
+- `InvalidArgumentException`  If given name is empty
 
-### `dispatch()`
+### dispatch() · [source](../../src/Mvc/Dispatcher.php#L121)
 
-`public function dispatch(array $routeInfo) : Merlin\Http\Response`
+`public function dispatch(array $routeInfo): Merlin\Http\Response`
 
 Dispatch a request to the appropriate controller and action based on the provided routing information. This method will determine the controller class and action method to invoke, build the middleware pipeline, and execute the controller action, returning the resulting Response.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$routeInfo` | `📦 array` | `` |  |
+| `$routeInfo` | 📦 `array` | - |  |
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Response`
+- Type: [🧩`Response`](Response.md)
 
 **⚠️ Throws**
 
-- \ControllerNotFoundException 
-- \InvalidControllerException 
-- \ActionNotFoundException 
+- [🧩`ControllerNotFoundException`](ControllerNotFoundException.md)
+- [🧩`InvalidControllerException`](InvalidControllerException.md)
+- [🧩`ActionNotFoundException`](ActionNotFoundException.md)
 
-### `setControllerFactory()`
+### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L501)
 
-`public function setControllerFactory(callable $factory) : void`
+`public function setControllerFactory(callable $factory): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$factory` | `callable` | `` |  |
+| `$factory` | `callable` | - |  |
 
 **➡️ Return value**
 

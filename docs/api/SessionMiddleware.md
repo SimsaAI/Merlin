@@ -1,4 +1,6 @@
-# 🧩 Merlin\Http\SessionMiddleware
+# 🧩 SessionMiddleware
+
+**Full name:** [Merlin\Http\SessionMiddleware](../../src/Http/SessionMiddleware.php)
 
 Middleware to manage PHP sessions.
 
@@ -9,18 +11,18 @@ response is sent.
 
 ## 🚀 Public methods
 
-### `process()`
+### process() · [source](../../src/Http/SessionMiddleware.php#L18)
 
-`public function process(Merlin\AppContext $context, callable $next) : Merlin\Http\Response|null`
+`public function process(Merlin\AppContext $context, callable $next): Merlin\Http\Response|null`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$context` | `Merlin\AppContext` | `` |  |
-| `$next` | `callable` | `` |  |
+| `$context` | [🧩`AppContext`](AppContext.md) | - |  |
+| `$next` | `callable` | - |  |
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Response|null`
+- Type: [🧩`Response`](Response.md)|`null`
 

@@ -1,4 +1,6 @@
-# 🧩 Merlin\ResolvedRoute
+# 🧩 ResolvedRoute
+
+**Full name:** [Merlin\ResolvedRoute](../../src/AppContext.php)
 
 Class ResolvedRoute
 
@@ -16,33 +18,33 @@ This includes:
 
 ## 🔐 Properties
 
-- `public string|null $namespace`
-- `public 🔤 string $controller`
-- `public 🔤 string $action`
-- `public 📦 array $params`
-- `public 📦 array $vars`
-- `public 📦 array $groups`
-- `public 📦 array $override`
+- `public` 🔤 `string`|`null` `$namespace` · [source](../../src/AppContext.php)
+- `public` 🔤 `string` `$controller` · [source](../../src/AppContext.php)
+- `public` 🔤 `string` `$action` · [source](../../src/AppContext.php)
+- `public` 📦 `array` `$params` · [source](../../src/AppContext.php)
+- `public` 📦 `array` `$vars` · [source](../../src/AppContext.php)
+- `public` 📦 `array` `$groups` · [source](../../src/AppContext.php)
+- `public` 📦 `array` `$override` · [source](../../src/AppContext.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/AppContext.php#L298)
 
-`public function __construct(string|null $namespace, string $controller, string $action, array $params, array $vars, array $groups, array $override) : mixed`
+`public function __construct(string|null $namespace, string $controller, string $action, array $params, array $vars, array $groups, array $override): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$namespace` | `string\|null` | `` |  |
-| `$controller` | `🔤 string` | `` |  |
-| `$action` | `🔤 string` | `` |  |
-| `$params` | `📦 array` | `` |  |
-| `$vars` | `📦 array` | `` |  |
-| `$groups` | `📦 array` | `` |  |
-| `$override` | `📦 array` | `` |  |
+| `$namespace` | 🔤 `string`\|`null` | - |  |
+| `$controller` | 🔤 `string` | - |  |
+| `$action` | 🔤 `string` | - |  |
+| `$params` | 📦 `array` | - |  |
+| `$vars` | 📦 `array` | - |  |
+| `$groups` | 📦 `array` | - |  |
+| `$override` | 📦 `array` | - |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 

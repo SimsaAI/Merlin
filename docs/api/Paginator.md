@@ -1,119 +1,121 @@
-# 🧩 Merlin\Db\Paginator
+# 🧩 Paginator
+
+**Full name:** [Merlin\Db\Paginator](../../src/Db/Paginator.php)
 
 Paginator class for paginating database query results.
 
 ## 🔐 Properties
 
-- `protected Merlin\Db\Query $builder`
-- `protected 🔢 int $pageSize`
-- `protected 🔢 int $page`
-- `protected ⚙️ bool $reverse`
-- `protected 🔢 int $totalItems`
-- `protected 🔢 int $totalPages`
-- `protected 🔢 int $firstItemPos`
-- `protected 🔢 int $lastItemPos`
+- `protected` [🧩`Query`](Query.md) `$builder` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$pageSize` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$page` · [source](../../src/Db/Paginator.php)
+- `protected` ⚙️ `bool` `$reverse` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$totalItems` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$totalPages` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$firstItemPos` · [source](../../src/Db/Paginator.php)
+- `protected` 🔢 `int` `$lastItemPos` · [source](../../src/Db/Paginator.php)
 
 ## 🚀 Public methods
 
-### `__construct()`
+### __construct() · [source](../../src/Db/Paginator.php#L27)
 
-`public function __construct(Merlin\Db\Query $builder, int $page = 1, int $pageSize = 30, bool $reverse = false) : mixed`
+`public function __construct(Merlin\Db\Query $builder, int $page = 1, int $pageSize = 30, bool $reverse = false): mixed`
 
 Create a new Paginator instance.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$builder` | `Merlin\Db\Query` | `` | The Query builder instance to paginate. |
-| `$page` | `🔢 int` | `1` | The current page number. |
-| `$pageSize` | `🔢 int` | `30` | The number of items per page. |
-| `$reverse` | `⚙️ bool` | `false` | Whether to reverse the order of items. |
+| `$builder` | [🧩`Query`](Query.md) | - | The Query builder instance to paginate. |
+| `$page` | 🔢 `int` | `1` | The current page number. |
+| `$pageSize` | 🔢 `int` | `30` | The number of items per page. |
+| `$reverse` | ⚙️ `bool` | `false` | Whether to reverse the order of items. |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `getPageSize()`
+### getPageSize() · [source](../../src/Db/Paginator.php#L44)
 
-`public function getPageSize() : int`
+`public function getPageSize(): int`
 
 Get the page size (number of items per page).
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The page size.
 
-### `getTotalItems()`
+### getTotalItems() · [source](../../src/Db/Paginator.php#L54)
 
-`public function getTotalItems() : int`
+`public function getTotalItems(): int`
 
 Get the total number of items across all pages.
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The total number of items.
 
-### `getTotalPages()`
+### getTotalPages() · [source](../../src/Db/Paginator.php#L64)
 
-`public function getTotalPages() : int`
+`public function getTotalPages(): int`
 
 Get the total number of pages.
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The total number of pages.
 
-### `getCurrentPage()`
+### getCurrentPage() · [source](../../src/Db/Paginator.php#L74)
 
-`public function getCurrentPage() : int`
+`public function getCurrentPage(): int`
 
 Get the current page number.
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The current page number.
 
-### `getFirstItemPos()`
+### getFirstItemPos() · [source](../../src/Db/Paginator.php#L84)
 
-`public function getFirstItemPos() : int`
+`public function getFirstItemPos(): int`
 
 Get the position of the first item in the current page (1-based index).
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The position of the first item in the current page.
 
-### `getLastItemPos()`
+### getLastItemPos() · [source](../../src/Db/Paginator.php#L94)
 
-`public function getLastItemPos() : int`
+`public function getLastItemPos(): int`
 
 Get the position of the last item in the current page (1-based index).
 
 **➡️ Return value**
 
-- Type: `int`
+- Type: 🔢 `int`
 - Description: The position of the last item in the current page.
 
-### `execute()`
+### execute() · [source](../../src/Db/Paginator.php#L105)
 
-`public function execute($fetchMode = 0) : array`
+`public function execute(mixed $fetchMode = 0): array`
 
 Execute the paginated query and return the items for the current page.
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$fetchMode` | `🎲 mixed` | `0` | The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT). |
+| `$fetchMode` | 🎲 `mixed` | `0` | The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT). |
 
 **➡️ Return value**
 
-- Type: `array`
+- Type: 📦 `array`
 - Description: The items for the current page.
 

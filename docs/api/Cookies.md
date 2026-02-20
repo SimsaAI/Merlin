@@ -1,77 +1,79 @@
-# 🧩 Merlin\Http\Cookies
+# 🧩 Cookies
+
+**Full name:** [Merlin\Http\Cookies](../../src/Http/Cookies.php)
 
 ## 🔐 Properties
 
-- `protected 📦 array $cookies`
+- `protected` 📦 `array` `$cookies` · [source](../../src/Http/Cookies.php)
 
 ## 🚀 Public methods
 
-### `get()`
+### get() · [source](../../src/Http/Cookies.php#L10)
 
-`public function get(string $name, mixed $default = null) : mixed`
+`public function get(string $name, mixed $default = null): mixed`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
-| `$default` | `🎲 mixed` | `null` |  |
+| `$name` | 🔤 `string` | - |  |
+| `$default` | 🎲 `mixed` | `null` |  |
 
 **➡️ Return value**
 
-- Type: `mixed`
+- Type: 🎲 `mixed`
 
-### `cookie()`
+### cookie() · [source](../../src/Http/Cookies.php#L16)
 
-`public function cookie(string $name) : Merlin\Http\Cookie`
+`public function cookie(string $name): Merlin\Http\Cookie`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
+| `$name` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Cookie`
+- Type: [🧩`Cookie`](Cookie.md)
 
-### `set()`
+### set() · [source](../../src/Http/Cookies.php#L22)
 
-`public function set(string $name, mixed $value, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true) : Merlin\Http\Cookie`
+`public function set(string $name, mixed $value, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): Merlin\Http\Cookie`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
-| `$value` | `🎲 mixed` | `` |  |
-| `$expires` | `🔢 int` | `0` |  |
-| `$path` | `🔤 string` | `'/'` |  |
-| `$domain` | `🔤 string` | `''` |  |
-| `$secure` | `⚙️ bool` | `false` |  |
-| `$httpOnly` | `⚙️ bool` | `true` |  |
+| `$name` | 🔤 `string` | - |  |
+| `$value` | 🎲 `mixed` | - |  |
+| `$expires` | 🔢 `int` | `0` |  |
+| `$path` | 🔤 `string` | `'/'` |  |
+| `$domain` | 🔤 `string` | `''` |  |
+| `$secure` | ⚙️ `bool` | `false` |  |
+| `$httpOnly` | ⚙️ `bool` | `true` |  |
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Cookie`
+- Type: [🧩`Cookie`](Cookie.md)
 
-### `delete()`
+### delete() · [source](../../src/Http/Cookies.php#L36)
 
-`public function delete(string $name) : void`
+`public function delete(string $name): void`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$name` | `🔤 string` | `` |  |
+| `$name` | 🔤 `string` | - |  |
 
 **➡️ Return value**
 
 - Type: `void`
 
-### `sendAll()`
+### sendAll() · [source](../../src/Http/Cookies.php#L45)
 
-`public function sendAll() : void`
+`public function sendAll(): void`
 
 **➡️ Return value**
 

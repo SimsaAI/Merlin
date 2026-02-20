@@ -1,63 +1,65 @@
-# 🧩 Merlin\Mvc\Controller
+# 🧩 Controller
+
+**Full name:** [Merlin\Mvc\Controller](../../src/Mvc/Controller.php)
 
 MVC Controller class
 
 ## 🔐 Properties
 
-- `protected 📦 array $middleware`
-- `protected 📦 array $actionMiddleware`
+- `protected` 📦 `array` `$middleware` · [source](../../src/Mvc/Controller.php)
+- `protected` 📦 `array` `$actionMiddleware` · [source](../../src/Mvc/Controller.php)
 
 ## 🚀 Public methods
 
-### `beforeAction()`
+### beforeAction() · [source](../../src/Mvc/Controller.php#L37)
 
-`public function beforeAction(string|null $action = null, array $params = []) : Merlin\Http\Response|null`
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$action` | `string\|null` | `null` |  |
-| `$params` | `📦 array` | `[]` |  |
-
-**➡️ Return value**
-
-- Type: `Merlin\Http\Response|null`
-
-### `afterAction()`
-
-`public function afterAction(string|null $action = null, array $params = []) : Merlin\Http\Response|null`
+`public function beforeAction(string|null $action = null, array $params = []): Merlin\Http\Response|null`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$action` | `string\|null` | `null` |  |
-| `$params` | `📦 array` | `[]` |  |
+| `$action` | 🔤 `string`\|`null` | `null` |  |
+| `$params` | 📦 `array` | `[]` |  |
 
 **➡️ Return value**
 
-- Type: `Merlin\Http\Response|null`
+- Type: [🧩`Response`](Response.md)|`null`
 
-### `getMiddleware()`
+### afterAction() · [source](../../src/Mvc/Controller.php#L42)
 
-`public function getMiddleware() : array`
-
-**➡️ Return value**
-
-- Type: `array`
-
-### `getActionMiddleware()`
-
-`public function getActionMiddleware(string $action) : array`
+`public function afterAction(string|null $action = null, array $params = []): Merlin\Http\Response|null`
 
 **🧭 Parameters**
 
-| Name | Type | Default | Description |
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
 |---|---|---|---|
-| `$action` | `🔤 string` | `` |  |
+| `$action` | 🔤 `string`\|`null` | `null` |  |
+| `$params` | 📦 `array` | `[]` |  |
 
 **➡️ Return value**
 
-- Type: `array`
+- Type: [🧩`Response`](Response.md)|`null`
+
+### getMiddleware() · [source](../../src/Mvc/Controller.php#L49)
+
+`public function getMiddleware(): array`
+
+**➡️ Return value**
+
+- Type: 📦 `array`
+
+### getActionMiddleware() · [source](../../src/Mvc/Controller.php#L54)
+
+`public function getActionMiddleware(string $action): array`
+
+**🧭 Parameters**
+
+| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+|---|---|---|---|
+| `$action` | 🔤 `string` | - |  |
+
+**➡️ Return value**
+
+- Type: 📦 `array`
 
