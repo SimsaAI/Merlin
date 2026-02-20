@@ -21,7 +21,7 @@ class SessionMiddleware implements MiddlewareInterface
             session_start();
         }
 
-        $context->session = new Session($_SESSION);
+        $context->setSession(new Session($_SESSION));
 
         $response = $next();
 

@@ -17,7 +17,7 @@ response is sent.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$context` | [AppContext](AppContext.md) | - |  |
 | `$next` | callable | - |  |

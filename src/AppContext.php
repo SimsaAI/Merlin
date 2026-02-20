@@ -117,6 +117,16 @@ class AppContext
     }
 
     /**
+     * Set the Session instance.
+     *
+     * @param Session $session The Session instance to set in the context.
+     */
+    public function setSession(Session $session): void
+    {
+        $this->session = $session;
+    }
+
+    /**
      * Get the current resolved route information.
      */
     public function route(): ?ResolvedRoute

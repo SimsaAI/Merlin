@@ -2,15 +2,6 @@
 
 **Full name:** [Merlin\Mvc\ViewEngine](../../src/Mvc/ViewEngine.php)
 
-## 🔐 Properties
-
-- `protected` string `$extension` · [source](../../src/Mvc/ViewEngine.php)
-- `protected` array `$namespaces` · [source](../../src/Mvc/ViewEngine.php)
-- `protected` string `$path` · [source](../../src/Mvc/ViewEngine.php)
-- `protected` int `$renderDepth` · [source](../../src/Mvc/ViewEngine.php)
-- `protected` string|null `$layout` · [source](../../src/Mvc/ViewEngine.php)
-- `protected` array `$vars` · [source](../../src/Mvc/ViewEngine.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Mvc/ViewEngine.php#L18)
@@ -21,7 +12,7 @@ Create a new ViewEngine instance.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$vars` | array | `[]` | Initial variables available to all views. |
 
@@ -37,7 +28,7 @@ Set the view file extension for this instance.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$ext` | string | - | Extension with or without a leading dot. |
 
@@ -66,7 +57,7 @@ Views can be referenced using the syntax "namespace::view.name".
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Namespace name to register. |
 | `$path` | string | - | Filesystem path corresponding to the namespace. |
@@ -94,7 +85,7 @@ Set the base path for resolving relative view names.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$path` | string | - | Base directory for views. |
 
@@ -124,7 +115,7 @@ rendered view output.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$layout` | string\|null | - | Layout view name or null to disable. |
 
@@ -151,7 +142,7 @@ Set a single view variable.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Variable name available inside templates. |
 | `$value` | mixed | - | Value assigned to the variable. |
@@ -170,7 +161,7 @@ Later values override earlier ones for the same keys.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$vars` | array | - | Associative array of variables. |
 
@@ -186,7 +177,7 @@ Render a view (and optional layout) and echo the result.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$view` | string | - | View name to render. |
 | `$vars` | array | `[]` | Additional variables for this render call. |
@@ -207,7 +198,7 @@ and captures the output buffer.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$view` | string | - | View name to resolve and render. |
 | `$vars` | array | `[]` | Variables for this render call. |
@@ -231,7 +222,7 @@ The layout receives the content in the `content` variable.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$layout` | string | - | Layout view name. |
 | `$content` | string | - | Previously rendered content. |

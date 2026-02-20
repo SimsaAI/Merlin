@@ -2,10 +2,6 @@
 
 **Full name:** [Merlin\Http\Session](../../src/Http/Session.php)
 
-## 🔐 Properties
-
-- `private` array `$store` · [source](../../src/Http/Session.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Http/Session.php#L6)
@@ -14,7 +10,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$store` | array | - |  |
 
@@ -28,7 +24,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 | `$default` | mixed | `null` |  |
@@ -43,7 +39,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 | `$value` | mixed | - |  |
@@ -58,7 +54,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 
@@ -72,7 +68,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 

@@ -8,30 +8,6 @@ Represents SQL expressions (functions, casts, arrays, etc.) that serialize at SQ
 Default behavior: serialize to literals (debug-friendly)
 Sql::param() creates bind parameters explicitly
 
-## 📌 Constants
-
-- **TYPE_COLUMN** = `1`
-- **TYPE_PARAM** = `2`
-- **TYPE_FUNC** = `3`
-- **TYPE_CAST** = `4`
-- **TYPE_PG_ARRAY** = `5`
-- **TYPE_CS_LIST** = `6`
-- **TYPE_RAW** = `7`
-- **TYPE_JSON** = `8`
-- **TYPE_CONCAT** = `9`
-- **TYPE_EXPR** = `10`
-- **TYPE_ALIAS** = `11`
-- **TYPE_VALUE** = `12`
-
-## 🔐 Properties
-
-- `protected` int `$type` · [source](../../src/Db/Sql.php)
-- `protected` mixed `$value` · [source](../../src/Db/Sql.php)
-- `protected` array `$args` · [source](../../src/Db/Sql.php)
-- `protected` string|null `$cast` · [source](../../src/Db/Sql.php)
-- `protected` array `$bindParams` · [source](../../src/Db/Sql.php)
-- `protected` bool `$mustResolve` · [source](../../src/Db/Sql.php)
-
 ## 🚀 Public methods
 
 ### column() · [source](../../src/Db/Sql.php#L77)
@@ -43,7 +19,7 @@ Supports Model.column syntax for automatic table resolution
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Column name (simple or Model.column format) |
 
@@ -59,7 +35,7 @@ Bind parameter reference
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Parameter name (without colons) |
 
@@ -75,7 +51,7 @@ SQL function call
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Function name |
 | `$args` | array | `[]` | Function arguments (scalars or Sql instances) |
@@ -92,7 +68,7 @@ Type cast (driver-specific syntax)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | Value to cast (scalar or Sql) |
 | `$type` | string | - | Target type name |
@@ -109,7 +85,7 @@ PostgreSQL array literal
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$values` | array | - | Array elements (scalars or Sql instances) |
 
@@ -125,7 +101,7 @@ Comma-separated list (for IN clauses)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$values` | array | - | List elements (scalars or Sql instances) |
 
@@ -141,7 +117,7 @@ Raw SQL (unescaped, passed through as-is)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$sql` | string | - | Raw SQL string |
 | `$bindParams` | array | `[]` | Optional bind parameters ['param_name' => value] |
@@ -158,7 +134,7 @@ Literal value (will be properly quoted/escaped)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | Value to serialize as SQL literal |
 
@@ -174,7 +150,7 @@ JSON value (serialized as JSON literal)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | Value to encode as JSON |
 
@@ -192,7 +168,7 @@ MySQL: uses CONCAT() function
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$parts` | mixed | - | Parts to concatenate (scalars or Sql instances) |
 
@@ -210,7 +186,7 @@ Plain strings are treated as raw SQL tokens (not serialized)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$parts` | mixed | - | Expression parts (strings are raw, use Sql instances for values) |
 
@@ -237,7 +213,7 @@ Add alias to this expression (returns aliased node)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$alias` | string | - | Column alias |
 
@@ -265,7 +241,7 @@ Serialize node to SQL string
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$driver` | string | - | Database driver (mysql, pgsql, sqlite) |
 | `$serialize` | callable | - | Callback for serializing scalar values<br>Signature: fn(mixed $value, bool $param = false): string |

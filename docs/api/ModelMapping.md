@@ -4,10 +4,6 @@
 
 Class to map models
 
-## 🔐 Properties
-
-- `private` array `$mapping` · [source](../../src/Mvc/ModelMapping.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Mvc/ModelMapping.php#L19)
@@ -18,7 +14,7 @@ ModelMapping constructor.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$mapping` | array\|null | `null` |  |
 
@@ -34,7 +30,7 @@ Add model mapping
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$source` | string\|null | `null` |  |
@@ -52,7 +48,7 @@ Get model mapping by name
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 
@@ -82,7 +78,7 @@ Multiple separators are unified into a single underscore, and duplicate undersco
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The input string to convert. |
 

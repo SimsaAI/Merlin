@@ -2,19 +2,6 @@
 
 **Full name:** [Merlin\Db\ResultSet](../../src/Db/ResultSet.php)
 
-## 🔐 Properties
-
-- `protected` [Database](Database.md) `$db` · [source](../../src/Db/ResultSet.php)
-- `protected` PDOStatement `$statement` · [source](../../src/Db/ResultSet.php)
-- `protected` string|null `$sqlStatement` · [source](../../src/Db/ResultSet.php)
-- `protected` array|null `$boundParams` · [source](../../src/Db/ResultSet.php)
-- `protected` string|null `$modelClass` · [source](../../src/Db/ResultSet.php)
-- `protected` int `$fetchMode` · [source](../../src/Db/ResultSet.php)
-- `protected` mixed `$firstObject` · [source](../../src/Db/ResultSet.php)
-- `protected` mixed `$currentRow` · [source](../../src/Db/ResultSet.php)
-- `protected` int `$position` · [source](../../src/Db/ResultSet.php)
-- `protected` bool `$initialized` · [source](../../src/Db/ResultSet.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Db/ResultSet.php#L27)
@@ -23,7 +10,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$connection` | [Database](Database.md) | - |  |
 | `$statement` | PDOStatement | - |  |
@@ -73,7 +60,7 @@ Fetch next row as a single column value.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$column` | int | `0` |  |
 
@@ -89,7 +76,7 @@ Fetch all values from a single column.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$column` | int | `0` |  |
 
@@ -105,7 +92,7 @@ Fetch all rows as objects or arrays depending on fetch mode.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$fetchMode` | int | `0` | Override fetch mode for this call (optional) |
 | `$columnIndex` | int | `0` | Column index for PDO::FETCH_COLUMN mode (optional) |
@@ -122,7 +109,7 @@ Set the default fetch mode for this result set.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$fetchMode` | int | - | One of the PDO::FETCH_* constants |
 

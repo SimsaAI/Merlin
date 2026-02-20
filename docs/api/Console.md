@@ -2,13 +2,6 @@
 
 **Full name:** [Merlin\Cli\Console](../../src/Cli/Console.php)
 
-## 🔐 Properties
-
-- `protected` string `$defaultTask` · [source](../../src/Cli/Console.php)
-- `protected` string `$defaultAction` · [source](../../src/Cli/Console.php)
-- `protected` string `$namespace` · [source](../../src/Cli/Console.php)
-- `protected` bool `$parseParams` · [source](../../src/Cli/Console.php)
-
 ## 🚀 Public methods
 
 ### getDefaultTask() · [source](../../src/Cli/Console.php#L19)
@@ -25,7 +18,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$defaultTask` | string | - |  |
 
@@ -47,7 +40,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$defaultAction` | string | - |  |
 
@@ -69,7 +62,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$namespace` | string | - |  |
 
@@ -91,7 +84,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$parseParams` | bool | - |  |
 
@@ -105,7 +98,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$task` | string\|null | `null` |  |
 | `$action` | string\|null | `null` |  |

@@ -6,12 +6,6 @@ Manages multiple database connections (roles) and their factories.
 
 This class allows the definition of multiple database connections (e.g. "default", "analytics", "logging") and retrieval of them by role. The first role defined will be used as the default when requesting the default connection, but it can be changed by calling setDefaultRole(). Each role can be defined with either a Database instance or a factory callable that returns a Database instance. The factory will only be called once per role, and the resulting Database instance will be cached for future use.
 
-## 🔐 Properties
-
-- `protected` array `$factories` · [source](../../src/Db/DatabaseManager.php)
-- `protected` array `$instances` · [source](../../src/Db/DatabaseManager.php)
-- `protected` string|null `$defaultRole` · [source](../../src/Db/DatabaseManager.php)
-
 ## 🚀 Public methods
 
 ### set() · [source](../../src/Db/DatabaseManager.php#L25)
@@ -22,7 +16,7 @@ Define a database connection for a specific role.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role (e.g. "default", "analytics") |
 | `$factory` | [Database](Database.md)\|callable | - | A factory callable that returns a Database instance, or a Database instance directly |
@@ -39,7 +33,7 @@ Set the default database role to use when requesting the default connection. By 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role to set as default |
 
@@ -59,7 +53,7 @@ Check if a database role is defined.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role to check |
 
@@ -76,7 +70,7 @@ Get the Database instance for a specific role.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role to retrieve |
 
@@ -97,7 +91,7 @@ Get the Database instance for a specific role, or the default if the role is not
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - | The name of the role to retrieve |
 

@@ -2,14 +2,6 @@
 
 **Full name:** [Merlin\Http\UploadedFile](../../src/Http/UploadedFile.php)
 
-## 🔐 Properties
-
-- `protected` string `$name` · [source](../../src/Http/UploadedFile.php)
-- `protected` string `$type` · [source](../../src/Http/UploadedFile.php)
-- `protected` string `$tmpName` · [source](../../src/Http/UploadedFile.php)
-- `protected` int `$error` · [source](../../src/Http/UploadedFile.php)
-- `protected` int `$size` · [source](../../src/Http/UploadedFile.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Http/UploadedFile.php#L7)
@@ -18,7 +10,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$type` | string | - |  |
@@ -68,7 +60,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$targetPath` | string | - |  |
 

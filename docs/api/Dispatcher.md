@@ -2,16 +2,6 @@
 
 **Full name:** [Merlin\Mvc\Dispatcher](../../src/Mvc/Dispatcher.php)
 
-## 🔐 Properties
-
-- `protected` [AppContext](AppContext.md) `$context` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` array `$globalMiddleware` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` array `$middlewareGroups` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` string `$baseNamespace` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` string `$defaultController` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` string `$defaultAction` · [source](../../src/Mvc/Dispatcher.php)
-- `protected` mixed `$controllerFactory` · [source](../../src/Mvc/Dispatcher.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Mvc/Dispatcher.php#L18)
@@ -28,7 +18,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$mw` | Merlin\Mvc\MiddlewareInterface | - |  |
 
@@ -42,7 +32,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$middleware` | array | - |  |
@@ -70,7 +60,7 @@ Set the base namespace for controllers. This namespace will be prefixed to all c
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$baseNamespace` | string | - | The base namespace for controllers (e.g. "App\\Controllers") |
 
@@ -97,7 +87,7 @@ Set the default controller name.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$defaultController` | string | - | Controller class name to use as default |
 
@@ -128,7 +118,7 @@ Set the default action name.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$defaultAction` | string | - | Action method name to use as default |
 
@@ -148,7 +138,7 @@ Dispatch a request to the appropriate controller and action based on the provide
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$routeInfo` | array | - |  |
 
@@ -168,7 +158,7 @@ Dispatch a request to the appropriate controller and action based on the provide
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$factory` | callable | - |  |
 

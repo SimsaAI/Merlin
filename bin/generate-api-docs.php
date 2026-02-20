@@ -118,18 +118,26 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
         }
     }
 
-    // Constants
-    $constants = $reflector->getConstants();
+    // Constants (hide protected)
+    $constants = array_filter(
+        $reflector->getReflectionConstants(),
+        fn(ReflectionClassConstant $constant) => $constant->isPublic()
+    );
     if (!empty($constants)) {
         $md .= "## 📌 Constants\n\n";
-        foreach ($constants as $name => $value) {
+        foreach ($constants as $constant) {
+            $name = $constant->getName();
+            $value = $constant->getValue();
             $md .= "- **{$name}** = `" . var_export($value, true) . "`\n";
         }
         $md .= "\n";
     }
 
-    // Properties
-    $props = $reflector->getProperties();
+    // Properties (hide protected)
+    $props = array_filter(
+        $reflector->getProperties(),
+        fn(ReflectionProperty $prop) => $prop->isPublic()
+    );
     if (!empty($props)) {
         $md .= "## 🔐 Properties\n\n";
         foreach ($props as $prop) {
@@ -205,7 +213,7 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
     // Parameters table
     if ($method->getNumberOfParameters() > 0) {
         $md .= "**🧭 Parameters**\n\n";
-        $md .= "| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |\n";
+        $md .= "| Name | Type | Default | Description |\n";
         $md .= "|---|---|---|---|\n";
         $paramTags = $block ? $block->getTagsByName('param') : [];
         $paramTagMap = mapParamTags($paramTags);

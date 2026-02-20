@@ -28,24 +28,6 @@ $c = Condition::create()
         ->orWhere('u.role', 'moderator')
     ->groupEnd();
 
-## 📌 Constants
-
-- **PI_DEFAULT** = `0`
-- **PI_COLUMN** = `1`
-- **PI_TABLE** = `2`
-
-## 🔐 Properties
-
-- `protected` [Database](Database.md)|null `$db` · [source](../../src/Db/Condition.php)
-- `protected` string `$condition` · [source](../../src/Db/Condition.php)
-- `protected` bool `$needOperator` · [source](../../src/Db/Condition.php)
-- `protected` int `$paramCounter` · [source](../../src/Db/Condition.php)
-- `protected` array `$autoBindParams` · [source](../../src/Db/Condition.php)
-- `protected` mixed `$modelResolver` · [source](../../src/Db/Condition.php)
-- `protected` array `$tableCache` · [source](../../src/Db/Condition.php)
-- `protected` array `$deferredModelPrefixes` · [source](../../src/Db/Condition.php)
-- `protected` string|null `$finalCondition` · [source](../../src/Db/Condition.php)
-
 ## 🚀 Public methods
 
 ### new() · [source](../../src/Db/Condition.php#L86)
@@ -56,7 +38,7 @@ Create a new Condition builder instance
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$db` | [Database](Database.md)\|null | `null` |  |
 
@@ -70,7 +52,7 @@ Create a new Condition builder instance
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$db` | [Database](Database.md)\|null | `null` |  |
 
@@ -90,7 +72,7 @@ Inject model resolver from Query builder
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$resolver` | callable | - | Callable that takes model name and returns table name |
 
@@ -106,7 +88,7 @@ Appends a condition to the current conditions using an AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Condition](Condition.md)\|string | - |  |
 | `$value` | mixed | `null` |  |
@@ -124,7 +106,7 @@ Appends a condition to the current conditions using a OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Condition](Condition.md)\|string | - |  |
 | `$value` | mixed | `null` |  |
@@ -142,7 +124,7 @@ Appends a BETWEEN condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$minimum` | mixed | - |  |
@@ -160,7 +142,7 @@ Appends a NOT BETWEEN condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$minimum` | mixed | - |  |
@@ -178,7 +160,7 @@ Appends a BETWEEN condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$minimum` | mixed | - |  |
@@ -196,7 +178,7 @@ Appends a NOT BETWEEN condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$minimum` | mixed | - |  |
@@ -214,7 +196,7 @@ Appends an IN condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$values` | mixed | - |  |
@@ -231,7 +213,7 @@ Appends an NOT IN condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$values` | mixed | - |  |
@@ -248,7 +230,7 @@ Appends an IN condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$values` | mixed | - |  |
@@ -265,7 +247,7 @@ Appends an NOT IN condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | string | - |  |
 | `$values` | mixed | - |  |
@@ -282,7 +264,7 @@ Appends an HAVING condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Sql](Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
@@ -299,7 +281,7 @@ Appends an NOT HAVING condition to the current conditions using AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Sql](Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
@@ -316,7 +298,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Sql](Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
@@ -331,7 +313,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | [Sql](Sql.md)\|string | - |  |
 | `$values` | mixed | `null` |  |
@@ -348,7 +330,7 @@ Appends a LIKE condition to the current condition
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -366,7 +348,7 @@ Appends a LIKE condition to the current condition using an AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -384,7 +366,7 @@ Appends a LIKE condition to the current condition using an OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -402,7 +384,7 @@ Appends a NOT LIKE condition to the current condition
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -420,7 +402,7 @@ Appends a NOT LIKE condition to the current condition using an AND operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -438,7 +420,7 @@ Appends a NOT LIKE condition to the current condition using an OR operator
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$identifier` | string | - |  |
 | `$value` | mixed | - |  |
@@ -516,7 +498,7 @@ Replace placeholders in the condition with actual values
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$bindParams` | array | - |  |
 

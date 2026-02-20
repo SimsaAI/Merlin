@@ -4,17 +4,6 @@
 
 Paginator class for paginating database query results.
 
-## 🔐 Properties
-
-- `protected` [Query](Query.md) `$builder` · [source](../../src/Db/Paginator.php)
-- `protected` int `$pageSize` · [source](../../src/Db/Paginator.php)
-- `protected` int `$page` · [source](../../src/Db/Paginator.php)
-- `protected` bool `$reverse` · [source](../../src/Db/Paginator.php)
-- `protected` int `$totalItems` · [source](../../src/Db/Paginator.php)
-- `protected` int `$totalPages` · [source](../../src/Db/Paginator.php)
-- `protected` int `$firstItemPos` · [source](../../src/Db/Paginator.php)
-- `protected` int `$lastItemPos` · [source](../../src/Db/Paginator.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Db/Paginator.php#L27)
@@ -25,7 +14,7 @@ Create a new Paginator instance.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$builder` | [Query](Query.md) | - | The Query builder instance to paginate. |
 | `$page` | int | `1` | The current page number. |
@@ -110,7 +99,7 @@ Execute the paginated query and return the items for the current page.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$fetchMode` | mixed | `0` | The PDO fetch mode to use (default: \PDO::FETCH_DEFAULT). |
 

@@ -4,11 +4,6 @@
 
 MVC Controller class
 
-## 🔐 Properties
-
-- `protected` array `$middleware` · [source](../../src/Mvc/Controller.php)
-- `protected` array `$actionMiddleware` · [source](../../src/Mvc/Controller.php)
-
 ## 🚀 Public methods
 
 ### beforeAction() · [source](../../src/Mvc/Controller.php#L37)
@@ -17,7 +12,7 @@ MVC Controller class
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$action` | string\|null | `null` |  |
 | `$params` | array | `[]` |  |
@@ -32,7 +27,7 @@ MVC Controller class
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$action` | string\|null | `null` |  |
 | `$params` | array | `[]` |  |
@@ -55,7 +50,7 @@ MVC Controller class
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$action` | string | - |  |
 

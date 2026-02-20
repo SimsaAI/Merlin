@@ -4,52 +4,6 @@
 
 Unified query builder for SELECT, INSERT, UPDATE, DELETE operations
 
-## 📌 Constants
-
-- **PI_DEFAULT** = `0`
-- **PI_COLUMN** = `1`
-- **PI_TABLE** = `2`
-
-## 🔐 Properties
-
-- `protected static` bool `$useModels` · [source](../../src/Db/Query.php)
-- `protected static` array `$modelCache` · [source](../../src/Db/Query.php)
-- `protected static` [ModelMapping](ModelMapping.md)|null `$modelMapping` · [source](../../src/Db/Query.php)
-- `protected` [Model](Model.md)|null `$model` · [source](../../src/Db/Query.php)
-- `protected` array `$bindParams` · [source](../../src/Db/Query.php)
-- `protected` int `$limit` · [source](../../src/Db/Query.php)
-- `protected` int `$offset` · [source](../../src/Db/Query.php)
-- `protected` int `$rowCount` · [source](../../src/Db/Query.php)
-- `protected` bool `$isReadQuery` · [source](../../src/Db/Query.php)
-- `protected` bool `$hasResultSet` · [source](../../src/Db/Query.php)
-- `protected` array|null `$columns` · [source](../../src/Db/Query.php)
-- `protected` array `$joins` · [source](../../src/Db/Query.php)
-- `protected` array `$orderBy` · [source](../../src/Db/Query.php)
-- `protected` array `$values` · [source](../../src/Db/Query.php)
-- `protected` bool `$getModelDb` · [source](../../src/Db/Query.php)
-- `protected` string|null `$table` · [source](../../src/Db/Query.php)
-- `protected` bool `$returnSql` · [source](../../src/Db/Query.php)
-- `protected` array `$groupBy` · [source](../../src/Db/Query.php)
-- `protected` bool `$forUpdate` · [source](../../src/Db/Query.php)
-- `protected` bool `$sharedLock` · [source](../../src/Db/Query.php)
-- `protected` bool `$distinct` · [source](../../src/Db/Query.php)
-- `protected` string `$preColumnInjection` · [source](../../src/Db/Query.php)
-- `protected` bool `$replaceInto` · [source](../../src/Db/Query.php)
-- `protected` bool `$ignore` · [source](../../src/Db/Query.php)
-- `protected` array `$updateValues` · [source](../../src/Db/Query.php)
-- `protected` bool `$updateValuesIsList` · [source](../../src/Db/Query.php)
-- `protected` array|string `$conflictTarget` · [source](../../src/Db/Query.php)
-- `protected` array|string|null `$returning` · [source](../../src/Db/Query.php)
-- `protected` [Database](Database.md)|null `$db` · [source](../../src/Db/Query.php)
-- `protected` string `$condition` · [source](../../src/Db/Query.php)
-- `protected` bool `$needOperator` · [source](../../src/Db/Query.php)
-- `protected` int `$paramCounter` · [source](../../src/Db/Query.php)
-- `protected` array `$autoBindParams` · [source](../../src/Db/Query.php)
-- `protected` mixed `$modelResolver` · [source](../../src/Db/Query.php)
-- `protected` array `$tableCache` · [source](../../src/Db/Query.php)
-- `protected` array `$deferredModelPrefixes` · [source](../../src/Db/Query.php)
-- `protected` string|null `$finalCondition` · [source](../../src/Db/Query.php)
-
 ## 🚀 Public methods
 
 ### useModels() · [source](../../src/Db/Query.php#L56)
@@ -60,7 +14,7 @@ Enable or disable automatic model resolution for queries. If enabled, the query 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$useModels` | bool | - |  |
 
@@ -76,7 +30,7 @@ Set the model mapping instance to use for resolving model class names to table n
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$modelMapping` | [ModelMapping](ModelMapping.md)\|null | - |  |
 
@@ -92,7 +46,7 @@ Constructor. Can optionally pass a Database connection to use for this query, or
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$db` | [Database](Database.md)\|null | `null` |  |
 | `$model` | [Model](Model.md)\|null | `null` |  |
@@ -109,7 +63,7 @@ Factory method to create a new Query instance. Can optionally pass a Database co
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$db` | [Database](Database.md)\|null | `null` |  |
 
@@ -125,7 +79,7 @@ Set the table for this query. Can be either a table name or a model class name. 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | Table name or model class name |
 | `$alias` | string\|null | `null` | Optional table alias |
@@ -146,7 +100,7 @@ Set columns for SELECT queries. Can be either a comma-separated string or an arr
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$columns` | array\|string | - |  |
 
@@ -163,7 +117,7 @@ Set the LIMIT and optional OFFSET for SELECT queries
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$limit` | int | - |  |
 | `$offset` | int | `0` |  |
@@ -180,7 +134,7 @@ Sets an OFFSET clause for SELECT queries
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$offset` | int | - |  |
 
@@ -198,7 +152,7 @@ Adds values for INSERT or UPDATE queries. Can be either:
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$values` | object\|array | - |  |
 | `$escape` | bool | `true` |  |
@@ -217,7 +171,7 @@ Each item in the list should be an array of column => value pairs.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$valuesList` | array | `[]` |  |
 | `$escape` | bool | `true` |  |
@@ -246,7 +200,7 @@ Set a value for INSERT or UPDATE queries. Can be either:
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$column` | array\|string | - |  |
 | `$value` | mixed | `null` |  |
@@ -264,7 +218,7 @@ Add a JOIN clause to the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
 | `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
@@ -287,7 +241,7 @@ Adds an INNER join to the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
 | `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
@@ -309,7 +263,7 @@ Adds a LEFT join to the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
 | `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
@@ -331,7 +285,7 @@ Adds a RIGHT join to the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
 | `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
@@ -353,7 +307,7 @@ Adds a CROSS join to the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$model` | string | - |  |
 | `$alias` | [Condition](Condition.md)\|string\|null | `null` |  |
@@ -375,7 +329,7 @@ Set ORDER BY clause
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$orderBy` | array\|string | - |  |
 
@@ -391,7 +345,7 @@ Bind parameters for prepared statements. Can be either an associative array or a
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$bindParams` | object\|array | - |  |
 
@@ -407,7 +361,7 @@ Set whether to return the SQL string instead of executing the query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$returnSql` | bool | `true` |  |
 
@@ -423,7 +377,7 @@ Set DISTINCT modifier for SELECT queries
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$distinct` | bool | - |  |
 
@@ -439,7 +393,7 @@ Set a string to be injected before the column list in SELECT queries (e.g. for S
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$inject` | string | - |  |
 
@@ -455,7 +409,7 @@ Set GROUP BY clause
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$groupBy` | array\|string | - |  |
 
@@ -471,7 +425,7 @@ Sets a FOR UPDATE clause (MySQL/PostgreSQL) or FOR SHARE (PostgreSQL)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$forUpdate` | bool | - |  |
 
@@ -487,7 +441,7 @@ Sets a LOCK IN SHARE MODE / FOR SHARE clause (MySQL/PostgreSQL)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$sharedLock` | bool | - |  |
 
@@ -503,7 +457,7 @@ Mark this as a REPLACE INTO operation (MySQL/SQLite)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$replace` | bool | `true` |  |
 
@@ -519,7 +473,7 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$ignore` | bool | `true` |  |
 
@@ -537,7 +491,7 @@ Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$updateValues` | array | - |  |
 | `$escape` | bool | `true` |  |
@@ -556,7 +510,7 @@ Set conflict target for ON CONFLICT clause (PostgreSQL). Can be either:
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$columnsOrConstraint` | array\|string | - |  |
 
@@ -572,7 +526,7 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$columns` | array\|string\|null | - |  |
 
@@ -606,7 +560,7 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$columns` | array\|string\|null | `null` | Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names. |
 
@@ -641,7 +595,7 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$data` | array\|null | `null` | Data to insert |
 
@@ -662,7 +616,7 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$data` | array\|null | `null` | Data to insert |
 
@@ -683,7 +637,7 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$data` | array\|null | `null` | Data to update |
 
@@ -773,7 +727,7 @@ Create a paginator for the current query
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$page` | int | `1` | Page number (1-based) |
 | `$pageSize` | int | `30` | Number of items per page |

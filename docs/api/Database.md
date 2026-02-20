@@ -4,20 +4,6 @@
 
 Class Database
 
-## 🔐 Properties
-
-- `protected` string `$connectString` · [source](../../src/Db/Database.php)
-- `protected` string `$user` · [source](../../src/Db/Database.php)
-- `protected` string `$driverName` · [source](../../src/Db/Database.php)
-- `protected` string `$pass` · [source](../../src/Db/Database.php)
-- `protected` array `$options` · [source](../../src/Db/Database.php)
-- `protected` PDO `$pdo` · [source](../../src/Db/Database.php)
-- `protected` PDOStatement `$statement` · [source](../../src/Db/Database.php)
-- `protected` int `$transactionLevel` · [source](../../src/Db/Database.php)
-- `protected` string `$quoteChar` · [source](../../src/Db/Database.php)
-- `protected` array|bool `$autoReconnect` · [source](../../src/Db/Database.php)
-- `protected` array `$listeners` · [source](../../src/Db/Database.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Db/Database.php#L49)
@@ -28,7 +14,7 @@ Create a new database connection using the provided DSN, credentials and options
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$dsn` | string | - |  |
 | `$user` | string | `''` |  |
@@ -65,7 +51,7 @@ Add an event listener for database events
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$listener` | callable | - | A callable that receives the event name and relevant data |
 
@@ -81,7 +67,7 @@ Configure automatic reconnection behavior with detailed options
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$enabled` | bool | `true` | Enable or disable auto-reconnect |
 | `$maxAttempts` | int | `0` | Maximum number of retry attempts (0 for unlimited) |
@@ -113,7 +99,7 @@ Execute a SQL query with optional parameters and return the resulting statement 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$query` | string | - | SQL query to execute |
 | `$params` | array\|null | `null` | Optional parameters for prepared statements |
@@ -134,7 +120,7 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$query` | string | - | SQL query to prepare |
 
@@ -152,7 +138,7 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$params` | array | `[]` |  |
 
@@ -172,7 +158,7 @@ Fetch a single row from the database as object, associative array, or numeric ar
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$query` | string | - |  |
 | `$params` | array\|null | `null` |  |
@@ -190,7 +176,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$query` | string | - |  |
 | `$params` | array\|null | `null` |  |
@@ -214,7 +200,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$table` | string\|null | `null` |  |
 | `$field` | string\|null | `null` |  |
@@ -229,7 +215,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$nesting` | bool | `true` |  |
 
@@ -243,7 +229,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$nesting` | bool | `true` |  |
 
@@ -259,7 +245,7 @@ Rollback the current transaction or to a savepoint if nesting is enabled and sup
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$nesting` | bool | `true` | Whether to use savepoints for nested transactions (if supported by the driver) |
 
@@ -279,7 +265,7 @@ Quote a string for use in a query.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$str` | string\|null | - |  |
 
@@ -293,7 +279,7 @@ Quote a string for use in a query.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$args` | string\|null | - | ...?string $args |
 

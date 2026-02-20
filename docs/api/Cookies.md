@@ -2,10 +2,6 @@
 
 **Full name:** [Merlin\Http\Cookies](../../src/Http/Cookies.php)
 
-## 🔐 Properties
-
-- `protected` array `$cookies` · [source](../../src/Http/Cookies.php)
-
 ## 🚀 Public methods
 
 ### get() · [source](../../src/Http/Cookies.php#L10)
@@ -14,7 +10,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$default` | mixed | `null` |  |
@@ -29,7 +25,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 
@@ -43,7 +39,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$value` | mixed | - |  |
@@ -63,7 +59,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 

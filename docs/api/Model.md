@@ -2,13 +2,6 @@
 
 **Full name:** [Merlin\Mvc\Model](../../src/Mvc/Model.php)
 
-## 🔐 Properties
-
-- `protected` mixed `$__state__` · [source](../../src/Mvc/Model.php)
-- `protected static` array `$excludedPropertiesCache` · [source](../../src/Mvc/Model.php)
-- `protected static` array `$defaultReadRoles` · [source](../../src/Mvc/Model.php)
-- `protected static` array `$defaultWriteRoles` · [source](../../src/Mvc/Model.php)
-
 ## 🚀 Public methods
 
 ### source() · [source](../../src/Mvc/Model.php#L27)
@@ -58,7 +51,7 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$alias` | string\|null | `null` | Optional alias for the model in the query |
 
@@ -74,7 +67,7 @@ Create a new model instance with the given values and save it to the database. R
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$values` | array | - | Associative array of field values to set on the new model |
 
@@ -91,7 +84,7 @@ Force create a new model instance with the given values, bypassing any checks fo
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$values` | array | - | Associative array of field values to set on the new model |
 
@@ -108,7 +101,7 @@ Find the first model matching the given conditions or create a new one with the 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | - | Associative array of field conditions to find the model |
 | `$values` | array | `[]` | Additional values to set on the model if it needs to be created (merged with conditions) |
@@ -126,7 +119,7 @@ Find the first model matching the given conditions or update it with the provide
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | - | Associative array of field conditions to find the model |
 | `$values` | array | `[]` | Values to set on the model if found (updated) or merged with conditions if created |
@@ -144,7 +137,7 @@ Finds a model by its ID(s)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
@@ -160,7 +153,7 @@ Finds a model by its ID(s) or throws an exception if not found
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
@@ -180,7 +173,7 @@ Finds the first model matching the given conditions or returns null if none foun
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | - | Associative array of field conditions to find the model |
 
@@ -197,7 +190,7 @@ Find all models matching the given conditions. If no conditions are provided, it
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | `[]` | Associative array of field conditions to find the models |
 
@@ -214,7 +207,7 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | - | Associative array of field conditions to check for existence |
 
@@ -231,7 +224,7 @@ Count the number of models matching the given conditions. Returns the count as a
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$conditions` | array | `[]` | Associative array of field conditions to count |
 
@@ -332,7 +325,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - |  |
 
@@ -346,7 +339,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - |  |
 
@@ -360,7 +353,7 @@ Delete the model from the database. This method requires that all ID fields are 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$role` | string | - |  |
 

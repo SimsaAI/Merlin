@@ -2,20 +2,6 @@
 
 **Full name:** [Merlin\Http\Cookie](../../src/Http/Cookie.php)
 
-## 🔐 Properties
-
-- `protected` string `$name` · [source](../../src/Http/Cookie.php)
-- `protected` mixed `$value` · [source](../../src/Http/Cookie.php)
-- `protected` bool `$loaded` · [source](../../src/Http/Cookie.php)
-- `protected` int `$expires` · [source](../../src/Http/Cookie.php)
-- `protected` string `$path` · [source](../../src/Http/Cookie.php)
-- `protected` string `$domain` · [source](../../src/Http/Cookie.php)
-- `protected` bool `$secure` · [source](../../src/Http/Cookie.php)
-- `protected` bool `$httpOnly` · [source](../../src/Http/Cookie.php)
-- `protected` bool `$encrypted` · [source](../../src/Http/Cookie.php)
-- `protected` string `$cipher` · [source](../../src/Http/Cookie.php)
-- `protected` string|null `$key` · [source](../../src/Http/Cookie.php)
-
 ## 🚀 Public methods
 
 ### make() · [source](../../src/Http/Cookie.php#L38)
@@ -26,7 +12,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The name of the cookie. |
 | `$value` | mixed | `null` | The value of the cookie (optional). |
@@ -47,7 +33,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - |  |
 | `$value` | mixed | `null` |  |
@@ -67,7 +53,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$default` | mixed | `null` |  |
 
@@ -81,7 +67,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - |  |
 
@@ -111,7 +97,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$state` | bool | `true` |  |
 
@@ -125,7 +111,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$cipher` | string | - |  |
 
@@ -139,7 +125,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string\|null | - |  |
 
@@ -161,7 +147,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$timestamp` | int | - |  |
 
@@ -175,7 +161,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$path` | string | - |  |
 
@@ -189,7 +175,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$domain` | string | - |  |
 
@@ -203,7 +189,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$state` | bool | - |  |
 
@@ -217,7 +203,7 @@ Create a new Cookie instance with the given parameters.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$state` | bool | - |  |
 

@@ -2,16 +2,6 @@
 
 **Full name:** [Merlin\Mvc\Router](../../src/Mvc/Router.php)
 
-## 🔐 Properties
-
-- `protected` array `$static` · [source](../../src/Mvc/Router.php)
-- `protected` array `$groups` · [source](../../src/Mvc/Router.php)
-- `protected` array `$types` · [source](../../src/Mvc/Router.php)
-- `protected` array `$middlewareGroupStack` · [source](../../src/Mvc/Router.php)
-- `protected` array `$prefixGroupStack` · [source](../../src/Mvc/Router.php)
-- `protected` array `$namedRoutes` · [source](../../src/Mvc/Router.php)
-- `protected` array|null `$lastAddedTokens` · [source](../../src/Mvc/Router.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Mvc/Router.php#L22)
@@ -34,7 +24,7 @@ Predefined types include 'int', 'alpha', 'alnum', 'uuid', and '*' (matches anyth
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The type name (e.g., 'slug', 'email') |
 | `$validator` | callable | - | Function that validates a string value, returns bool |
@@ -52,7 +42,7 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$method` | array\|string\|null | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods) |
 | `$pattern` | string | - | Route pattern (e.g., '/blog/{slug}', '/{:controller}/{:action}/{:params}') |
@@ -71,7 +61,7 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The name to assign to the route |
 
@@ -92,7 +82,7 @@ Check if a named route exists.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The name of the route to check |
 
@@ -109,7 +99,7 @@ Generate a URL for a named route, substituting parameters as needed.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | string | - | The name of the route to generate a URL for |
 | `$params` | array | `[]` | Associative array of parameter values to substitute into the route pattern |
@@ -132,7 +122,7 @@ Define a group of routes that share a common URI prefix. This allows you to orga
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$prefix` | string | - | URI prefix for the group (e.g., "/admin") |
 | `$callback` | callable | - | Function that receives the router instance to define routes within the group |
@@ -149,7 +139,7 @@ Add group of middleware to be applied to all routes defined within the group. Th
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | array\|string | - | Middleware group name (e.g., "auth") |
 | `$callback` | callable | - | Function that receives the router instance to define routes within the group |
@@ -166,7 +156,7 @@ Attempt to match the given URI and HTTP method against the registered routes.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$uri` | string | - | The request URI (path) to match, e.g. "/blog/hello-world" |
 | `$method` | string | `'GET'` | The HTTP method, e.g. "GET", "POST" |

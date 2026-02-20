@@ -2,12 +2,6 @@
 
 **Full name:** [Merlin\Http\Response](../../src/Http/Response.php)
 
-## 🔐 Properties
-
-- `protected` int `$status` · [source](../../src/Http/Response.php)
-- `protected` array `$headers` · [source](../../src/Http/Response.php)
-- `protected` string `$body` · [source](../../src/Http/Response.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/Http/Response.php#L6)
@@ -16,7 +10,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$status` | int | `200` |  |
 | `$headers` | array | `[]` |  |
@@ -32,7 +26,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$code` | int | - |  |
 
@@ -46,7 +40,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 | `$value` | string | - |  |
@@ -61,7 +55,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$text` | string | - |  |
 
@@ -83,7 +77,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$data` | mixed | - |  |
 | `$status` | int | `200` |  |
@@ -98,7 +92,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$text` | string | - |  |
 | `$status` | int | `200` |  |
@@ -113,7 +107,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$html` | string | - |  |
 | `$status` | int | `200` |  |
@@ -128,7 +122,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$url` | string | - |  |
 | `$status` | int | `302` |  |
@@ -143,7 +137,7 @@
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$status` | int | - |  |
 

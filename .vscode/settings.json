@@ -1,3 +1,10 @@
 {
+  "runOnSave.commands": [
+    {
+      "globMatch": "src/*.php",
+      "command": "php bin/generate-api-docs.php",
+      "runIn": "backend"
+    }
+  ],
   "php.version": "8.0"
 }

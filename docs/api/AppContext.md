@@ -2,17 +2,6 @@
 
 **Full name:** [Merlin\AppContext](../../src/AppContext.php)
 
-## 🔐 Properties
-
-- `protected` array `$services` · [source](../../src/AppContext.php)
-- `protected` [Request](Request.md)|null `$request` · [source](../../src/AppContext.php)
-- `protected` [ViewEngine](ViewEngine.md)|null `$view` · [source](../../src/AppContext.php)
-- `protected` [Session](Session.md)|null `$session` · [source](../../src/AppContext.php)
-- `protected` [Cookies](Cookies.md)|null `$cookies` · [source](../../src/AppContext.php)
-- `protected` [ResolvedRoute](ResolvedRoute.md)|null `$route` · [source](../../src/AppContext.php)
-- `protected` [DatabaseManager](DatabaseManager.md) `$dbManager` · [source](../../src/AppContext.php)
-- `protected static` [AppContext](AppContext.md)|null `$instance` · [source](../../src/AppContext.php)
-
 ## 🚀 Public methods
 
 ### __construct() · [source](../../src/AppContext.php#L14)
@@ -42,7 +31,7 @@ Set the singleton instance of AppContext. This can be used to inject a custom co
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$instance` | [AppContext](AppContext.md) | - | The AppContext instance to set as the singleton. |
 
@@ -101,7 +90,23 @@ Get the Session instance.
 
 - Type: [Session](Session.md)|null
 
-### route() · [source](../../src/AppContext.php#L122)
+### setSession() · [source](../../src/AppContext.php#L124)
+
+`public function setSession(Merlin\Http\Session $session): void`
+
+Set the Session instance.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$session` | [Session](Session.md) | - | The Session instance to set in the context. |
+
+**➡️ Return value**
+
+- Type: void
+
+### route() · [source](../../src/AppContext.php#L132)
 
 `public function route(): Merlin\ResolvedRoute|null`
 
@@ -111,7 +116,7 @@ Get the current resolved route information.
 
 - Type: [ResolvedRoute](ResolvedRoute.md)|null
 
-### setRoute() · [source](../../src/AppContext.php#L132)
+### setRoute() · [source](../../src/AppContext.php#L142)
 
 `public function setRoute(Merlin\ResolvedRoute $route): void`
 
@@ -119,7 +124,7 @@ Set the current resolved route information.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$route` | [ResolvedRoute](ResolvedRoute.md) | - | The resolved route to set in the context. |
 
@@ -127,7 +132,7 @@ Set the current resolved route information.
 
 - Type: void
 
-### set() · [source](../../src/AppContext.php#L145)
+### set() · [source](../../src/AppContext.php#L155)
 
 `public function set(string $id, object $service): void`
 
@@ -135,7 +140,7 @@ Register a service instance in the context.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | string | - | The identifier for the service (usually the class name). |
 | `$service` | object | - | The service instance to register. |
@@ -144,7 +149,7 @@ Register a service instance in the context.
 
 - Type: void
 
-### has() · [source](../../src/AppContext.php#L156)
+### has() · [source](../../src/AppContext.php#L166)
 
 `public function has(string $id): bool`
 
@@ -152,7 +157,7 @@ Check if a service is registered in the context.
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | string | - | The identifier of the service to check. |
 
@@ -161,7 +166,7 @@ Check if a service is registered in the context.
 - Type: bool
 - Description: True if the service is registered, false otherwise.
 
-### get() · [source](../../src/AppContext.php#L168)
+### get() · [source](../../src/AppContext.php#L178)
 
 `public function get(string $id): object`
 
@@ -169,7 +174,7 @@ Get a service instance from the context. If the service is not registered but th
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | string | - | The identifier of the service to retrieve. |
 
@@ -182,7 +187,7 @@ Get a service instance from the context. If the service is not registered but th
 
 - RuntimeException  If the service is not found and cannot be auto-wired.
 
-### tryGet() · [source](../../src/AppContext.php#L187)
+### tryGet() · [source](../../src/AppContext.php#L197)
 
 `public function tryGet(string $id): object|null`
 
@@ -190,7 +195,7 @@ Try to get a service instance from the context. If the service is not registered
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | string | - | The identifier of the service to retrieve. |
 
@@ -199,7 +204,7 @@ Try to get a service instance from the context. If the service is not registered
 - Type: object|null
 - Description: The service instance associated with the given identifier, or null if not found.
 
-### getOrNull() · [source](../../src/AppContext.php#L206)
+### getOrNull() · [source](../../src/AppContext.php#L216)
 
 `public function getOrNull(string $id): object|null`
 
@@ -207,7 +212,7 @@ Get a service instance from the context if it exists, or null if it does not exi
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$id` | string | - | The identifier of the service to retrieve. |
 

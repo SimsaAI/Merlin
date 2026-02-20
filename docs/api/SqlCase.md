@@ -4,11 +4,6 @@
 
 Fluent builder for CASE expressions
 
-## 🔐 Properties
-
-- `protected` array `$whenClauses` · [source](../../src/Db/Sql.php)
-- `protected` mixed `$elseValue` · [source](../../src/Db/Sql.php)
-
 ## 🚀 Public methods
 
 ### when() · [source](../../src/Db/Sql.php#L414)
@@ -19,7 +14,7 @@ Add WHEN condition THEN result clause
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$condition` | mixed | - | Condition (scalar or Sql instance) |
 | `$then` | mixed | - | Result value (scalar or Sql instance) |
@@ -36,7 +31,7 @@ Set ELSE default value
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | Default value (scalar or Sql instance) |
 

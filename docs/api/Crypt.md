@@ -20,7 +20,7 @@ Encrypt a value using the specified cipher
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | The value to encrypt |
 | `$key` | mixed | - | The encryption key (at least 32 bytes recommended) |
@@ -43,7 +43,7 @@ Decrypt a value using the specified cipher
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$value` | mixed | - | The base64-encoded encrypted value |
 | `$key` | mixed | - | The encryption key |

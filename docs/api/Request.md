@@ -25,7 +25,7 @@ Get and parse JSON request body
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$assoc` | mixed | `true` | When true, returns associative arrays. When false, returns objects |
 
@@ -42,7 +42,7 @@ Get a parameter from the request (GET, POST, COOKIE, etc.)
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | `null` |  |
 | `$defaultValue` | mixed | `null` |  |
@@ -59,7 +59,7 @@ Get a POST parameter from the request
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | `null` |  |
 | `$defaultValue` | mixed | `null` |  |
@@ -76,7 +76,7 @@ Get a query parameter from the request
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | `null` |  |
 | `$defaultValue` | mixed | `null` |  |
@@ -93,7 +93,7 @@ Get a server variable from the request
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | `null` |  |
 | `$defaultValue` | mixed | `null` |  |
@@ -180,7 +180,7 @@ Get the client's IP address, optionally trusting proxy headers
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$trustForwardedHeader` | mixed | `false` |  |
 
@@ -226,7 +226,7 @@ Gets an array with mime/types and their quality accepted by the browser/client f
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$sort` | mixed | `false` |  |
 
@@ -252,7 +252,7 @@ Gets a charsets array and their quality accepted by the browser/client from _SER
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$sort` | mixed | `false` |  |
 
@@ -278,7 +278,7 @@ Gets languages array and their quality accepted by the browser/client from _SERV
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$sort` | mixed | `false` |  |
 
@@ -364,7 +364,7 @@ Checks whether request has been made using GET method
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | - |  |
 
@@ -380,7 +380,7 @@ Checks whether request has been made using POST method
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | - |  |
 
@@ -396,7 +396,7 @@ Checks whether request has been made using GET method
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | - |  |
 
@@ -412,7 +412,7 @@ Checks whether request has been made using GET method
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$name` | mixed | - |  |
 
@@ -428,7 +428,7 @@ Get an uploaded file for a given key. Returns an UploadedFile object or null if 
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 
@@ -444,7 +444,7 @@ Get uploaded files for a given key. Returns an array of UploadedFile objects, ev
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$key` | string | - |  |
 

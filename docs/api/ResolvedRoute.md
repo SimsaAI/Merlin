@@ -28,13 +28,13 @@ This includes:
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/AppContext.php#L298)
+### __construct() · [source](../../src/AppContext.php#L308)
 
 `public function __construct(string|null $namespace, string $controller, string $action, array $params, array $vars, array $groups, array $override): mixed`
 
 **🧭 Parameters**
 
-| 🔑 Name | 🧩 Type | 🏷️ Default | 📝 Description |
+| Name | Type | Default | Description |
 |---|---|---|---|
 | `$namespace` | string\|null | - |  |
 | `$controller` | string | - |  |
