@@ -90,24 +90,35 @@ use Merlin\Http\Response;
 use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
-AppContext::instance()->dbManager()->set('default',
-    new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass'));
+// Application context holds shared services
+$ctx = AppContext::instance();
 
+// Register database connection as a lazy service
+$ctx->dbManager()->set('default',
+    fn() => new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass')
+);
+
+// Configure routing
 $router = new Router();
 $router->add('GET', '/hello/{name}', 'IndexController::helloAction');
 
+// Dispatcher handles controller resolution and middleware
 $dispatcher = new Dispatcher();
 $dispatcher->setBaseNamespace('App\\Controllers');
 
-$route = $router->match('/hello/Merlin', 'GET');
+// Match the incoming request
+$path = $ctx->request()->getPath();
+$method = $ctx->request()->getMethod();
+$route = $router->match($path, $method);
 
 if ($route === null) {
+    // No route matched - return 404
     Response::status(404)->send();
-    return;
+} else {
+    // Dispatch the request to the appropriate controller action
+    $response = $dispatcher->dispatch($route);
+    $response->send();
 }
-
-$response = $dispatcher->dispatch($route);
-$response->send();
 ```
 
 Controller example:
@@ -172,7 +183,7 @@ User::query()->where('status', 'spam')->delete();
 
 ### Advanced Query Builder
 
-Build complex queries with joins, subqueries, and aggregations:
+Build complex queries with joins, subqueries, and aggregations.
 
 ```php
 use Merlin\Db\Query;
