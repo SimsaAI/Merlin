@@ -2,7 +2,7 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
-use phpDocumentor\Reflection\DocBlock\Tags\Deprecated as DeprecatedTag;
+//use phpDocumentor\Reflection\DocBlock\Tags\Deprecated as DeprecatedTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param as ParamTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_ as ReturnTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws as ThrowsTag;
@@ -11,8 +11,13 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionClassConstant;
+use ReflectionIntersectionType;
 use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionProperty;
+use ReflectionType;
+use ReflectionUnionType;
 use Throwable;
 
 $srcDir = 'src';

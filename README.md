@@ -90,13 +90,13 @@ use Merlin\Http\Response;
 use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
-$ctx = AppContext::instance();
-$ctx->db = new Database('mysql:host=localhost;dbname=app', 'user', 'pass');
+AppContext::instance()->dbManager()->set('default',
+    new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass'));
 
 $router = new Router();
 $router->add('GET', '/hello/{name}', 'IndexController::helloAction');
 
-$dispatcher = new Dispatcher($ctx);
+$dispatcher = new Dispatcher();
 $dispatcher->setBaseNamespace('App\\Controllers');
 
 $route = $router->match('/hello/Merlin', 'GET');
@@ -269,26 +269,30 @@ Comprehensive guides and references:
 - **[Security](docs/08-SECURITY.md)** - Best practices and security features
 - **[Logging](docs/09-LOGGING.md)** - Application and database logging
 - **[Cookbook](docs/10-COOKBOOK.md)** - Practical recipes and examples
-- **[API Reference](docs/11-API-REFERENCE.md)** - Complete API documentation
+- **[API Reference](docs/api/index.md)** - Complete API documentation
 
 ## Key Concepts
 
 ### AppContext - Service Container
 
-Centralized access to shared services:
+Centralized access to shared services via a singleton service container:
 
 ```php
 use Merlin\AppContext;
 use Merlin\Db\Database;
 
 $ctx = AppContext::instance();
-// Set up database connection
-$ctx->db = new Database('mysql:host=localhost;dbname=app', 'user', 'pass');
-// Access lazy-loaded service
-$ctx->getView()->setPath(__DIR__ . '/app/views');
 
-// Access anywhere
-$db = AppContext::instance()->db;
+// Register database connection(s)
+$ctx->dbManager()->set('default', fn() => new Database('mysql:host=localhost;dbname=app', 'user', 'pass'));
+
+// Configure services
+$ctx->view()->setPath(__DIR__ . '/app/views');
+
+// Access services anywhere
+$ctx = AppContext::instance();
+$request = $ctx->request();
+$cookies = $ctx->cookies();
 ```
 
 ### Middleware Pipeline
@@ -296,7 +300,7 @@ $db = AppContext::instance()->db;
 Add custom logic to the request/response cycle:
 
 ```php
-$dispatcher = new Dispatcher($ctx);
+$dispatcher = new Dispatcher();
 $dispatcher->addMiddleware(new AuthMiddleware());
 $dispatcher->addMiddleware(new SessionMiddleware());
 $response = $dispatcher->dispatch($route);
@@ -307,10 +311,12 @@ $response = $dispatcher->dispatch($route);
 Separate read and write connections for scalability:
 
 ```php
-$ctx->dbWrite = new Database('mysql:host=master;dbname=app', 'user', 'pass');
-$ctx->dbRead = new Database('mysql:host=replica;dbname=app', 'user', 'pass');
+$mgr = AppContext::instance()->dbManager();
+$mgr->set('write', new Database('mysql:host=master;dbname=app', 'user', 'pass'));
+$mgr->set('read', new Database('mysql:host=replica;dbname=app', 'user', 'pass'));
 
-// Writes go to master, reads go to replica automatically
+// Models and queries automatically route reads to 'read' role, writes to 'write' role
+// Falls back to default if a specific role is missing
 ```
 
 ## Development
