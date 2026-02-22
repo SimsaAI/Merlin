@@ -91,17 +91,29 @@ use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
 // Application context holds shared services
-// Dispatcher, Controllers, Query Builders and Models access the AppContext singleton for database connections, request data, etc. like in this example. This allows flexible configuration and easy access to services throughout the application without tight coupling.
+// Dispatcher, Controllers, Query Builders and Models access the AppContext
+// singleton for database connections, request data, etc. like in this example.
+// This allows flexible configuration and easy access to services throughout
+// the application without tight coupling.
 $ctx = AppContext::instance();
 
 // Register database connection as a lazy service
-// The label 'default' is used to identify this connection. The first registered connection becomes the default connection. You can register multiple connections with different names and roles (e.g. 'read', 'write') for read/write splitting. The closure allows for lazy initialization, so the connection is only created when first accessed.
+// The label 'default' is used to identify this connection. The first
+// registered connection becomes the default connection. You can register
+// multiple connections with different names and roles (e.g. 'read', 'write')
+// for read/write splitting. The closure allows for lazy initialization,
+// so the connection is only created when first accessed.
 $ctx->dbManager()->set('default',
     fn() => new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass')
 );
 
 // Configure routing
-// Define routes with HTTP method, path pattern, and controller action. The pattern can include named parameters (e.g. {name}) which will be passed to the controller action as arguments. The controller action is specified as 'ControllerClass::methodName' or as array syntax ['controller' => 'ControllerClass', 'action' => 'methodName'] for more complex cases.
+// Define routes with HTTP method, path pattern, and controller action.
+// The pattern can include named parameters (e.g. {name}) which will be
+// passed to the controller action as arguments. The controller action is
+// specified as 'ControllerClass::methodName' or as array syntax
+// ['controller' => 'ControllerClass', 'action' => 'methodName'] for more
+// complex cases.
 $router = new Router();
 $router->add('GET', '/hello/{name}', 'IndexController::helloAction');
 
@@ -221,7 +233,11 @@ $results = Order::query('o')
 ```php
 use Merlin\Db\Query;
 
-// For raw queries without models, you can use the Query builder directly. This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with Query::new() and specify the table manually.
+// For raw queries without models, you can use the Query builder directly.
+// This is useful for complex queries that don't fit the Active Record pattern
+// or when you want more control over the SQL being generated. The API is
+// the same as the model query builder, but you start with Query::new() and
+// specify the table manually.
 Query::useModels(false);
 
 $results = Query::new()
@@ -396,8 +412,8 @@ $mgr = AppContext::instance()->dbManager();
 $mgr->set('write', new Database('mysql:host=master;dbname=app', 'user', 'pass'));
 $mgr->set('read', new Database('mysql:host=replica;dbname=app', 'user', 'pass'));
 
-// Models and queries automatically route reads to 'read' role, writes to 'write' role
-// Falls back to default if a specific role is missing
+// Models and queries automatically route reads to 'read' role, writes to
+// 'write' role. Falls back to default if a specific role is missing
 ```
 
 ## Development
