@@ -98,8 +98,9 @@ class UserTask extends Task
 
 ## Error Types
 
-- `Merlin\Cli\TaskNotFoundException`
-- `Merlin\Cli\ActionNotFoundException`
+- `Merlin\Cli\Exceptions\TaskNotFoundException`
+- `Merlin\Cli\Exceptions\ActionNotFoundException`
+- `Merlin\Cli\Exceptions\InvalidTaskException`
 
 ## See Also
 

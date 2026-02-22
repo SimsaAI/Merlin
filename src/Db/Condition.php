@@ -51,12 +51,17 @@ class Condition
 	/**
 	 * @var int
 	 */
-	protected int $paramCounter = 0;
+	protected int $autoBindCounter = 0;
 
 	/**
 	 * @var array
 	 */
-	protected array $autoBindParams = [];
+	protected array $automaticBindings = [];
+
+	/**
+	 * @var array
+	 */
+	protected array $subQueryBindings = [];
 
 	/**
 	 * @var callable|null Callable to resolve model names to table names
@@ -216,6 +221,8 @@ class Condition
 					fn($model) => $this->getTableName($model)
 				);
 			}
+			// merge bind parameters from sub conditions into current builder
+			$this->subQueryBindings = $condition->getBindings() + $this->subQueryBindings;
 			$escape = false;
 			$condition = $condition->toSql();
 		} elseif (\is_array($value)) {
@@ -224,6 +231,8 @@ class Condition
 		} elseif (isset($value)) {
 			if ($value instanceof Query) {
 				// sub select
+				// merge bind parameters from sub conditions into current builder
+				$this->subQueryBindings = $value->getBindings() + $this->subQueryBindings;
 				$escape = false;
 				$value = '(' . $value->toSql() . ')';
 			} elseif ($value instanceof Condition) {
@@ -233,12 +242,19 @@ class Condition
 						fn($model) => $this->getTableName($model)
 					);
 				}
+				// merge bind parameters from sub conditions into current builder
+				$this->subQueryBindings = $value->getBindings() + $this->subQueryBindings;
 				$escape = false;
 				$value = '(' . $value->toSql() . ')';
 			}
 			// ci style - protect identifier
 			$condition = $this->protectIdentifier($condition);
-			$condition = $this->appendOperator($condition);
+			$condition = rtrim($condition);
+			// If condition doesn't already end with an operator, add '='
+			if (!preg_match('/(?:\b(?:NOT\s+)?(?:IN|LIKE|BETWEEN|REGEXP|SIMILAR\s+TO)|[=<>])$/i', $condition)) {
+				$condition .= ' =';
+			}
+			$condition .= ' ';
 			$condition .= $escape ? $this->escapeValue($value) : $value;
 		} else {
 			// Plain condition string - parse and protect identifiers
@@ -387,6 +403,8 @@ class Condition
 					fn($model) => $this->getTableName($model)
 				);
 			}
+			$this->subQueryBindings =
+				$values->getBindings() + $this->subQueryBindings;
 			$this->condition .= '(' . $protectedCondition . " $in (" . $values->toSql() . '))';
 		} else {
 			$this->condition .= '(' . $protectedCondition . " $in (" . $this->escapeValue($values) . '))';
@@ -646,30 +664,6 @@ class Condition
 	}
 
 	/**
-	 * Append CI style operator to condition string
-	 * @param string $condition
-	 * @return string
-	 */
-	private function appendOperator(string $condition): string
-	{
-		$condition = rtrim($condition);
-		$index = strlen($condition) - 1;
-		if ($index >= 0) {
-			switch ($condition[$index]) {
-				case '=':
-				case '<':
-				case '>':
-					break;
-				default:
-					$condition .= ' =';
-					break;
-			}
-			$condition .= ' ';
-		}
-		return $condition;
-	}
-
-	/**
 	 * Replace placeholders with escaped values
 	 * Supports both positional (?) and named (:name) placeholders
 	 * @param string $condition
@@ -724,8 +718,8 @@ class Condition
 		if ($param) {
 			// Param mode: create bind parameter
 			$id = spl_object_id($this); // ensure unique ID for objects
-			$name = "__p{$id}_" . (++$this->paramCounter);
-			$this->autoBindParams[$name] = $value;
+			$name = "__p{$id}_" . (++$this->autoBindCounter);
+			$this->automaticBindings[$name] = $value;
 			return ':' . $name;
 		} else {
 			// Literal mode: escape to SQL literal
@@ -796,10 +790,7 @@ class Condition
 		if ($value instanceof Query) {
 			// sub select
 			// merge auto-bind parameters from sub select into current builder
-			$this->autoBindParams = array_merge($value->autoBindParams, $this->autoBindParams);
-			if ($this instanceof Query) {
-				$this->bindParams = array_merge($value->bindParams, $this->bindParams);
-			}
+			$this->subQueryBindings = $value->getBindings() + $this->subQueryBindings;
 			return '(' . $value->toSql() . ')';
 		}
 
@@ -811,7 +802,7 @@ class Condition
 				});
 			}
 			// merge auto-bind parameters from sub conditions into current builder
-			$this->autoBindParams = array_merge($value->autoBindParams, $this->autoBindParams);
+			$this->subQueryBindings = $value->getBindings() + $this->subQueryBindings;
 			return '(' . $value->toSql() . ')';
 		}
 
@@ -865,7 +856,8 @@ class Condition
 		int $type = self::PI_DEFAULT,
 		?string $alias = null
 	): string {
-		$item = preg_replace('/\s+/', ' ', $item);
+		// Normalize whitespace: trim and replace multiple spaces/tabs/newlines with single space
+		$item = preg_replace('/\s+/', ' ', trim($item));
 
 		// Extract alias from "item AS alias" or "item alias"
 		// Orderby/Groupby can have ASC/DESC as "alias"
@@ -881,7 +873,6 @@ class Condition
 
 		// Only process items without functions, quotes, or parentheses
 		if (strcspn($item, "()'") === strlen($item)) {
-			$item = trim($item);
 
 			if ($type === self::PI_TABLE) {
 				// Table mode: use full table name resolution with alias support
@@ -978,14 +969,9 @@ class Condition
 	 */
 	public function bind(array $bindParams): static
 	{
-		if (\count($this->autoBindParams) > $this->paramCounter) {
-			// Remove old auto-bind parameters that were not used in the current condition
-			array_splice($this->autoBindParams, 0, $this->paramCounter);
-		}
-		$bindParams = array_merge($this->autoBindParams, $bindParams);
 		$this->finalCondition = $this->replacePlaceholders(
 			$this->condition,
-			$bindParams
+			$bindParams + $this->getBindings()
 		);
 		return $this;
 	}
@@ -998,5 +984,13 @@ class Condition
 	{
 		$sql = $this->finalCondition ?? $this->condition;
 		return $this->resolveDeferredModels($sql);
+	}
+
+	/**
+	 * Get bind parameters
+	 */
+	public function getBindings(): array
+	{
+		return \array_slice($this->automaticBindings, 0, $this->autoBindCounter) + $this->subQueryBindings;
 	}
 }

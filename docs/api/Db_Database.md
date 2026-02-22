@@ -29,6 +29,9 @@ Create a new database connection using the provided DSN, credentials and options
 
 - Exception
 
+
+---
+
 ### connect() · [source](../../src/Db/Database.php#L83)
 
 `public function connect(): mixed`
@@ -42,6 +45,9 @@ Establish a new PDO connection using the current configuration
 **⚠️ Throws**
 
 - Exception
+
+
+---
 
 ### addListener() · [source](../../src/Db/Database.php#L99)
 
@@ -58,6 +64,9 @@ Add an event listener for database events
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### setAutoReconnect() · [source](../../src/Db/Database.php#L122)
 
@@ -81,6 +90,9 @@ Configure automatic reconnection behavior with detailed options
 
 - Type: static
 
+
+---
+
 ### getAutoReconnect() · [source](../../src/Db/Database.php#L147)
 
 `public function getAutoReconnect(): array|bool`
@@ -90,6 +102,9 @@ Get auto-reconnect configuration
 **➡️ Return value**
 
 - Type: array|bool
+
+
+---
 
 ### query() · [source](../../src/Db/Database.php#L159)
 
@@ -112,6 +127,9 @@ Execute a SQL query with optional parameters and return the resulting statement 
 
 - Exception
 
+
+---
+
 ### prepare() · [source](../../src/Db/Database.php#L194)
 
 `public function prepare(string $query): PDOStatement|bool`
@@ -132,6 +150,9 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 - Exception
 
+
+---
+
 ### execute() · [source](../../src/Db/Database.php#L221)
 
 `public function execute(array $params = []): PDOStatement|bool`
@@ -149,6 +170,9 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 **⚠️ Throws**
 
 - Exception
+
+
+---
 
 ### selectRow() · [source](../../src/Db/Database.php#L386)
 
@@ -168,6 +192,9 @@ Fetch a single row from the database as object, associative array, or numeric ar
 
 - Type: array|bool
 
+
+---
+
 ### selectAll() · [source](../../src/Db/Database.php#L401)
 
 `public function selectAll(string $query, array|null $params = null, int $fetchMode = 0): array`
@@ -186,6 +213,9 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 - Type: array
 
+
+---
+
 ### rowCount() · [source](../../src/Db/Database.php#L412)
 
 `public function rowCount(): int`
@@ -193,6 +223,9 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 **➡️ Return value**
 
 - Type: int
+
+
+---
 
 ### lastInsertId() · [source](../../src/Db/Database.php#L420)
 
@@ -209,6 +242,9 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 - Type: string|bool
 
+
+---
+
 ### begin() · [source](../../src/Db/Database.php#L448)
 
 `public function begin(bool $nesting = true): int|bool`
@@ -223,6 +259,9 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 - Type: int|bool
 
+
+---
+
 ### commit() · [source](../../src/Db/Database.php#L485)
 
 `public function commit(bool $nesting = true): int|bool`
@@ -236,6 +275,9 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 **➡️ Return value**
 
 - Type: int|bool
+
+
+---
 
 ### rollback() · [source](../../src/Db/Database.php#L531)
 
@@ -257,6 +299,9 @@ Rollback the current transaction or to a savepoint if nesting is enabled and sup
 
 - Exception
 
+
+---
+
 ### quote() · [source](../../src/Db/Database.php#L576)
 
 `public function quote(string|null $str): string|bool`
@@ -273,6 +318,9 @@ Quote a string for use in a query.
 
 - Type: string|bool
 
+
+---
+
 ### quoteIdentifier() · [source](../../src/Db/Database.php#L589)
 
 `public function quoteIdentifier(string|null ...$args): string`
@@ -287,6 +335,9 @@ Quote a string for use in a query.
 
 - Type: string
 
+
+---
+
 ### getInternalConnection() · [source](../../src/Db/Database.php#L617)
 
 `public function getInternalConnection(): PDO|null`
@@ -294,6 +345,9 @@ Quote a string for use in a query.
 **➡️ Return value**
 
 - Type: PDO|null
+
+
+---
 
 ### builder() · [source](../../src/Db/Database.php#L626)
 
@@ -305,6 +359,9 @@ Create a new Query builder instance associated with this database connection.
 
 - Type: [Query](Db_Query.md)
 
+
+---
+
 ### getDriver() · [source](../../src/Db/Database.php#L634)
 
 `public function getDriver(): string`
@@ -313,3 +370,8 @@ Create a new Query builder instance associated with this database connection.
 
 - Type: string
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

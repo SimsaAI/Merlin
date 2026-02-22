@@ -20,6 +20,9 @@ Create a new ViewEngine instance.
 
 - Type: mixed
 
+
+---
+
 ### setExtension() · [source](../../src/Mvc/ViewEngine.php#L29)
 
 `public function setExtension(string $ext): static`
@@ -36,6 +39,9 @@ Set the view file extension for this instance.
 
 - Type: static
 
+
+---
+
 ### getExtension() · [source](../../src/Mvc/ViewEngine.php#L43)
 
 `public function getExtension(): string`
@@ -46,6 +52,9 @@ Get the effective file extension used when resolving templates.
 
 - Type: string
 - Description: Extension including leading dot or empty string.
+
+
+---
 
 ### addNamespace() · [source](../../src/Mvc/ViewEngine.php#L57)
 
@@ -66,6 +75,9 @@ Views can be referenced using the syntax "namespace::view.name".
 
 - Type: static
 
+
+---
+
 ### getNamespaces() · [source](../../src/Mvc/ViewEngine.php#L68)
 
 `public function getNamespaces(): array`
@@ -76,6 +88,9 @@ Get the currently registered view namespaces.
 
 - Type: array
 - Description: Associative array of namespace => path mappings.
+
+
+---
 
 ### setPath() · [source](../../src/Mvc/ViewEngine.php#L80)
 
@@ -93,6 +108,9 @@ Set the base path for resolving relative view names.
 
 - Type: static
 
+
+---
+
 ### getPath() · [source](../../src/Mvc/ViewEngine.php#L91)
 
 `public function getPath(): string`
@@ -103,6 +121,9 @@ Get the currently configured base path for view resolution.
 
 - Type: string
 - Description: Base directory for views.
+
+
+---
 
 ### setLayout() · [source](../../src/Mvc/ViewEngine.php#L105)
 
@@ -123,6 +144,9 @@ rendered view output.
 
 - Type: static
 
+
+---
+
 ### getLayout() · [source](../../src/Mvc/ViewEngine.php#L116)
 
 `public function getLayout(): string|null`
@@ -133,6 +157,9 @@ Get the currently configured layout view name.
 
 - Type: string|null
 - Description: Layout name or null when none set.
+
+
+---
 
 ### setVar() · [source](../../src/Mvc/ViewEngine.php#L128)
 
@@ -150,6 +177,9 @@ Set a single view variable.
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### setVars() · [source](../../src/Mvc/ViewEngine.php#L142)
 
@@ -169,6 +199,9 @@ Later values override earlier ones for the same keys.
 
 - Type: static
 
+
+---
+
 ### render() · [source](../../src/Mvc/ViewEngine.php#L155)
 
 `public function render(string $view, array $vars = []): string`
@@ -186,6 +219,9 @@ Render a view (and optional layout) and echo the result.
 
 - Type: string
 - Description: Rendered content.
+
+
+---
 
 ### renderPartial() · [source](../../src/Mvc/ViewEngine.php#L177)
 
@@ -212,6 +248,9 @@ and captures the output buffer.
 
 - Exception  If the view file cannot be resolved.
 
+
+---
+
 ### renderLayout() · [source](../../src/Mvc/ViewEngine.php#L205)
 
 `public function renderLayout(string $layout, string $content, array $vars = []): string`
@@ -233,6 +272,9 @@ The layout receives the content in the `content` variable.
 - Type: string
 - Description: Rendered layout output.
 
+
+---
+
 ### getRenderDepth() · [source](../../src/Mvc/ViewEngine.php#L217)
 
 `public function getRenderDepth(): int`
@@ -245,3 +287,8 @@ Get current render nesting depth. Useful to detect top-level renders
 - Type: int
 - Description: Current render depth (0 = top-level).
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

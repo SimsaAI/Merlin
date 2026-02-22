@@ -6,6 +6,7 @@ use LogicException;
 use Merlin\AppContext;
 use Merlin\Mvc\Model;
 use Merlin\Mvc\ModelMapping;
+use PDOStatement;
 
 /**
  * Unified query builder for SELECT, INSERT, UPDATE, DELETE operations
@@ -93,7 +94,7 @@ class Query extends Condition
 
     protected ?Model $model;
 
-    protected array $bindParams = [];
+    protected array $manualBindings = [];
 
     protected int $limit;
 
@@ -101,9 +102,9 @@ class Query extends Condition
 
     protected int $rowCount;
 
-    protected bool $isReadQuery;
+    protected bool $isReadQuery = true;
 
-    protected bool $hasResultSet;
+    protected bool $forceSelect = false;
 
     protected ?array $columns;
 
@@ -113,11 +114,11 @@ class Query extends Condition
 
     protected array $values;
 
-    protected bool $getModelDb = false;
-
     protected ?string $table = null;
 
     protected bool $returnSql = false;
+
+    protected int $autoBindRestorePoint = 0;
 
     /* -------------------------------------------------------------
      *  SELECT-SPECIFIC PROPERTIES
@@ -161,10 +162,7 @@ class Query extends Condition
     public function __construct(?Database $db = null, ?Model $model = null)
     {
         parent::__construct($db);
-        $this->getModelDb = $db === null;
         $this->model = $model;
-        $this->isReadQuery = true;
-        $this->hasResultSet = true;
     }
 
     /**
@@ -194,9 +192,8 @@ class Query extends Condition
                 : $this->model->writeConnection();
         }
 
-        return $this->isReadQuery
-            ? AppContext::instance()->dbManager()->getOrDefault('read')
-            : AppContext::instance()->dbManager()->getOrDefault('write');
+        $role = $this->isReadQuery ? 'read' : 'write';
+        return AppContext::instance()->dbManager()->getOrDefault($role);
     }
 
     /* -------------------------------------------------------------
@@ -214,6 +211,35 @@ class Query extends Condition
     {
         $this->model = null;
         $this->table = $this->protectIdentifier($name, self::PI_TABLE, $alias);
+        $this->forceSelect = false;
+        return $this;
+    }
+
+    /**
+     * Set the source for this query from a subquery or raw table expression. The subquery will be wrapped in parentheses and treated as a table. An optional alias can be provided for the subquery.
+     * @param string|Query $source Subquery or raw table expression
+     * @param string|null $alias Optional alias for the subquery
+     * @return $this
+     * @throws Exception
+     */
+    public function from(string|Query $source, ?string $alias = null): static
+    {
+        $this->model = null;
+
+        if ($source instanceof Query) {
+            $sql = '(' . $source->toSql() . ')';
+            if ($alias) {
+                $sql .= ' AS ' . $this->quoteIdentifier($alias);
+            }
+            $this->subQueryBindings = $source->getBindings() + $this->subQueryBindings;
+            $this->forceSelect = true; // Force SELECT mode for subqueries
+        } else {
+            $sql = $this->protectIdentifier($source, self::PI_TABLE, $alias);
+            $this->forceSelect = false;
+        }
+
+        $this->table = $sql;
+
         return $this;
     }
 
@@ -350,17 +376,75 @@ class Query extends Condition
     }
 
     /**
+     * Adds an INNER join to the query
+     * @param string|Query $model
+     * @param string|Condition|null $alias
+     * @param string|Condition|null $conditions
+     * @return $this
+     * @throws Exception
+     */
+    public function innerJoin(string|Query $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
+    {
+        return $this->join($model, $alias, $conditions, 'INNER');
+    }
+
+    /**
+     * Adds a LEFT join to the query
+     * @param string|Query $model
+     * @param string|Condition|null $alias
+     * @param string|Condition|null $conditions
+     * @return $this
+     * @throws Exception
+     */
+    public function leftJoin(string|Query $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
+    {
+        return $this->join($model, $alias, $conditions, 'LEFT');
+    }
+
+    /**
+     * Adds a RIGHT join to the query
+     * @param string|Query $model
+     * @param string|Condition|null $alias
+     * @param string|Condition|null $conditions
+     * @return $this
+     * @throws Exception
+     */
+    public function rightJoin(string|Query $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
+    {
+        return $this->join($model, $alias, $conditions, 'RIGHT');
+    }
+
+    /**
+     * Adds a CROSS join to the query
+     * @param string|Query $model
+     * @param string|Condition|null $alias
+     * @param string|Condition|null $conditions
+     * @return $this
+     * @throws Exception
+     */
+    public function crossJoin(string|Query $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
+    {
+        return $this->join($model, $alias, $conditions, 'CROSS');
+    }
+
+    /**
      * Add a JOIN clause to the query
-     * @param string $model
+     * @param string|Query $model
      * @param string|Condition|null $alias
      * @param string|Condition|null $conditions
      * @param string|null $type
      * @return $this
      * @throws Exception
      */
-    public function join(string $model, string|Condition|null $alias = null, string|Condition|null $conditions = null, ?string $type = null): static
+    public function join(string|Query $model, string|Condition|null $alias = null, string|Condition|null $conditions = null, ?string $type = null): static
     {
-        $pos = strrpos($model, ' ');
+        if ($model instanceof Query) {
+            $this->subQueryBindings = $model->getBindings() + $this->subQueryBindings;
+            $model = '(' . $model->toSql() . ')';
+            $pos = false;
+        } else {
+            $pos = strrpos($model, ' ');
+        }
         if ($pos !== false) {
             // If conditions parameter is not provided, treat the second
             // part as alias
@@ -378,12 +462,14 @@ class Query extends Condition
             $conditions = $alias;
             $alias = null;
 
-        } elseif (is_string($alias) && $this->looksLikeCondition($alias)) {
+        } elseif (\is_string($alias) && $this->looksLikeCondition($alias)) {
             $conditions = $alias;
             $alias = null;
 
         } else {
-            $conditions = '';
+            if ($conditions === null) {
+                $conditions = '';
+            }
         }
 
         // Register table in cache before compiling join conditions to allow 
@@ -409,58 +495,6 @@ class Query extends Condition
     }
 
     /**
-     * Adds an INNER join to the query
-     * @param string $model
-     * @param string|Condition|null $alias
-     * @param string|Condition|null $conditions
-     * @return $this
-     * @throws Exception
-     */
-    public function innerJoin(string $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
-    {
-        return $this->join($model, $alias, $conditions, 'INNER');
-    }
-
-    /**
-     * Adds a LEFT join to the query
-     * @param string $model
-     * @param string|Condition|null $alias
-     * @param string|Condition|null $conditions
-     * @return $this
-     * @throws Exception
-     */
-    public function leftJoin(string $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
-    {
-        return $this->join($model, $alias, $conditions, 'LEFT');
-    }
-
-    /**
-     * Adds a RIGHT join to the query
-     * @param string $model
-     * @param string|Condition|null $alias
-     * @param string|Condition|null $conditions
-     * @return $this
-     * @throws Exception
-     */
-    public function rightJoin(string $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
-    {
-        return $this->join($model, $alias, $conditions, 'RIGHT');
-    }
-
-    /**
-     * Adds a CROSS join to the query
-     * @param string $model
-     * @param string|Condition|null $alias
-     * @param string|Condition|null $conditions
-     * @return $this
-     * @throws Exception
-     */
-    public function crossJoin(string $model, string|Condition|null $alias = null, string|Condition|null $conditions = null): static
-    {
-        return $this->join($model, $alias, $conditions, 'CROSS');
-    }
-
-    /**
      * Set ORDER BY clause
      * @param array|string $orderBy
      * @return $this
@@ -480,7 +514,7 @@ class Query extends Condition
      */
     public function bind(array|object $bindParams): static
     {
-        $this->bindParams = \is_object($bindParams)
+        $this->manualBindings = \is_object($bindParams)
             ? \get_object_vars($bindParams)
             : $bindParams;
 
@@ -659,7 +693,10 @@ class Query extends Condition
      */
     public function toSql(): string
     {
-        $query = $this->compileSelect();
+        $this->autoBindRestorePoint = $this->autoBindCounter;
+        $this->isReadQuery = true;
+        $db = $this->getDb();
+        $query = $this->compileSelect($db);
         return $this->prepareQueryForReturn($query);
     }
 
@@ -671,17 +708,18 @@ class Query extends Condition
      */
     public function select(array|string|null $columns = null): ResultSet|string
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
-        $this->hasResultSet = true;
+        $db = $this->getDb();
 
         if ($columns !== null) {
             $this->columns($columns);
         }
-        $query = $this->compileSelect();
+        $query = $this->compileSelect($db);
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
-        $result = $this->executeQuery($query);
+        $result = $this->executeQuery($db, $query);
         if (!($result instanceof ResultSet)) {
             throw new Exception('SELECT query did not return ResultSet');
         }
@@ -727,32 +765,31 @@ class Query extends Condition
 
     protected function runInsert(?array $data, bool $upsert): bool|string|array|ResultSet
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
-        $this->hasResultSet = false;
+        $db = $this->getDb();
 
         // Set values if data provided
         if (!empty($data)) {
             $this->values($data);
         }
 
-        $query = $this->compileInsert($upsert);
+        $query = $this->compileInsert($db, $upsert);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
-        $result = $this->executeQuery($query);
+
+        $result = $this->executeQuery($db, $query);
 
         // Return insert ID for single inserts
-        if ($this->hasResultSet && $result instanceof ResultSet) {
+        if ($result instanceof ResultSet) {
             return $result;
         }
 
         // For non-RETURNING queries, try to get last insert ID
-        if (!$this->hasResultSet) {
-            $lastId = $this->db->getInternalConnection()->lastInsertId();
-            return $lastId ?: true;
-        }
-
-        return true;
+        $lastId = $db->getInternalConnection()->lastInsertId();
+        return $lastId ?: true;
     }
 
     /**
@@ -763,21 +800,24 @@ class Query extends Condition
      */
     public function update(?array $data = null): int|string|array|ResultSet
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
-        $this->hasResultSet = false;
+        $db = $this->getDb();
 
         // Set values if data provided
         if (!empty($data)) {
             $this->values($data);
         }
 
-        $query = $this->compileUpdate();
+        $query = $this->compileUpdate($db);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
-        $result = $this->executeQuery($query);
 
-        if ($this->hasResultSet && $result instanceof ResultSet) {
+        $result = $this->executeQuery($db, $query);
+
+        if ($result instanceof ResultSet) {
             return $result;
         }
 
@@ -791,16 +831,19 @@ class Query extends Condition
      */
     public function delete(): int|string|array|ResultSet
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
-        $this->hasResultSet = false;
+        $db = $this->getDb();
 
-        $query = $this->compileDelete();
+        $query = $this->compileDelete($db);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
 
-        $result = $this->executeQuery($query);
-        if ($this->hasResultSet && $result instanceof ResultSet) {
+        $result = $this->executeQuery($db, $query);
+
+        if ($result instanceof ResultSet) {
             return $result;
         }
 
@@ -814,15 +857,18 @@ class Query extends Condition
      */
     public function truncate(): int|string
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
-        $this->hasResultSet = false;
+        $db = $this->getDb();
 
-        $query = $this->compileTruncate();
+        $query = $this->compileTruncate($db);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
 
-        $this->executeQuery($query);
+        $this->executeQuery($db, $query);
+
         return $this->rowCount;
     }
 
@@ -833,21 +879,25 @@ class Query extends Condition
      */
     public function exists(): bool|string
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
-        $this->hasResultSet = true;
+        $db = $this->getDb();
 
-        $query = $this->compileExists();
+        $query = $this->compileExists($db);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
-        $result = $this->executeQuery($query);
+
+        $result = $this->executeQuery($db, $query);
 
         if (empty($result)) {
             return false;
         }
 
-        $row = $result->fetchArray();
-        return !empty($row) && !empty($row['exists']);
+        $exists = $result->fetchColumn();
+
+        return !empty($exists);
     }
 
     /**
@@ -857,14 +907,17 @@ class Query extends Condition
      */
     public function count(): int|string
     {
+        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
-        $this->hasResultSet = true;
+        $db = $this->getDb();
 
-        $query = $this->compileCount();
+        $query = $this->compileCount($db);
+
         if ($this->returnSql) {
             return $this->prepareQueryForReturn($query);
         }
-        $result = $this->executeQuery($query);
+
+        $result = $this->executeQuery($db, $query);
 
         if (empty($result)) {
             return 0;
@@ -882,7 +935,7 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileSelect(): string
+    protected function compileSelect(Database $db): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for SELECT query');
@@ -898,7 +951,7 @@ class Query extends Condition
             $statement .= ' ';
         }
         if (!empty($this->columns)) {
-            $statement .= implode(', ', $this->protectColumns($this->columns));
+            $statement .= implode(', ', $this->protectColumns($db, $this->columns));
         } else {
             $statement .= '*';
         }
@@ -913,14 +966,16 @@ class Query extends Condition
                 }
                 $statement .= ' JOIN ';
                 $statement .= $join['table'];
-                $statement .= ' ON (';
-                $statement .= $this->compileCondition($join['conditions']);
-                $statement .= ')';
+                if (!empty($join['conditions'])) {
+                    $statement .= ' ON (';
+                    $statement .= $this->compileCondition($join['conditions']);
+                    $statement .= ')';
+                }
             }
         }
         if (!empty($this->condition)) {
             $statement .= ' WHERE ';
-            $statement .= $this->compileCondition($this->condition);
+            $statement .= $this->resolveDeferredModels($this->condition);
         }
         if (!empty($this->groupBy)) {
             $sep = '';
@@ -950,7 +1005,7 @@ class Query extends Condition
         if (!empty($this->forUpdate)) {
             $statement .= ' FOR UPDATE';
         } elseif (!empty($this->sharedLock)) {
-            switch ($this->db->getDriver()) {
+            switch ($db->getDriver()) {
                 case 'mysql':
                     $statement .= ' IN SHARED MODE';
                     break;
@@ -966,10 +1021,12 @@ class Query extends Condition
 
     /**
      * Compile INSERT statement
+     * @param Database $db
+     * @param bool $upsert Whether to compile as an UPSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE clause
      * @return string
      * @throws LogicException
      */
-    protected function compileInsert($upsert = false): string
+    protected function compileInsert(Database $db, bool $upsert = false): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for INSERT query');
@@ -977,14 +1034,14 @@ class Query extends Condition
 
         // Determine columns from values or bind parameters
         if (empty($this->values)) {
-            if (empty($this->bindParams)) {
+            if (empty($this->manualBindings)) {
                 throw new LogicException('No values or bind parameters set');
             }
             $columns = !empty($this->columns)
                 ? $this->columns
-                : array_keys($this->bindParams);
+                : array_keys($this->manualBindings);
         } else {
-            if (!empty($this->bindParams)) {
+            if (!empty($this->manualBindings)) {
                 throw new LogicException('Cannot use bind parameters when values are set');
             }
             $columns = array_keys($this->values[0]);
@@ -993,7 +1050,7 @@ class Query extends Condition
             }
         }
 
-        $driver = $this->db->getDriver();
+        $driver = $db->getDriver();
 
         // Determine statement type based on flags and driver capabilities
         if ($this->replaceInto) {
@@ -1029,11 +1086,11 @@ class Query extends Condition
         // Start building statement
         $statement .= $this->table;
         $statement .= ' (';
-        $statement .= implode(',', $this->protectColumns($columns));
+        $statement .= implode(',', $this->protectColumns($db, $columns));
         $statement .= ') VALUES ';
 
         // Use bind parameters if set, otherwise set values directly
-        if (isset($this->bindParams)) {
+        if (isset($this->manualBindings)) {
             $statement .= '(:';
             $statement .= implode(',:', $columns);
             $statement .= ')';
@@ -1069,8 +1126,12 @@ class Query extends Condition
                 case 'pgsql':
                     if (empty($this->conflictTarget)) {
                         if (isset($this->model)) {
-                            // Todo check if id fields are defined here and throw exception if not?
                             $this->conflictTarget = $this->model->idFields();
+                            if (empty($this->conflictTarget)) {
+                                throw new LogicException(
+                                    "PostgreSQL requires a conflict target for UPSERT. No conflict target set and model does not define any ID fields."
+                                );
+                            }
                         } else {
                             throw new LogicException(
                                 "PostgreSQL requires a conflict target for UPSERT"
@@ -1078,7 +1139,7 @@ class Query extends Condition
                         }
                     }
                     if (is_array($this->conflictTarget)) {
-                        $statement .= ' ON CONFLICT (' . implode(',', $this->protectColumns($this->conflictTarget)) . ') DO UPDATE SET ';
+                        $statement .= ' ON CONFLICT (' . implode(',', $this->protectColumns($db, $this->conflictTarget)) . ') DO UPDATE SET ';
                     } else {
                         $statement .= ' ON CONFLICT ON CONSTRAINT ' . $this->protectIdentifier($this->conflictTarget) . ' DO UPDATE SET ';
                     }
@@ -1124,7 +1185,7 @@ class Query extends Condition
                         $valSep = ',';
                     }
                 }
-            } elseif (isset($this->bindParams)) {
+            } elseif (isset($this->manualBindings)) {
                 foreach ($columns as $column) {
                     $statement .= $valSep;
                     $statement .= $this->protectIdentifier($column);
@@ -1155,8 +1216,7 @@ class Query extends Condition
         // Handle RETURNING clause for PostgreSQL
         if (!empty($this->returning)) {
             $statement .= ' RETURNING ';
-            $statement .= implode(', ', $this->protectColumns($this->returning));
-            $this->hasResultSet = true;
+            $statement .= implode(', ', $this->protectColumns($db, $this->returning));
         }
 
         return $statement;
@@ -1167,7 +1227,7 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileUpdate(): string
+    protected function compileUpdate(Database $db): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for UPDATE query');
@@ -1192,7 +1252,7 @@ class Query extends Condition
 
         $statement .= ' SET ';
         if (!empty($this->values[0])) {
-            if (!empty($this->bindParams)) {
+            if (!empty($this->manualBindings)) {
                 throw new LogicException('Cannot use bind parameters when values are set');
             }
             $sep = '';
@@ -1223,8 +1283,8 @@ class Query extends Condition
                 $statement .= $value;
                 $sep = ',';
             }
-        } elseif (!empty($this->bindParams)) {
-            foreach ($this->bindParams as $column => $_) {
+        } elseif (!empty($this->manualBindings)) {
+            foreach ($this->manualBindings as $column => $_) {
                 $statement .= $sep;
                 $statement .= $this->protectIdentifier($column, self::PI_COLUMN);
                 $statement .= '=:';
@@ -1237,7 +1297,7 @@ class Query extends Condition
 
         if (!empty($this->condition)) {
             $statement .= ' WHERE ';
-            $statement .= $this->compileCondition($this->condition);
+            $statement .= $this->resolveDeferredModels($this->condition);
         }
         if (!empty($this->orderBy)) {
             $sep = '';
@@ -1255,8 +1315,7 @@ class Query extends Condition
         // Handle RETURNING clause for PostgreSQL
         if (!empty($this->returning)) {
             $statement .= ' RETURNING ';
-            $statement .= implode(', ', $this->protectColumns($this->returning));
-            $this->hasResultSet = true;
+            $statement .= implode(', ', $this->protectColumns($db, $this->returning));
         }
 
         return $statement;
@@ -1267,13 +1326,13 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileTruncate(): string
+    protected function compileTruncate(Database $db): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for TRUNCATE query');
         }
 
-        switch ($this->db->getDriver()) {
+        switch ($db->getDriver()) {
             case 'mysql':
                 return 'TRUNCATE ' . $this->table;
             case 'pgsql':
@@ -1288,7 +1347,7 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileDelete(): string
+    protected function compileDelete(Database $db): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for DELETE query');
@@ -1312,7 +1371,7 @@ class Query extends Condition
 
         if (!empty($this->condition)) {
             $statement .= ' WHERE ';
-            $statement .= $this->compileCondition($this->condition);
+            $statement .= $this->resolveDeferredModels($this->condition);
         }
         if (!empty($this->orderBy)) {
             $sep = '';
@@ -1331,8 +1390,7 @@ class Query extends Condition
         // Handle RETURNING clause for PostgreSQL
         if (!empty($this->returning)) {
             $statement .= ' RETURNING ';
-            $statement .= implode(', ', $this->protectColumns($this->returning));
-            $this->hasResultSet = true;
+            $statement .= implode(', ', $this->protectColumns($db, $this->returning));
         }
 
         return $statement;
@@ -1343,11 +1401,11 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileExists(): string
+    protected function compileExists(Database $db): string
     {
         // Build a basic SELECT to wrap
-        $innerQuery = $this->compileSelect();
-        return 'SELECT EXISTS(' . $innerQuery . ') as exists';
+        $innerQuery = $this->compileSelect($db);
+        return 'SELECT EXISTS(' . $innerQuery . ') as __mrln_exists__';
     }
 
     /**
@@ -1355,13 +1413,13 @@ class Query extends Condition
      * @return string
      * @throws LogicException
      */
-    protected function compileCount(): string
+    protected function compileCount(Database $db): string
     {
         if (empty($this->table)) {
             throw new LogicException('No table set for COUNT query');
         }
 
-        $statement = 'SELECT COUNT(*) as counter_123 FROM ';
+        $statement = 'SELECT COUNT(*) as __mrln_cnt__ FROM ';
         $statement .= $this->table;
 
         if (isset($this->joins)) {
@@ -1379,7 +1437,7 @@ class Query extends Condition
         }
         if (!empty($this->condition)) {
             $statement .= ' WHERE ';
-            $statement .= $this->compileCondition($this->condition);
+            $statement .= $this->resolveDeferredModels($this->condition);
         }
 
         return $statement;
@@ -1391,12 +1449,14 @@ class Query extends Condition
 
     protected function prepareQueryForReturn(string $query)
     {
-        // Reset auto-generated parameters for fresh build
-        // This prevents parameter accumulation if the builder is reused
-        $this->paramCounter = 0;
+        // Get all bind parameters for this query including auto-generated ones from sub-conditions
+        $bindParams = $this->getBindings();
+
+        // Reset auto-generated parameters from before compilation so they can be reused for the next query if needed
+        $this->autoBindCounter = $this->autoBindRestorePoint;
 
         // Replace bound parameters in query string for debugging purposes
-        foreach ($this->bindParams as $key => $value) {
+        foreach ($bindParams as $key => $value) {
             $placeholder = ':' . $key;
             if (is_string($value)) {
                 $replacement = $this->escapeValue($value);
@@ -1408,6 +1468,7 @@ class Query extends Condition
             }
             $query = str_replace($placeholder, $replacement, $query);
         }
+
         return $query;
     }
 
@@ -1462,8 +1523,6 @@ class Query extends Condition
         } else {
             // Use model name as table name
             $items = explode('.', $modelName);
-            //Todo use fast identifier quoting here?
-            //$table = $this->getDb()->quoteIdentifier(...$items);
             $table = '';
             $sep = '';
             foreach ($items as $item) {
@@ -1503,11 +1562,8 @@ class Query extends Condition
             $condition->injectModelResolver(function ($model) {
                 return $this->getTableName($model);
             });
-            // Condition already protects identifiers internally - just merge params
-            $this->autoBindParams = array_merge($condition->autoBindParams, $this->autoBindParams);
-            if ($condition instanceof Query) {
-                $this->bindParams = array_merge($condition->bindParams, $this->bindParams);
-            }
+            // Merge auto-bind parameters from sub-condition
+            $this->subQueryBindings = $condition->getBindings() + $this->subQueryBindings;
             return $condition->toSql();
         }
 
@@ -1520,7 +1576,7 @@ class Query extends Condition
      * @return array
      * @throws Exception
      */
-    protected function protectColumns(array $columns = null): array
+    protected function protectColumns(Database $db, array $columns = null): array
     {
         $columnsToProtect = $columns;
 
@@ -1544,9 +1600,9 @@ class Query extends Condition
                 );
 
                 // Merge auto-bind parameters from sub-condition
-                $this->autoBindParams = array_merge(
-                    $column->autoBindParams,
-                    $this->autoBindParams
+                $this->automaticBindings = array_merge(
+                    $column->automaticBindings,
+                    $this->automaticBindings
                 );
 
                 $protected[$index] = '(' . $column->toSql() . ')';
@@ -1555,7 +1611,7 @@ class Query extends Condition
 
             if ($column instanceof Sql) {
                 $protected[$index] = $column->toSql(
-                    $this->getDb()->getDriver(),
+                    $db->getDriver(),
                     fn($v, $p = false) => $this->serializeScalar($v, $p),
                     fn($identifier) => $this->protectIdentifier($identifier, self::PI_COLUMN)
                 );
@@ -1575,8 +1631,8 @@ class Query extends Condition
      */
     public function getBindings(): array
     {
-        return $this->bindParams +
-            \array_slice($this->autoBindParams, 0, $this->paramCounter);
+        return $this->manualBindings +
+            \array_slice($this->automaticBindings, 0, $this->autoBindCounter) + $this->subQueryBindings;
     }
 
     /**
@@ -1599,26 +1655,21 @@ class Query extends Condition
      * @return ResultSet|bool
      * @throws Exception
      */
-    protected function executeQuery(string $query): bool|ResultSet
+    protected function executeQuery(Database $db, string $query): bool|ResultSet
     {
-        $bindParams = $this->bindParams + array_slice($this->autoBindParams, 0, $this->paramCounter);
+        // Get all bind parameters for this query including auto-generated ones from sub-conditions
+        $bindParams = $this->getBindings();
 
-        // Reset auto-generated parameters for fresh build
-        // This prevents parameter accumulation if the builder is reused
-        $this->paramCounter = 0;
-
-        $db = $this->getDb();
+        // Reset auto-generated parameters from before compilation so they can be reused for the next query if needed
+        $this->autoBindCounter = $this->autoBindRestorePoint;
 
         $result = $db->query($query, $bindParams);
 
-        if (empty($result)) {
-            return false;
-        }
-
         $this->rowCount = $db->rowCount();
 
-        if (!$this->hasResultSet) {
-            return true;
+        // Result is either a PDOStatement for read queries or a boolean for write queries without RETURNING clauses
+        if (!$result instanceof PDOStatement) {
+            return $result;
         }
 
         return new ResultSet(

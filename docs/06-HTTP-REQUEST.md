@@ -67,12 +67,20 @@ Handle file uploads securely with the UploadedFile wrapper. It provides validati
 
 ```php
 $file = $request->getFile('avatar');
-if ($file && $file->isUploaded()) {
-    $file->moveTo(__DIR__ . '/uploads/' . $file->getName());
+if ($file && $file->isValid()) {
+    $file->moveTo(__DIR__ . '/uploads/' . $file->getClientFilename());
 }
 
 $attachments = $request->getFiles('attachments');
 ```
+
+Available `UploadedFile` methods:
+
+- `isValid(): bool` – true when upload succeeded with no error
+- `getClientFilename(): string` – original filename from the browser
+- `getClientMediaType(): string` – MIME type reported by the browser
+- `getSize(): int` – file size in bytes
+- `moveTo(string $targetPath): void` – move file to destination
 
 ## Controller Example
 
@@ -81,7 +89,7 @@ class UserController extends \Merlin\Mvc\Controller
 {
     public function createAction(): array
     {
-        $email = $this->request->getPost('email');
+        $email = $this->request()->getPost('email');
 
         if (!$email) {
             return ['ok' => false, 'error' => 'email is required'];

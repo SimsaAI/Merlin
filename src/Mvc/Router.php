@@ -61,7 +61,7 @@ class Router
      * Add a new route to the router. The route can be defined for specific HTTP methods, a URI pattern, and an optional handler that overrides the default controller/action resolution. The pattern can include static segments, typed parameters, dynamic segments for namespace/controller/action, and wildcard segments for additional parameters. Validators can be applied to dynamic parameters using predefined or custom types. For example: /user/{id:int} or /blog/{slug:slug}
      *
      * @param string|array|null $method HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods)
-     * @param string $pattern Route pattern (e.g., '/blog/{slug}', '/{:controller}/{:action}/{:params}')
+     * @param string $pattern Route pattern (e.g., '/blog/{slug}', '/{controller}/{action}/{params:*}')
      * @param string|array|null $handler Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'.
      * @return static For method chaining
      */

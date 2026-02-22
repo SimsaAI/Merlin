@@ -47,24 +47,60 @@ When storing sensitive data in cookies (like session tokens or remember-me token
 Use `Merlin\Http\Cookie` with encryption when storing sensitive values.
 
 ```php
-$cookie = new Merlin\Http\Cookie('auth');
-$cookie->setValue($token)
-    ->useEncryption(true)
-    ->setEncryptionKey($secretKey)
-    ->setExpiration(time() + 3600)
+use Merlin\Http\Cookie;
+
+// Fluent builder; Cookie::make() or new Cookie() both work
+$cookie = Cookie::make('auth')
+    ->set($token)
+    ->encrypted()              // enable encryption
+    ->key($secretKey)          // optional: explicit key (overrides global default)
+    ->expires(time() + 3600)
     ->send();
+
+// Reading a cookie value
+$value = $ctx->cookies()->get('auth');
+
+// Deleting a cookie
+$ctx->cookies()->delete('auth');
 ```
+
+The `Cookie` object exposes the following fluent API:
+
+| Method                                  | Description                            |
+| --------------------------------------- | -------------------------------------- |
+| `set(mixed $value): static`             | Set the cookie value                   |
+| `value(mixed $default = null): mixed`   | Read the current value                 |
+| `encrypted(bool $state = true): static` | Enable/disable encryption via `Crypt`  |
+| `key(?string $key): static`             | Encryption key (falls back to app key) |
+| `expires(int $timestamp): static`       | Expiry Unix timestamp                  |
+| `path(string $path): static`            | Cookie path                            |
+| `domain(string $domain): static`        | Cookie domain                          |
+| `secure(bool $state): static`           | HTTPS-only flag                        |
+| `httpOnly(bool $state): static`         | `HttpOnly` flag                        |
+| `send(): static`                        | Queue cookie for sending               |
+| `delete(): void`                        | Delete cookie by setting past expiry   |
 
 ## Crypt Helper
 
-For general-purpose encryption needs, Merlin provides the Crypt class with authenticated encryption support. It automatically uses the best available encryption extension (Sodium or OpenSSL).
+For general-purpose encryption needs, Merlin provides the Crypt class with authenticated encryption support. It automatically uses the best available encryption extension (libsodium preferred, OpenSSL fallback).
 
-`Merlin\Crypt` supports modern authenticated encryption (depending on available extensions).
+`Merlin\Crypt` is a **static-only** class – never instantiate it.
 
 ```php
-$crypt = new Merlin\Crypt($secretKey);
-$cipher = $crypt->encrypt('hello');
-$plain = $crypt->decrypt($cipher);
+use Merlin\Crypt;
+
+$encrypted = Crypt::encrypt('hello', $secretKey);
+$plain     = Crypt::decrypt($encrypted, $secretKey); // null on failure/tamper
+
+// Explicit cipher selection
+Crypt::encrypt($value, $key, Crypt::CIPHER_CHACHA20_POLY1305);
+Crypt::encrypt($value, $key, Crypt::CIPHER_AES_256_GCM);
+Crypt::encrypt($value, $key, Crypt::CIPHER_AUTO); // default (best available)
+
+// Availability checks
+Crypt::hasSodium();          // bool
+Crypt::hasOpenSSL();         // bool
+Crypt::getAvailableCipher(); // string constant
 ```
 
 ## Request Validation

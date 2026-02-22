@@ -6,7 +6,7 @@ Unified query builder for SELECT, INSERT, UPDATE, DELETE operations
 
 ## 🚀 Public methods
 
-### useModels() · [source](../../src/Db/Query.php#L56)
+### useModels() · [source](../../src/Db/Query.php#L57)
 
 `public static function useModels(bool $useModels): void`
 
@@ -22,7 +22,10 @@ Enable or disable automatic model resolution for queries. If enabled, the query 
 
 - Type: void
 
-### setModelMapping() · [source](../../src/Db/Query.php#L65)
+
+---
+
+### setModelMapping() · [source](../../src/Db/Query.php#L66)
 
 `public static function setModelMapping(Merlin\Mvc\ModelMapping|null $modelMapping): void`
 
@@ -38,7 +41,10 @@ Set the model mapping instance to use for resolving model class names to table n
 
 - Type: void
 
-### __construct() · [source](../../src/Db/Query.php#L161)
+
+---
+
+### __construct() · [source](../../src/Db/Query.php#L162)
 
 `public function __construct(Merlin\Db\Database|null $db = null, Merlin\Mvc\Model|null $model = null): mixed`
 
@@ -55,7 +61,10 @@ Constructor. Can optionally pass a Database connection to use for this query, or
 
 - Type: mixed
 
-### new() · [source](../../src/Db/Query.php#L175)
+
+---
+
+### new() · [source](../../src/Db/Query.php#L173)
 
 `public static function new(Merlin\Db\Database|null $db = null): static`
 
@@ -71,7 +80,10 @@ Factory method to create a new Query instance. Can optionally pass a Database co
 
 - Type: static
 
-### table() · [source](../../src/Db/Query.php#L213)
+
+---
+
+### table() · [source](../../src/Db/Query.php#L210)
 
 `public function table(string $name, string|null $alias = null): static`
 
@@ -92,7 +104,34 @@ Set the table for this query. Can be either a table name or a model class name. 
 
 - Exception
 
-### columns() · [source](../../src/Db/Query.php#L229)
+
+---
+
+### from() · [source](../../src/Db/Query.php#L225)
+
+`public function from(Merlin\Db\Query|string $source, string|null $alias = null): static`
+
+Set the source for this query from a subquery or raw table expression. The subquery will be wrapped in parentheses and treated as a table. An optional alias can be provided for the subquery.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$source` | [Query](Db_Query.md)\|string | - | Subquery or raw table expression |
+| `$alias` | string\|null | `null` | Optional alias for the subquery |
+
+**➡️ Return value**
+
+- Type: static
+
+**⚠️ Throws**
+
+- Exception
+
+
+---
+
+### columns() · [source](../../src/Db/Query.php#L255)
 
 `public function columns(array|string $columns): static`
 
@@ -108,7 +147,10 @@ Set columns for SELECT queries. Can be either a comma-separated string or an arr
 
 - Type: static
 
-### limit() · [source](../../src/Db/Query.php#L246)
+
+---
+
+### limit() · [source](../../src/Db/Query.php#L272)
 
 `public function limit(int $limit, int $offset = 0): static`
 
@@ -126,7 +168,10 @@ Set the LIMIT and optional OFFSET for SELECT queries
 
 - Type: static
 
-### offset() · [source](../../src/Db/Query.php#L258)
+
+---
+
+### offset() · [source](../../src/Db/Query.php#L284)
 
 `public function offset(int $offset): static`
 
@@ -142,7 +187,10 @@ Sets an OFFSET clause for SELECT queries
 
 - Type: static
 
-### values() · [source](../../src/Db/Query.php#L272)
+
+---
+
+### values() · [source](../../src/Db/Query.php#L298)
 
 `public function values(object|array $values, bool $escape = true): static`
 
@@ -161,7 +209,10 @@ Adds values for INSERT or UPDATE queries. Can be either:
 
 - Type: static
 
-### bulkValues() · [source](../../src/Db/Query.php#L296)
+
+---
+
+### bulkValues() · [source](../../src/Db/Query.php#L322)
 
 `public function bulkValues(array $valuesList = [], bool $escape = true): static`
 
@@ -180,7 +231,10 @@ Each item in the list should be an array of column => value pairs.
 
 - Type: static
 
-### hasValues() · [source](../../src/Db/Query.php#L316)
+
+---
+
+### hasValues() · [source](../../src/Db/Query.php#L342)
 
 `public function hasValues(): bool`
 
@@ -190,7 +244,10 @@ Check if any values have been set for this query
 
 - Type: bool
 
-### set() · [source](../../src/Db/Query.php#L330)
+
+---
+
+### set() · [source](../../src/Db/Query.php#L356)
 
 `public function set(array|string $column, mixed $value = null, bool $escape = true): static`
 
@@ -210,9 +267,112 @@ Set a value for INSERT or UPDATE queries. Can be either:
 
 - Type: static
 
-### join() · [source](../../src/Db/Query.php#L361)
 
-`public function join(string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null, string|null $type = null): static`
+---
+
+### innerJoin() · [source](../../src/Db/Query.php#L386)
+
+`public function innerJoin(Merlin\Db\Query|string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
+
+Adds an INNER join to the query
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: static
+
+**⚠️ Throws**
+
+- Exception
+
+
+---
+
+### leftJoin() · [source](../../src/Db/Query.php#L399)
+
+`public function leftJoin(Merlin\Db\Query|string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
+
+Adds a LEFT join to the query
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: static
+
+**⚠️ Throws**
+
+- Exception
+
+
+---
+
+### rightJoin() · [source](../../src/Db/Query.php#L412)
+
+`public function rightJoin(Merlin\Db\Query|string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
+
+Adds a RIGHT join to the query
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: static
+
+**⚠️ Throws**
+
+- Exception
+
+
+---
+
+### crossJoin() · [source](../../src/Db/Query.php#L425)
+
+`public function crossJoin(Merlin\Db\Query|string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
+
+Adds a CROSS join to the query
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: static
+
+**⚠️ Throws**
+
+- Exception
+
+
+---
+
+### join() · [source](../../src/Db/Query.php#L439)
+
+`public function join(Merlin\Db\Query|string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null, string|null $type = null): static`
 
 Add a JOIN clause to the query
 
@@ -220,7 +380,7 @@ Add a JOIN clause to the query
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$model` | string | - |  |
+| `$model` | [Query](Db_Query.md)\|string | - |  |
 | `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 | `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 | `$type` | string\|null | `null` |  |
@@ -233,95 +393,10 @@ Add a JOIN clause to the query
 
 - Exception
 
-### innerJoin() · [source](../../src/Db/Query.php#L419)
 
-`public function innerJoin(string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
+---
 
-Adds an INNER join to the query
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$model` | string | - |  |
-| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-
-**➡️ Return value**
-
-- Type: static
-
-**⚠️ Throws**
-
-- Exception
-
-### leftJoin() · [source](../../src/Db/Query.php#L432)
-
-`public function leftJoin(string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
-
-Adds a LEFT join to the query
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$model` | string | - |  |
-| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-
-**➡️ Return value**
-
-- Type: static
-
-**⚠️ Throws**
-
-- Exception
-
-### rightJoin() · [source](../../src/Db/Query.php#L445)
-
-`public function rightJoin(string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
-
-Adds a RIGHT join to the query
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$model` | string | - |  |
-| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-
-**➡️ Return value**
-
-- Type: static
-
-**⚠️ Throws**
-
-- Exception
-
-### crossJoin() · [source](../../src/Db/Query.php#L458)
-
-`public function crossJoin(string $model, Merlin\Db\Condition|string|null $alias = null, Merlin\Db\Condition|string|null $conditions = null): static`
-
-Adds a CROSS join to the query
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$model` | string | - |  |
-| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
-
-**➡️ Return value**
-
-- Type: static
-
-**⚠️ Throws**
-
-- Exception
-
-### orderBy() · [source](../../src/Db/Query.php#L468)
+### orderBy() · [source](../../src/Db/Query.php#L502)
 
 `public function orderBy(array|string $orderBy): static`
 
@@ -337,7 +412,10 @@ Set ORDER BY clause
 
 - Type: static
 
-### bind() · [source](../../src/Db/Query.php#L481)
+
+---
+
+### bind() · [source](../../src/Db/Query.php#L515)
 
 `public function bind(object|array $bindParams): static`
 
@@ -353,7 +431,10 @@ Bind parameters for prepared statements. Can be either an associative array or a
 
 - Type: static
 
-### returnSql() · [source](../../src/Db/Query.php#L495)
+
+---
+
+### returnSql() · [source](../../src/Db/Query.php#L529)
 
 `public function returnSql(bool $returnSql = true): static`
 
@@ -369,7 +450,10 @@ Set whether to return the SQL string instead of executing the query
 
 - Type: static
 
-### distinct() · [source](../../src/Db/Query.php#L510)
+
+---
+
+### distinct() · [source](../../src/Db/Query.php#L544)
 
 `public function distinct(bool $distinct): static`
 
@@ -385,7 +469,10 @@ Set DISTINCT modifier for SELECT queries
 
 - Type: static
 
-### injectBeforeColumns() · [source](../../src/Db/Query.php#L521)
+
+---
+
+### injectBeforeColumns() · [source](../../src/Db/Query.php#L555)
 
 `public function injectBeforeColumns(string $inject): static`
 
@@ -401,7 +488,10 @@ Set a string to be injected before the column list in SELECT queries (e.g. for S
 
 - Type: static
 
-### groupBy() · [source](../../src/Db/Query.php#L532)
+
+---
+
+### groupBy() · [source](../../src/Db/Query.php#L566)
 
 `public function groupBy(array|string $groupBy): static`
 
@@ -417,7 +507,10 @@ Set GROUP BY clause
 
 - Type: static
 
-### forUpdate() · [source](../../src/Db/Query.php#L545)
+
+---
+
+### forUpdate() · [source](../../src/Db/Query.php#L579)
 
 `public function forUpdate(bool $forUpdate): static`
 
@@ -433,7 +526,10 @@ Sets a FOR UPDATE clause (MySQL/PostgreSQL) or FOR SHARE (PostgreSQL)
 
 - Type: static
 
-### sharedLock() · [source](../../src/Db/Query.php#L556)
+
+---
+
+### sharedLock() · [source](../../src/Db/Query.php#L590)
 
 `public function sharedLock(bool $sharedLock): static`
 
@@ -449,7 +545,10 @@ Sets a LOCK IN SHARE MODE / FOR SHARE clause (MySQL/PostgreSQL)
 
 - Type: static
 
-### replace() · [source](../../src/Db/Query.php#L571)
+
+---
+
+### replace() · [source](../../src/Db/Query.php#L605)
 
 `public function replace(bool $replace = true): static`
 
@@ -465,7 +564,10 @@ Mark this as a REPLACE INTO operation (MySQL/SQLite)
 
 - Type: static
 
-### ignore() · [source](../../src/Db/Query.php#L582)
+
+---
+
+### ignore() · [source](../../src/Db/Query.php#L616)
 
 `public function ignore(bool $ignore = true): static`
 
@@ -481,7 +583,10 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 
 - Type: static
 
-### updateValues() · [source](../../src/Db/Query.php#L596)
+
+---
+
+### updateValues() · [source](../../src/Db/Query.php#L630)
 
 `public function updateValues(array $updateValues, bool $escape = true): static`
 
@@ -500,7 +605,10 @@ Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
 
 - Type: static
 
-### conflict() · [source](../../src/Db/Query.php#L627)
+
+---
+
+### conflict() · [source](../../src/Db/Query.php#L661)
 
 `public function conflict(array|string $columnsOrConstraint): static`
 
@@ -518,7 +626,10 @@ Set conflict target for ON CONFLICT clause (PostgreSQL). Can be either:
 
 - Type: static
 
-### returning() · [source](../../src/Db/Query.php#L639)
+
+---
+
+### returning() · [source](../../src/Db/Query.php#L673)
 
 `public function returning(array|string|null $columns): static`
 
@@ -538,7 +649,10 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 - Exception
 
-### toSql() · [source](../../src/Db/Query.php#L660)
+
+---
+
+### toSql() · [source](../../src/Db/Query.php#L694)
 
 `public function toSql(): string`
 
@@ -552,7 +666,10 @@ Compile and return the SQL string for this query without executing it
 
 - Exception
 
-### select() · [source](../../src/Db/Query.php#L672)
+
+---
+
+### select() · [source](../../src/Db/Query.php#L709)
 
 `public function select(array|string|null $columns = null): Merlin\Db\ResultSet|string`
 
@@ -572,7 +689,10 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 - Exception
 
-### first() · [source](../../src/Db/Query.php#L697)
+
+---
+
+### first() · [source](../../src/Db/Query.php#L735)
 
 `public function first(): Merlin\Mvc\Model|string|null`
 
@@ -587,7 +707,10 @@ Execute SELECT query and return first model or null or return SQL string if retu
 
 - Exception
 
-### insert() · [source](../../src/Db/Query.php#L712)
+
+---
+
+### insert() · [source](../../src/Db/Query.php#L750)
 
 `public function insert(array|null $data = null): Merlin\Db\ResultSet|array|string|bool`
 
@@ -608,7 +731,10 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 - Exception
 
-### upsert() · [source](../../src/Db/Query.php#L723)
+
+---
+
+### upsert() · [source](../../src/Db/Query.php#L761)
 
 `public function upsert(array|null $data = null): Merlin\Db\ResultSet|array|string|bool`
 
@@ -629,7 +755,10 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 - Exception
 
-### update() · [source](../../src/Db/Query.php#L764)
+
+---
+
+### update() · [source](../../src/Db/Query.php#L801)
 
 `public function update(array|null $data = null): Merlin\Db\ResultSet|array|string|int`
 
@@ -650,7 +779,10 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 - Exception
 
-### delete() · [source](../../src/Db/Query.php#L792)
+
+---
+
+### delete() · [source](../../src/Db/Query.php#L832)
 
 `public function delete(): Merlin\Db\ResultSet|array|string|int`
 
@@ -665,7 +797,10 @@ Execute DELETE query
 
 - Exception
 
-### truncate() · [source](../../src/Db/Query.php#L815)
+
+---
+
+### truncate() · [source](../../src/Db/Query.php#L858)
 
 `public function truncate(): string|int`
 
@@ -680,7 +815,10 @@ Execute TRUNCATE query or return SQL string if returnSql is enabled
 
 - Exception
 
-### exists() · [source](../../src/Db/Query.php#L834)
+
+---
+
+### exists() · [source](../../src/Db/Query.php#L880)
 
 `public function exists(): string|bool`
 
@@ -694,7 +832,10 @@ Check if any rows exist matching the query
 
 - Exception
 
-### count() · [source](../../src/Db/Query.php#L858)
+
+---
+
+### count() · [source](../../src/Db/Query.php#L908)
 
 `public function count(): string|int`
 
@@ -709,7 +850,10 @@ Count rows matching the query
 
 - Exception
 
-### getBindings() · [source](../../src/Db/Query.php#L1576)
+
+---
+
+### getBindings() · [source](../../src/Db/Query.php#L1632)
 
 `public function getBindings(): array`
 
@@ -719,7 +863,10 @@ Get bind parameters
 
 - Type: array
 
-### paginate() · [source](../../src/Db/Query.php#L1589)
+
+---
+
+### paginate() · [source](../../src/Db/Query.php#L1645)
 
 `public function paginate(int $page = 1, int $pageSize = 30, bool $reverse = false): Merlin\Db\Paginator`
 
@@ -737,7 +884,10 @@ Create a paginator for the current query
 
 - Type: [Paginator](Db_Paginator.md)
 
-### getRowCount() · [source](../../src/Db/Query.php#L1637)
+
+---
+
+### getRowCount() · [source](../../src/Db/Query.php#L1688)
 
 `public function getRowCount(): int`
 
@@ -747,3 +897,8 @@ Return the number of affected rows for write operations or the number of rows in
 
 - Type: int
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

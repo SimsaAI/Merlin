@@ -10,7 +10,7 @@ Sql::param() creates bind parameters explicitly
 
 ## 🚀 Public methods
 
-### column() · [source](../../src/Db/Sql.php#L77)
+### column() · [source](../../src/Db/Sql.php#L79)
 
 `public static function column(string $name): static`
 
@@ -27,7 +27,10 @@ Supports Model.column syntax for automatic table resolution
 
 - Type: static
 
-### param() · [source](../../src/Db/Sql.php#L92)
+
+---
+
+### param() · [source](../../src/Db/Sql.php#L94)
 
 `public static function param(string $name): static`
 
@@ -43,7 +46,10 @@ Bind parameter reference
 
 - Type: static
 
-### func() · [source](../../src/Db/Sql.php#L103)
+
+---
+
+### func() · [source](../../src/Db/Sql.php#L105)
 
 `public static function func(string $name, array $args = []): static`
 
@@ -60,7 +66,10 @@ SQL function call
 
 - Type: static
 
-### cast() · [source](../../src/Db/Sql.php#L114)
+
+---
+
+### cast() · [source](../../src/Db/Sql.php#L116)
 
 `public static function cast(mixed $value, string $type): static`
 
@@ -77,7 +86,10 @@ Type cast (driver-specific syntax)
 
 - Type: static
 
-### pgArray() · [source](../../src/Db/Sql.php#L124)
+
+---
+
+### pgArray() · [source](../../src/Db/Sql.php#L126)
 
 `public static function pgArray(array $values): static`
 
@@ -93,7 +105,10 @@ PostgreSQL array literal
 
 - Type: static
 
-### csList() · [source](../../src/Db/Sql.php#L134)
+
+---
+
+### csList() · [source](../../src/Db/Sql.php#L136)
 
 `public static function csList(array $values): static`
 
@@ -109,7 +124,10 @@ Comma-separated list (for IN clauses)
 
 - Type: static
 
-### raw() · [source](../../src/Db/Sql.php#L145)
+
+---
+
+### raw() · [source](../../src/Db/Sql.php#L147)
 
 `public static function raw(string $sql, array $bindParams = []): static`
 
@@ -126,7 +144,10 @@ Raw SQL (unescaped, passed through as-is)
 
 - Type: static
 
-### value() · [source](../../src/Db/Sql.php#L157)
+
+---
+
+### value() · [source](../../src/Db/Sql.php#L159)
 
 `public static function value(mixed $value): static`
 
@@ -142,7 +163,10 @@ Literal value (will be properly quoted/escaped)
 
 - Type: static
 
-### json() · [source](../../src/Db/Sql.php#L167)
+
+---
+
+### json() · [source](../../src/Db/Sql.php#L169)
 
 `public static function json(mixed $value): static`
 
@@ -158,7 +182,10 @@ JSON value (serialized as JSON literal)
 
 - Type: static
 
-### concat() · [source](../../src/Db/Sql.php#L179)
+
+---
+
+### concat() · [source](../../src/Db/Sql.php#L181)
 
 `public static function concat(mixed ...$parts): static`
 
@@ -176,7 +203,10 @@ MySQL: uses CONCAT() function
 
 - Type: static
 
-### expr() · [source](../../src/Db/Sql.php#L191)
+
+---
+
+### expr() · [source](../../src/Db/Sql.php#L193)
 
 `public static function expr(mixed ...$parts): static`
 
@@ -194,7 +224,10 @@ Plain strings are treated as raw SQL tokens (not serialized)
 
 - Type: static
 
-### case() · [source](../../src/Db/Sql.php#L200)
+
+---
+
+### case() · [source](../../src/Db/Sql.php#L202)
 
 `public static function case(): Merlin\Db\SqlCase`
 
@@ -205,7 +238,29 @@ CASE expression builder
 - Type: [SqlCase](Db_SqlCase.md)
 - Description: Fluent builder for CASE expressions
 
-### as() · [source](../../src/Db/Sql.php#L210)
+
+---
+
+### subQuery() · [source](../../src/Db/Sql.php#L212)
+
+`public static function subQuery(Merlin\Db\Query $query): static`
+
+Subquery expression - wraps a Query instance as a subquery
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$query` | [Query](Db_Query.md) | - | Subquery instance |
+
+**➡️ Return value**
+
+- Type: static
+
+
+---
+
+### as() · [source](../../src/Db/Sql.php#L222)
 
 `public function as(string $alias): static`
 
@@ -220,9 +275,11 @@ Add alias to this expression (returns aliased node)
 **➡️ Return value**
 
 - Type: static
-- Description: New Sql node with alias
 
-### getBindParams() · [source](../../src/Db/Sql.php#L219)
+
+---
+
+### getBindParams() · [source](../../src/Db/Sql.php#L232)
 
 `public function getBindParams(): array`
 
@@ -233,7 +290,10 @@ Get bind parameters associated with this node
 - Type: array
 - Description: Associative array of bind parameters
 
-### toSql() · [source](../../src/Db/Sql.php#L281)
+
+---
+
+### toSql() · [source](../../src/Db/Sql.php#L294)
 
 `public function toSql(string $driver, callable $serialize, callable|null $protectIdentifier = null): string`
 
@@ -252,7 +312,10 @@ Serialize node to SQL string
 - Type: string
 - Description: SQL fragment
 
-### __toString() · [source](../../src/Db/Sql.php#L390)
+
+---
+
+### __toString() · [source](../../src/Db/Sql.php#L422)
 
 `public function __toString(): string`
 
@@ -260,3 +323,8 @@ Serialize node to SQL string
 
 - Type: string
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

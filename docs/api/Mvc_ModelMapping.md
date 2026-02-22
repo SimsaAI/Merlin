@@ -6,23 +6,26 @@ Class to map models
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/ModelMapping.php#L19)
+### fromArray() · [source](../../src/Mvc/ModelMapping.php#L21)
 
-`public function __construct(array|null $mapping = null): mixed`
+`public static function fromArray(array $mapping): static`
 
-ModelMapping constructor.
+Create ModelMapping from array config
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$mapping` | array\|null | `null` |  |
+| `$mapping` | array | - |  |
 
 **➡️ Return value**
 
-- Type: mixed
+- Type: static
 
-### add() · [source](../../src/Mvc/ModelMapping.php#L31)
+
+---
+
+### add() · [source](../../src/Mvc/ModelMapping.php#L55)
 
 `public function add(string $name, string|null $source = null, string|null $schema = null): static`
 
@@ -40,7 +43,10 @@ Add model mapping
 
 - Type: static
 
-### get() · [source](../../src/Mvc/ModelMapping.php#L52)
+
+---
+
+### get() · [source](../../src/Mvc/ModelMapping.php#L76)
 
 `public function get(string $name): array|null`
 
@@ -56,17 +62,23 @@ Get model mapping by name
 
 - Type: array|null
 
-### getAll() · [source](../../src/Mvc/ModelMapping.php#L62)
 
-`public function getAll(): array`
+---
 
-Get all model mapping
+### toArray() · [source](../../src/Mvc/ModelMapping.php#L86)
+
+`public function toArray(): array`
+
+Get all model mappings as an array
 
 **➡️ Return value**
 
 - Type: array
 
-### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L76)
+
+---
+
+### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L100)
 
 `public static function toSnakeCase(string $name): string`
 
@@ -87,3 +99,8 @@ Multiple separators are unified into a single underscore, and duplicate undersco
 - Type: string
 - Description: The converted snake_case string.
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

@@ -16,6 +16,9 @@ Override this method if you want to specify a custom source.
 
 - Type: string
 
+
+---
+
 ### schema() · [source](../../src/Mvc/Model.php#L36)
 
 `public function schema(): string|null`
@@ -27,6 +30,9 @@ Override this method if you want to specify a schema (e.g. for PostgreSQL).
 **➡️ Return value**
 
 - Type: string|null
+
+
+---
 
 ### idFields() · [source](../../src/Mvc/Model.php#L46)
 
@@ -40,6 +46,9 @@ Override this method if your model has a different primary key or composite keys
 
 - Type: array
 - Description: List of primary key field names
+
+
+---
 
 ### query() · [source](../../src/Mvc/Model.php#L61)
 
@@ -59,6 +68,9 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 - Type: [Query](Db_Query.md)
 
+
+---
+
 ### create() · [source](../../src/Mvc/Model.php#L77)
 
 `public static function create(array $values): static`
@@ -76,6 +88,9 @@ Create a new model instance with the given values and save it to the database. R
 - Type: static
 - Description: The created model instance
 
+
+---
+
 ### forceCreate() · [source](../../src/Mvc/Model.php#L94)
 
 `public static function forceCreate(array $values): static`
@@ -92,6 +107,9 @@ Force create a new model instance with the given values, bypassing any checks fo
 
 - Type: static
 - Description: The created model instance
+
+
+---
 
 ### firstOrCreate() · [source](../../src/Mvc/Model.php#L114)
 
@@ -111,6 +129,9 @@ Find the first model matching the given conditions or create a new one with the 
 - Type: static
 - Description: The found or created model instance
 
+
+---
+
 ### updateOrCreate() · [source](../../src/Mvc/Model.php#L131)
 
 `public static function updateOrCreate(array $conditions, array $values = []): static`
@@ -129,6 +150,9 @@ Find the first model matching the given conditions or update it with the provide
 - Type: static
 - Description: The found, updated, or created model instance
 
+
+---
+
 ### find() · [source](../../src/Mvc/Model.php#L155)
 
 `public static function find(mixed $id): static|null`
@@ -144,6 +168,9 @@ Finds a model by its ID(s)
 **➡️ Return value**
 
 - Type: static|null
+
+
+---
 
 ### findOrFail() · [source](../../src/Mvc/Model.php#L195)
 
@@ -165,6 +192,9 @@ Finds a model by its ID(s) or throws an exception if not found
 
 - Exception  if the model is not found
 
+
+---
+
 ### findOne() · [source](../../src/Mvc/Model.php#L209)
 
 `public static function findOne(array $conditions): static|null`
@@ -181,6 +211,9 @@ Finds the first model matching the given conditions or returns null if none foun
 
 - Type: static|null
 - Description: The found model instance or null if not found
+
+
+---
 
 ### findAll() · [source](../../src/Mvc/Model.php#L223)
 
@@ -199,6 +232,9 @@ Find all models matching the given conditions. If no conditions are provided, it
 - Type: [ResultSet](Db_ResultSet.md)
 - Description: The found model instances as a ResultSet
 
+
+---
+
 ### exists() · [source](../../src/Mvc/Model.php#L237)
 
 `public static function exists(array $conditions): bool`
@@ -215,6 +251,9 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 - Type: bool
 - Description: True if a matching model exists, false otherwise
+
+
+---
 
 ### count() · [source](../../src/Mvc/Model.php#L251)
 
@@ -233,6 +272,9 @@ Count the number of models matching the given conditions. Returns the count as a
 - Type: int
 - Description: The count of matching models
 
+
+---
+
 ### saveState() · [source](../../src/Mvc/Model.php#L270)
 
 `public function saveState(): static`
@@ -243,6 +285,9 @@ Save the current state of the model for change tracking. This method clones the 
 
 - Type: static
 
+
+---
+
 ### loadState() · [source](../../src/Mvc/Model.php#L280)
 
 `public function loadState(): static`
@@ -252,6 +297,9 @@ Load the saved state of the model back into the current instance. This method co
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### getState() · [source](../../src/Mvc/Model.php#L298)
 
@@ -264,6 +312,9 @@ Get the saved state object for this model. This returns the clone of the model t
 - Type: static|null
 - Description: The saved state object or null if no state saved
 
+
+---
+
 ### hasChanged() · [source](../../src/Mvc/Model.php#L351)
 
 `public function hasChanged(): bool`
@@ -274,6 +325,9 @@ Check if any fields have changed since the last saveState() call. This compares 
 
 - Type: bool
 - Description: True if any fields have changed, false otherwise
+
+
+---
 
 ### save() · [source](../../src/Mvc/Model.php#L364)
 
@@ -286,6 +340,9 @@ Save the model to the database. If the model has all ID fields set, it performs 
 - Type: bool
 - Description: True if the model was saved (inserted or updated), false if there were no changes to save
 
+
+---
+
 ### insert() · [source](../../src/Mvc/Model.php#L392)
 
 `public function insert(): bool`
@@ -296,6 +353,9 @@ Insert the model as a new record in the database. This method performs an INSERT
 
 - Type: bool
 - Description: True if the model was inserted successfully
+
+
+---
 
 ### update() · [source](../../src/Mvc/Model.php#L407)
 
@@ -308,6 +368,9 @@ Update the existing record in the database with any changed fields. This method 
 - Type: bool
 - Description: True if the model was updated successfully, false if there were no changes to update
 
+
+---
+
 ### delete() · [source](../../src/Mvc/Model.php#L500)
 
 `public function delete(): bool`
@@ -318,6 +381,9 @@ Delete the model from the database. This method requires that all ID fields are 
 
 - Type: bool
 - Description: True if the model was deleted successfully
+
+
+---
 
 ### setDefaultRole() · [source](../../src/Mvc/Model.php#L520)
 
@@ -333,6 +399,9 @@ Delete the model from the database. This method requires that all ID fields are 
 
 - Type: void
 
+
+---
+
 ### setDefaultReadRole() · [source](../../src/Mvc/Model.php#L526)
 
 `public static function setDefaultReadRole(string $role): void`
@@ -346,6 +415,9 @@ Delete the model from the database. This method requires that all ID fields are 
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### setDefaultWriteRole() · [source](../../src/Mvc/Model.php#L531)
 
@@ -361,6 +433,9 @@ Delete the model from the database. This method requires that all ID fields are 
 
 - Type: void
 
+
+---
+
 ### readConnection() · [source](../../src/Mvc/Model.php#L556)
 
 `public function readConnection(): Merlin\Db\Database`
@@ -368,6 +443,9 @@ Delete the model from the database. This method requires that all ID fields are 
 **➡️ Return value**
 
 - Type: [Database](Db_Database.md)
+
+
+---
 
 ### writeConnection() · [source](../../src/Mvc/Model.php#L562)
 
@@ -377,3 +455,8 @@ Delete the model from the database. This method requires that all ID fields are 
 
 - Type: [Database](Db_Database.md)
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

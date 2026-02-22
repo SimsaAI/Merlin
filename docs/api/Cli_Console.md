@@ -12,6 +12,9 @@
 
 - Type: string
 
+
+---
+
 ### setDefaultTask() · [source](../../src/Cli/Console.php#L24)
 
 `public function setDefaultTask(string $defaultTask): void`
@@ -26,6 +29,9 @@
 
 - Type: void
 
+
+---
+
 ### getDefaultAction() · [source](../../src/Cli/Console.php#L32)
 
 `public function getDefaultAction(): string`
@@ -33,6 +39,9 @@
 **➡️ Return value**
 
 - Type: string
+
+
+---
 
 ### setDefaultAction() · [source](../../src/Cli/Console.php#L37)
 
@@ -48,6 +57,9 @@
 
 - Type: void
 
+
+---
+
 ### getNamespace() · [source](../../src/Cli/Console.php#L45)
 
 `public function getNamespace(): string`
@@ -55,6 +67,9 @@
 **➡️ Return value**
 
 - Type: string
+
+
+---
 
 ### setNamespace() · [source](../../src/Cli/Console.php#L50)
 
@@ -70,6 +85,9 @@
 
 - Type: void
 
+
+---
+
 ### shouldParseParams() · [source](../../src/Cli/Console.php#L61)
 
 `public function shouldParseParams(): bool`
@@ -77,6 +95,9 @@
 **➡️ Return value**
 
 - Type: bool
+
+
+---
 
 ### setParseParams() · [source](../../src/Cli/Console.php#L66)
 
@@ -91,6 +112,9 @@
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### process() · [source](../../src/Cli/Console.php#L79)
 
@@ -113,3 +137,8 @@
 - [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md)
 - ActionNotFoundException
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

@@ -7,18 +7,6 @@ use phpDocumentor\Reflection\DocBlock\Tags\Param as ParamTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_ as ReturnTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws as ThrowsTag;
 use phpDocumentor\Reflection\DocBlockFactory;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use ReflectionClass;
-use ReflectionClassConstant;
-use ReflectionIntersectionType;
-use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
-use ReflectionProperty;
-use ReflectionType;
-use ReflectionUnionType;
-use Throwable;
 
 $srcDir = 'src';
 $docsDir = 'docs/api';
@@ -109,6 +97,7 @@ file_put_contents("$docsDir/index.md", $indexContent . "\n");
 foreach ($allClasses as $class => $classMeta) {
     $reflector = new ReflectionClass($class);
     $md = generateClassDoc($reflector, $docFactory, $classRegistry);
+    $md .= "\n\n---\n\n[Back to the Index ⤴](index.md)\n";
     $filename = makeDocFileName($class);
     file_put_contents("$docsDir/$filename", $md);
     echo "  ✓ {$filename}\n";
@@ -153,7 +142,7 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
         fn(ReflectionClassConstant $constant) => $constant->isPublic()
     );
     if (!empty($constants)) {
-        $md .= "## 📌 Constants\n\n";
+        $md .= "## 📌 Public Constants\n\n";
         foreach ($constants as $constant) {
             $name = $constant->getName();
             $value = $constant->getValue();
@@ -168,7 +157,7 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
         fn(ReflectionProperty $prop) => $prop->isPublic()
     );
     if (!empty($props)) {
-        $md .= "## 🔐 Properties\n\n";
+        $md .= "## 🔐 Public Properties\n\n";
         foreach ($props as $prop) {
             $vis = getVisibility($prop);
             $static = $prop->isStatic() ? ' static' : '';
@@ -185,9 +174,12 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
 
     // Public methods
     $md .= "## 🚀 Public methods\n\n";
+    $sep = "";
     foreach ($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
         if ($method->class !== $reflector->name)
             continue;
+        $md .= $sep;
+        $sep = "\n---\n\n";
         $md .= generateMethodDoc($method, $docFactory, $classRegistry);
     }
 

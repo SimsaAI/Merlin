@@ -14,6 +14,9 @@ Create a new Router instance.
 
 - Type: mixed
 
+
+---
+
 ### addType() · [source](../../src/Mvc/Router.php#L54)
 
 `public function addType(string $name, callable $validator): static`
@@ -34,6 +37,9 @@ Predefined types include 'int', 'alpha', 'alnum', 'uuid', and '*' (matches anyth
 - Type: static
 - Description: For method chaining
 
+
+---
+
 ### add() · [source](../../src/Mvc/Router.php#L68)
 
 `public function add(array|string|null $method, string $pattern, array|string|null $handler = null): static`
@@ -45,13 +51,16 @@ Add a new route to the router. The route can be defined for specific HTTP method
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$method` | array\|string\|null | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods) |
-| `$pattern` | string | - | Route pattern (e.g., '/blog/{slug}', '/{:controller}/{:action}/{:params}') |
+| `$pattern` | string | - | Route pattern (e.g., '/blog/{slug}', '/{controller}/{action}/{params:*}') |
 | `$handler` | array\|string\|null | `null` | Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'. |
 
 **➡️ Return value**
 
 - Type: static
 - Description: For method chaining
+
+
+---
 
 ### setName() · [source](../../src/Mvc/Router.php#L113)
 
@@ -74,6 +83,9 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 - LogicException  If no route has been added yet or if the last added route is invalid
 
+
+---
+
 ### hasNamedRoute() · [source](../../src/Mvc/Router.php#L132)
 
 `public function hasNamedRoute(string $name): bool`
@@ -90,6 +102,9 @@ Check if a named route exists.
 
 - Type: bool
 - Description: True if a route with the given name exists, false otherwise
+
+
+---
 
 ### urlFor() · [source](../../src/Mvc/Router.php#L146)
 
@@ -114,6 +129,9 @@ Generate a URL for a named route, substituting parameters as needed.
 
 - RuntimeException  If no route with the given name exists or if required parameters are missing/invalid
 
+
+---
+
 ### prefix() · [source](../../src/Mvc/Router.php#L173)
 
 `public function prefix(string $prefix, callable $callback): void`
@@ -131,6 +149,9 @@ Define a group of routes that share a common URI prefix. This allows you to orga
 
 - Type: void
 
+
+---
+
 ### middleware() · [source](../../src/Mvc/Router.php#L192)
 
 `public function middleware(array|string $name, callable $callback): void`
@@ -147,6 +168,9 @@ Add group of middleware to be applied to all routes defined within the group. Th
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### match() · [source](../../src/Mvc/Router.php#L428)
 
@@ -166,3 +190,8 @@ Attempt to match the given URI and HTTP method against the registered routes.
 - Type: array|null
 - Description: If a match is found, returns an array with keys 'vars', 'override', 'groups', 'wildcards'. Otherwise, returns null.
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

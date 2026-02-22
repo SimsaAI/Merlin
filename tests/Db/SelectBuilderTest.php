@@ -43,7 +43,7 @@ class SelectBuilderTest extends TestCase
     {
         AppContext::setInstance(new AppContext());
         Query::useModels(true);
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Model' => ['source' => 'user', 'schema' => null],
         ]));
 
@@ -76,7 +76,7 @@ class SelectBuilderTest extends TestCase
         // This is crucial: verifies Model.column resolves to correct table identifiers throughout the query
 
         Query::useModels(true);
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Order' => ['source' => 'order', 'schema' => 'public'],
             'Customer' => ['source' => 'customer', 'schema' => 'public'],
         ]));
@@ -135,7 +135,7 @@ class SelectBuilderTest extends TestCase
             ->where('Model.id', 1)
             ->where('Model.status', 'active');
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Model' => ['source' => 'users', 'schema' => null],
         ]));
 
@@ -150,7 +150,7 @@ class SelectBuilderTest extends TestCase
             $first
         );
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Model' => ['source' => 'accounts', 'schema' => null],
         ]));
 
@@ -172,7 +172,7 @@ class SelectBuilderTest extends TestCase
     {
         AppContext::setInstance(new AppContext());
         Query::useModels(true);
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'User' => ['source' => 'users', 'schema' => null],
             'Order' => ['source' => 'orders', 'schema' => null],
         ]));
@@ -192,7 +192,7 @@ class SelectBuilderTest extends TestCase
             $first
         );
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'User' => ['source' => 'accounts', 'schema' => null],
             'Order' => ['source' => 'purchases', 'schema' => null],
         ]));
@@ -222,7 +222,7 @@ class SelectBuilderTest extends TestCase
             ->where('Model.status = :status')
             ->bind(['status' => 'active']);
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Model' => ['source' => 'users', 'schema' => null],
         ]));
 
@@ -237,7 +237,7 @@ class SelectBuilderTest extends TestCase
             $first
         );
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'Model' => ['source' => 'accounts', 'schema' => null],
         ]));
 
@@ -267,7 +267,7 @@ class SelectBuilderTest extends TestCase
             ->where('Order.state = :state')
             ->bind(['state' => 'open']);
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'User' => ['source' => 'users', 'schema' => null],
             'Order' => ['source' => 'orders', 'schema' => null],
         ]));
@@ -283,7 +283,7 @@ class SelectBuilderTest extends TestCase
             $first
         );
 
-        Query::setModelMapping(new ModelMapping([
+        Query::setModelMapping(ModelMapping::fromArray([
             'User' => ['source' => 'accounts', 'schema' => null],
             'Order' => ['source' => 'purchases', 'schema' => null],
         ]));
@@ -300,5 +300,76 @@ class SelectBuilderTest extends TestCase
             'SELECT * FROM "accounts" JOIN "purchases" ON (("accounts"."id" = "purchases"."user_id") AND ("purchases"."state" = \'open\'))',
             $second
         );
+    }
+
+    public function testSubQueryInFrom(): void
+    {
+        AppContext::setInstance(new AppContext());
+        Query::useModels(false);
+        $db = new TestPgDatabase();
+        AppContext::instance()->dbManager()->set('default', $db);
+
+        $sub = Query::new($db)
+            ->table('orders o')
+            ->columns(['o.id', 'o.user_id'])
+            ->where('o.total >', 100);
+
+        $q = Query::new($db)
+            ->from($sub, 's')
+            ->columns(['s.user_id'])
+            ->returnSql()
+            ->select();
+
+        $expected = 'SELECT "s"."user_id" FROM (SELECT "o"."id", "o"."user_id" FROM "orders" AS "o" WHERE ("o"."total" > 100)) AS "s"';
+
+        $this->assertEquals($expected, $q);
+    }
+
+    public function testSubQueryInJoin(): void
+    {
+        AppContext::setInstance(new AppContext());
+        Query::useModels(false);
+        $db = new TestPgDatabase();
+        AppContext::instance()->dbManager()->set('default', $db);
+
+        $sub = Query::new($db)
+            ->table('orders o')
+            ->columns(['o.user_id', 'o.id'])
+            ->where('o.total >', 100);
+
+        $q = Query::new($db)
+            ->table('users u')
+            ->columns(['u.id'])
+            ->leftJoin($sub, 'o', Condition::new()->where('o.user_id = u.id'))
+            ->returnSql()
+            ->select();
+
+        $expected = 'SELECT "u"."id" FROM "users" AS "u" LEFT JOIN (SELECT "o"."user_id", "o"."id" FROM "orders" AS "o" WHERE ("o"."total" > 100)) AS "o" ON (("o"."user_id" = "u"."id"))';
+
+        $this->assertEquals($expected, $q);
+    }
+
+    public function testWhereWithSqlSubQuery(): void
+    {
+        AppContext::setInstance(new AppContext());
+        Query::useModels(false);
+        $db = new TestPgDatabase();
+        AppContext::instance()->dbManager()->set('default', $db);
+
+        $sub = Query::new($db)
+            ->table('orders o2')
+            ->columns(['o2.user_id'])
+            ->where('o2.total >', 100);
+
+        $q = Query::new($db)
+            ->table('users u')
+            ->inWhere('u.id', $sub)
+            //->where('u.id IN', Sql::subQuery($sub), false)
+            ->returnSql()
+            ->select();
+
+        $expected = 'SELECT * FROM "users" AS "u" WHERE ("u"."id" IN (SELECT "o2"."user_id" FROM "orders" AS "o2" WHERE ("o2"."total" > 100)))';
+
+        $this->assertEquals($expected, $q);
     }
 }

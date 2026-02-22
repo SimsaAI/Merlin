@@ -42,7 +42,6 @@ Implement a middleware to catch and log exceptions during request processing:
 use Merlin\Mvc\MiddlewareInterface;
 use Merlin\AppContext;
 use Merlin\Http\Response;
-use Merlin\Http\JsonResponse;
 
 class ExceptionMiddleware implements MiddlewareInterface
 {
@@ -58,13 +57,13 @@ class ExceptionMiddleware implements MiddlewareInterface
             error_log($e);
 
             if ($this->debug) {
-                return new JsonResponse([
+                return Response::json([
                     'error' => $e->getMessage(),
                     'trace' => $e->getTrace(),
                 ], 500);
             }
 
-            return new JsonResponse(['error' => 'Internal Server Error'], 500);
+            return Response::json(['error' => 'Internal Server Error'], 500);
         }
     }
 }

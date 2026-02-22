@@ -24,6 +24,9 @@ Optional method to run before an action. If it returns a Response, the action wi
 - Type: [Response](Http_Response.md)|null
 - Description: If a Response is returned, it will be sent immediately and the action will be skipped. If null is returned, the action will execute as normal.
 
+
+---
+
 ### afterAction() · [source](../../src/Mvc/Controller.php#L56)
 
 `public function afterAction(string|null $action = null, array $params = []): Merlin\Http\Response|null`
@@ -42,6 +45,9 @@ Optional method to run after an action. It receives the Response returned by the
 - Type: [Response](Http_Response.md)|null
 - Description: If a Response is returned, it will replace the original response from the action. If null is returned, the original response will be sent.
 
+
+---
+
 ### getMiddleware() · [source](../../src/Mvc/Controller.php#L67)
 
 `public function getMiddleware(): array`
@@ -51,6 +57,9 @@ Get the middleware for the controller. Usually used by the Dispatcher to build t
 **➡️ Return value**
 
 - Type: array
+
+
+---
 
 ### getActionMiddleware() · [source](../../src/Mvc/Controller.php#L77)
 
@@ -68,6 +77,9 @@ Get the middleware for a specific action. Usually used by the Dispatcher to buil
 
 - Type: array
 
+
+---
+
 ### context() · [source](../../src/Mvc/Controller.php#L88)
 
 `public function context(): Merlin\AppContext`
@@ -77,6 +89,9 @@ Get the current AppContext instance. Useful for accessing services or route info
 **➡️ Return value**
 
 - Type: [AppContext](AppContext.md)
+
+
+---
 
 ### request() · [source](../../src/Mvc/Controller.php#L97)
 
@@ -88,6 +103,9 @@ Get the current Request object from the context.
 
 - Type: [Request](Http_Request.md)
 
+
+---
+
 ### view() · [source](../../src/Mvc/Controller.php#L106)
 
 `public function view(): Merlin\Mvc\ViewEngine`
@@ -97,6 +115,9 @@ Get the ViewEngine from the context for rendering views.
 **➡️ Return value**
 
 - Type: [ViewEngine](Mvc_ViewEngine.md)
+
+
+---
 
 ### session() · [source](../../src/Mvc/Controller.php#L115)
 
@@ -108,6 +129,9 @@ Get the Session from the context. May return null if no session is available.
 
 - Type: [Session](Http_Session.md)|null
 
+
+---
+
 ### cookies() · [source](../../src/Mvc/Controller.php#L124)
 
 `public function cookies(): Merlin\Http\Cookies`
@@ -118,3 +142,8 @@ Get the Cookies service from the context for managing cookies.
 
 - Type: [Cookies](Http_Cookies.md)
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

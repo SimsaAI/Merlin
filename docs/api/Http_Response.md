@@ -20,6 +20,9 @@
 
 - Type: mixed
 
+
+---
+
 ### setStatus() · [source](../../src/Http/Response.php#L13)
 
 `public function setStatus(int $code): static`
@@ -33,6 +36,9 @@
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### setHeader() · [source](../../src/Http/Response.php#L19)
 
@@ -49,6 +55,9 @@
 
 - Type: static
 
+
+---
+
 ### write() · [source](../../src/Http/Response.php#L25)
 
 `public function write(string $text): static`
@@ -63,6 +72,9 @@
 
 - Type: static
 
+
+---
+
 ### send() · [source](../../src/Http/Response.php#L31)
 
 `public function send(): void`
@@ -70,6 +82,9 @@
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### json() · [source](../../src/Http/Response.php#L42)
 
@@ -86,6 +101,9 @@
 
 - Type: static
 
+
+---
+
 ### text() · [source](../../src/Http/Response.php#L51)
 
 `public static function text(string $text, int $status = 200): static`
@@ -100,6 +118,9 @@
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### html() · [source](../../src/Http/Response.php#L60)
 
@@ -116,6 +137,9 @@
 
 - Type: static
 
+
+---
+
 ### redirect() · [source](../../src/Http/Response.php#L69)
 
 `public static function redirect(string $url, int $status = 302): static`
@@ -131,6 +155,9 @@
 
 - Type: static
 
+
+---
+
 ### status() · [source](../../src/Http/Response.php#L78)
 
 `public static function status(int $status): static`
@@ -145,3 +172,8 @@
 
 - Type: static
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

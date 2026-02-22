@@ -42,6 +42,7 @@ class Sql
     protected const TYPE_EXPR = 10;
     protected const TYPE_ALIAS = 11;
     protected const TYPE_VALUE = 12;
+    protected const TYPE_SUBQUERY = 13;
 
     protected int $type;
     protected $value;
@@ -49,6 +50,7 @@ class Sql
     protected ?string $cast;
     protected array $bindParams = [];
     protected bool $mustResolve = false;
+    protected ?string $alias = null;
 
     /**
      * @param int $type Node type: column, param, func, cast, pg_array, in_list, raw
@@ -72,7 +74,7 @@ class Sql
      * Column reference (unquoted identifier)
      * Supports Model.column syntax for automatic table resolution
      * @param string $name Column name (simple or Model.column format)
-     * @return self
+     * @return $this
      */
     public static function column(string $name): static
     {
@@ -87,7 +89,7 @@ class Sql
     /**
      * Bind parameter reference
      * @param string $name Parameter name (without colons)
-     * @return self
+     * @return $this
      */
     public static function param(string $name): static
     {
@@ -98,7 +100,7 @@ class Sql
      * SQL function call
      * @param string $name Function name
      * @param array $args Function arguments (scalars or Sql instances)
-     * @return self
+     * @return $this
      */
     public static function func(string $name, array $args = []): static
     {
@@ -109,7 +111,7 @@ class Sql
      * Type cast (driver-specific syntax)
      * @param mixed $value Value to cast (scalar or Sql)
      * @param string $type Target type name
-     * @return self
+     * @return $this
      */
     public static function cast(mixed $value, string $type): static
     {
@@ -119,7 +121,7 @@ class Sql
     /**
      * PostgreSQL array literal
      * @param array $values Array elements (scalars or Sql instances)
-     * @return self
+     * @return $this
      */
     public static function pgArray(array $values): static
     {
@@ -129,7 +131,7 @@ class Sql
     /**
      * Comma-separated list (for IN clauses)
      * @param array $values List elements (scalars or Sql instances)
-     * @return self
+     * @return $this
      */
     public static function csList(array $values): static
     {
@@ -140,7 +142,7 @@ class Sql
      * Raw SQL (unescaped, passed through as-is)
      * @param string $sql Raw SQL string
      * @param array $bindParams Optional bind parameters ['param_name' => value]
-     * @return self
+     * @return $this
      */
     public static function raw(string $sql, array $bindParams = []): static
     {
@@ -152,7 +154,7 @@ class Sql
     /**
      * Literal value (will be properly quoted/escaped)
      * @param mixed $value Value to serialize as SQL literal
-     * @return self
+     * @return $this
      */
     public static function value(mixed $value): static
     {
@@ -162,7 +164,7 @@ class Sql
     /**
      * JSON value (serialized as JSON literal)
      * @param array $value Value to encode as JSON
-     * @return self
+     * @return $this
      */
     public static function json(mixed $value): static
     {
@@ -174,7 +176,7 @@ class Sql
      * PostgreSQL/SQLite: uses || operator
      * MySQL: uses CONCAT() function
      * @param mixed ...$parts Parts to concatenate (scalars or Sql instances)
-     * @return self
+     * @return $this
      */
     public static function concat(...$parts): static
     {
@@ -186,7 +188,7 @@ class Sql
      * Useful for complex expressions like CASE WHEN
      * Plain strings are treated as raw SQL tokens (not serialized)
      * @param mixed ...$parts Expression parts (strings are raw, use Sql instances for values)
-     * @return self
+     * @return $this
      */
     public static function expr(...$parts): static
     {
@@ -203,13 +205,24 @@ class Sql
     }
 
     /**
+     * Subquery expression - wraps a Query instance as a subquery
+     * @param Query $query Subquery instance
+     * @return $this
+     */
+    public static function subQuery(Query $query): static
+    {
+        return new self(self::TYPE_SUBQUERY, $query);
+    }
+
+    /**
      * Add alias to this expression (returns aliased node)
      * @param string $alias Column alias
-     * @return self New Sql node with alias
+     * @return $this
      */
     public function as(string $alias): static
     {
-        return new self(self::TYPE_ALIAS, ['node' => $this, 'alias' => $alias]);
+        $this->alias = $alias;
+        return $this;
     }
 
     /**
@@ -287,6 +300,7 @@ class Sql
             }
 
             $quoteChar = $driver === 'mysql' ? '`' : '"';
+            $identifier = str_replace($quoteChar, $quoteChar . $quoteChar, $identifier);
 
             // Handle qualified identifiers (table.column)
             if (strpos($identifier, '.') !== false) {
@@ -297,29 +311,35 @@ class Sql
             return $quoteChar . $identifier . $quoteChar;
         };
 
+        $sql = '';
+
         switch ($this->type) {
             // Column reference - use protectIdentifier for resolution and quoting
             // This handles Model.column -> table.column resolution when callback is provided
             case self::TYPE_COLUMN:
-                return $quoteIdentifier($this->value);
+                $sql = $quoteIdentifier($this->value);
+                break;
 
             // Parameter reference - format as :name: for binding
             case self::TYPE_PARAM:
-                return $serialize($this->value, true);
+                $sql = $serialize($this->value, true);
+                break;
 
             // Raw SQL - pass through as-is
             case self::TYPE_RAW:
-                return $this->value;
+                $sql = $this->value;
+                break;
 
             // Function call - serialize arguments in literal mode by default
             case self::TYPE_FUNC:
-                return $this->value . '(' .
+                $sql = $this->value . '(' .
                     implode(', ', array_map(
                         fn($a) => $a instanceof self
                         ? $a->toSql($driver, $serialize, $protectIdentifier)
                         : $serialize($a),
                         $this->args
                     )) . ')';
+                break;
 
             // Type cast - driver-specific syntax
             case self::TYPE_CAST:
@@ -327,25 +347,30 @@ class Sql
                     ? $this->value->toSql($driver, $serialize, $protectIdentifier)
                     : $serialize($this->value);
                 if ($driver === 'pgsql') {
-                    return "$expr::{$this->cast}";
+                    $sql = "$expr::{$this->cast}";
+                } else {
+                    $sql = "CAST($expr AS {$this->cast})";
                 }
-                return "CAST($expr AS {$this->cast})";
+                break;
 
             // PostgreSQL array literal
             case self::TYPE_PG_ARRAY:
-                return $this->serializePgArray();
+                $sql = $this->serializePgArray();
+                break;
 
             // Comma-separated list (for IN clauses)
             case self::TYPE_CS_LIST:
-                return implode(', ', array_map(
+                $sql = implode(', ', array_map(
                     fn($v) => $v instanceof self
                     ? $v->toSql($driver, $serialize, $protectIdentifier)
                     : $serialize($v),
                     $this->value
                 ));
+                break;
 
             case self::TYPE_JSON:
-                return $serialize(json_encode($this->value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                $sql = $serialize(json_encode($this->value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                break;
 
             // String concatenation - driver-specific
             case self::TYPE_CONCAT:
@@ -354,37 +379,44 @@ class Sql
                     $this->value
                 );
                 if ($driver === 'mysql') {
-                    return 'CONCAT(' . implode(', ', $serialized) . ')';
+                    $sql = 'CONCAT(' . implode(', ', $serialized) . ')';
+                } else {
+                    // PostgreSQL and SQLite use || operator
+                    $sql = implode(' || ', $serialized);
                 }
-                // PostgreSQL and SQLite use || operator
-                return implode(' || ', $serialized);
+                break;
 
             // Composite expression - concatenate with spaces
             // Treat plain strings as raw SQL tokens for cleaner expressions
             case self::TYPE_EXPR:
-                return implode(' ', array_map(
+                $sql = implode(' ', array_map(
                     fn($p) => $p instanceof self
                     ? $p->toSql($driver, $serialize, $protectIdentifier)
                     : (is_string($p) ? $p : $serialize($p)),
                     $this->value
                 ));
-
-            // Aliased expression
-            case self::TYPE_ALIAS:
-                $nodeSql = $this->value['node'] instanceof self
-                    ? $this->value['node']->toSql($driver, $serialize, $protectIdentifier)
-                    : $serialize($this->value['node']);
-                // Quote the alias using driver-specific quoting
-                $quoteChar = $driver === 'mysql' ? '`' : '"';
-                return $nodeSql . ' AS ' . $quoteChar . $this->value['alias'] . $quoteChar;
+                break;
 
             // Literal value - serialize using provided callback
             case self::TYPE_VALUE:
-                return $serialize($this->value);
+                $sql = $serialize($this->value);
+                break;
+
+            case self::TYPE_SUBQUERY:
+                // Subquery - wrap in parentheses
+                $sql = '(' . $this->value->toSql() . ')';
+                break;
 
             default:
                 throw new \LogicException("Unknown Sql node type: {$this->type}");
         }
+
+        // Append alias if set
+        if ($this->alias !== null) {
+            $sql .= ' AS ' . $quoteIdentifier($this->alias);
+        }
+
+        return $sql;
     }
 
     public function __toString(): string

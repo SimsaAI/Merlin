@@ -27,11 +27,12 @@ Controllers come with several convenience methods and properties to access commo
 
 From `Merlin\Mvc\Controller`:
 
-- `$this->getContext()` returns `AppContext`
-- `$this->request` is injected (`Merlin\Http\Request`)
-- `view()` returns the current `ViewEngine`
-- `session()` returns current session (or `null`)
-- `beforeAction()` / `afterAction()` hooks
+- `$this->context()` returns `AppContext`
+- `$this->request()` returns `Merlin\Http\Request`
+- `$this->view()` returns the current `ViewEngine`
+- `$this->session()` returns current session (or `null`)
+- `$this->cookies()` returns `Merlin\Http\Cookies`
+- `beforeAction()` / `afterAction()` lifecycle hooks – return a `Response` to short-circuit the action
 - `$middleware` and `$actionMiddleware` configuration arrays
 
 ## Returning Responses
@@ -159,4 +160,4 @@ class AdminController extends Controller
 
 - [MVC Routing](02-MVC-ROUTING.md)
 - [HTTP Request](06-HTTP-REQUEST.md)
-- [API Reference](11-API-REFERENCE.md)
+- [API Reference](api/index.md)

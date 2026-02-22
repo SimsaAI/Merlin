@@ -102,7 +102,7 @@ Wrap related database operations in a transaction to ensure data consistency. If
 ```php
 use Merlin\AppContext;
 
-$db = AppContext::instance()->getWriteDb();
+$db = AppContext::instance()->dbManager()->default();
 
 $db->begin();
 try {
@@ -137,8 +137,8 @@ use Merlin\AppContext;
 use Merlin\Db\Database;
 
 $ctx = AppContext::instance();
-$ctx->dbWrite = new Database('mysql:host=primary;dbname=app', 'rw', 'secret');
-$ctx->dbRead = new Database('mysql:host=replica;dbname=app', 'ro', 'secret');
+$ctx->dbManager()->set('write', new Database('mysql:host=primary;dbname=app', 'rw', 'secret'));
+$ctx->dbManager()->set('read',  new Database('mysql:host=replica;dbname=app', 'ro', 'secret'));
 
 $users = User::findAll(['status' => 'active']); // read
 
@@ -179,4 +179,51 @@ class CleanupTask extends \Merlin\Cli\Task
         echo "Deleted {$deleted} sessions\n";
     }
 }
+```
+
+## 11) Subquery as Derived Table (FROM)
+
+Use a `Query` instance as the `FROM` source to pre-aggregate or pre-filter data before the outer query processes it. Bind parameters from the subquery are automatically carried over — no manual merging required.
+
+```php
+use Merlin\Db\Query;
+
+// Step 1 — build the inner query independently
+$activeSales = Query::new()
+    ->table('orders')
+    ->where('status', 'completed')
+    ->where('created_at > :since', ['since' => '2025-01-01'])
+    ->groupBy('user_id')
+    ->columns(['user_id', 'SUM(total) AS revenue']);
+
+// Step 2 — wrap it as a derived table
+$topCustomers = Query::new()
+    ->from($activeSales, 'sales')   // alias required so outer query can reference columns
+    ->where('sales.revenue >', 1000)
+    ->orderBy('sales.revenue DESC')
+    ->limit(10)
+    ->select();
+```
+
+## 12) Subquery in JOIN
+
+Join any pre-built `Query` directly. Works with `join()`, `leftJoin()`, `innerJoin()`, `rightJoin()`, and `crossJoin()`. Provide an alias as the second argument so the outer query can reference it in conditions and columns.
+
+```php
+use Merlin\Db\Query;
+
+// Aggregate products to their latest price
+$latestPrices = Query::new()
+    ->table('price_history')
+    ->where('effective_date <= :today', ['today' => date('Y-m-d')])
+    ->groupBy('product_id')
+    ->columns(['product_id', 'MAX(price) AS current_price']);
+
+$catalogue = Query::new()
+    ->table('products', 'p')
+    ->leftJoin($latestPrices, 'lp', 'lp.product_id = p.id')
+    ->columns(['p.name', 'p.sku', 'lp.current_price'])
+    ->where('p.active', 1)
+    ->orderBy('p.name')
+    ->select();
 ```

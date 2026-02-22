@@ -1,327 +1,906 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 1000 1050" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
-    <path id="path26-5" d="M998.993,15.087L998.993,1034.91C998.993,1042.68 992.673,1048.99 984.88,1048.99L15.12,1048.99C7.331,1048.99 1.007,1042.68 1.007,1034.91L1.007,15.087C1.007,7.316 7.331,1.007 15.12,1.007L984.88,1.007C992.673,1.007 998.993,7.316 998.993,15.087Z" style="fill:rgb(238,242,255);"/>
-    <g transform="matrix(1,0,0,1,237.24,64)">
-        <g id="g1">
-            <g id="text1">
-                <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:26.667px;fill:rgb(15,23,42);">Merlin Framework — Overall <tspan x="366.55px 385.808px " y="0px 0px ">Ar</tspan>chitecture</text>
+<svg
+   width="100%"
+   height="100%"
+   viewBox="0 0 1000 1050"
+   version="1.1"
+   xml:space="preserve"
+   style="fill-rule:evenodd;clip-rule:evenodd;"
+   id="svg101"
+   sodipodi:docname="architecture-overview.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:serif="http://www.serif.com/"><sodipodi:namedview
+   id="namedview101"
+   pagecolor="#505050"
+   bordercolor="#eeeeee"
+   borderopacity="1"
+   inkscape:showpageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="1.6485714"
+   inkscape:cx="499.82669"
+   inkscape:cy="525"
+   inkscape:window-width="2977"
+   inkscape:window-height="2022"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="g96" />
+    <path
+   id="path26-5"
+   d="M998.993,15.087L998.993,1034.91C998.993,1042.68 992.673,1048.99 984.88,1048.99L15.12,1048.99C7.331,1048.99 1.007,1042.68 1.007,1034.91L1.007,15.087C1.007,7.316 7.331,1.007 15.12,1.007L984.88,1.007C992.673,1.007 998.993,7.316 998.993,15.087Z"
+   style="fill:rgb(238,242,255);" />
+    <g
+   transform="matrix(1,0,0,1,237.24,64)"
+   id="g3">
+        <g
+   id="g2">
+            <g
+   id="g1">
+                <text
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:26.667px;fill:rgb(15,23,42);"
+   id="text1">Merlin Framework — Overall <tspan
+   x="366.55px 385.808px "
+   y="0px 0px "
+   id="tspan1">Ar</tspan>chitecture</text>
             </g>
         </g>
     </g>
-    <g transform="matrix(1,0,0,1,119.16,97.808)">
-        <g id="g2">
-            <g id="text2">
-                <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);">Simple runtime centered around <tspan x="269.783px 282.234px " y="0px 0px ">Ap</tspan>plication Context, MVC dispatch, DB abstractions, and CLI tasks</text>
+    <g
+   transform="matrix(1,0,0,1,119.16,97.808)"
+   id="g5">
+        <g
+   id="g4">
+            <g
+   id="text2">
+                <text
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);"
+   id="text3">Simple runtime centered around <tspan
+   x="269.783px 282.234px "
+   y="0px 0px "
+   id="tspan3">Ap</tspan>plication Context, MVC dispatch, DB abstractions, and CLI tasks</text>
             </g>
         </g>
     </g>
-    <g id="g63" transform="matrix(1,0,0,1,0,1.79523)">
-        <path id="path2" d="M283.209,153.742L283.209,199.742C283.209,209.676 275.143,217.742 265.209,217.742L61.209,217.742C51.275,217.742 43.209,209.676 43.209,199.742L43.209,153.742C43.209,143.808 51.275,135.742 61.209,135.742L265.209,135.742C275.143,135.742 283.209,143.808 283.209,153.742Z" style="fill:white;stroke:rgb(203,213,225);stroke-width:2px;"/>
-        <g transform="matrix(1,0,0,1,89.6628,168.742)">
-            <g id="g3">
-                <g id="text3">
-                    <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);">HTTP<tspan x="55.312px 61.239px " y="0px 0px "> R</tspan>equest</text>
+    <g
+   id="g63"
+   transform="matrix(1,0,0,1,0,1.79523)">
+        <path
+   id="path2"
+   d="M283.209,153.742L283.209,199.742C283.209,209.676 275.143,217.742 265.209,217.742L61.209,217.742C51.275,217.742 43.209,209.676 43.209,199.742L43.209,153.742C43.209,143.808 51.275,135.742 61.209,135.742L265.209,135.742C275.143,135.742 283.209,143.808 283.209,153.742Z"
+   style="fill:white;stroke:rgb(203,213,225);stroke-width:2px;" />
+        <g
+   transform="matrix(1,0,0,1,89.6628,168.742)"
+   id="g8">
+            <g
+   id="g7">
+                <g
+   id="g6">
+                    <text
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);"
+   id="text5">HTTP<tspan
+   x="55.312px 61.239px "
+   y="0px 0px "
+   id="tspan5"> R</tspan>equest</text>
                 </g>
             </g>
         </g>
-        <g transform="matrix(1,0,0,1,162.953,196.957)">
-            <g id="g4">
-                <g id="text4">
-                    <text x="-104.298px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">path + method + headers</text>
+        <g
+   transform="matrix(1,0,0,1,162.953,196.957)"
+   id="g10">
+            <g
+   id="g9">
+                <g
+   id="text4">
+                    <text
+   x="-104.298px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);"
+   id="text8">path + method + headers</text>
                 </g>
             </g>
         </g>
     </g>
-    <g id="g62">
-        <path id="path4" d="M970.701,155.537L970.701,201.537C970.701,211.471 962.631,219.537 952.701,219.537L748.701,219.537C738.767,219.537 730.701,211.471 730.701,201.537L730.701,155.537C730.701,145.603 738.767,137.537 748.701,137.537L952.701,137.537C962.631,137.537 970.701,145.603 970.701,155.537Z" style="fill:white;stroke:rgb(203,213,225);stroke-width:2px;"/>
-        <g id="text5" transform="matrix(1,0,0,1,778.576,170.136)">
-            <g id="g5">
-                <text id="text51" serif:id="text5" x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);">CLI Command</text>
+    <g
+   id="g62">
+        <path
+   id="path4"
+   d="M970.701,155.537L970.701,201.537C970.701,211.471 962.631,219.537 952.701,219.537L748.701,219.537C738.767,219.537 730.701,211.471 730.701,201.537L730.701,155.537C730.701,145.603 738.767,137.537 748.701,137.537L952.701,137.537C962.631,137.537 970.701,145.603 970.701,155.537Z"
+   style="fill:white;stroke:rgb(203,213,225);stroke-width:2px;" />
+        <g
+   id="g12"
+   transform="matrix(1,0,0,1,778.576,170.136)">
+            <g
+   id="g11">
+                <text
+   id="text51"
+   serif:id="text5"
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);">CLI Command</text>
             </g>
         </g>
-        <g id="text6" transform="matrix(1,0,0,1,769.444,194.34)">
-            <g id="g6">
-                <text id="text61" serif:id="text6" x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">task + action + args</text>
+        <g
+   id="text6"
+   transform="matrix(1,0,0,1,769.444,194.34)">
+            <g
+   id="g13">
+                <text
+   id="text61"
+   serif:id="text6"
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">task + action + args</text>
             </g>
         </g>
     </g>
-    <g id="g64" transform="matrix(1,0,0,1,1.01815,0)">
-        <path id="path6" d="M767.982,278.907L767.982,358.907C767.982,369.945 759.02,378.907 747.982,378.907L249.982,378.907C238.944,378.907 229.982,369.945 229.982,358.907L229.982,278.907C229.982,267.869 238.944,258.907 249.982,258.907L747.982,258.907C759.02,258.907 767.982,267.869 767.982,278.907Z" style="fill:url(#_Linear1);stroke:rgb(6,184,13);stroke-width:1.5px;"/>
-        <g transform="matrix(1,0,0,1,398.204,298.009)">
-            <g id="g7">
-                <g id="text7">
-                    <g transform="matrix(21.3333,0,0,21.3333,201.479,0)">
+    <g
+   id="g64"
+   transform="matrix(1,0,0,1,1.01815,0)">
+        <path
+   id="path6"
+   d="m 857.98185,278.907 v 80 c 0,11.038 -8.962,20 -20,20 h -678 c -11.038,0 -20,-8.962 -20,-20 v -80 c 0,-11.038 8.962,-20 20,-20 h 678 c 11.038,0 20,8.962 20,20 z"
+   style="fill:url(#_Linear1);stroke:#06b80d;stroke-width:1.5px"
+   sodipodi:nodetypes="sssssssss" />
+        <g
+   transform="translate(398.37405,298.009)"
+   id="g16">
+            <g
+   id="g15">
+                <g
+   id="text7">
+                    <g
+   transform="matrix(21.3333,0,0,21.3333,201.479,0)"
+   id="g14">
                     </g>
-                    <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">Application Context</text>
+                    <text
+   x="0"
+   y="0"
+   style="font-weight:700;font-size:21.333px;font-family:Arial-BoldMT, Arial, sans-serif;fill:#ffffff"
+   id="text14">Application Context</text>
                 </g>
             </g>
         </g>
-        <g transform="matrix(1,0,0,1,259.974,327.009)">
-            <g id="g8">
-                <g id="text8">
-                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">dbManager roles (default/read/write) • request • view • session • cookies</text>
+        <g
+   transform="translate(195.80262,327.009)"
+   id="g19">
+            <g
+   id="g18">
+                <g
+   id="g17">
+                    <text
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text16">dbManager • roles (default/read/write) • request • view • session • cookies</text>
                 </g>
             </g>
         </g>
-        <g id="text10" transform="matrix(1,0,0,1,295.375,352.009)">
-            <g id="g11">
-                <text id="text101" serif:id="text10" x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Singleton service hub used by web and CLI ﬂows</text>
-            </g>
-        </g>
-    </g>
-    <g id="g95" transform="matrix(1,0,0,1,0,-86)">
-        <path id="path11" d="M371.372,564.155L371.372,876.155C371.372,887.193 362.41,896.155 351.372,896.155L75.372,896.155C64.334,896.155 55.372,887.193 55.372,876.155L55.372,564.155C55.372,553.117 64.334,544.155 75.372,544.155L351.372,544.155C362.41,544.155 371.372,553.117 371.372,564.155Z" style="fill:url(#_Linear2);"/>
-        <g id="text11" transform="matrix(1,0,0,1,157.352,578.917)">
-            <g id="g12">
-                <text id="text111" serif:id="text11" x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">MVC Layer</text>
-            </g>
-        </g>
-        <g id="g13" transform="matrix(1,0,0,1,233.991,612.719)">
-            <g id="text12" transform="matrix(1,0,0,1,38.1089,8.42407)">
-                <g transform="matrix(1,0,0,1,-58.55,0)">
-                    <text x="-39.94px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Router →</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-58.55,23.3334)">
-                    <text x="-56.538px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Dispatcher →</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-58.55,46.6668)">
-                    <text x="-68.478px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Controller <tspan x="16.598px 29.048px " y="0px 0px ">Ac</tspan>tion</text>
-                </g>
-            </g>
-            <g id="text79">
-            </g>
-        </g>
-        <g id="text13" transform="matrix(1,0,0,1,279.326,709.14)">
-            <g id="g14">
-                <g id="text131" serif:id="text13">
-                    <g transform="matrix(1,0,0,1,-65.6664,0)">
-                        <text x="-90.535px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Middleware pipeline +</text>
-                    </g>
-                    <g transform="matrix(1,0,0,1,-65.6664,23.3334)">
-                        <text x="-105.834px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">automatic return mapping</text>
-                    </g>
-                </g>
-            </g>
-        </g>
-        <g id="g15" transform="matrix(1,0,0,1,195.163,776.266)">
-            <g id="text14">
-                <g transform="matrix(1,0,0,1,-118.141,0)">
-                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">V</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-107.758,0)">
-                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">i<tspan x="3.555px " y="0px ">e</tspan>wEngine for templates/layouts</text>
-                </g>
-            </g>
-        </g>
-        <g id="g16" transform="matrix(1,0,0,1,257.2,822.103)">
-            <g id="text15">
-                <g transform="matrix(1,0,0,1,-43.9046,3.61032)">
-                    <text x="-102.722px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Response normalization:</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-43.9046,26.9437)">
-                    <text x="-120.873px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Response/array/string/int/null</text>
-                </g>
+        <g
+   id="text10"
+   transform="translate(295.54072,352.009)">
+            <g
+   id="g20">
+                <text
+   id="text101"
+   serif:id="text10"
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">Singleton service hub used by web and CLI ﬂows</text>
             </g>
         </g>
     </g>
-    <g id="g17" transform="matrix(1,0,0,1,-124.751,274.123)">
-        <path id="path16" d="M575,626L575,720C575,727.727 568.727,734 561,734L175,734C167.273,734 161,727.727 161,720L161,626C161,618.273 167.273,612 175,612L561,612C568.727,612 575,618.273 575,626Z" style="fill:white;stroke:rgb(191,219,254);stroke-width:2px;"/>
+    <g
+   id="g95"
+   transform="matrix(1,0,0,1,0,-86)">
+        <path
+   id="path11"
+   d="M371.372,564.155L371.372,876.155C371.372,887.193 362.41,896.155 351.372,896.155L75.372,896.155C64.334,896.155 55.372,887.193 55.372,876.155L55.372,564.155C55.372,553.117 64.334,544.155 75.372,544.155L351.372,544.155C362.41,544.155 371.372,553.117 371.372,564.155Z"
+   style="fill:url(#_Linear2);" />
+        <g
+   id="text11"
+   transform="matrix(1,0,0,1,157.352,578.917)">
+            <g
+   id="g21">
+                <text
+   id="text111"
+   serif:id="text11"
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">MVC Layer</text>
+            </g>
+        </g>
+        <g
+   id="g25"
+   transform="matrix(1,0,0,1,233.991,612.719)">
+            <g
+   id="text12"
+   transform="matrix(1,0,0,1,38.1089,8.42407)">
+                <g
+   transform="matrix(1,0,0,1,-58.55,0)"
+   id="g22">
+                    <text
+   x="-39.94px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text21">Router →</text>
+                </g>
+                <g
+   transform="matrix(1,0,0,1,-58.55,23.3334)"
+   id="g23">
+                    <text
+   x="-56.538px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text22">Dispatcher →</text>
+                </g>
+                <g
+   transform="matrix(1,0,0,1,-58.55,46.6668)"
+   id="g24">
+                    <text
+   x="-68.478px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text23">Controller <tspan
+   x="16.598px 29.048px "
+   y="0px 0px "
+   id="tspan23">Ac</tspan>tion</text>
+                </g>
+            </g>
+            <g
+   id="text79">
+            </g>
+        </g>
+        <g
+   id="text13"
+   transform="matrix(1,0,0,1,279.326,709.14)">
+            <g
+   id="g28">
+                <g
+   id="text131"
+   serif:id="text13">
+                    <g
+   transform="matrix(1,0,0,1,-65.6664,0)"
+   id="g26">
+                        <text
+   x="-90.535px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text25">Middleware pipeline +</text>
+                    </g>
+                    <g
+   transform="matrix(1,0,0,1,-65.6664,23.3334)"
+   id="g27">
+                        <text
+   x="-105.834px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text26">automatic return mapping</text>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <g
+   id="g32"
+   transform="matrix(1,0,0,1,195.163,776.266)">
+            <g
+   id="g31">
+                <g
+   transform="matrix(1,0,0,1,-118.141,0)"
+   id="g29">
+                    <text
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text28">V</text>
+                </g>
+                <g
+   transform="matrix(1,0,0,1,-107.758,0)"
+   id="g30">
+                    <text
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text29">i<tspan
+   x="3.555px "
+   y="0px "
+   id="tspan29">e</tspan>wEngine for templates/layouts</text>
+                </g>
+            </g>
+        </g>
+        <g
+   id="g35"
+   transform="matrix(1,0,0,1,257.2,822.103)">
+            <g
+   id="text15">
+                <g
+   transform="matrix(1,0,0,1,-43.9046,3.61032)"
+   id="g33">
+                    <text
+   x="-102.722px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text32">Response normalization:</text>
+                </g>
+                <g
+   transform="matrix(1,0,0,1,-43.9046,26.9437)"
+   id="g34">
+                    <text
+   x="-120.873px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);"
+   id="text33">Response/array/string/int/null</text>
+                </g>
+            </g>
+        </g>
     </g>
-    <g transform="matrix(1,0,0,1,174.946,923.123)">
-        <g id="g18">
-            <g id="text17">
-                <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);">HTTP<tspan x="55.312px 61.239px " y="0px 0px "> M</tspan>odule</text>
+    <g
+   id="g36"
+   transform="matrix(1,0,0,1,-124.751,274.123)">
+        <path
+   id="path16"
+   d="M575,626L575,720C575,727.727 568.727,734 561,734L175,734C167.273,734 161,727.727 161,720L161,626C161,618.273 167.273,612 175,612L561,612C568.727,612 575,618.273 575,626Z"
+   style="fill:white;stroke:rgb(191,219,254);stroke-width:2px;" />
+    </g>
+    <g
+   transform="matrix(1,0,0,1,174.946,923.123)"
+   id="g38">
+        <g
+   id="g37">
+            <g
+   id="text17">
+                <text
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);"
+   id="text36">HTTP<tspan
+   x="55.312px 61.239px "
+   y="0px 0px "
+   id="tspan36"> M</tspan>odule</text>
             </g>
         </g>
     </g>
-    <g id="text18" transform="matrix(1,0,0,1,304.504,959.914)">
-        <g id="g19">
-            <g id="text181" serif:id="text18">
-                <g transform="matrix(1,0,0,1,-61.2866,0)">
-                    <text x="-85.244px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">Request • Response</text>
+    <g
+   id="text18"
+   transform="matrix(1,0,0,1,304.504,959.914)">
+        <g
+   id="g41">
+            <g
+   id="text181"
+   serif:id="text18">
+                <g
+   transform="matrix(1,0,0,1,-61.2866,0)"
+   id="g39">
+                    <text
+   x="-85.244px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);"
+   id="text38">Request • Response</text>
                 </g>
-                <g transform="matrix(1,0,0,1,-61.2866,23.3334)">
-                    <text x="-138.829px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">Session • Cookies • UploadedFile</text>
-                </g>
-            </g>
-        </g>
-    </g>
-    <g id="g96" transform="matrix(1,0,0,1,0,-86)">
-        <path id="path19" d="M723.622,564.155L723.622,878.155C723.622,889.193 714.662,898.155 703.622,898.155L429.622,898.155C418.584,898.155 409.622,889.193 409.622,878.155L409.622,564.155C409.622,553.117 418.584,544.155 429.622,544.155L703.622,544.155C714.662,544.155 723.622,553.117 723.622,564.155Z" style="fill:url(#_Linear3);"/>
-        <g id="text19" transform="matrix(1,0,0,1,511.169,580.539)">
-            <g id="g20">
-                <text id="text191" serif:id="text19" x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">Data Layer</text>
-            </g>
-        </g>
-                    <g id="text22" transform="matrix(1,0,0,1,644.7,621.16)">
-            <g id="g23">
-                <g id="text221" serif:id="text22">
-                    <g transform="matrix(1,0,0,1,-78.2512,0)">
-                        <text x="-122.154px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Model (Active Record style) +</text>
-                    </g>
-                    <g transform="matrix(1,0,0,1,-78.2512,23.3334)">
-                        <text x="-108.591px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Query (fluent SQL builder — uses DB roles)</text>
-                    </g>
-                </g>
-            </g>
-        </g>
-        <g id="g24" transform="matrix(1,0,0,1,622.741,674.844)">
-            <g id="text23">
-                <g transform="matrix(1,0,0,1,-56.3189,8.42407)">
-                    <text x="-113.345px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Database (PDO wrapper) +</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-56.3189,31.7574)">
-                    <text x="-98.579px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">ResultSet + Condition +</text>
-                </g>
-                <g transform="matrix(1,0,0,1,-56.3189,55.0908)">
-                    <text x="-41.512px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Sql nodes</text>
-                </g>
-            </g>
-        </g>
-                    <g id="text25" transform="matrix(1,0,0,1,626.576,770.336)">
-            <g id="g25">
-                <g id="text251" serif:id="text25">
-                    <g transform="matrix(1,0,0,1,-60.2904,0)">
-                        <text x="-107.215px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Read/Write separation via</text>
-                    </g>
-                    <g transform="matrix(1,0,0,1,-60.2904,23.3334)">
-                        <text x="-85.44px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">DatabaseManager roles (read/write)</text>
-                    </g>
-                </g>
-            </g>
-        </g>
-        <g id="text26" transform="matrix(1,0,0,1,645.265,830.47)">
-            <g id="g26">
-                <g id="text261" serif:id="text26">
-                    <g transform="matrix(1,0,0,1,-78.8616,0)">
-                        <text x="-84.041px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">T<tspan x="-74.708px -64.326px " y="0px 0px ">er</tspan>minal operations:</text>
-                    </g>
-                    <g transform="matrix(1,0,0,1,-78.8616,23.3334)">
-                        <text x="-101.673px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">select/count/exists/insert</text>
-                    </g>
-                    <g transform="matrix(1,0,0,1,-78.8616,46.6668)">
-                        <text x="-56.57px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">update/delete</text>
-                    </g>
+                <g
+   transform="matrix(1,0,0,1,-61.2866,23.3334)"
+   id="g40">
+                    <text
+   x="-138.829px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);"
+   id="text39">Session • Cookies • UploadedFile</text>
                 </g>
             </g>
         </g>
     </g>
-    <path id="path26" d="M967.249,899.123L967.249,993.123C967.249,1000.85 960.979,1007.12 953.249,1007.12L551.249,1007.12C543.522,1007.12 537.249,1000.85 537.249,993.123L537.249,899.123C537.249,891.396 543.522,885.123 551.249,885.123L953.249,885.123C960.979,885.123 967.249,891.396 967.249,899.123Z" style="fill:white;stroke:rgb(221,214,254);stroke-width:2px;"/>
-    <g transform="matrix(1,0,0,1,671.963,919.123)">
-        <g id="g27">
-            <g id="text27">
-                <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);">Storage T<tspan x="96.802px 108.666px " y="0px 0px ">ar</tspan>gets</text>
+    <g
+   id="g96"
+   transform="translate(-6,-86)">
+        <path
+   id="path19"
+   d="m 771.30092,564.155 v 314 c 0,11.038 -8.96,20 -20,20 h -314 c -11.038,0 -20,-8.962 -20,-20 v -314 c 0,-11.038 8.962,-20 20,-20 h 314 c 11.04,0 20,8.962 20,20 z"
+   style="fill:url(#_Linear3)"
+   sodipodi:nodetypes="sssssssss" />
+        <g
+   id="text19"
+   transform="translate(538.84866,580.539)">
+            <g
+   id="g42">
+                <text
+   id="text191"
+   serif:id="text19"
+   x="0"
+   y="0"
+   style="font-weight:700;font-size:21.333px;font-family:Arial-BoldMT, Arial, sans-serif;fill:#ffffff">Data Layer</text>
+            </g>
+        </g>
+                    <g
+   id="g46"
+   transform="translate(672.37711,621.16)">
+            <g
+   id="g45">
+                <g
+   id="text221"
+   serif:id="text22">
+                    <g
+   transform="translate(-78.2512)"
+   id="g43">
+                        <text
+   x="-122.154"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text42">Model (Active Record style) +</text>
+                    </g>
+                    <g
+   transform="translate(-78.2512,23.3334)"
+   id="g44">
+                        <text
+   x="-108.591"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text43">Query (fluent SQL builder)</text>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <g
+   id="g51"
+   transform="translate(650.41787,674.844)">
+            <g
+   id="g50">
+                <g
+   transform="translate(-56.3189,8.42407)"
+   id="g47">
+                    <text
+   x="-113.345"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text46">Database (PDO wrapper) +</text>
+                </g>
+                <g
+   transform="translate(-56.3189,31.7574)"
+   id="g48">
+                    <text
+   x="-98.579002"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text47">ResultSet + Condition +</text>
+                </g>
+                <g
+   transform="translate(-56.3189,55.0908)"
+   id="g49">
+                    <text
+   x="-41.512001"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text48">Sql nodes</text>
+                </g>
+            </g>
+        </g>
+                    <g
+   transform="translate(593.96191,770.336)"
+   id="g52"
+   style="clip-rule:evenodd;display:inline;fill-rule:evenodd">
+                        <text
+   x="-107.215"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text52">Read/Write separation via</text>
+                    </g><g
+   transform="translate(529.95374,793.6694)"
+   id="g53"
+   style="clip-rule:evenodd;fill-rule:evenodd">
+                        <text
+   x="-85.440002"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text53">DatabaseManager roles (read/write)</text>
+                    </g>
+        <g
+   id="g60"
+   transform="translate(672.94176,830.47)">
+            <g
+   id="g59">
+                <g
+   id="text261"
+   serif:id="text26">
+                    <g
+   transform="translate(-78.8616)"
+   id="g56">
+                        <text
+   x="-84.041"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text55">T<tspan
+   x="-74.708 -64.325996"
+   y="0 0"
+   id="tspan55">er</tspan>minal operations:</text>
+                    </g>
+                    <g
+   transform="translate(-78.8616,23.3334)"
+   id="g57">
+                        <text
+   x="-101.673"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text56">select/count/exists/insert</text>
+                    </g>
+                    <g
+   transform="translate(-78.8616,46.6668)"
+   id="g58">
+                        <text
+   x="-56.57"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text57">update/delete</text>
+                    </g>
+                </g>
             </g>
         </g>
     </g>
-    <g id="text28" transform="matrix(1,0,0,1,814.685,959.553)">
-        <g id="g28">
-            <g id="text281" serif:id="text28">
-                <g transform="matrix(1,0,0,1,-62.8317,0)">
-                    <text x="-80.888px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">Primary DB (writes)</text>
+    <path
+   id="path26"
+   d="M967.249,899.123L967.249,993.123C967.249,1000.85 960.979,1007.12 953.249,1007.12L551.249,1007.12C543.522,1007.12 537.249,1000.85 537.249,993.123L537.249,899.123C537.249,891.396 543.522,885.123 551.249,885.123L953.249,885.123C960.979,885.123 967.249,891.396 967.249,899.123Z"
+   style="fill:white;stroke:rgb(221,214,254);stroke-width:2px;" />
+    <g
+   transform="matrix(1,0,0,1,671.963,919.123)"
+   id="g65">
+        <g
+   id="g61">
+            <g
+   id="text27">
+                <text
+   x="0px"
+   y="0px"
+   style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:rgb(30,41,59);"
+   id="text60">Storage T<tspan
+   x="96.802px 108.666px "
+   y="0px 0px "
+   id="tspan60">ar</tspan>gets</text>
+            </g>
+        </g>
+    </g>
+    <g
+   id="g69"
+   transform="matrix(1,0,0,1,814.685,959.553)">
+        <g
+   id="g68">
+            <g
+   id="text281"
+   serif:id="text28">
+                <g
+   transform="matrix(1,0,0,1,-62.8317,0)"
+   id="g66">
+                    <text
+   x="-80.888px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);"
+   id="text65">Primary DB (writes)</text>
                 </g>
-                <g transform="matrix(1,0,0,1,-62.8317,23.3334)">
-                    <text x="-116.722px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);">Replica DB (reads, optional)</text>
+                <g
+   transform="matrix(1,0,0,1,-62.8317,23.3334)"
+   id="g67">
+                    <text
+   x="-116.722px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(100,116,139);"
+   id="text66">Replica DB (reads, optional)</text>
                 </g>
             </g>
         </g>
     </g>
-    <g id="g90" transform="matrix(1,0,0,1,-1.60458,-86)">
-        <g id="g69">
-            <g id="g901" serif:id="g90">
-                <path id="path28" d="M950.604,578.17L950.604,738.17C950.604,749.208 941.644,758.17 930.604,758.17L805.604,758.17C794.564,758.17 785.604,749.208 785.604,738.17L785.604,578.17C785.604,567.132 794.564,558.17 805.604,558.17L930.604,558.17C941.644,558.17 950.604,567.132 950.604,578.17Z" style="fill:url(#_Linear4);"/>
-                <g transform="matrix(1,0,0,1,851.109,600.17)">
-                    <g id="g29">
-                        <g id="text29">
-                            <text x="0px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:21.333px;fill:white;">CLI</text>
+    <g
+   id="g90"
+   transform="translate(18.39542,-86)">
+        <g
+   id="g81">
+            <g
+   id="g901"
+   serif:id="g90">
+                <path
+   id="path28"
+   d="m 950.604,578.17 v 160 c 0,11.038 -8.96,20 -20,20 h -125 c -11.04,0 -20,-8.962 -20,-20 v -160 c 0,-11.038 8.96,-20 20,-20 h 125 c 11.04,0 20,8.962 20,20 z"
+   style="fill:url(#_Linear4)" />
+                <g
+   transform="translate(851.109,600.17)"
+   id="g72">
+                    <g
+   id="g71">
+                        <g
+   id="g70">
+                            <text
+   x="0"
+   y="0"
+   style="font-weight:700;font-size:21.333px;font-family:Arial-BoldMT, Arial, sans-serif;fill:#ffffff"
+   id="text69">CLI</text>
                         </g>
                     </g>
                 </g>
-                <g id="text30" transform="matrix(1,0,0,1,833.783,634.17)">
-                    <g id="g30">
-                        <text id="text301" serif:id="text30" x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">Console</text>
+                <g
+   id="text30"
+   transform="translate(833.783,634.17)">
+                    <g
+   id="g73">
+                        <text
+   id="text301"
+   serif:id="text30"
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">Console</text>
                     </g>
                 </g>
-                <g id="g31" transform="matrix(1,0,0,1,866.447,662.716)">
-                    <g id="text31">
-                        <g transform="matrix(1,0,0,1,-26.527,0)">
-                            <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">→</text>
+                <g
+   id="g76"
+   transform="translate(866.447,662.716)">
+                    <g
+   id="text31">
+                        <g
+   transform="translate(-26.527)"
+   id="g74">
+                            <text
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text73">→</text>
                         </g>
-                        <g transform="matrix(1,0,0,1,-6.371,0)">
-                            <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">T<tspan x="8px 16.898px " y="0px 0px ">as</tspan>k</text>
+                        <g
+   transform="translate(-6.371)"
+   id="g75">
+                            <text
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
+   id="text74">T<tspan
+   x="8 16.898001"
+   y="0 0"
+   id="tspan74">as</tspan>k</text>
                         </g>
                     </g>
                 </g>
-                <g id="text32" transform="matrix(1,0,0,1,820.366,689.63)">
-                    <g id="g32">
-                        <text id="text321" serif:id="text32" x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">→ *Action()</text>
+                <g
+   id="g78"
+   transform="translate(820.366,689.63)">
+                    <g
+   id="g77">
+                        <text
+   id="text321"
+   serif:id="text32"
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">→ *Action()</text>
                     </g>
                 </g>
-                <g id="text33" transform="matrix(1,0,0,1,825.306,728.17)">
-                    <g id="g33">
-                        <text id="text331" serif:id="text33" x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(226,232,240);">batch jobs</text>
+                <g
+   id="g80"
+   transform="translate(825.306,728.17)">
+                    <g
+   id="g79">
+                        <text
+   id="text331"
+   serif:id="text33"
+   x="0"
+   y="0"
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">batch jobs</text>
                     </g>
                 </g>
             </g>
         </g>
     </g>
-    <path id="path33" d="M273.655,208.884L325.754,258.547" style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;"/>
-    <g id="g34" transform="matrix(0.717704,0.696349,-0.696349,0.717704,117.81,-176.339)">
-        <path id="path34" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(51,65,85);"/>
+    <path
+   id="path33"
+   d="M273.655,208.884L325.754,258.547"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;" />
+    <g
+   id="g82"
+   transform="matrix(0.717704,0.696349,-0.696349,0.717704,117.81,-176.339)">
+        <path
+   id="path34"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(51,65,85);" />
     </g>
-    <path id="path33-1" d="M743.989,208.99L691.89,258.652" style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;"/>
-    <g id="g34-7" transform="matrix(-0.717704,0.696349,0.696349,0.717704,899.835,-176.234)">
-        <path id="path34-1" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(51,65,85);"/>
+    <path
+   id="path33-1"
+   d="M743.989,208.99L691.89,258.652"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;" />
+    <g
+   id="g34-7"
+   transform="matrix(-0.717704,0.696349,0.696349,0.717704,899.835,-176.234)">
+        <path
+   id="path34-1"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(51,65,85);" />
     </g>
-    <g id="g36" transform="matrix(0.339395,0.940644,0.940644,-0.339395,641.362,89.9094)">
-        <path id="path36" d="M408.541,27.744L410.343,9.834L421.382,19.99L408.541,27.744Z" style="fill:rgb(51,65,85);"/>
+    <g
+   id="g83"
+   transform="matrix(0.339395,0.940644,0.940644,-0.339395,657.362,89.9094)">
+        <path
+   id="path36"
+   d="m 408.541,27.744 1.802,-17.91 11.039,10.156 z"
+   style="fill:#334155" />
     </g>
-    <g id="g37" transform="matrix(0.275425,0.961322,0.961322,-0.275425,335.419,99.1945)">
-        <path id="path37" d="M371.469,20.72L371.469,2.72L383.469,11.72L371.469,20.72Z" style="fill:rgb(51,65,85);"/>
+    <g
+   id="g84"
+   transform="matrix(0.275425,0.961322,0.961322,-0.275425,335.419,99.1945)">
+        <path
+   id="path37"
+   d="m 409.66127,144.0181 -5.07446,-17.26991 14.05051,5.25199 z"
+   style="fill:#334155" />
     </g>
-    <g id="g38" transform="matrix(-0.878761,0.477262,-0.477262,-0.878761,768.14,374.146)">
-        <path id="path38" d="M539.497,208.39L539.497,190.39L551.497,199.39L539.497,208.39Z" style="fill:rgb(51,65,85);"/>
+    <g
+   id="g85"
+   transform="rotate(122.56481,340.35306,253.99675)">
+        <path
+   id="path38"
+   d="m 539.497,208.39 v -18 l 12,9 z"
+   style="fill:#334155" />
     </g>
-    <path id="path40" d="M359.109,371.891L190.633,460.784" style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;"/>
-    <path id="path41" d="M421.203,369.484L450.374,457.749" style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;"/>
-    <path id="path42" d="M748.223,361.257L800.968,475.296" style="fill:none;fill-rule:nonzero;stroke:rgb(51,65,85);stroke-width:3px;"/>
-    <path id="path43" d="M360.178,663.14L406.178,663.14" style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;"/>
-    <g id="g43" transform="matrix(1,0,0,1,369.272,650.768)">
-        <path id="path2-9" d="M23.068,-9.132L23.068,0.96C23.068,3.14 21.524,4.909 19.622,4.909L-19.432,4.909C-21.333,4.909 -22.878,3.14 -22.878,0.96L-22.878,-9.132C-22.878,-11.311 -21.333,-13.081 -19.432,-13.081L19.622,-13.081C21.524,-13.081 23.068,-11.311 23.068,-9.132Z" style="fill:white;stroke:rgb(203,213,225);stroke-width:0.41px;"/>
-        <g id="text43" transform="matrix(1,0,0,1,-20.1072,0.802292)">
-            <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);">uses</text>
+    <path
+   id="path40"
+   d="M 327.36885,366.52949 275.7738,456.92372"
+   style="fill:none;fill-rule:nonzero;stroke:#334155;stroke-width:3px"
+   sodipodi:nodetypes="cc" />
+    <path
+   id="path41"
+   d="m 577.84565,369.484 -0.0124,88.265"
+   style="fill:none;fill-rule:nonzero;stroke:#334155;stroke-width:3px"
+   sodipodi:nodetypes="cc" />
+    <path
+   id="path42"
+   d="m 764.223,361.257 52.745,114.039"
+   style="fill:none;fill-rule:nonzero;stroke:#334155;stroke-width:3px" />
+    <path
+   id="path43"
+   d="M360.178,663.14L406.178,663.14"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;" />
+    <g
+   id="g87"
+   transform="matrix(1,0,0,1,369.272,650.768)">
+        <path
+   id="path2-9"
+   d="M23.068,-9.132L23.068,0.96C23.068,3.14 21.524,4.909 19.622,4.909L-19.432,4.909C-21.333,4.909 -22.878,3.14 -22.878,0.96L-22.878,-9.132C-22.878,-11.311 -21.333,-13.081 -19.432,-13.081L19.622,-13.081C21.524,-13.081 23.068,-11.311 23.068,-9.132Z"
+   style="fill:white;stroke:rgb(203,213,225);stroke-width:0.41px;" />
+        <g
+   id="g86"
+   transform="matrix(1,0,0,1,-20.1072,0.802292)">
+            <text
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);"
+   id="text85">uses</text>
         </g>
     </g>
-    <path id="path44" d="M245.648,787.679L245.246,883.261" style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;"/>
-    <path id="path45" d="M675.788,782.464L732.149,882.458" style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;"/>
-    <path id="path46" d="M364.441,918.524L534.441,918.524" style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;"/>
-    <g id="g97" transform="matrix(1,0,0,1,442.999,908.392)">
-        <g id="g46">
-            <g id="g971" serif:id="g97">
-                <path id="path2-9-5" d="M63.114,-10.84L63.114,1.252C63.114,3.431 61.57,5.203 59.668,5.201L-40.103,5.101C-42.004,5.099 -43.549,3.331 -43.549,1.152L-43.549,-10.941C-43.549,-13.12 -42.004,-14.892 -40.103,-14.89L59.668,-14.789C61.57,-14.787 63.114,-13.02 63.114,-10.84Z" style="fill:white;stroke:rgb(203,213,225);stroke-width:0.41px;"/>
-                <g id="text46" transform="matrix(1,0,0,1,-38.012,0)">
-                    <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);">persists via</text>
+    <path
+   id="path44"
+   d="M245.648,787.679L245.246,883.261"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;" />
+    <path
+   id="path45"
+   d="M675.788,782.464L732.149,882.458"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;" />
+    <path
+   id="path46"
+   d="M364.441,918.524L534.441,918.524"
+   style="fill:none;fill-rule:nonzero;stroke:rgb(100,116,139);stroke-width:2.5px;" />
+    <g
+   id="g97"
+   transform="matrix(1,0,0,1,442.999,908.392)">
+        <g
+   id="g89">
+            <g
+   id="g971"
+   serif:id="g97">
+                <path
+   id="path2-9-5"
+   d="M63.114,-10.84L63.114,1.252C63.114,3.431 61.57,5.203 59.668,5.201L-40.103,5.101C-42.004,5.099 -43.549,3.331 -43.549,1.152L-43.549,-10.941C-43.549,-13.12 -42.004,-14.892 -40.103,-14.89L59.668,-14.789C61.57,-14.787 63.114,-13.02 63.114,-10.84Z"
+   style="fill:white;stroke:rgb(203,213,225);stroke-width:0.41px;" />
+                <g
+   id="g88"
+   transform="matrix(1,0,0,1,-38.012,0)">
+                    <text
+   x="0px"
+   y="0px"
+   style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);"
+   id="text87">persists via</text>
                 </g>
             </g>
         </g>
     </g>
-    <g id="g48" transform="matrix(-3.82857e-16,1,-1,-3.82857e-16,412.464,429.728)">
-        <path id="path47" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(100,116,139);"/>
+    <g
+   id="g91"
+   transform="matrix(-3.82857e-16,1,-1,-3.82857e-16,412.464,429.728)">
+        <path
+   id="path47"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(100,116,139);" />
     </g>
-    <g id="g49" transform="matrix(1,0,0,1,80.4413,751.524)">
-        <path id="path48" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(100,116,139);"/>
+    <g
+   id="g92"
+   transform="matrix(1,0,0,1,80.4413,751.524)">
+        <path
+   id="path48"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(100,116,139);" />
     </g>
-    <g id="g50" transform="matrix(1,0,0,1,-47.8224,496.14)">
-        <path id="path49" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(100,116,139);"/>
+    <g
+   id="g93"
+   transform="matrix(1,0,0,1,-47.8224,496.14)">
+        <path
+   id="path49"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(100,116,139);" />
     </g>
-    <g id="g51" transform="matrix(0.476871,0.878973,-0.878973,0.476871,661.956,403.352)">
-        <path id="path50" d="M450,176L450,158L462,167L450,176Z" style="fill:rgb(100,116,139);"/>
+    <g
+   id="g94"
+   transform="matrix(0.476871,0.878973,-0.878973,0.476871,661.956,403.352)">
+        <path
+   id="path50"
+   d="M450,176L450,158L462,167L450,176Z"
+   style="fill:rgb(100,116,139);" />
     </g>
-    <defs>
-        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(525.606,114.082,-114.082,525.606,231.415,260.11)"><stop offset="0" style="stop-color:rgb(22,163,74);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(21,128,61);stop-opacity:1"/></linearGradient>
-        <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(484,230,-230,484,55.3725,544.155)"><stop offset="0" style="stop-color:rgb(37,99,235);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(29,78,216);stop-opacity:1"/></linearGradient>
-        <linearGradient id="_Linear3" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(500,230,-230,500,409.622,544.155)"><stop offset="0" style="stop-color:rgb(124,58,237);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(109,40,217);stop-opacity:1"/></linearGradient>
-        <linearGradient id="_Linear4" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(165,200,-200,165,785.604,558.17)"><stop offset="0" style="stop-color:rgb(245,158,11);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(217,119,6);stop-opacity:1"/></linearGradient>
+    <defs
+   id="defs101">
+        <linearGradient
+   id="_Linear1"
+   x1="0"
+   y1="0"
+   x2="1"
+   y2="0"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(525.606,114.082,-114.082,525.606,201.41485,260.11)"><stop
+     offset="0"
+     style="stop-color:rgb(22,163,74);stop-opacity:1"
+     id="stop94" /><stop
+     offset="1"
+     style="stop-color:rgb(21,128,61);stop-opacity:1"
+     id="stop95" /></linearGradient>
+        <linearGradient
+   id="_Linear2"
+   x1="0"
+   y1="0"
+   x2="1"
+   y2="0"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(484,230,-230,484,55.3725,544.155)"><stop
+     offset="0"
+     style="stop-color:rgb(37,99,235);stop-opacity:1"
+     id="stop96" /><stop
+     offset="1"
+     style="stop-color:rgb(29,78,216);stop-opacity:1"
+     id="stop97" /></linearGradient>
+        <linearGradient
+   id="_Linear3"
+   x1="0"
+   y1="0"
+   x2="1"
+   y2="0"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(500,230,-230,500,417.30092,544.155)"><stop
+     offset="0"
+     style="stop-color:rgb(124,58,237);stop-opacity:1"
+     id="stop98" /><stop
+     offset="1"
+     style="stop-color:rgb(109,40,217);stop-opacity:1"
+     id="stop99" /></linearGradient>
+        <linearGradient
+   id="_Linear4"
+   x1="0"
+   y1="0"
+   x2="1"
+   y2="0"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(165,200,-200,165,785.604,558.17)"><stop
+     offset="0"
+     style="stop-color:rgb(245,158,11);stop-opacity:1"
+     id="stop100" /><stop
+     offset="1"
+     style="stop-color:rgb(217,119,6);stop-opacity:1"
+     id="stop101" /></linearGradient>
     </defs>
 </svg>

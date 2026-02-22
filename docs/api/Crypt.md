@@ -4,7 +4,7 @@
 
 Simple encryption utility supporting Sodium and OpenSSL
 
-## 📌 Constants
+## 📌 Public Constants
 
 - **CIPHER_CHACHA20_POLY1305** = `'chacha20-poly1305'`
 - **CIPHER_AES_256_GCM** = `'aes-256-gcm'`
@@ -35,6 +35,9 @@ Encrypt a value using the specified cipher
 
 - Exception
 
+
+---
+
 ### decrypt() · [source](../../src/Crypt.php#L50)
 
 `public static function decrypt(mixed $value, mixed $key, mixed $cipher = 'auto'): mixed`
@@ -58,6 +61,9 @@ Decrypt a value using the specified cipher
 
 - Exception
 
+
+---
+
 ### hasSodium() · [source](../../src/Crypt.php#L70)
 
 `public static function hasSodium(): mixed`
@@ -68,6 +74,9 @@ Check if Sodium is available
 
 - Type: mixed
 
+
+---
+
 ### hasOpenSSL() · [source](../../src/Crypt.php#L80)
 
 `public static function hasOpenSSL(): mixed`
@@ -77,6 +86,9 @@ Check if OpenSSL is available
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getAvailableCipher() · [source](../../src/Crypt.php#L91)
 
@@ -92,3 +104,8 @@ Get the best available cipher (prefers Sodium over OpenSSL)
 
 - Exception
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

@@ -10,15 +10,39 @@ class ModelMapping
 	/**
 	 * @var array
 	 */
-	private array $mapping;
+	protected array $mapping;
+
 
 	/**
-	 * ModelMapping constructor.
-	 * @param array|null $mapping
+	 * Create ModelMapping from array config
+	 * @param array $mapping
+	 * @return static
 	 */
-	public function __construct(?array $mapping = null)
+	public static function fromArray(array $mapping): static
 	{
-		$this->mapping = $mapping ?? [];
+		$instance = new self();
+		foreach ($mapping ?? [] as $name => $config) {
+			if (!\is_string($name)) {
+				throw new \InvalidArgumentException('Model name must be a string');
+			}
+			if (\is_string($config)) {
+				// "User" => "users"
+				$config = [
+					'source' => $config,
+					'schema' => null,
+				];
+			} elseif (empty($config['source'])) {
+				throw new \InvalidArgumentException("Model source cannot be empty for model '$name'");
+			} elseif (!\is_string($config['source'])) {
+				throw new \InvalidArgumentException("Model source must be a string for model '$name'");
+			} elseif (!isset($config['schema'])) {
+				$config['schema'] = null;
+			} elseif (!\is_string($config['schema'])) {
+				throw new \InvalidArgumentException("Model schema must be a string for model '$name'");
+			}
+			$instance->mapping[$name] = $config;
+		}
+		return $instance;
 	}
 
 	/**
@@ -56,10 +80,10 @@ class ModelMapping
 
 
 	/**
-	 * Get all model mapping
+	 * Get all model mappings as an array
 	 * @return array
 	 */
-	public function getAll(): array
+	public function toArray(): array
 	{
 		return $this->mapping;
 	}

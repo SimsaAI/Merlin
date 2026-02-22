@@ -19,6 +19,9 @@
 
 - Type: mixed
 
+
+---
+
 ### cookie() · [source](../../src/Http/Cookies.php#L16)
 
 `public function cookie(string $name): Merlin\Http\Cookie`
@@ -32,6 +35,9 @@
 **➡️ Return value**
 
 - Type: [Cookie](Http_Cookie.md)
+
+
+---
 
 ### set() · [source](../../src/Http/Cookies.php#L22)
 
@@ -53,6 +59,9 @@
 
 - Type: [Cookie](Http_Cookie.md)
 
+
+---
+
 ### delete() · [source](../../src/Http/Cookies.php#L36)
 
 `public function delete(string $name): void`
@@ -67,6 +76,9 @@
 
 - Type: void
 
+
+---
+
 ### sendAll() · [source](../../src/Http/Cookies.php#L45)
 
 `public function sendAll(): void`
@@ -75,3 +87,8 @@
 
 - Type: void
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

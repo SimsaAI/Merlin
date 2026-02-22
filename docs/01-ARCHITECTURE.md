@@ -41,7 +41,8 @@ Custom services can be registered with `$ctx->set($id, $service)` and retrieved 
 - `Dispatcher` is instantiated without arguments; obtains `AppContext` internally. It resolves controllers via DI (`AppContext::get()`), executes the middleware pipeline, injects action parameters (route vars or DI), and stores route info via `AppContext::setRoute()`
 - `Controller` provides access to request/context plus lifecycle hooks
 - `ViewEngine` renders templates, layouts, and namespaced views
-- `RoutingResult` (in `AppContext->route`) contains resolved route information accessible anywhere
+- `MiddlewareInterface` defines the contract for all middleware; `SessionMiddleware` is the built-in implementation
+- `ResolvedRoute` (in `AppContext->route()`) contains resolved route information accessible anywhere
 
 ### Data Layer
 

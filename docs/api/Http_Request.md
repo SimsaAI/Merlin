@@ -17,6 +17,9 @@ Caches the body since php://input can only be read once
 
 - Type: mixed
 
+
+---
+
 ### getJsonBody() · [source](../../src/Http/Request.php#L29)
 
 `public function getJsonBody(mixed $assoc = true): mixed`
@@ -33,6 +36,9 @@ Get and parse JSON request body
 
 - Type: mixed
 - Description: Returns the parsed JSON data, or null on error
+
+
+---
 
 ### get() · [source](../../src/Http/Request.php#L45)
 
@@ -51,6 +57,9 @@ Get a parameter from the request (GET, POST, COOKIE, etc.)
 
 - Type: mixed
 
+
+---
+
 ### getPost() · [source](../../src/Http/Request.php#L56)
 
 `public function getPost(mixed $name = null, mixed $defaultValue = null): mixed`
@@ -67,6 +76,9 @@ Get a POST parameter from the request
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getQuery() · [source](../../src/Http/Request.php#L67)
 
@@ -85,6 +97,9 @@ Get a query parameter from the request
 
 - Type: mixed
 
+
+---
+
 ### getServer() · [source](../../src/Http/Request.php#L78)
 
 `public function getServer(mixed $name = null, mixed $defaultValue = null): mixed`
@@ -102,6 +117,9 @@ Get a server variable from the request
 
 - Type: mixed
 
+
+---
+
 ### getMethod() · [source](../../src/Http/Request.php#L87)
 
 `public function getMethod(): mixed`
@@ -111,6 +129,9 @@ Get the HTTP method of the request, accounting for method overrides in POST requ
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getScheme() · [source](../../src/Http/Request.php#L107)
 
@@ -122,6 +143,9 @@ Get the request scheme (http or https)
 
 - Type: mixed
 
+
+---
+
 ### getServerName() · [source](../../src/Http/Request.php#L116)
 
 `public function getServerName(): mixed`
@@ -131,6 +155,9 @@ Get the server name from the request
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getServerAddr() · [source](../../src/Http/Request.php#L125)
 
@@ -142,6 +169,9 @@ Get the server IP address
 
 - Type: mixed
 
+
+---
+
 ### getHttpHost() · [source](../../src/Http/Request.php#L134)
 
 `public function getHttpHost(): mixed`
@@ -151,6 +181,9 @@ Get the host from the request, accounting for Host header and server variables
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getPort() · [source](../../src/Http/Request.php#L152)
 
@@ -162,6 +195,9 @@ Get the port number from the request, accounting for standard ports and Host hea
 
 - Type: mixed
 
+
+---
+
 ### getContentType() · [source](../../src/Http/Request.php#L169)
 
 `public function getContentType(): mixed`
@@ -171,6 +207,9 @@ Get the Content-Type header from the request
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getClientAddress() · [source](../../src/Http/Request.php#L182)
 
@@ -188,6 +227,9 @@ Get the client's IP address, optionally trusting proxy headers
 
 - Type: mixed
 
+
+---
+
 ### getUri() · [source](../../src/Http/Request.php#L214)
 
 `public function getUri(): mixed`
@@ -197,6 +239,9 @@ Get the request URI
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getPath() · [source](../../src/Http/Request.php#L223)
 
@@ -208,6 +253,9 @@ Get the request path (URI without query string)
 
 - Type: string
 
+
+---
+
 ### getUserAgent() · [source](../../src/Http/Request.php#L233)
 
 `public function getUserAgent(): mixed`
@@ -217,6 +265,9 @@ Get the User-Agent header from the request
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getAcceptableContent() · [source](../../src/Http/Request.php#L284)
 
@@ -234,6 +285,9 @@ Gets an array with mime/types and their quality accepted by the browser/client f
 
 - Type: mixed
 
+
+---
+
 ### getBestAccept() · [source](../../src/Http/Request.php#L293)
 
 `public function getBestAccept(): mixed`
@@ -243,6 +297,9 @@ Gets best mime/type accepted by the browser/client from _SERVER["HTTP_ACCEPT"]
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getClientCharsets() · [source](../../src/Http/Request.php#L302)
 
@@ -260,6 +317,9 @@ Gets a charsets array and their quality accepted by the browser/client from _SER
 
 - Type: mixed
 
+
+---
+
 ### getBestCharset() · [source](../../src/Http/Request.php#L311)
 
 `public function getBestCharset(): mixed`
@@ -269,6 +329,9 @@ Gets best charset accepted by the browser/client from _SERVER["HTTP_ACCEPT_CHARS
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getLanguages() · [source](../../src/Http/Request.php#L319)
 
@@ -286,6 +349,9 @@ Gets languages array and their quality accepted by the browser/client from _SERV
 
 - Type: mixed
 
+
+---
+
 ### getBestLanguage() · [source](../../src/Http/Request.php#L327)
 
 `public function getBestLanguage(): mixed`
@@ -295,6 +361,9 @@ Gets best language accepted by the browser/client from _SERVER["HTTP_ACCEPT_LANG
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getBasicAuth() · [source](../../src/Http/Request.php#L336)
 
@@ -306,6 +375,9 @@ Gets auth info accepted by the browser/client from $_SERVER['PHP_AUTH_USER']
 
 - Type: mixed
 
+
+---
+
 ### getDigestAuth() · [source](../../src/Http/Request.php#L351)
 
 `public function getDigestAuth(): mixed`
@@ -315,6 +387,9 @@ Gets auth info accepted by the browser/client from $_SERVER['PHP_AUTH_DIGEST']
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### isAjax() · [source](../../src/Http/Request.php#L369)
 
@@ -326,6 +401,9 @@ Checks whether request has been made using AJAX
 
 - Type: bool
 
+
+---
+
 ### isSoap() · [source](../../src/Http/Request.php#L401)
 
 `public function isSoap(): mixed`
@@ -335,6 +413,9 @@ Checks whether request has been made using SOAP
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### isSecure() · [source](../../src/Http/Request.php#L414)
 
@@ -346,6 +427,9 @@ Checks whether request has been made using HTTPS
 
 - Type: mixed
 
+
+---
+
 ### isPost() · [source](../../src/Http/Request.php#L423)
 
 `public function isPost(): mixed`
@@ -355,6 +439,9 @@ Checks whether request has been made using GET method
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### has() · [source](../../src/Http/Request.php#L433)
 
@@ -372,6 +459,9 @@ Checks whether request has been made using GET method
 
 - Type: mixed
 
+
+---
+
 ### hasPost() · [source](../../src/Http/Request.php#L443)
 
 `public function hasPost(mixed $name): mixed`
@@ -387,6 +477,9 @@ Checks whether request has been made using POST method
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### hasQuery() · [source](../../src/Http/Request.php#L453)
 
@@ -404,6 +497,9 @@ Checks whether request has been made using GET method
 
 - Type: mixed
 
+
+---
+
 ### hasServer() · [source](../../src/Http/Request.php#L463)
 
 `public function hasServer(mixed $name): mixed`
@@ -419,6 +515,9 @@ Checks whether request has been made using GET method
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### getFile() · [source](../../src/Http/Request.php#L508)
 
@@ -436,6 +535,9 @@ Get an uploaded file for a given key. Returns an UploadedFile object or null if 
 
 - Type: [UploadedFile](Http_UploadedFile.md)|null
 
+
+---
+
 ### getFiles() · [source](../../src/Http/Request.php#L526)
 
 `public function getFiles(string $key): array`
@@ -452,3 +554,8 @@ Get uploaded files for a given key. Returns an array of UploadedFile objects, ev
 
 - Type: array
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

@@ -16,7 +16,7 @@ This includes:
 - route middleware groups
 - route overrides (e.g. controller/action)
 
-## 🔐 Properties
+## 🔐 Public Properties
 
 - `public` string|null `$namespace` · [source](../../src/AppContext.php)
 - `public` string `$controller` · [source](../../src/AppContext.php)
@@ -48,3 +48,8 @@ This includes:
 
 - Type: mixed
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

@@ -25,6 +25,9 @@ Define a database connection for a specific role.
 
 - Type: static
 
+
+---
+
 ### setDefaultRole() · [source](../../src/Db/DatabaseManager.php#L44)
 
 `public function setDefaultRole(string $role): static`
@@ -45,6 +48,9 @@ Set the default database role to use when requesting the default connection. By 
 
 - RuntimeException  If the specified role is not defined
 
+
+---
+
 ### has() · [source](../../src/Db/DatabaseManager.php#L60)
 
 `public function has(string $role): bool`
@@ -61,6 +67,9 @@ Check if a database role is defined.
 
 - Type: bool
 - Description: True if the role is defined, false otherwise
+
+
+---
 
 ### get() · [source](../../src/Db/DatabaseManager.php#L72)
 
@@ -83,6 +92,9 @@ Get the Database instance for a specific role.
 
 - RuntimeException  If the role is not defined or if the factory does not return a Database instance
 
+
+---
+
 ### getOrDefault() · [source](../../src/Db/DatabaseManager.php#L102)
 
 `public function getOrDefault(string $role): Merlin\Db\Database`
@@ -104,6 +116,9 @@ Get the Database instance for a specific role, or the default if the role is not
 
 - RuntimeException  If no default database is configured
 
+
+---
+
 ### default() · [source](../../src/Db/DatabaseManager.php#L117)
 
 `public function default(): Merlin\Db\Database`
@@ -119,3 +134,8 @@ Get the default Database instance.
 
 - RuntimeException  If no default database is configured
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

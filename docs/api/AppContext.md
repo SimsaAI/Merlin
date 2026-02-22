@@ -12,6 +12,9 @@
 
 - Type: mixed
 
+
+---
+
 ### instance() · [source](../../src/AppContext.php#L55)
 
 `public static function instance(): static`
@@ -22,6 +25,9 @@ Get the singleton instance of AppContext. If it doesn't exist, it will be create
 
 - Type: static
 - Description: The singleton instance of AppContext.
+
+
+---
 
 ### setInstance() · [source](../../src/AppContext.php#L66)
 
@@ -39,6 +45,9 @@ Set the singleton instance of AppContext. This can be used to inject a custom co
 
 - Type: void
 
+
+---
+
 ### request() · [source](../../src/AppContext.php#L78)
 
 `public function request(): Merlin\Http\Request`
@@ -49,6 +58,9 @@ Get the HttpRequest instance. If it doesn't exist, it will be created.
 
 - Type: [Request](Http_Request.md)
 - Description: The HttpRequest instance.
+
+
+---
 
 ### view() · [source](../../src/AppContext.php#L88)
 
@@ -61,6 +73,9 @@ Get the ViewEngine instance. If it doesn't exist, it will be created.
 - Type: [ViewEngine](Mvc_ViewEngine.md)
 - Description: The ViewEngine instance.
 
+
+---
+
 ### cookies() · [source](../../src/AppContext.php#L98)
 
 `public function cookies(): Merlin\Http\Cookies`
@@ -72,6 +87,9 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 - Type: [Cookies](Http_Cookies.md)
 - Description: The Cookies instance.
 
+
+---
+
 ### dbManager() · [source](../../src/AppContext.php#L104)
 
 `public function dbManager(): Merlin\Db\DatabaseManager`
@@ -79,6 +97,9 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 **➡️ Return value**
 
 - Type: [DatabaseManager](Db_DatabaseManager.md)
+
+
+---
 
 ### session() · [source](../../src/AppContext.php#L114)
 
@@ -89,6 +110,9 @@ Get the Session instance.
 **➡️ Return value**
 
 - Type: [Session](Http_Session.md)|null
+
+
+---
 
 ### setSession() · [source](../../src/AppContext.php#L124)
 
@@ -106,6 +130,9 @@ Set the Session instance.
 
 - Type: void
 
+
+---
+
 ### route() · [source](../../src/AppContext.php#L132)
 
 `public function route(): Merlin\ResolvedRoute|null`
@@ -115,6 +142,9 @@ Get the current resolved route information.
 **➡️ Return value**
 
 - Type: [ResolvedRoute](ResolvedRoute.md)|null
+
+
+---
 
 ### setRoute() · [source](../../src/AppContext.php#L142)
 
@@ -131,6 +161,9 @@ Set the current resolved route information.
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### set() · [source](../../src/AppContext.php#L155)
 
@@ -149,6 +182,9 @@ Register a service instance in the context.
 
 - Type: void
 
+
+---
+
 ### has() · [source](../../src/AppContext.php#L166)
 
 `public function has(string $id): bool`
@@ -165,6 +201,9 @@ Check if a service is registered in the context.
 
 - Type: bool
 - Description: True if the service is registered, false otherwise.
+
+
+---
 
 ### get() · [source](../../src/AppContext.php#L178)
 
@@ -187,6 +226,9 @@ Get a service instance from the context. If the service is not registered but th
 
 - RuntimeException  If the service is not found and cannot be auto-wired.
 
+
+---
+
 ### tryGet() · [source](../../src/AppContext.php#L197)
 
 `public function tryGet(string $id): object|null`
@@ -203,6 +245,9 @@ Try to get a service instance from the context. If the service is not registered
 
 - Type: object|null
 - Description: The service instance associated with the given identifier, or null if not found.
+
+
+---
 
 ### getOrNull() · [source](../../src/AppContext.php#L216)
 
@@ -221,3 +266,8 @@ Get a service instance from the context if it exists, or null if it does not exi
 - Type: object|null
 - Description: The service instance associated with the given identifier, or null if not found.
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

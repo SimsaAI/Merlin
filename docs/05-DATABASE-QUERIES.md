@@ -73,6 +73,34 @@ User::query()->where('email', 'a@example.com')->firstModel();
 User::query()->where('email <>', 'a@example.com')->firstModel();
 ```
 
+## FROM Subquery
+
+Use a `Query` instance as the table source for a derived table. The subquery is wrapped in parentheses and its bind parameters are automatically merged into the parent query.
+
+```php
+use Merlin\Db\Query;
+
+// Build the inner query independently
+$recent = Query::new()
+    ->table('orders')
+    ->where('created_at > :since', ['since' => '2025-01-01'])
+    ->columns(['user_id', 'total']);
+
+// Use it as a derived table with an alias
+$results = Query::new()
+    ->from($recent, 'recent_orders')
+    ->where('recent_orders.total >', 100)
+    ->select();
+// Produces: SELECT * FROM (SELECT `user_id`, `total` FROM `orders` WHERE ...) AS `recent_orders` WHERE ...
+```
+
+`from()` also accepts a plain table name string (same as `table()`):
+
+```php
+// Equivalent: plain string still works
+$q = Query::new()->from('users', 'u')->where('u.status', 'active')->select();
+```
+
 ## JOIN, GROUP, HAVING
 
 Build complex queries with joins, aggregations, and grouping. The query builder makes it easy to construct sophisticated SQL while maintaining readability.
@@ -94,6 +122,32 @@ $rows = Query::new()
     ->orderBy('comments_count DESC')
     ->select();
 ```
+
+### Subquery in JOIN
+
+Any join method (`join`, `innerJoin`, `leftJoin`, `rightJoin`, `crossJoin`) also accepts a `Query` instance as the first argument. Supply an alias as the second argument so the outer query can reference it.
+
+```php
+// Pre-aggregate orders into a subquery
+$orderTotals = Query::new()
+    ->table('orders')
+    ->where('status', 'completed')
+    ->groupBy('user_id')
+    ->columns(['user_id', 'SUM(total) AS total_spent']);
+
+$results = Query::new()
+    ->table('users', 'u')
+    ->leftJoin($orderTotals, 'ot', 'ot.user_id = u.id')
+    ->columns(['u.username', 'ot.total_spent'])
+    ->where('ot.total_spent >', 500)
+    ->select();
+// Produces: SELECT ... FROM `users` AS `u`
+//   LEFT JOIN (SELECT `user_id`, SUM(total) AS total_spent
+//              FROM `orders` WHERE ... GROUP BY `user_id`) AS `ot` ON (ot.user_id = u.id)
+//   WHERE ...
+```
+
+Bind parameters from the subquery are automatically propagated to the parent query — you never need to merge them manually.
 
 ## INSERT / UPSERT / UPDATE / DELETE
 
@@ -227,4 +281,4 @@ try {
 
 - [Models & ORM](04-MODELS-ORM.md)
 - [Cookbook](10-COOKBOOK.md)
-- [API Reference](11-API-REFERENCE.md)
+- [API Reference](api/index.md)

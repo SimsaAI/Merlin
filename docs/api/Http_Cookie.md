@@ -27,6 +27,9 @@ Create a new Cookie instance with the given parameters.
 - Type: static
 - Description: A new Cookie instance.
 
+
+---
+
 ### __construct() · [source](../../src/Http/Cookie.php#L52)
 
 `public function __construct(string $name, mixed $value = null, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): mixed`
@@ -47,6 +50,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: mixed
 
+
+---
+
 ### value() · [source](../../src/Http/Cookie.php#L77)
 
 `public function value(mixed $default = null): mixed`
@@ -60,6 +66,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### set() · [source](../../src/Http/Cookie.php#L99)
 
@@ -75,6 +84,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### send() · [source](../../src/Http/Cookie.php#L108)
 
 `public function send(): static`
@@ -83,6 +95,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### delete() · [source](../../src/Http/Cookie.php#L129)
 
 `public function delete(): void`
@@ -90,6 +105,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### encrypted() · [source](../../src/Http/Cookie.php#L144)
 
@@ -105,6 +123,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### cipher() · [source](../../src/Http/Cookie.php#L150)
 
 `public function cipher(string $cipher): static`
@@ -118,6 +139,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### key() · [source](../../src/Http/Cookie.php#L156)
 
@@ -133,6 +157,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### name() · [source](../../src/Http/Cookie.php#L183)
 
 `public function name(): string`
@@ -140,6 +167,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: string
+
+
+---
 
 ### expires() · [source](../../src/Http/Cookie.php#L188)
 
@@ -155,6 +185,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### path() · [source](../../src/Http/Cookie.php#L194)
 
 `public function path(string $path): static`
@@ -168,6 +201,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### domain() · [source](../../src/Http/Cookie.php#L200)
 
@@ -183,6 +219,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### secure() · [source](../../src/Http/Cookie.php#L206)
 
 `public function secure(bool $state): static`
@@ -196,6 +235,9 @@ Create a new Cookie instance with the given parameters.
 **➡️ Return value**
 
 - Type: static
+
+
+---
 
 ### httpOnly() · [source](../../src/Http/Cookie.php#L212)
 
@@ -211,6 +253,9 @@ Create a new Cookie instance with the given parameters.
 
 - Type: static
 
+
+---
+
 ### __toString() · [source](../../src/Http/Cookie.php#L218)
 
 `public function __toString(): string`
@@ -219,3 +264,8 @@ Create a new Cookie instance with the given parameters.
 
 - Type: string
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

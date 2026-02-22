@@ -25,7 +25,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 - **Router** - Fast pattern matching with named routes, parameter validation, and middleware support
 - **Controllers** - Clean action-based controllers with dependency injection
 - **Dispatcher** - Flexible request dispatching with middleware pipeline
-- **ViewEngine** - Simple PHP-based templating with layout support
+- **ViewEngine** - Fast PHP-based templating with layout support
 
 ### Database & ORM
 
@@ -91,20 +91,19 @@ use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
 // Application context holds shared services
+// Dispatcher, Controllers, Query Builders and Models access the AppContext singleton for database connections, request data, etc. like in this example. This allows flexible configuration and easy access to services throughout the application without tight coupling.
 $ctx = AppContext::instance();
 
 // Register database connection as a lazy service
+// The label 'default' is used to identify this connection. The first registered connection becomes the default connection. You can register multiple connections with different names and roles (e.g. 'read', 'write') for read/write splitting. The closure allows for lazy initialization, so the connection is only created when first accessed.
 $ctx->dbManager()->set('default',
     fn() => new Database('mysql:host=localhost;dbname=myapp', 'user', 'pass')
 );
 
 // Configure routing
+// Define routes with HTTP method, path pattern, and controller action. The pattern can include named parameters (e.g. {name}) which will be passed to the controller action as arguments. The controller action is specified as 'ControllerClass::methodName' or as array syntax ['controller' => 'ControllerClass', 'action' => 'methodName'] for more complex cases.
 $router = new Router();
 $router->add('GET', '/hello/{name}', 'IndexController::helloAction');
-
-// Dispatcher handles controller resolution and middleware
-$dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers');
 
 // Match the incoming request
 $path = $ctx->request()->getPath();
@@ -114,11 +113,15 @@ $route = $router->match($path, $method);
 if ($route === null) {
     // No route matched - return 404
     Response::status(404)->send();
-} else {
-    // Dispatch the request to the appropriate controller action
-    $response = $dispatcher->dispatch($route);
-    $response->send();
+    exit;
 }
+
+// Dispatcher handles controller resolution and middleware
+$dispatcher = new Dispatcher();
+// Dispatch the request to the appropriate controller action
+$response = $dispatcher->dispatch($route);
+// Send the response to the client
+$response->send();
 ```
 
 Controller example:
@@ -185,8 +188,41 @@ User::query()->where('status', 'spam')->delete();
 
 Build complex queries with joins, subqueries, and aggregations.
 
+#### Using Models and Sql Functions
+
+```php
+use Merlin\Db\Sql;
+
+// Subquery: select the latest order date for each user
+$latestOrder = Sql::subquery(
+    Order::query('o2')
+        ->where('o2.user_id = u.id')
+        ->orderBy('o2.created_at DESC')
+        ->limit(1)
+        ->select('o2.created_at')
+)->as('latest_order');
+
+$results = Order::query('o')
+    ->join(User::class, 'u', 'o.user_id = u.id')
+    ->where('o.status', 'completed')
+    ->where('o.total >', 100)
+    ->groupBy('u.id')
+    ->having('COUNT(*) >', 5)
+    ->select([
+        'u.username',
+        Sql::expr('COUNT(*)')->as('order_count'),
+        Sql::func('SUM', 'o.total')->as('total_spent'),
+        $latestOrder,
+    ]);
+```
+
+#### Using the Query Builder Directly on Tables
+
 ```php
 use Merlin\Db\Query;
+
+// For raw queries without models, you can use the Query builder directly. This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with Query::new() and specify the table manually.
+Query::useModels(false);
 
 $results = Query::new()
     ->table('orders o')
@@ -195,7 +231,41 @@ $results = Query::new()
     ->where('o.total >', 100)
     ->groupBy('u.id')
     ->having('COUNT(*) >', 5)
-    ->select(['u.username', 'COUNT(*) as order_count', 'SUM(o.total) as total_spent']);
+    ->select([
+        'u.username',
+        'COUNT(*) as order_count',
+        'SUM(o.total) as total_spent'
+    ]);
+```
+
+#### Subqueries as Table Sources
+
+A `Query` instance can be passed directly to `->from()` or to any join method (`->join()`, `->leftJoin()`, `->innerJoin()`, `->rightJoin()`, `->crossJoin()`). The subquery is wrapped in parentheses automatically and its bind parameters are propagated to the outer query — no manual merging required.
+
+```php
+use Merlin\Db\Query;
+
+// Build the subquery independently
+$completedOrders = Query::new()
+    ->table('orders')
+    ->where('status', 'completed')
+    ->where('created_at > :since', ['since' => '2025-01-01'])
+    ->groupBy('user_id')
+    ->columns(['user_id', 'SUM(total) AS total_spent']);
+
+// Use it as a derived table with ->from()
+$topBuyers = Query::new()
+    ->from($completedOrders, 'co')
+    ->where('co.total_spent >', 500)
+    ->orderBy('co.total_spent DESC')
+    ->select();
+
+// Or join it alongside another table
+$report = Query::new()
+    ->table('users', 'u')
+    ->leftJoin($completedOrders, 'co', 'co.user_id = u.id')
+    ->columns(['u.username', 'co.total_spent'])
+    ->select();
 ```
 
 ### CLI Tasks

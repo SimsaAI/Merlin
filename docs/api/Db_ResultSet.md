@@ -22,6 +22,9 @@
 
 - Type: mixed
 
+
+---
+
 ### fetch() · [source](../../src/Db/ResultSet.php#L47)
 
 `public function fetch(): object|array|false`
@@ -31,6 +34,9 @@ Fetch next row as object or array depending on fetch mode.
 **➡️ Return value**
 
 - Type: object|array|false
+
+
+---
 
 ### fetchArray() · [source](../../src/Db/ResultSet.php#L57)
 
@@ -42,6 +48,9 @@ Fetch next row as associative array.
 
 - Type: array|false
 
+
+---
+
 ### fetchObject() · [source](../../src/Db/ResultSet.php#L67)
 
 `public function fetchObject(): object|false`
@@ -51,6 +60,9 @@ Fetch next row as object.
 **➡️ Return value**
 
 - Type: object|false
+
+
+---
 
 ### fetchColumn() · [source](../../src/Db/ResultSet.php#L77)
 
@@ -68,6 +80,9 @@ Fetch next row as a single column value.
 
 - Type: mixed
 
+
+---
+
 ### fetchAllColumns() · [source](../../src/Db/ResultSet.php#L88)
 
 `public function fetchAllColumns(int $column = 0): array`
@@ -83,6 +98,9 @@ Fetch all values from a single column.
 **➡️ Return value**
 
 - Type: array
+
+
+---
 
 ### fetchAll() · [source](../../src/Db/ResultSet.php#L100)
 
@@ -101,6 +119,9 @@ Fetch all rows as objects or arrays depending on fetch mode.
 
 - Type: array
 
+
+---
+
 ### setFetchMode() · [source](../../src/Db/ResultSet.php#L111)
 
 `public function setFetchMode(int $fetchMode): void`
@@ -117,6 +138,9 @@ Set the default fetch mode for this result set.
 
 - Type: void
 
+
+---
+
 ### allArrays() · [source](../../src/Db/ResultSet.php#L120)
 
 `public function allArrays(): array`
@@ -126,6 +150,9 @@ Return all rows as associative arrays.
 **➡️ Return value**
 
 - Type: array
+
+
+---
 
 ### allObjects() · [source](../../src/Db/ResultSet.php#L131)
 
@@ -137,6 +164,9 @@ Return all rows as objects.
 
 - Type: array
 
+
+---
+
 ### nextModel() · [source](../../src/Db/ResultSet.php#L142)
 
 `public function nextModel(): Merlin\Mvc\Model|null`
@@ -146,6 +176,9 @@ Get the next model from the result set, or false if there are no more models. Th
 **➡️ Return value**
 
 - Type: [Model](Mvc_Model.md)|null
+
+
+---
 
 ### firstModel() · [source](../../src/Db/ResultSet.php#L179)
 
@@ -157,6 +190,9 @@ Get first model or object from result set.
 
 - Type: [Model](Mvc_Model.md)|null
 
+
+---
+
 ### allModels() · [source](../../src/Db/ResultSet.php#L201)
 
 `public function allModels(): array`
@@ -166,6 +202,9 @@ Get all remaining models or objects from result set.
 **➡️ Return value**
 
 - Type: array
+
+
+---
 
 ### getSql() · [source](../../src/Db/ResultSet.php#L219)
 
@@ -177,6 +216,9 @@ Return the SQL statement that was executed to produce this result set, if availa
 
 - Type: string|null
 
+
+---
+
 ### getBindings() · [source](../../src/Db/ResultSet.php#L228)
 
 `public function getBindings(): array|null`
@@ -186,6 +228,9 @@ Return the variables that were bound to the SQL statement, if available.
 **➡️ Return value**
 
 - Type: array|null
+
+
+---
 
 ### reexecute() · [source](../../src/Db/ResultSet.php#L237)
 
@@ -197,6 +242,9 @@ Execute the query again to repopulate the result set.
 
 - Type: void
 
+
+---
+
 ### rewind() · [source](../../src/Db/ResultSet.php#L252)
 
 `public function rewind(): void`
@@ -204,6 +252,9 @@ Execute the query again to repopulate the result set.
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### current() · [source](../../src/Db/ResultSet.php#L257)
 
@@ -213,6 +264,9 @@ Execute the query again to repopulate the result set.
 
 - Type: mixed
 
+
+---
+
 ### key() · [source](../../src/Db/ResultSet.php#L266)
 
 `public function key(): int`
@@ -220,6 +274,9 @@ Execute the query again to repopulate the result set.
 **➡️ Return value**
 
 - Type: int
+
+
+---
 
 ### next() · [source](../../src/Db/ResultSet.php#L271)
 
@@ -229,6 +286,9 @@ Execute the query again to repopulate the result set.
 
 - Type: void
 
+
+---
+
 ### valid() · [source](../../src/Db/ResultSet.php#L277)
 
 `public function valid(): bool`
@@ -236,6 +296,9 @@ Execute the query again to repopulate the result set.
 **➡️ Return value**
 
 - Type: bool
+
+
+---
 
 ### count() · [source](../../src/Db/ResultSet.php#L282)
 
@@ -245,3 +308,8 @@ Execute the query again to repopulate the result set.
 
 - Type: int
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

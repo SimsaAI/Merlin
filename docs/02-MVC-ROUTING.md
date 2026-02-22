@@ -50,7 +50,7 @@ $router->add('GET', '/blog/{slug}', 'BlogController::showAction');
 
 Add type constraints to validate parameters automatically. This helps prevent invalid data from reaching your controllers and makes routes more self-documenting.
 
-Built-in types: `int`, `alpha`, `alnum`, `uuid`, `*`.
+Built-in types: `int`, `alpha`, `alnum`, `uuid`, `*` (matches any remaining path segments, captured as an array).
 
 ```php
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
@@ -63,7 +63,7 @@ Certain parameter names have special meaning to the Dispatcher and control how c
 
 ```php
 $router->add('GET', '/{controller}/{action}');
-$router->add('GET', '/api/{namespace}/{controller}/{action}/{params:*}');
+$router->add('GET', '/api/{namespace}/{controller}/{action}');
 ```
 
 Routing variables recognized by the Dispatcher:
@@ -71,14 +71,12 @@ Routing variables recognized by the Dispatcher:
 - `{namespace}` - Appends to the base namespace for controller resolution
 - `{controller}` - Specifies the controller name (converted to PascalCase + 'Controller')
 - `{action}` - Specifies the action method name (converted to camelCase + 'Action')
-- `{params:*}` - Captures all remaining path segments as an array
 
-Example: `/api/admin/user/view/123` with pattern `/api/{namespace}/{controller}/{action}/{params:*}` yields:
+Example: `/api/admin/user/view` with pattern `/api/{namespace}/{controller}/{action}` yields:
 
 - `namespace` → `Admin` (appended to base namespace)
 - `controller` → `UserController`
 - `action` → `viewAction`
-- `params` → `['123']`
 
 **Note:** When you specify a handler (third parameter to `add()`), it overrides the routing variables. This lets you use parameters named `controller`, `action`, etc. for other purposes:
 
@@ -137,16 +135,7 @@ $router->middleware('auth', function (Router $r) {
 
 Route group middleware names are attached to route info and consumed by `Dispatcher` middleware groups.
 
-## Configuration
-
-### Router Options
-
-```php
-$router = new Router();
-$router->setParseParams(true); // Auto-parse params to int/float/bool/null
-```
-
-### Dispatcher Configuration
+## Dispatcher Configuration
 
 The Dispatcher handles controller resolution and default values:
 
@@ -159,18 +148,18 @@ $dispatcher->setDefaultAction('indexAction'); // Default: 'indexAction'
 
 ## Route Information in AppContext
 
-When the Dispatcher processes a route, it stores the routing information in `AppContext->route` as a `RoutingResult` object. This makes the current route accessible throughout your application:
+When the Dispatcher processes a route, it stores the routing information in `AppContext->route` as a `ResolvedRoute` object. This makes the current route accessible throughout your application:
 
 ```php
 // In any controller, middleware, or service:
-$route = AppContext::instance()->route;
+$route = AppContext::instance()->route();
 
 // Access route details:
 $controller = $route->controller; // Full controller class name
 $action = $route->action; // Action method name
 $namespace = $route->namespace; // Resolved namespace
 $vars = $route->vars; // All route variables
-$params = $route->params; // Parameters passed to action
+$params = $route->params; // Resolved arguments passed to the action
 $groups = $route->groups; // Middleware groups
 $override = $route->override; // Handler overrides
 ```
@@ -184,44 +173,91 @@ $override = $route->override; // Handler overrides
 
 ## Dispatcher Argument Resolution
 
-`Dispatcher` keeps route vars and resolved action arguments separate:
+The Dispatcher resolves action method parameters in the following order for each parameter:
 
-- `vars['params']`: raw wildcard route payload from the router
-- `RoutingResult->params`: effective arguments used to call the action method
+1. **By name from route variables** – if a route variable matches the parameter name, its value is used and cast to the declared type when possible.
+2. **By type from DI (AppContext)** – if the parameter has a class or interface type hint that is registered in `AppContext` (or is an instantiable class), it is auto-wired.
+3. **Default value** – the value declared in the method signature.
+4. **Nullable** – injected as `null`.
 
-`RoutingResult->params` is built from:
+If none of the above apply, a `RuntimeException` is thrown.
 
-1. all `vars` except routing keys (`controller`, `action`, `namespace`, `params`)
-2. then values from `vars['params']`
+### Wildcard Parameters
 
-This means `RoutingResult->params` is the effective call payload for controller actions and
-for `beforeAction(..., $params)` / `afterAction(..., $params)` hooks.
-
-Example:
+A wildcard segment (`{segments:*}`) captures all remaining path segments as an `array`. To receive this value in an action, declare the parameter either as variadic or typed as `array`:
 
 ```php
-$routeInfo = [
-    'vars' => [
-        'id' => 42,
-        'controller' => 'routing-state',
-        'action' => 'from-override',
-        'params' => ['x', 'y'],
-    ],
-    'override' => [
-        'namespace' => 'Merlin\\Tests\\Mvc',
-        'controller' => 'RoutingStateController',
-        'action' => 'fromOverride',
-    ],
-];
+$router->add('GET', '/files/{params:*}', 'FileController::readAction');
 
-$dispatcher->dispatch($routeInfo);
+class FileController extends Controller
+{
+    // Variadic: each segment becomes a separate argument
+    public function readAction(string ...$params): Response
+    {
+        $path = implode('/', $params); // e.g. 'images/2026/photo.jpg'
+        // ...
+    }
 
-// Stored in AppContext->route:
-// vars['params'] => ['x', 'y']
-// params         => [42, 'x', 'y']
+    // Alternative: receive all segments as a plain array
+    // public function readAction(array $params): Response { ... }
+}
+```
+
+### DI Injection Example
+
+Parameters that can't be matched by name fall through to DI resolution. Here is a full cycle example:
+
+#### 1. Define a Service
+
+```php
+// src/Services/Greeter.php
+namespace App\Services;
+
+class Greeter
+{
+    public function greet(string $name): string
+    {
+        return "Hello, $name!";
+    }
+}
+```
+
+#### 2. Register the Service in AppContext
+
+```php
+use Merlin\AppContext;
+use App\Services\Greeter;
+
+$ctx = AppContext::instance();
+// Register Greeter as a lazy service. It will be instantiated when first requested.
+$ctx->set(Greeter::class, fn() => new Greeter());
+```
+
+#### 3. Inject and Use in a Controller Action
+
+```php
+use App\Services\Greeter;
+
+class WelcomeController extends Controller
+{
+    // $name is matched by route; $greeter is injected from AppContext by type
+    public function helloAction(string $name, Greeter $greeter): array
+    {
+        return [
+            'message' => $greeter->greet($name)
+        ];
+    }
+}
+```
+
+#### 4. Route Example
+
+```php
+$router->add('GET', '/hello/{name}', 'WelcomeController::helloAction');
+// GET /hello/World → {"message":"Hello, World!"}
 ```
 
 ## See Also
 
 - [Controllers & Views](03-CONTROLLERS-VIEWS.md)
-- [API Reference](11-API-REFERENCE.md)
+- [API Reference](api/index.md)

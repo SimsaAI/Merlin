@@ -22,6 +22,9 @@
 
 - Type: mixed
 
+
+---
+
 ### getClientFilename() · [source](../../src/Http/UploadedFile.php#L16)
 
 `public function getClientFilename(): string`
@@ -29,6 +32,9 @@
 **➡️ Return value**
 
 - Type: string
+
+
+---
 
 ### getClientMediaType() · [source](../../src/Http/UploadedFile.php#L21)
 
@@ -38,6 +44,9 @@
 
 - Type: string
 
+
+---
+
 ### getSize() · [source](../../src/Http/UploadedFile.php#L26)
 
 `public function getSize(): int`
@@ -46,6 +55,9 @@
 
 - Type: int
 
+
+---
+
 ### isValid() · [source](../../src/Http/UploadedFile.php#L31)
 
 `public function isValid(): bool`
@@ -53,6 +65,9 @@
 **➡️ Return value**
 
 - Type: bool
+
+
+---
 
 ### moveTo() · [source](../../src/Http/UploadedFile.php#L36)
 
@@ -68,3 +83,8 @@
 
 - Type: void
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

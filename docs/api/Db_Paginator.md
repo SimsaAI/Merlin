@@ -25,6 +25,9 @@ Create a new Paginator instance.
 
 - Type: mixed
 
+
+---
+
 ### getPageSize() · [source](../../src/Db/Paginator.php#L44)
 
 `public function getPageSize(): int`
@@ -35,6 +38,9 @@ Get the page size (number of items per page).
 
 - Type: int
 - Description: The page size.
+
+
+---
 
 ### getTotalItems() · [source](../../src/Db/Paginator.php#L54)
 
@@ -47,6 +53,9 @@ Get the total number of items across all pages.
 - Type: int
 - Description: The total number of items.
 
+
+---
+
 ### getTotalPages() · [source](../../src/Db/Paginator.php#L64)
 
 `public function getTotalPages(): int`
@@ -57,6 +66,9 @@ Get the total number of pages.
 
 - Type: int
 - Description: The total number of pages.
+
+
+---
 
 ### getCurrentPage() · [source](../../src/Db/Paginator.php#L74)
 
@@ -69,6 +81,9 @@ Get the current page number.
 - Type: int
 - Description: The current page number.
 
+
+---
+
 ### getFirstItemPos() · [source](../../src/Db/Paginator.php#L84)
 
 `public function getFirstItemPos(): int`
@@ -80,6 +95,9 @@ Get the position of the first item in the current page (1-based index).
 - Type: int
 - Description: The position of the first item in the current page.
 
+
+---
+
 ### getLastItemPos() · [source](../../src/Db/Paginator.php#L94)
 
 `public function getLastItemPos(): int`
@@ -90,6 +108,9 @@ Get the position of the last item in the current page (1-based index).
 
 - Type: int
 - Description: The position of the last item in the current page.
+
+
+---
 
 ### execute() · [source](../../src/Db/Paginator.php#L105)
 
@@ -108,3 +129,8 @@ Execute the paginated query and return the items for the current page.
 - Type: array
 - Description: The items for the current page.
 
+
+
+---
+
+[Back to the Index ⤴](index.md)

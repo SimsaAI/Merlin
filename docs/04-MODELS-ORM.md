@@ -146,4 +146,4 @@ AppContext::instance()->dbManager()->set('default', new Database(...));
 
 - [Database Queries](05-DATABASE-QUERIES.md)
 - [Cookbook](10-COOKBOOK.md)
-- [API Reference](11-API-REFERENCE.md)
+- [API Reference](api/index.md)

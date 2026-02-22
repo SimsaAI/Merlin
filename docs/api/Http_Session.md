@@ -18,6 +18,9 @@
 
 - Type: mixed
 
+
+---
+
 ### get() · [source](../../src/Http/Session.php#L10)
 
 `public function get(string $key, mixed $default = null): mixed`
@@ -32,6 +35,9 @@
 **➡️ Return value**
 
 - Type: mixed
+
+
+---
 
 ### set() · [source](../../src/Http/Session.php#L15)
 
@@ -48,6 +54,9 @@
 
 - Type: void
 
+
+---
+
 ### remove() · [source](../../src/Http/Session.php#L20)
 
 `public function remove(string $key): void`
@@ -61,6 +70,9 @@
 **➡️ Return value**
 
 - Type: void
+
+
+---
 
 ### has() · [source](../../src/Http/Session.php#L25)
 
@@ -76,6 +88,9 @@
 
 - Type: bool
 
+
+---
+
 ### clear() · [source](../../src/Http/Session.php#L30)
 
 `public function clear(): void`
@@ -84,3 +99,8 @@
 
 - Type: void
 
+
+
+---
+
+[Back to the Index ⤴](index.md)
