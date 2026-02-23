@@ -272,11 +272,11 @@ User::query()
 
 Contrast with existing helpers:
 
-| Helper | SQL output | Value delivery |
-|---|---|---|
-| `Sql::raw('x + :n', ['n'=>1])` | `x + 1` (literal) | Inlined (escaped) |
-| `Sql::param('n')` | `:n` | Placeholder only — value must be supplied via `Query::bind()` |
-| `Sql::bind('n', 1)` | `:n` | Placeholder **and** value bubbled as PDO param |
+| Helper                         | SQL output        | Value delivery                                                |
+| ------------------------------ | ----------------- | ------------------------------------------------------------- |
+| `Sql::raw('x + :n', ['n'=>1])` | `x + 1` (literal) | Inlined (escaped)                                             |
+| `Sql::param('n')`              | `:n`              | Placeholder only — value must be supplied via `Query::bind()` |
+| `Sql::bind('n', 1)`            | `:n`              | Placeholder **and** value bubbled as PDO param                |
 
 ## Returning SQL Without Executing
 

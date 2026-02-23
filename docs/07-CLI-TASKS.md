@@ -129,16 +129,16 @@ php console.php sync make  <ClassName>  <directory> [options]   # scaffold a new
 
 ### Options
 
-| Flag | Description |
-|---|---|
-| _(none)_ | Dry-run: preview changes without writing files |
-| `--apply` | Write the updated model files to disk |
-| `--database=<role>` | Database role to introspect (default: `read`) |
-| `--generate-accessors` | Generate a camelized getter/setter for each new property |
-| `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private` |
-| `--no-deprecate` | Skip `@deprecated` tags on properties whose columns have been removed |
-| `--create-missing` | (`sync all` only) Scaffold model files for tables that have no matching model |
-| `--namespace=<ns>` | PHP namespace for scaffolded model files (required with `--create-missing`) |
+| Flag                       | Description                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| _(none)_                   | Dry-run: preview changes without writing files                                |
+| `--apply`                  | Write the updated model files to disk                                         |
+| `--database=<role>`        | Database role to introspect (default: `read`)                                 |
+| `--generate-accessors`     | Generate a camelized getter/setter for each new property                      |
+| `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`            |
+| `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed         |
+| `--create-missing`         | (`sync all` only) Scaffold model files for tables that have no matching model |
+| `--namespace=<ns>`         | PHP namespace for scaffolded model files (required with `--create-missing`)   |
 
 ### Examples
 
