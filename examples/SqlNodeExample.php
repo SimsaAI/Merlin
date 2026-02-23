@@ -74,7 +74,7 @@ Query::new()
     ->where('id', 1)
     ->update();
 // SQL: UPDATE articles 
-//      SET updated_by = :userId:, updated_at = FROM_UNIXTIME(:timestamp:)
+//      SET updated_by = :userId, updated_at = FROM_UNIXTIME(:timestamp)
 //      WHERE (id = 1)
 
 

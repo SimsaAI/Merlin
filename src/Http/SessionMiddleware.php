@@ -15,6 +15,14 @@ use Merlin\Mvc\MiddlewareInterface;
  */
 class SessionMiddleware implements MiddlewareInterface
 {
+    /**
+     * Start the PHP session, expose it through {@see AppContext::session()},
+     * invoke the next middleware, then flush the session to storage.
+     *
+     * @param AppContext $context Application context.
+     * @param callable   $next    Next middleware callable.
+     * @return \Merlin\Http\Response|null The response from the downstream pipeline.
+     */
     public function process(AppContext $context, callable $next): ?Response
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {

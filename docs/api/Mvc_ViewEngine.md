@@ -1,4 +1,4 @@
-# 🧩 ViewEngine
+# 🧩 Class: ViewEngine
 
 **Full name:** [Merlin\Mvc\ViewEngine](../../src/Mvc/ViewEngine.php)
 
@@ -206,7 +206,7 @@ Later values override earlier ones for the same keys.
 
 `public function render(string $view, array $vars = []): string`
 
-Render a view (and optional layout) and echo the result.
+Render a view (and optional layout) and return the result.
 
 **🧭 Parameters**
 

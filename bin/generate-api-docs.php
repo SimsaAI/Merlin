@@ -6,6 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use phpDocumentor\Reflection\DocBlock\Tags\Param as ParamTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_ as ReturnTag;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws as ThrowsTag;
+use phpDocumentor\Reflection\DocBlock\Tags\Example as ExampleTag;
 use phpDocumentor\Reflection\DocBlockFactory;
 
 $srcDir = 'src';
@@ -16,21 +17,22 @@ echo "🔍 Scanning $srcDir...\n";
 
 $docFactory = DocBlockFactory::createInstance();
 
-// Find all classes
+// Find all classes and interfaces
 $allClasses = [];
 $namespacedClasses = [];
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($srcDir));
 foreach ($iterator as $file) {
     if ($file->isFile() && $file->getExtension() === 'php') {
         $content = file_get_contents($file->getPathname());
-        if (preg_match_all('/class\s+([A-Za-z0-9_]+)/', $content, $matches)) {
+        if (preg_match_all('/(?:class|interface)\s+([A-Za-z0-9_]+)/', $content, $matches)) {
             $namespace = '';
             if (preg_match('/namespace\s+([^\s;{]+)/', $content, $ns)) {
                 $namespace = trim($ns[1]) . '\\';
             }
             foreach ($matches[1] as $className) {
                 $fqcn = $namespace . $className;
-                if (class_exists($fqcn)) {
+                // include both classes and interfaces
+                if (class_exists($fqcn) || interface_exists($fqcn)) {
                     $ns = substr($namespace, 0, -1);
                     $allClasses[$fqcn] = [
                         'short' => $className,
@@ -43,7 +45,7 @@ foreach ($iterator as $file) {
     }
 }
 
-echo "📝 Generating docs for " . count($allClasses) . " classes...\n";
+echo "📝 Generating docs for " . count($allClasses) . " types (classes & interfaces)...\n";
 
 // Build class registry: maps FQCN and short name -> metadata for link generation.
 // All src links are relative from docs/api/ (two levels up to project root).
@@ -80,7 +82,7 @@ if (!is_dir($docsDir)) {
 foreach (glob($docsDir . '/*.md') as $oldDocFile) {
     @unlink($oldDocFile);
 }
-$indexContent = "# Merlin MVC API\n\n## Classes overview\n\n";
+$indexContent = "# Merlin MVC API\n\n## Classes & Interfaces overview\n\n";
 $sep = '';
 foreach ($namespacedClasses as $namespace => $classes) {
     $indexContent .= $sep;
@@ -114,7 +116,8 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
 
     $srcInfo = $classRegistry[$fqcn] ?? null;
     $classLink = $srcInfo ? "[{$fqcn}]({$srcInfo['srcFile']})" : "`{$fqcn}`";
-    $md = "# 🧩 {$shortName}\n\n";
+    $typeLabel = $reflector->isInterface() ? '🔌 Interface' : '🧩 Class';
+    $md = "# {$typeLabel}: {$shortName}\n\n";
     $md .= "**Full name:** {$classLink}\n\n";
 
     // Class DocComment
@@ -130,6 +133,9 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
             if ($block->hasTag('deprecated')) {
                 $tag = current($block->getTagsByName('deprecated'));
                 $md .= "**🛑 Deprecated**: " . safeTagToString($tag) . "\n\n";
+            }
+            if ($block->hasTag('example')) {
+                $md .= renderExampleTags($block->getTagsByName('example'));
             }
         } catch (Throwable $e) {
             $md .= trim(cleanDocBlock($doc)) . "\n\n";
@@ -289,10 +295,72 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
         $md .= "\n";
     }
 
+    // Example
+    if ($block && $block->hasTag('example')) {
+        $md .= renderExampleTags($block->getTagsByName('example'));
+    }
+
     return $md;
 }
 
 /* ---------------- Helpers ---------------- */
+
+/**
+ * Render one or more @example tags as a fenced PHP code block section.
+ *
+ * phpDocumentor's ExampleTag splits the tag body as:
+ *   @example [filePath] [startLine] [lineCount] [description]
+ *
+ * We treat the combination of filePath + description as inline code when the
+ * filePath does not look like an actual file reference (no extension / path
+ * separator). Real file references are emitted as a prose link instead.
+ */
+function renderExampleTags(array $exampleTags): string
+{
+    if (empty($exampleTags)) {
+        return '';
+    }
+
+    $count = count($exampleTags);
+    $md = '**💡 ' . ($count === 1 ? 'Example' : 'Examples') . "**\n\n";
+
+    foreach ($exampleTags as $tag) {
+        if (!($tag instanceof ExampleTag)) {
+            $raw = trim(safeTagToString($tag));
+            if ($raw !== '') {
+                $md .= "```php\n{$raw}\n```\n\n";
+            }
+            continue;
+        }
+
+        $filePath = trim($tag->getFilePath());
+        $desc = trim((string) $tag->getDescription());
+
+        // Looks like a real file when it has an extension or a path separator.
+        $looksLikeFile = $filePath !== '' &&
+            (str_contains($filePath, '/') ||
+                str_contains($filePath, '\\') ||
+                preg_match('/\.[a-zA-Z]{2,5}$/', $filePath));
+
+        if ($looksLikeFile) {
+            $lineInfo = '';
+            $start = $tag->getStartingLine();
+            $count = $tag->getLineCount();
+            if ($start > 1) {
+                $lineInfo = " (line{$start}" . ($count > 0 ? '–' . ($start + $count - 1) : '') . ')';
+            }
+            $md .= "`{$filePath}`{$lineInfo}" . ($desc !== '' ? " – {$desc}" : '') . "\n\n";
+        } else {
+            // Treat the whole tag body as an inline PHP snippet.
+            $code = rtrim($filePath . ($desc !== '' ? "\n" . $desc : ''));
+            if ($code !== '') {
+                $md .= "```php\n{$code}\n```\n\n";
+            }
+        }
+    }
+
+    return $md;
+}
 
 function makeDocFileName(string $fqcn): string
 {

@@ -1,4 +1,4 @@
-# 🧩 DatabaseManager
+# 🧩 Class: DatabaseManager
 
 **Full name:** [Merlin\Db\DatabaseManager](../../src/Db/DatabaseManager.php)
 

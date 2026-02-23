@@ -1,14 +1,15 @@
-# 🧩 Model
+# 🧩 Class: Model
 
 **Full name:** [Merlin\Mvc\Model](../../src/Mvc/Model.php)
 
 ## 🚀 Public methods
 
-### source() · [source](../../src/Mvc/Model.php#L27)
+### source() · [source](../../src/Mvc/Model.php#L28)
 
 `public function source(): string`
 
-Return the table or view name for this model. By default, it converts the class name from CamelCase to snake_case.
+Return the table or view name for this model. By default, it converts the
+short class name (without namespace) from CamelCase to snake_case.
 
 Override this method if you want to specify a custom source.
 
@@ -19,7 +20,7 @@ Override this method if you want to specify a custom source.
 
 ---
 
-### schema() · [source](../../src/Mvc/Model.php#L36)
+### schema() · [source](../../src/Mvc/Model.php#L42)
 
 `public function schema(): string|null`
 
@@ -34,7 +35,7 @@ Override this method if you want to specify a schema (e.g. for PostgreSQL).
 
 ---
 
-### idFields() · [source](../../src/Mvc/Model.php#L46)
+### idFields() · [source](../../src/Mvc/Model.php#L52)
 
 `public function idFields(): array`
 
@@ -50,7 +51,7 @@ Override this method if your model has a different primary key or composite keys
 
 ---
 
-### query() · [source](../../src/Mvc/Model.php#L61)
+### query() · [source](../../src/Mvc/Model.php#L67)
 
 `public static function query(string|null $alias = null): Merlin\Db\Query`
 
@@ -71,7 +72,7 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 ---
 
-### create() · [source](../../src/Mvc/Model.php#L77)
+### create() · [source](../../src/Mvc/Model.php#L83)
 
 `public static function create(array $values): static`
 
@@ -91,7 +92,7 @@ Create a new model instance with the given values and save it to the database. R
 
 ---
 
-### forceCreate() · [source](../../src/Mvc/Model.php#L94)
+### forceCreate() · [source](../../src/Mvc/Model.php#L100)
 
 `public static function forceCreate(array $values): static`
 
@@ -111,7 +112,7 @@ Force create a new model instance with the given values, bypassing any checks fo
 
 ---
 
-### firstOrCreate() · [source](../../src/Mvc/Model.php#L114)
+### firstOrCreate() · [source](../../src/Mvc/Model.php#L120)
 
 `public static function firstOrCreate(array $conditions, array $values = []): static`
 
@@ -132,7 +133,7 @@ Find the first model matching the given conditions or create a new one with the 
 
 ---
 
-### updateOrCreate() · [source](../../src/Mvc/Model.php#L131)
+### updateOrCreate() · [source](../../src/Mvc/Model.php#L137)
 
 `public static function updateOrCreate(array $conditions, array $values = []): static`
 
@@ -153,7 +154,7 @@ Find the first model matching the given conditions or update it with the provide
 
 ---
 
-### find() · [source](../../src/Mvc/Model.php#L155)
+### find() · [source](../../src/Mvc/Model.php#L161)
 
 `public static function find(mixed $id): static|null`
 
@@ -172,7 +173,7 @@ Finds a model by its ID(s)
 
 ---
 
-### findOrFail() · [source](../../src/Mvc/Model.php#L195)
+### findOrFail() · [source](../../src/Mvc/Model.php#L201)
 
 `public static function findOrFail(mixed $id): static`
 
@@ -195,7 +196,7 @@ Finds a model by its ID(s) or throws an exception if not found
 
 ---
 
-### findOne() · [source](../../src/Mvc/Model.php#L209)
+### findOne() · [source](../../src/Mvc/Model.php#L215)
 
 `public static function findOne(array $conditions): static|null`
 
@@ -215,7 +216,7 @@ Finds the first model matching the given conditions or returns null if none foun
 
 ---
 
-### findAll() · [source](../../src/Mvc/Model.php#L223)
+### findAll() · [source](../../src/Mvc/Model.php#L229)
 
 `public static function findAll(array $conditions = []): Merlin\Db\ResultSet`
 
@@ -235,7 +236,7 @@ Find all models matching the given conditions. If no conditions are provided, it
 
 ---
 
-### exists() · [source](../../src/Mvc/Model.php#L237)
+### exists() · [source](../../src/Mvc/Model.php#L243)
 
 `public static function exists(array $conditions): bool`
 
@@ -255,7 +256,7 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 ---
 
-### count() · [source](../../src/Mvc/Model.php#L251)
+### count() · [source](../../src/Mvc/Model.php#L257)
 
 `public static function count(array $conditions = []): int`
 
@@ -275,7 +276,7 @@ Count the number of models matching the given conditions. Returns the count as a
 
 ---
 
-### saveState() · [source](../../src/Mvc/Model.php#L270)
+### saveState() · [source](../../src/Mvc/Model.php#L276)
 
 `public function saveState(): static`
 
@@ -288,7 +289,7 @@ Save the current state of the model for change tracking. This method clones the 
 
 ---
 
-### loadState() · [source](../../src/Mvc/Model.php#L280)
+### loadState() · [source](../../src/Mvc/Model.php#L286)
 
 `public function loadState(): static`
 
@@ -301,7 +302,7 @@ Load the saved state of the model back into the current instance. This method co
 
 ---
 
-### getState() · [source](../../src/Mvc/Model.php#L298)
+### getState() · [source](../../src/Mvc/Model.php#L304)
 
 `public function getState(): static|null`
 
@@ -315,7 +316,7 @@ Get the saved state object for this model. This returns the clone of the model t
 
 ---
 
-### hasChanged() · [source](../../src/Mvc/Model.php#L351)
+### hasChanged() · [source](../../src/Mvc/Model.php#L357)
 
 `public function hasChanged(): bool`
 
@@ -329,7 +330,7 @@ Check if any fields have changed since the last saveState() call. This compares 
 
 ---
 
-### save() · [source](../../src/Mvc/Model.php#L364)
+### save() · [source](../../src/Mvc/Model.php#L370)
 
 `public function save(): bool`
 
@@ -343,7 +344,7 @@ Save the model to the database. If the model has all ID fields set, it performs 
 
 ---
 
-### insert() · [source](../../src/Mvc/Model.php#L392)
+### insert() · [source](../../src/Mvc/Model.php#L398)
 
 `public function insert(): bool`
 
@@ -357,7 +358,7 @@ Insert the model as a new record in the database. This method performs an INSERT
 
 ---
 
-### update() · [source](../../src/Mvc/Model.php#L407)
+### update() · [source](../../src/Mvc/Model.php#L413)
 
 `public function update(): bool`
 
@@ -371,7 +372,7 @@ Update the existing record in the database with any changed fields. This method 
 
 ---
 
-### delete() · [source](../../src/Mvc/Model.php#L500)
+### delete() · [source](../../src/Mvc/Model.php#L506)
 
 `public function delete(): bool`
 
@@ -385,15 +386,17 @@ Delete the model from the database. This method requires that all ID fields are 
 
 ---
 
-### setDefaultRole() · [source](../../src/Mvc/Model.php#L520)
+### setDefaultRole() · [source](../../src/Mvc/Model.php#L531)
 
 `public static function setDefaultRole(string $role): void`
 
+Set both the read and write database role for this model class.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - |  |
+| `$role` | string | - | Named role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
@@ -402,15 +405,17 @@ Delete the model from the database. This method requires that all ID fields are 
 
 ---
 
-### setDefaultReadRole() · [source](../../src/Mvc/Model.php#L526)
+### setDefaultReadRole() · [source](../../src/Mvc/Model.php#L542)
 
 `public static function setDefaultReadRole(string $role): void`
 
+Set the database role used for SELECT queries on this model class.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - |  |
+| `$role` | string | - | Named read role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
@@ -419,15 +424,17 @@ Delete the model from the database. This method requires that all ID fields are 
 
 ---
 
-### setDefaultWriteRole() · [source](../../src/Mvc/Model.php#L531)
+### setDefaultWriteRole() · [source](../../src/Mvc/Model.php#L552)
 
 `public static function setDefaultWriteRole(string $role): void`
 
+Set the database role used for INSERT/UPDATE/DELETE queries on this model class.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - |  |
+| `$role` | string | - | Named write role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
@@ -436,9 +443,13 @@ Delete the model from the database. This method requires that all ID fields are 
 
 ---
 
-### readConnection() · [source](../../src/Mvc/Model.php#L556)
+### readConnection() · [source](../../src/Mvc/Model.php#L584)
 
 `public function readConnection(): Merlin\Db\Database`
+
+Return the database connection used for read (SELECT) queries.
+
+Resolves the configured read role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
 
 **➡️ Return value**
 
@@ -447,9 +458,13 @@ Delete the model from the database. This method requires that all ID fields are 
 
 ---
 
-### writeConnection() · [source](../../src/Mvc/Model.php#L562)
+### writeConnection() · [source](../../src/Mvc/Model.php#L597)
 
 `public function writeConnection(): Merlin\Db\Database`
+
+Return the database connection used for write (INSERT/UPDATE/DELETE) queries.
+
+Resolves the configured write role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
 
 **➡️ Return value**
 

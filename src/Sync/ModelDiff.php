@@ -1,0 +1,160 @@
+<?php
+namespace Merlin\Sync;
+
+use Merlin\Sync\Schema\TableSchema;
+
+class ModelDiff
+{
+    /**
+     * @return DiffOperation[]
+     */
+    public function diff(TableSchema $table, ParsedModel $model): array
+    {
+        $ops = [];
+
+        // Build DB column map
+        $dbCols = [];
+        foreach ($table->columns as $col) {
+            $dbCols[$col->name] = $col;
+        }
+
+        // Properties are already name-keyed in ParsedModel
+        $phpProps = $model->properties;
+
+        // 1. Missing properties (DB → PHP)
+        foreach ($dbCols as $name => $col) {
+            if (!isset($phpProps[$name])) {
+                $op = new AddProperty();
+                $op->property = $name;
+                $op->type = $this->mapColumnToPhpType($col);
+                $op->nullable = $col->nullable && !$col->primary;
+                $op->comment = $col->comment;
+                $ops[] = $op;
+            }
+        }
+
+        // 2. Orphaned properties (PHP → DB): mark @deprecated
+        foreach ($phpProps as $name => $prop) {
+            if (!isset($dbCols[$name])) {
+                $op = new RemoveProperty();
+                $op->property = $name;
+                $ops[] = $op;
+            }
+        }
+
+        // 3. Type changes
+        foreach ($dbCols as $name => $col) {
+            if (isset($phpProps[$name])) {
+                $phpType = $phpProps[$name]->type;
+                $dbType = $this->mapColumnToPhpType($col);
+
+                if ($phpType !== $dbType) {
+                    $op = new UpdatePropertyType();
+                    $op->property = $name;
+                    $op->oldType = $phpType;
+                    $op->newType = $dbType;
+                    $ops[] = $op;
+                }
+            }
+        }
+
+        // 4. Comment changes (only when DB provides a column comment)
+        foreach ($dbCols as $name => $col) {
+            if (isset($phpProps[$name]) && $col->comment !== null) {
+                $phpComment = $phpProps[$name]->docComment;
+                $dbComment = $col->comment;
+
+                if ($this->normalizeComment($phpComment) !== $this->normalizeComment($dbComment)) {
+                    $op = new UpdatePropertyComment();
+                    $op->property = $name;
+                    $op->oldComment = $phpComment;
+                    $op->newComment = $dbComment;
+                    $ops[] = $op;
+                }
+            }
+        }
+
+        // 5. Table comment → class PHPDoc (only when table has a comment)
+        if (
+            $table->comment !== null &&
+            $this->normalizeComment($model->classComment) !== $this->normalizeComment($table->comment)
+        ) {
+            $op = new UpdateClassComment();
+            $op->oldComment = $model->classComment;
+            $op->newComment = $table->comment;
+            $ops[] = $op;
+        }
+
+        return $ops;
+    }
+
+    private function mapColumnToPhpType(\Merlin\Sync\Schema\ColumnSchema $col): string
+    {
+        $base = $this->mapDbTypeToPhp($col->type);
+        return ($col->nullable && !$col->primary) ? '?' . $base : $base;
+    }
+
+    private function mapDbTypeToPhp(string $dbType): string
+    {
+        $dbType = strtolower($dbType);
+
+        return match (true) {
+            str_contains($dbType, 'int') => 'int',
+            str_contains($dbType, 'bool') => 'bool',
+            str_contains($dbType, 'decimal'),
+            str_contains($dbType, 'numeric'),
+            str_contains($dbType, 'float'),
+            str_contains($dbType, 'double'),
+            str_contains($dbType, 'real') => 'float',
+            str_contains($dbType, 'char'),
+            str_contains($dbType, 'text'),
+            str_contains($dbType, 'varchar'),
+            str_contains($dbType, 'date'),
+            str_contains($dbType, 'time'),
+            str_contains($dbType, 'json'),
+            str_contains($dbType, 'uuid'),
+            str_contains($dbType, 'enum') => 'string',
+            default => 'string',
+        };
+    }
+
+    private function normalizeComment(?string $comment): string
+    {
+        return trim((string) $comment);
+    }
+}
+
+abstract class DiffOperation
+{
+    public string $property;
+}
+
+class AddProperty extends DiffOperation
+{
+    public string $type;
+    public bool $nullable = false;
+    public ?string $comment;
+}
+
+class RemoveProperty extends DiffOperation
+{
+    public bool $markDeprecated = true;
+}
+
+class UpdatePropertyType extends DiffOperation
+{
+    public string $oldType;
+    public string $newType;
+}
+
+class UpdatePropertyComment extends DiffOperation
+{
+    public ?string $oldComment;
+    public ?string $newComment;
+}
+
+class UpdateClassComment extends DiffOperation
+{
+    public ?string $oldComment;
+    public ?string $newComment;
+}

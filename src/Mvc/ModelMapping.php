@@ -45,6 +45,28 @@ class ModelMapping
 		return $instance;
 	}
 
+	/** Whether to pluralize table names automatically when no source is given */
+	protected static bool $pluralizeTableNames = false;
+
+	/**
+	 * Enable or disable automatic table name pluralization.
+	 * When enabled, model names are converted to plural snake_case table names
+	 * (e.g. User → users, AdminUser → admin_users, Person → people).
+	 * Explicit source names passed to add() are never modified.
+	 */
+	public static function usePluralTableNames(bool $enable): void
+	{
+		self::$pluralizeTableNames = $enable;
+	}
+
+	/**
+	 * Returns whether automatic table name pluralization is enabled.
+	 */
+	public static function usingPluralTableNames(): bool
+	{
+		return self::$pluralizeTableNames;
+	}
+
 	/**
 	 * Add model mapping
 	 * @param string $name
@@ -58,8 +80,7 @@ class ModelMapping
 			throw new \InvalidArgumentException('Model name cannot be empty');
 		}
 		if (empty($source)) {
-			// AdminUserFlags -> admin_user_flags
-			$source = static::toSnakeCase($name);
+			$source = static::convertModelToSource($name);
 		}
 		$this->mapping[$name] = [
 			'source' => $source,
@@ -86,6 +107,35 @@ class ModelMapping
 	public function toArray(): array
 	{
 		return $this->mapping;
+	}
+
+	/**
+	 * Convert a model name to a default source name (table name).
+	 * By default, converts PascalCase or camelCase to snake_case (e.g. AdminUser → admin_user).
+	 * When pluralization is enabled, the last word segment is pluralized (e.g. AdminUser → admin_users).
+	 *
+	 * @param string $modelName The model class name to convert.
+	 * @return string The converted source name (table name).
+	 */
+	public static function convertModelToSource(string $modelName): string
+	{
+		// AdminUserFlags -> admin_user_flags
+		$source = static::toSnakeCase($modelName);
+		if (self::$pluralizeTableNames) {
+			// Pluralize only the last word segment (e.g. admin_user -> admin_users)
+			$pos = strrpos($source, '_');
+			if ($pos !== false) {
+				$prefix = substr($source, 0, $pos);
+				$suffix = substr($source, $pos + 1);
+				$suffix = static::pluralize($suffix);
+				$source = $prefix . '_' . $suffix;
+			} else {
+				// single word model name (e.g. User -> users)
+				// -> pluralize the whole name
+				$source = static::pluralize($source);
+			}
+		}
+		return $source;
 	}
 
 	/**
@@ -147,4 +197,131 @@ class ModelMapping
 		return $result;
 	}
 
+	/** Irregular singular → plural mappings */
+	protected static array $irregulars = [
+		'person' => 'people',
+		'mouse' => 'mice',
+		'child' => 'children',
+		'man' => 'men',
+		'woman' => 'women',
+		'tooth' => 'teeth',
+		'foot' => 'feet',
+		'goose' => 'geese',
+		'ox' => 'oxen',
+		'louse' => 'lice',
+		'cactus' => 'cacti',
+		'focus' => 'foci',
+		'analysis' => 'analyses',
+		'index' => 'indices',
+		'appendix' => 'appendices',
+
+		// additional Latin/Greek irregulars
+		'datum' => 'data',
+		'bacterium' => 'bacteria',
+		'criterion' => 'criteria',
+		'phenomenon' => 'phenomena',
+		'medium' => 'media',
+		'radius' => 'radii',
+		'matrix' => 'matrices',
+		'vertex' => 'vertices',
+		'axis' => 'axes',
+		'fungus' => 'fungi',
+		'syllabus' => 'syllabi',
+
+		// invariant plurals (same singular and plural)
+		'sheep' => 'sheep',
+		'deer' => 'deer',
+		'fish' => 'fish',
+		'species' => 'species',
+		'series' => 'series',
+		'aircraft' => 'aircraft',
+		'moose' => 'moose',
+		'salmon' => 'salmon',
+		'bison' => 'bison',
+		'offspring' => 'offspring',
+
+		// other common irregulars
+		'thesis' => 'theses',
+		'crisis' => 'crises',
+		'diagnosis' => 'diagnoses',
+		'parenthesis' => 'parentheses',
+		'synthesis' => 'syntheses',
+	];
+
+	/**
+	 * Return the plural form of a word (always lowercase).
+	 * Returns the word unchanged if it appears to be already plural.
+	 * Irregular plurals are applied first; regular suffix rules are used otherwise.
+	 *
+	 * @param string $word Singular word.
+	 * @return string Pluralized lowercase word.
+	 */
+	public static function pluralize(string $word): string
+	{
+		$word = mb_strtolower($word);
+
+		// 0) already plural – return unchanged
+		if (static::isAlreadyPlural($word)) {
+			return $word;
+		}
+
+		// 1) irregular plurals
+		if (isset(self::$irregulars[$word])) {
+			return self::$irregulars[$word];
+		}
+
+		// 2) words ending with y preceded by a consonant -> replace y with ies
+		if (preg_match('/[b-df-hj-np-tv-z]y$/', $word)) {
+			return preg_replace('/y$/', 'ies', $word);
+		}
+
+		// 3) words ending with s, sh, ch, x, z -> add es
+		if (preg_match('/(s|sh|ch|x|z)$/', $word)) {
+			return $word . 'es';
+		}
+
+		// 4) words ending with f or fe -> replace with ves
+		if (preg_match('/(fe|f)$/', $word)) {
+			return preg_replace('/(fe|f)$/', 'ves', $word);
+		}
+
+		// 5) default: append s
+		return $word . 's';
+	}
+
+	/**
+	 * Returns true when a word appears to already be plural, preventing double pluralization.
+	 *
+	 * Detected cases:
+	 * - Known irregular plural values (people, children, …)
+	 * - Words ending in ies / ves  (categories, knives)
+	 * - Words ending in sibilant+es suffixes (classes, boxes, churches, …)
+	 * - Words ending in a non-sibilant consonant followed by s (flags, items, users)
+	 *
+	 * Limitation: regular plurals ending in a vowel + s (e.g. "roles") are not detected.
+	 */
+	protected static function isAlreadyPlural(string $word): bool
+	{
+		static $irregularsFlipped = null;
+		if ($irregularsFlipped === null) {
+			$irregularsFlipped = array_flip(self::$irregulars);
+		}
+
+		// known irregular plural values
+		if (isset($irregularsFlipped[$word])) {
+			return true;
+		}
+
+		// common plural suffixes produced by the pluralize rules
+		if (preg_match('/(ies|ves|ses|xes|zes|ches|shes)$/', $word)) {
+			return true;
+		}
+
+		// ends in a non-sibilant consonant + s  →  flags, items, users, cards, …
+		if (preg_match('/[bcdfghjklmnpqrtvwyz]s$/', $word)) {
+			return true;
+		}
+
+		return false;
+	}
 }

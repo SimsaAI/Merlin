@@ -39,7 +39,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 
 - **Request** - Normalized access to GET, POST, headers, and file uploads
 - **Response** - Fluent response building with JSON, redirects, and status codes
-- **Session** - Secure session management with flash messages
+- **Session** - Simple session management with pluggable storage handlers
 - **Cookies** - Easy cookie handling with encryption support
 - **Middleware** - Composable request/response filters
 
@@ -168,6 +168,20 @@ class User extends \Merlin\Mvc\Model
 // Find by primary key
 $user = User::find(1);
 
+// Update and save
+$user->email = 'john@example.com';
+$user->save();
+
+// Create new record
+$newUser = User::create([
+    'username' => 'jane',
+    'email' => 'jane@example.com',
+]);
+$newUser->save();
+
+// Delete record
+$newUser->delete();
+
 // Check existence
 $exists = User::exists(['email' => 'john@example.com']);
 
@@ -230,14 +244,13 @@ $results = Order::query('o')
 
 #### Using the Query Builder Directly on Tables
 
+For raw queries without models, you can use the Query builder directly.
+This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with `Query::new()` and specify the table manually.
+
 ```php
 use Merlin\Db\Query;
 
-// For raw queries without models, you can use the Query builder directly.
-// This is useful for complex queries that don't fit the Active Record pattern
-// or when you want more control over the SQL being generated. The API is
-// the same as the model query builder, but you start with Query::new() and
-// specify the table manually.
+
 Query::useModels(false);
 
 $results = Query::new()
@@ -299,7 +312,6 @@ $action = $argv[2] ?? null;
 $params = array_slice($argv, 3);
 
 $console = new Console();
-$console->setNamespace('App\\Tasks');
 $console->process($task, $action, $params);
 ```
 
@@ -381,10 +393,12 @@ use Merlin\Db\Database;
 $ctx = AppContext::instance();
 
 // Register database connection(s)
-$ctx->dbManager()->set('default', fn() => new Database('mysql:host=localhost;dbname=app', 'user', 'pass'));
+$ctx->dbManager()->set('default',
+    fn() => new Database('mysql:host=localhost;dbname=app', 'user', 'pass')
+);
 
 // Configure services
-$ctx->view()->setPath(__DIR__ . '/app/views');
+$ctx->view()->setPath(__DIR__ . '/views');
 
 // Access services anywhere
 $ctx = AppContext::instance();

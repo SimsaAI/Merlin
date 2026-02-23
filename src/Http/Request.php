@@ -12,7 +12,7 @@ class Request
 	 * Caches the body since php://input can only be read once
 	 * @return string
 	 */
-	public function getRequestBody()
+	public function getRequestBody(): bool|string
 	{
 		static $body = null;
 		if ($body === null) {
@@ -25,8 +25,9 @@ class Request
 	 * Get and parse JSON request body
 	 * @param bool $assoc When true, returns associative arrays. When false, returns objects
 	 * @return mixed Returns the parsed JSON data, or null on error
+	 * @throws \RuntimeException if the JSON body cannot be parsed
 	 */
-	public function getJsonBody($assoc = true)
+	public function getJsonBody($assoc = true): mixed
 	{
 		$body = $this->getRequestBody();
 		$jsonBody = json_decode($body, $assoc);
@@ -38,44 +39,44 @@ class Request
 
 	/**
 	 * Get a parameter from the request (GET, POST, COOKIE, etc.)
-	 * @param string $name
+	 * @param ?string $name
 	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
-	public function get($name = null, $defaultValue = null)
+	public function get(?string $name = null, mixed $defaultValue = null): mixed
 	{
 		return isset($name) ? (isset($_REQUEST[$name]) ? $_REQUEST[$name] : $defaultValue) : $_REQUEST;
 	}
 
 	/**
 	 * Get a POST parameter from the request
-	 * @param string $name
+	 * @param ?string $name
 	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
-	public function getPost($name = null, $defaultValue = null)
+	public function getPost(?string $name = null, mixed $defaultValue = null): mixed
 	{
 		return isset($name) ? (isset($_POST[$name]) ? $_POST[$name] : $defaultValue) : $_POST;
 	}
 
 	/**
 	 * Get a query parameter from the request
-	 * @param string $name
+	 * @param ?string $name
 	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
-	public function getQuery($name = null, $defaultValue = null)
+	public function getQuery(?string $name = null, mixed $defaultValue = null): mixed
 	{
 		return isset($name) ? (isset($_GET[$name]) ? $_GET[$name] : $defaultValue) : $_GET;
 	}
 
 	/**
 	 * Get a server variable from the request
-	 * @param string $name
+	 * @param ?string $name
 	 * @param mixed $defaultValue
 	 * @return mixed
 	 */
-	public function getServer($name = null, $defaultValue = null)
+	public function getServer(?string $name = null, mixed $defaultValue = null): mixed
 	{
 		return isset($name) ? (isset($_SERVER[$name]) ? $_SERVER[$name] : $defaultValue) : $_SERVER;
 	}
@@ -84,7 +85,7 @@ class Request
 	 * Get the HTTP method of the request, accounting for method overrides in POST requests
 	 * @return string
 	 */
-	public function getMethod()
+	public function getMethod(): string
 	{
 		$requestMethod = 'GET';
 		if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -104,7 +105,7 @@ class Request
 	 * Get the request scheme (http or https)
 	 * @return string
 	 */
-	public function getScheme()
+	public function getScheme(): string
 	{
 		return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
 	}
@@ -113,7 +114,7 @@ class Request
 	 * Get the server name from the request
 	 * @return string
 	 */
-	public function getServerName()
+	public function getServerName(): string
 	{
 		return isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost';
 	}
@@ -122,7 +123,7 @@ class Request
 	 * Get the server IP address
 	 * @return string
 	 */
-	public function getServerAddr()
+	public function getServerAddr(): string
 	{
 		return isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : gethostbyname('localhost');
 	}
@@ -131,7 +132,7 @@ class Request
 	 * Get the host from the request, accounting for Host header and server variables
 	 * @return string
 	 */
-	public function getHttpHost()
+	public function getHttpHost(): string
 	{
 		if (!empty($_SERVER['HTTP_HOST'])) {
 			return $_SERVER['HTTP_HOST'];
@@ -149,7 +150,7 @@ class Request
 	 * Get the port number from the request, accounting for standard ports and Host header
 	 * @return int
 	 */
-	public function getPort()
+	public function getPort(): int
 	{
 		if (!empty($_SERVER['HTTP_HOST'])) {
 			$host = $_SERVER['HTTP_HOST'];
@@ -166,7 +167,7 @@ class Request
 	 * Get the Content-Type header from the request
 	 * @return string
 	 */
-	public function getContentType()
+	public function getContentType(): string
 	{
 		if (isset($_SERVER['CONTENT_TYPE'])) {
 			return $_SERVER['CONTENT_TYPE'];
@@ -179,7 +180,7 @@ class Request
 	 * @param bool $trustForwardedHeader
 	 * @return string|bool
 	 */
-	public function getClientAddress($trustForwardedHeader = false)
+	public function getClientAddress(bool $trustForwardedHeader = false): string|bool
 	{
 		// return IP given by proxy?
 
@@ -211,7 +212,7 @@ class Request
 	 * Get the request URI
 	 * @return string
 	 */
-	public function getUri()
+	public function getUri(): string
 	{
 		return $_SERVER['REQUEST_URI'] ?? '/';
 	}
@@ -230,18 +231,12 @@ class Request
 	 * Get the User-Agent header from the request
 	 * @return string
 	 */
-	public function getUserAgent()
+	public function getUserAgent(): string
 	{
 		return $_SERVER['HTTP_USER_AGENT'] ?? '';
 	}
 
-	/**
-	 * @param $serverIndex
-	 * @param $name
-	 * @param $sort
-	 * @return array
-	 */
-	protected final function _getQualityHeader($serverIndex, $name, $sort)
+	protected final function _getQualityHeader(string $serverIndex, string $name, bool $sort): array
 	{
 		// Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8
 		// Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
@@ -270,9 +265,10 @@ class Request
 			}
 		}
 		if ($sort && $needSort) {
-			usort($returnedParts, function ($a, $b) {
-				return (int) ($b['quality'] * 100) <=> (int) ($a['quality'] * 100);
-			});
+			usort(
+				$returnedParts,
+				fn($a, $b) => (int) ($b['quality'] * 100) <=> (int) ($a['quality'] * 100)
+			);
 		}
 		return $returnedParts;
 	}
@@ -281,7 +277,7 @@ class Request
 	 * Gets an array with mime/types and their quality accepted by the browser/client from _SERVER["HTTP_ACCEPT"]
 	 * @return array
 	 */
-	public function getAcceptableContent($sort = false)
+	public function getAcceptableContent(bool $sort = false): array
 	{
 		return $this->_getQualityHeader('HTTP_ACCEPT', 'accept', $sort);
 	}
@@ -290,7 +286,7 @@ class Request
 	 * Gets best mime/type accepted by the browser/client from _SERVER["HTTP_ACCEPT"]
 	 * @return string
 	 */
-	public function getBestAccept()
+	public function getBestAccept(): string
 	{
 		return $this->getAcceptableContent(true)[0]['accept'] ?? '';
 	}
@@ -299,7 +295,7 @@ class Request
 	 * Gets a charsets array and their quality accepted by the browser/client from _SERVER["HTTP_ACCEPT_CHARSET"]
 	 * @return array
 	 */
-	public function getClientCharsets($sort = false)
+	public function getClientCharsets(bool $sort = false): array
 	{
 		return $this->_getQualityHeader("HTTP_ACCEPT_CHARSET", 'charset', $sort);
 	}
@@ -308,7 +304,7 @@ class Request
 	 * Gets best charset accepted by the browser/client from _SERVER["HTTP_ACCEPT_CHARSET"]
 	 * @return string
 	 */
-	public function getBestCharset()
+	public function getBestCharset(): string
 	{
 		return $this->getClientCharsets(true)[0]['charset'] ?? '';
 	}
@@ -316,7 +312,7 @@ class Request
 	/**
 	 * Gets languages array and their quality accepted by the browser/client from _SERVER["HTTP_ACCEPT_LANGUAGE"]
 	 */
-	public function getLanguages($sort = false)
+	public function getLanguages(bool $sort = false): array
 	{
 		return $this->_getQualityHeader("HTTP_ACCEPT_LANGUAGE", 'language', $sort);
 	}
@@ -324,7 +320,7 @@ class Request
 	/**
 	 * Gets best language accepted by the browser/client from _SERVER["HTTP_ACCEPT_LANGUAGE"]
 	 */
-	public function getBestLanguage()
+	public function getBestLanguage(): string
 	{
 		return $this->getLanguages(true)[0]['language'] ?? '';
 	}
@@ -333,7 +329,7 @@ class Request
 	 * Gets auth info accepted by the browser/client from $_SERVER['PHP_AUTH_USER']
 	 * @return array|null
 	 */
-	public function getBasicAuth()
+	public function getBasicAuth(): array|null
 	{
 		if (isset($_SERVER["PHP_AUTH_USER"]) && isset($_SERVER["PHP_AUTH_PW"])) {
 			return [
@@ -348,7 +344,7 @@ class Request
 	 * Gets auth info accepted by the browser/client from $_SERVER['PHP_AUTH_DIGEST']
 	 * @return array|null
 	 */
-	public function getDigestAuth()
+	public function getDigestAuth(): array|null
 	{
 		if (isset($_SERVER["PHP_AUTH_DIGEST"])) {
 			if (preg_match_all("#(\\w+)=(['\"]?)([^'\" ,]+)\\2#", $_SERVER["PHP_AUTH_DIGEST"], $matches, 2)) {
@@ -368,10 +364,10 @@ class Request
 	 */
 	public function isAjax(): bool
 	{
-		// Classic jQuery-Header (if set)
+		// JSON-Requests (fetch, axios, modern Clients)
 		if (
-			isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-			$_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest'
+			isset($_SERVER['CONTENT_TYPE']) &&
+			str_contains($_SERVER['CONTENT_TYPE'], 'application/json')
 		) {
 			return true;
 		}
@@ -384,9 +380,10 @@ class Request
 			return true;
 		}
 
+		// Classic jQuery-Header (if set)
 		if (
-			isset($_SERVER['CONTENT_TYPE']) &&
-			str_contains($_SERVER['CONTENT_TYPE'], 'application/json')
+			isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+			$_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest'
 		) {
 			return true;
 		}
@@ -395,72 +392,59 @@ class Request
 	}
 
 	/**
-	 * Checks whether request has been made using SOAP
-	 * @return bool
-	 */
-	public function isSoap()
-	{
-		if (isset($_SERVER["HTTP_SOAPACTION"])) {
-			return true;
-		} else {
-			return $this->getContentType() == 'application/soap+xml';
-		}
-	}
-
-	/**
 	 * Checks whether request has been made using HTTPS
 	 * @return bool
 	 */
-	public function isSecure()
+	public function isSecure(): bool
 	{
 		return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 	}
 
 	/**
-	 * Checks whether request has been made using GET method
+	 * Checks whether the request method is POST
 	 * @return bool
 	 */
-	public function isPost()
+	public function isPost(): bool
 	{
 		return $this->getMethod() === 'POST';
 	}
 
 	/**
-	 * Checks whether request has been made using GET method
-	 * @param string $name
+	 * Checks whether a parameter is present in the combined request data ($_REQUEST)
+	 * @param string $name Parameter name
 	 * @return bool
 	 */
-	public function has($name)
+	public function has($name): bool
 	{
 		return isset($_REQUEST[$name]);
 	}
 
 	/**
-	 * Checks whether request has been made using POST method
-	 * @param string $name
+	 * Checks whether a parameter is present in the POST data ($_POST)
+	 * @param string $name Parameter name
 	 * @return bool
 	 */
-	public function hasPost($name)
+	public function hasPost($name): bool
 	{
 		return isset($_POST[$name]);
 	}
 
 	/**
-	 * Checks whether request has been made using GET method
-	 * @param string $name
+	 * Checks whether a parameter is present in the query string ($_GET)
+	 * @param string $name Parameter name
 	 * @return bool
 	 */
-	public function hasQuery($name)
+	public function hasQuery($name): bool
 	{
 		return isset($_GET[$name]);
 	}
 
 	/**
-	 * Checks whether request has been made using GET method
-	 * @param string $name
+	 * Checks whether a server variable is present in $_SERVER
+	 * @param string $name Server variable name
 	 * @return bool
 	 */
-	public function hasServer($name)
+	public function hasServer($name): bool
 	{
 		return isset($_SERVER[$name]);
 	}

@@ -1,20 +1,9 @@
-# 🧩 ResolvedRoute
+# 🧩 Class: ResolvedRoute
 
 **Full name:** [Merlin\ResolvedRoute](../../src/AppContext.php)
 
-Class ResolvedRoute
-
-Represents the fully resolved route and execution context used by the
-dispatcher to invoke the matched controller and action.
-
-This includes:
-- the effective namespace (after applying route group namespaces)
-- the resolved controller class
-- the resolved action method name
-- the resolved action method parameters
-- route variables extracted from the URL
-- route middleware groups
-- route overrides (e.g. controller/action)
+ResolvedRoute represents the fully resolved route and execution context
+used by the dispatcher to invoke the matched controller and action.
 
 ## 🔐 Public Properties
 
@@ -28,21 +17,23 @@ This includes:
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/AppContext.php#L308)
+### __construct() · [source](../../src/AppContext.php#L312)
 
 `public function __construct(string|null $namespace, string $controller, string $action, array $params, array $vars, array $groups, array $override): mixed`
+
+Create a new ResolvedRoute instance with the given parameters.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$namespace` | string\|null | - |  |
-| `$controller` | string | - |  |
-| `$action` | string | - |  |
-| `$params` | array | - |  |
-| `$vars` | array | - |  |
-| `$groups` | array | - |  |
-| `$override` | array | - |  |
+| `$namespace` | string\|null | - | Effective namespace for the controller, after applying route group namespaces. Null if no namespace is used. |
+| `$controller` | string | - | Resolved controller class name. |
+| `$action` | string | - | Resolved action method name. |
+| `$params` | array | - | Resolved action method parameters. |
+| `$vars` | array | - | Associative array of route variables extracted from the URL (e.g. ['id' => '123']). |
+| `$groups` | array | - | List of middleware groups to apply for this route. |
+| `$override` | array | - | Associative array of route overrides (e.g. ['controller' => 'OtherController', 'action' => 'otherAction']). |
 
 **➡️ Return value**
 

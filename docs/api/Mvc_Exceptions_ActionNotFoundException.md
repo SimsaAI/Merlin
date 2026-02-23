@@ -1,4 +1,4 @@
-# 🧩 ActionNotFoundException
+# 🧩 Class: ActionNotFoundException
 
 **Full name:** [Merlin\Mvc\Exceptions\ActionNotFoundException](../../src/Mvc/Exceptions/ActionNotFoundException.php)
 

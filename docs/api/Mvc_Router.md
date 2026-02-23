@@ -1,10 +1,10 @@
-# 🧩 Router
+# 🧩 Class: Router
 
 **Full name:** [Merlin\Mvc\Router](../../src/Mvc/Router.php)
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Router.php#L22)
+### __construct() · [source](../../src/Mvc/Router.php#L31)
 
 `public function __construct(): mixed`
 
@@ -17,7 +17,7 @@ Create a new Router instance.
 
 ---
 
-### addType() · [source](../../src/Mvc/Router.php#L54)
+### addType() · [source](../../src/Mvc/Router.php#L63)
 
 `public function addType(string $name, callable $validator): static`
 
@@ -37,10 +37,17 @@ Predefined types include 'int', 'alpha', 'alnum', 'uuid', and '*' (matches anyth
 - Type: static
 - Description: For method chaining
 
+**💡 Example**
+
+```php
+$router->addType('slug', fn($v) => preg_match('/^[a-z0-9-]+$/', $v));
+$router->add('GET', '/blog/{slug:slug}', 'Blog::view');
+```
+
 
 ---
 
-### add() · [source](../../src/Mvc/Router.php#L68)
+### add() · [source](../../src/Mvc/Router.php#L77)
 
 `public function add(array|string|null $method, string $pattern, array|string|null $handler = null): static`
 
@@ -50,7 +57,7 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$method` | array\|string\|null | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods) |
+| `$method` | array\|string\|null | - | HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or '*' for all methods) |
 | `$pattern` | string | - | Route pattern (e.g., '/blog/{slug}', '/{controller}/{action}/{params:*}') |
 | `$handler` | array\|string\|null | `null` | Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'. |
 
@@ -62,7 +69,7 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 ---
 
-### setName() · [source](../../src/Mvc/Router.php#L113)
+### setName() · [source](../../src/Mvc/Router.php#L122)
 
 `public function setName(string $name): static`
 
@@ -86,7 +93,7 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 ---
 
-### hasNamedRoute() · [source](../../src/Mvc/Router.php#L132)
+### hasNamedRoute() · [source](../../src/Mvc/Router.php#L141)
 
 `public function hasNamedRoute(string $name): bool`
 
@@ -106,7 +113,7 @@ Check if a named route exists.
 
 ---
 
-### urlFor() · [source](../../src/Mvc/Router.php#L146)
+### urlFor() · [source](../../src/Mvc/Router.php#L155)
 
 `public function urlFor(string $name, array $params = [], array $query = []): string`
 
@@ -132,7 +139,7 @@ Generate a URL for a named route, substituting parameters as needed.
 
 ---
 
-### prefix() · [source](../../src/Mvc/Router.php#L173)
+### prefix() · [source](../../src/Mvc/Router.php#L182)
 
 `public function prefix(string $prefix, callable $callback): void`
 
@@ -149,10 +156,19 @@ Define a group of routes that share a common URI prefix. This allows you to orga
 
 - Type: void
 
+**💡 Example**
+
+```php
+$router->prefix('/admin', function($r) {
+    $r->add('GET', '/dashboard', 'Admin::dashboard');
+    $r->add('GET', '/users', 'Admin::users');
+});
+```
+
 
 ---
 
-### middleware() · [source](../../src/Mvc/Router.php#L192)
+### middleware() · [source](../../src/Mvc/Router.php#L201)
 
 `public function middleware(array|string $name, callable $callback): void`
 
@@ -169,10 +185,19 @@ Add group of middleware to be applied to all routes defined within the group. Th
 
 - Type: void
 
+**💡 Example**
+
+```php
+$router->middleware('auth', function($r) {
+    $r->add('GET', '/admin/dashboard', 'Admin::dashboard');
+    $r->add('GET', '/admin/users', 'Admin::users');
+});
+```
+
 
 ---
 
-### match() · [source](../../src/Mvc/Router.php#L428)
+### match() · [source](../../src/Mvc/Router.php#L440)
 
 `public function match(string $uri, string $method = 'GET'): array|null`
 

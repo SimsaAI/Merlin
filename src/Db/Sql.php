@@ -7,7 +7,7 @@ namespace Merlin\Db;
  * 
  * Represents SQL expressions (functions, casts, arrays, etc.) that serialize at SQL generation time.
  * Default behavior: serialize to literals (debug-friendly)
- * Sql::param() creates bind parameters explicitly
+ * Sql::param() creates a named binding reference (:name) for use with Query::bind()
  * 
  * @example
  * 
@@ -15,7 +15,7 @@ namespace Merlin\Db;
  * Sql::func('concat', ['prefix_', 'value'])
  * // → concat('prefix_', 'value')
  * 
- * // Function with bind parameter
+ * // Function with named binding reference (value supplied via Query::bind())
  * Sql::func('concat', ['prefix_', Sql::param('id')])
  * // → concat('prefix_', :id)
  * 
@@ -78,7 +78,7 @@ class Sql
      */
     public static function column(string $name): static
     {
-        $node = new self(self::TYPE_COLUMN, $name);
+        $node = new static(static::TYPE_COLUMN, $name);
         // Flag for Model.column resolution if dot notation detected
         if (strpos($name, '.') !== false) {
             $node->mustResolve = true;
@@ -87,13 +87,14 @@ class Sql
     }
 
     /**
-     * Bind parameter reference
-     * @param string $name Parameter name (without colons)
+     * Named binding reference — emits :name in the SQL, resolved against
+     * the manual bindings supplied via Query::bind().
+     * @param string $name Parameter name (must match a key in bind())
      * @return $this
      */
     public static function param(string $name): static
     {
-        return new self(self::TYPE_PARAM, $name);
+        return new static(static::TYPE_PARAM, $name);
     }
 
     /**
@@ -104,7 +105,7 @@ class Sql
      */
     public static function func(string $name, array $args = []): static
     {
-        return new self(self::TYPE_FUNC, $name, $args);
+        return new static(static::TYPE_FUNC, $name, $args);
     }
 
     /**
@@ -115,7 +116,7 @@ class Sql
      */
     public static function cast(mixed $value, string $type): static
     {
-        return new self(self::TYPE_CAST, $value, [], $type);
+        return new static(static::TYPE_CAST, $value, [], $type);
     }
 
     /**
@@ -125,7 +126,7 @@ class Sql
      */
     public static function pgArray(array $values): static
     {
-        return new self(self::TYPE_PG_ARRAY, $values);
+        return new static(static::TYPE_PG_ARRAY, $values);
     }
 
     /**
@@ -135,7 +136,7 @@ class Sql
      */
     public static function csList(array $values): static
     {
-        return new self(self::TYPE_CS_LIST, $values);
+        return new static(static::TYPE_CS_LIST, $values);
     }
 
     /**
@@ -146,7 +147,7 @@ class Sql
      */
     public static function raw(string $sql, array $bindParams = []): static
     {
-        $node = new self(self::TYPE_RAW, $sql);
+        $node = new static(static::TYPE_RAW, $sql);
         $node->bindParams = $bindParams;
         return $node;
     }
@@ -158,7 +159,7 @@ class Sql
      */
     public static function value(mixed $value): static
     {
-        return new self(self::TYPE_VALUE, $value);
+        return new static(static::TYPE_VALUE, $value);
     }
 
     /**
@@ -168,7 +169,7 @@ class Sql
      */
     public static function json(mixed $value): static
     {
-        return new self(self::TYPE_JSON, $value);
+        return new static(static::TYPE_JSON, $value);
     }
 
     /**
@@ -180,7 +181,7 @@ class Sql
      */
     public static function concat(...$parts): static
     {
-        return new self(self::TYPE_CONCAT, $parts);
+        return new static(static::TYPE_CONCAT, $parts);
     }
 
     /**
@@ -192,7 +193,7 @@ class Sql
      */
     public static function expr(...$parts): static
     {
-        return new self(self::TYPE_EXPR, $parts);
+        return new static(static::TYPE_EXPR, $parts);
     }
 
     /**
@@ -211,7 +212,7 @@ class Sql
      */
     public static function subQuery(Query $query): static
     {
-        return new self(self::TYPE_SUBQUERY, $query);
+        return new static(static::TYPE_SUBQUERY, $query);
     }
 
     /**
@@ -250,7 +251,7 @@ class Sql
             if (\is_bool($value)) {
                 return $value ? 'TRUE' : 'FALSE';
             }
-            if (\is_int($value) || is_float($value)) {
+            if (\is_int($value) || \is_float($value)) {
                 return (string) $value;
             }
 
@@ -303,9 +304,11 @@ class Sql
             $identifier = str_replace($quoteChar, $quoteChar . $quoteChar, $identifier);
 
             // Handle qualified identifiers (table.column)
-            if (strpos($identifier, '.') !== false) {
-                $parts = explode('.', $identifier, 2);
-                return $quoteChar . $parts[0] . $quoteChar . '.' . $quoteChar . $parts[1] . $quoteChar;
+            $table = strstr($identifier, '.', true); // Get part before dot for quoting
+            if ($table !== false) {
+                $identifier = substr($identifier, strlen($table) + 1); // Get part after dot
+                $table = str_replace($quoteChar, $quoteChar . $quoteChar, $table);
+                return $quoteChar . $table . $quoteChar . '.' . $quoteChar . $identifier . $quoteChar;
             }
 
             return $quoteChar . $identifier . $quoteChar;
@@ -316,36 +319,52 @@ class Sql
         switch ($this->type) {
             // Column reference - use protectIdentifier for resolution and quoting
             // This handles Model.column -> table.column resolution when callback is provided
-            case self::TYPE_COLUMN:
+            case static::TYPE_COLUMN:
                 $sql = $quoteIdentifier($this->value);
                 break;
 
-            // Parameter reference - format as :name: for binding
-            case self::TYPE_PARAM:
-                $sql = $serialize($this->value, true);
+            // Parameter reference - emit :name directly, referencing a named manual binding
+            case static::TYPE_PARAM:
+                $sql = ':' . $this->value;
                 break;
 
             // Raw SQL - pass through as-is
-            case self::TYPE_RAW:
+            case static::TYPE_RAW:
                 $sql = $this->value;
                 break;
 
             // Function call - serialize arguments in literal mode by default
-            case self::TYPE_FUNC:
-                $sql = $this->value . '(' .
-                    implode(', ', array_map(
-                        fn($a) => $a instanceof self
-                        ? $a->toSql($driver, $serialize, $protectIdentifier)
-                        : $serialize($a),
-                        $this->args
-                    )) . ')';
+            case static::TYPE_FUNC:
+                $sql = $this->value;
+                $sql .= '(';
+                $sep = '';
+                foreach ($this->args as $arg) {
+                    $sql .= $sep;
+                    $sep = ', ';
+                    if ($arg instanceof static) {
+                        $sql .= $arg->toSql(
+                            $driver,
+                            $serialize,
+                            $protectIdentifier
+                        );
+                    } else {
+                        $sql .= $serialize($arg);
+                    }
+                }
+                $sql .= ')';
                 break;
 
             // Type cast - driver-specific syntax
-            case self::TYPE_CAST:
-                $expr = $this->value instanceof self
-                    ? $this->value->toSql($driver, $serialize, $protectIdentifier)
-                    : $serialize($this->value);
+            case static::TYPE_CAST:
+                if ($this->value instanceof static) {
+                    $expr = $this->value->toSql(
+                        $driver,
+                        $serialize,
+                        $protectIdentifier
+                    );
+                } else {
+                    $expr = $serialize($this->value);
+                }
                 if ($driver === 'pgsql') {
                     $sql = "$expr::{$this->cast}";
                 } else {
@@ -354,55 +373,75 @@ class Sql
                 break;
 
             // PostgreSQL array literal
-            case self::TYPE_PG_ARRAY:
+            case static::TYPE_PG_ARRAY:
                 $sql = $this->serializePgArray();
                 break;
 
             // Comma-separated list (for IN clauses)
-            case self::TYPE_CS_LIST:
-                $sql = implode(', ', array_map(
-                    fn($v) => $v instanceof self
-                    ? $v->toSql($driver, $serialize, $protectIdentifier)
-                    : $serialize($v),
-                    $this->value
-                ));
+            case static::TYPE_CS_LIST:
+                $sql = '';
+                $sep = '';
+                foreach ($this->value as $v) {
+                    $sql .= $sep;
+                    $sep = ', ';
+                    if ($v instanceof static) {
+                        $sql .= $v->toSql(
+                            $driver,
+                            $serialize,
+                            $protectIdentifier
+                        );
+                    } else {
+                        $sql .= $serialize($v);
+                    }
+                }
                 break;
 
-            case self::TYPE_JSON:
+            case static::TYPE_JSON:
                 $sql = $serialize(json_encode($this->value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                 break;
 
             // String concatenation - driver-specific
-            case self::TYPE_CONCAT:
-                $serialized = array_map(
-                    fn($p) => $p instanceof self ? $p->toSql($driver, $serialize, $protectIdentifier) : $serialize($p),
-                    $this->value
-                );
+            case static::TYPE_CONCAT:
+                $serialized = [];
+                foreach ($this->value as $p) {
+                    if ($p instanceof static) {
+                        $serialized[] = $p->toSql($driver, $serialize, $protectIdentifier);
+                    } else {
+                        $serialized[] = $serialize($p);
+                    }
+                }
                 if ($driver === 'mysql') {
-                    $sql = 'CONCAT(' . implode(', ', $serialized) . ')';
+                    $sql = 'CONCAT(';
+                    $sql .= \implode(', ', $serialized);
+                    $sql .= ')';
                 } else {
                     // PostgreSQL and SQLite use || operator
-                    $sql = implode(' || ', $serialized);
+                    $sql = \implode(' || ', $serialized);
                 }
                 break;
 
             // Composite expression - concatenate with spaces
             // Treat plain strings as raw SQL tokens for cleaner expressions
-            case self::TYPE_EXPR:
-                $sql = implode(' ', array_map(
-                    fn($p) => $p instanceof self
-                    ? $p->toSql($driver, $serialize, $protectIdentifier)
-                    : (is_string($p) ? $p : $serialize($p)),
-                    $this->value
-                ));
+            case static::TYPE_EXPR:
+                $sql = '';
+                $sep = '';
+                foreach ($this->value as $p) {
+                    $sql .= $sep;
+                    $sep = ' ';
+                    if ($p instanceof static) {
+                        $sql .= $p->toSql($driver, $serialize, $protectIdentifier);
+                    } else {
+                        $sql .= \is_string($p) ? $p : $serialize($p);
+                    }
+                }
                 break;
 
             // Literal value - serialize using provided callback
-            case self::TYPE_VALUE:
+            case static::TYPE_VALUE:
                 $sql = $serialize($this->value);
                 break;
 
-            case self::TYPE_SUBQUERY:
+            case static::TYPE_SUBQUERY:
                 // Subquery - wrap in parentheses
                 $sql = '(' . $this->value->toSql() . ')';
                 break;
@@ -413,7 +452,8 @@ class Sql
 
         // Append alias if set
         if ($this->alias !== null) {
-            $sql .= ' AS ' . $quoteIdentifier($this->alias);
+            $sql .= ' AS ';
+            $sql .= $quoteIdentifier($this->alias);
         }
 
         return $sql;
@@ -441,7 +481,7 @@ class SqlCase
      * Add WHEN condition THEN result clause
      * @param mixed $condition Condition (scalar or Sql instance)
      * @param mixed $then Result value (scalar or Sql instance)
-     * @return self
+     * @return static
      */
     public function when($condition, $then): static
     {
@@ -452,7 +492,7 @@ class SqlCase
     /**
      * Set ELSE default value
      * @param mixed $value Default value (scalar or Sql instance)
-     * @return self
+     * @return static
      */
     public function else($value): static
     {

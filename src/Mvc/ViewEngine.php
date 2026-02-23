@@ -146,7 +146,7 @@ class ViewEngine
     }
 
     /**
-     * Render a view (and optional layout) and echo the result.
+     * Render a view (and optional layout) and return the result.
      *
      * @param string $view View name to render.
      * @param array $vars Additional variables for this render call.

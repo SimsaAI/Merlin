@@ -8,6 +8,15 @@ use InvalidArgumentException;
 
 class Router
 {
+    protected const KIND_STATIC = 1;
+    protected const KIND_WILDCARD = 2;
+    protected const KIND_PARAM = 3;
+    protected const KIND_PARAM_OPT = 4;
+    protected const KIND_REGEX = 5;
+    protected const KIND_REGEX_OPT = 6;
+
+
+
     protected array $static = [];   // [method][path] => ['handler'=>..., 'namespace'=>...]
     protected array $groups = [];   // [method][firstSegment] => [route, ...]
     protected array $types = [];    // type validators
@@ -60,7 +69,7 @@ class Router
     /**
      * Add a new route to the router. The route can be defined for specific HTTP methods, a URI pattern, and an optional handler that overrides the default controller/action resolution. The pattern can include static segments, typed parameters, dynamic segments for namespace/controller/action, and wildcard segments for additional parameters. Validators can be applied to dynamic parameters using predefined or custom types. For example: /user/{id:int} or /blog/{slug:slug}
      *
-     * @param string|array|null $method HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or null for all methods)
+     * @param string|array|null $method HTTP method(s) for the route (e.g., 'GET', ['GET', 'POST'], or '*' for all methods)
      * @param string $pattern Route pattern (e.g., '/blog/{slug}', '/{controller}/{action}/{params:*}')
      * @param string|array|null $handler Optional handler definition to override controller/action. Can be a string like 'Admin::dashboard' or an array with keys 'namespace', 'controller', 'action'.
      * @return static For method chaining
@@ -216,7 +225,7 @@ class Router
             return;
         }
 
-        $first = $tokens[0][0] === 'static'
+        $first = $tokens[0][0] === self::KIND_STATIC
             ? $tokens[0][1]
             : '__DYNAMIC__';
 
@@ -252,11 +261,11 @@ class Router
             $kind = $token[0];
             $type = $token[2] ?? null;
 
-            if ($kind === 'static') {
+            if ($kind === self::KIND_STATIC) {
                 $score += 3;
-            } elseif ($kind === 'param' && $type !== '*') {
+            } elseif ($kind === self::KIND_PARAM && $type !== '*') {
                 $score += 2;
-            } elseif ($kind === 'regex') {
+            } elseif ($kind === self::KIND_REGEX) {
                 $score += 2;
             } else {
                 // wildcard, dynamic, or param with type '*'
@@ -269,8 +278,9 @@ class Router
     protected function isStaticTokens(array $tokens): bool
     {
         foreach ($tokens as $t) {
-            if ($t[0] !== 'static')
+            if ($t[0] !== self::KIND_STATIC) {
                 return false;
+            }
         }
         return true;
     }
@@ -282,13 +292,13 @@ class Router
 
         foreach ($segments as $t) {
             if ($t === '') {
-                $result[] = ['static', ''];
+                $result[] = [self::KIND_STATIC, ''];
                 continue;
             }
 
             // normal static
             if ($t[0] !== '{') {
-                $result[] = ['static', $t];
+                $result[] = [self::KIND_STATIC, $t];
                 continue;
             }
 
@@ -310,19 +320,21 @@ class Router
             }
 
             if ($name === '') {
-                throw new RuntimeException("Unnamed route parameters are not supported: {$t}");
+                throw new RuntimeException(
+                    "Unnamed route parameters are not supported: {$t}"
+                );
             }
 
             if ($hasTypeSeparator && $type === '*') {
-                $result[] = ['wildcard', $name];
+                $result[] = [self::KIND_WILDCARD, $name];
                 continue;
             }
 
             if (str_starts_with($type, 'regex(') && str_ends_with($type, ')')) {
                 $regex = substr($type, 6, -1);
-                $result[] = [$optional ? 'optional-regex' : 'regex', $name, $regex];
+                $result[] = [$optional ? self::KIND_REGEX_OPT : self::KIND_REGEX, $name, $regex];
             } else {
-                $result[] = [$optional ? 'optional-param' : 'param', $name, $type];
+                $result[] = [$optional ? self::KIND_PARAM_OPT : self::KIND_PARAM, $name, $type];
             }
         }
 
@@ -336,20 +348,20 @@ class Router
         foreach ($tokens as $token) {
             [$kind, $name, $type] = $token + [null, null, null];
 
-            if ($kind === 'static') {
+            if ($kind === self::KIND_STATIC) {
                 if ($name !== '') {
                     $segments[] = $name;
                 }
                 continue;
             }
 
-            if ($kind === 'optional-param' || $kind === 'optional-regex') {
+            if ($kind === self::KIND_PARAM_OPT || $kind === self::KIND_REGEX_OPT) {
                 if (!array_key_exists($name, $params)) {
                     continue;
                 }
 
                 $value = (string) $params[$name];
-                if ($kind === 'optional-param') {
+                if ($kind === self::KIND_PARAM_OPT) {
                     if (!isset($this->types[$type])) {
                         throw new RuntimeException("Unknown validator: $type");
                     }
@@ -366,13 +378,13 @@ class Router
                 continue;
             }
 
-            if ($kind === 'param' || $kind === 'regex') {
+            if ($kind === self::KIND_PARAM || $kind === self::KIND_REGEX) {
                 if (!array_key_exists($name, $params)) {
                     throw new RuntimeException("Missing route parameter: $name");
                 }
 
                 $value = (string) $params[$name];
-                if ($kind === 'param') {
+                if ($kind === self::KIND_PARAM) {
                     if (!isset($this->types[$type])) {
                         throw new RuntimeException("Unknown validator: $type");
                     }
@@ -389,7 +401,7 @@ class Router
                 continue;
             }
 
-            if ($kind === 'wildcard') {
+            if ($kind === self::KIND_WILDCARD) {
                 $wildcardValues = [];
                 if (array_key_exists($name, $params)) {
                     $wildcardValues = $params[$name];
@@ -441,6 +453,9 @@ class Router
         }
 
         $parts = explode('/', trim($uri, '/'));
+        foreach ($parts as $index => $part) {
+            $parts[$index] = rawurldecode($part);
+        }
         $first = $parts[0] ?? '';
 
         $candidates = [];
@@ -460,12 +475,12 @@ class Router
             $maxSegments = 0;
             foreach ($tokens as $token) {
                 $kind = $token[0];
-                if ($kind === 'wildcard') {
+                if ($kind === self::KIND_WILDCARD) {
                     $hasWildcard = true;
                     continue;
                 }
 
-                if ($kind === 'optional-param' || $kind === 'optional-regex') {
+                if ($kind === self::KIND_PARAM_OPT || $kind === self::KIND_REGEX_OPT) {
                     $maxSegments++;
                     continue;
                 }
@@ -489,20 +504,20 @@ class Router
             foreach ($tokens as $token) {
                 [$kind, $name, $type] = $token + [null, null, null];
 
-                if ($kind === 'wildcard') {
+                if ($kind === self::KIND_WILDCARD) {
                     $params[$name] = array_slice($parts, $partIndex);
                     $partIndex = $partCount;
                     break;
                 }
 
-                if ($kind === 'optional-param' || $kind === 'optional-regex') {
+                if ($kind === self::KIND_PARAM_OPT || $kind === self::KIND_REGEX_OPT) {
                     if (!isset($parts[$partIndex])) {
                         continue;
                     }
 
                     $segment = $parts[$partIndex];
 
-                    if ($kind === 'optional-param') {
+                    if ($kind === self::KIND_PARAM_OPT) {
                         if (!isset($this->types[$type])) {
                             throw new RuntimeException("Unknown validator: $type");
                         }
@@ -511,7 +526,7 @@ class Router
                             $partIndex++;
                         }
                     } else {
-                        if (mb_ereg('^' . $type . '$', $segment)) {
+                        if (preg_match('/^' . $type . '$/', $segment)) {
                             $params[$name] = $segment;
                             $partIndex++;
                         }
@@ -527,14 +542,14 @@ class Router
                 $segment = $parts[$partIndex];
 
                 switch ($kind) {
-                    case 'static':
+                    case self::KIND_STATIC:
                         if ($name !== $segment)
                             $ok = false;
                         else
                             $partIndex++;
                         break;
 
-                    case 'param':
+                    case self::KIND_PARAM:
                         if (!isset($this->types[$type])) {
                             throw new RuntimeException("Unknown validator: $type");
                         }
@@ -546,8 +561,8 @@ class Router
                         }
                         break;
 
-                    case 'regex':
-                        if (!mb_ereg('^' . $type . '$', $segment)) {
+                    case self::KIND_REGEX:
+                        if (!preg_match('/^' . $type . '$/', $segment)) {
                             $ok = false;
                         } else {
                             $params[$name] = $segment;
@@ -588,19 +603,16 @@ class Router
         } elseif (\is_array($handler)) {
             $override = $handler;
         } else {
-            $handler = trim($handler);
-            if ($handler === '') {
-                return [];
-            }
-
             $override = [];
-
-            $controllerPart = strstr($handler, '::', true);
-            if ($controllerPart === false) {
-                $override['controller'] = $handler;
-            } else {
-                $override['controller'] = $controllerPart;
-                $override['action'] = substr((string) strstr($handler, '::'), 2);
+            $handler = trim($handler);
+            if ($handler !== '') {
+                $controllerPart = strstr($handler, '::', true);
+                if ($controllerPart === false) {
+                    $override['controller'] = $handler;
+                } else {
+                    $override['controller'] = $controllerPart;
+                    $override['action'] = substr((string) strstr($handler, '::'), 2);
+                }
             }
         }
 

@@ -265,20 +265,22 @@ class Query extends Condition
     /**
      * Set the LIMIT and optional OFFSET for SELECT queries
      * (or limit number of rows affected for UPDATE/DELETE)
-     * @param int $limit
-     * @param int $offset
+     * @param int $limit Number of rows to limit
+     * @param int|null $offset Optional offset for the limit
      * @return $this
      */
-    public function limit(int $limit, int $offset = 0): static
+    public function limit(int $limit, ?int $offset = null): static
     {
         $this->limit = $limit;
-        $this->offset = $offset;
+        if ($offset !== null) {
+            $this->offset = $offset;
+        }
         return $this;
     }
 
     /**
      * Sets an OFFSET clause for SELECT queries
-     * @param int $offset
+     * @param int $offset Number of rows to offset
      * @return $this
      */
     public function offset(int $offset): static
@@ -1041,9 +1043,6 @@ class Query extends Condition
                 ? $this->columns
                 : array_keys($this->manualBindings);
         } else {
-            if (!empty($this->manualBindings)) {
-                throw new LogicException('Cannot use bind parameters when values are set');
-            }
             $columns = array_keys($this->values[0]);
             if (empty($columns)) {
                 throw new LogicException('No columns found in values');
@@ -1252,9 +1251,6 @@ class Query extends Condition
 
         $statement .= ' SET ';
         if (!empty($this->values[0])) {
-            if (!empty($this->manualBindings)) {
-                throw new LogicException('Cannot use bind parameters when values are set');
-            }
             $sep = '';
             foreach ($this->values[0] as $column => $value) {
                 $statement .= $sep;

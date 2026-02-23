@@ -1,12 +1,14 @@
-# 🧩 Dispatcher
+# 🧩 Class: Dispatcher
 
 **Full name:** [Merlin\Mvc\Dispatcher](../../src/Mvc/Dispatcher.php)
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Dispatcher.php#L18)
+### __construct() · [source](../../src/Mvc/Dispatcher.php#L21)
 
 `public function __construct(): mixed`
+
+Create a new Dispatcher and bind it to the current {@see AppContext} singleton.
 
 **➡️ Return value**
 
@@ -15,15 +17,20 @@
 
 ---
 
-### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L26)
+### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L37)
 
 `public function addMiddleware(Merlin\Mvc\MiddlewareInterface $mw): void`
 
+Register a middleware that runs on every dispatched request.
+
+Global middleware is prepended to the pipeline before any group,
+controller, or action middleware.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$mw` | Merlin\Mvc\MiddlewareInterface | - |  |
+| `$mw` | [MiddlewareInterface](Mvc_MiddlewareInterface.md) | - | Middleware instance to add. |
 
 **➡️ Return value**
 
@@ -32,16 +39,22 @@
 
 ---
 
-### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L33)
+### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L54)
 
 `public function defineMiddlewareGroup(string $name, array $middleware): void`
 
+Define a named middleware group that can be referenced from route definitions.
+
+Groups are applied after global middleware and before controller/action
+middleware. If several middleware groups are active for a route, they are
+applied in the order they are listed on the route.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$name` | string | - |  |
-| `$middleware` | array | - |  |
+| `$name` | string | - | Unique group name (e.g. "auth", "admin"). |
+| `$middleware` | array | - | Array of middleware definitions accepted by the pipeline normalizer. |
 
 **➡️ Return value**
 
@@ -50,7 +63,7 @@
 
 ---
 
-### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L46)
+### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L67)
 
 `public function getBaseNamespace(): string`
 
@@ -64,7 +77,7 @@ Get the base namespace for controllers.
 
 ---
 
-### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L57)
+### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L78)
 
 `public function setBaseNamespace(string $baseNamespace): static`
 
@@ -83,7 +96,7 @@ Set the base namespace for controllers. This namespace will be prefixed to all c
 
 ---
 
-### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L68)
+### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L89)
 
 `public function getDefaultController(): string`
 
@@ -97,7 +110,7 @@ Get the default controller name used when a route doesn't provide one.
 
 ---
 
-### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L79)
+### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L100)
 
 `public function setDefaultController(string $defaultController): static`
 
@@ -120,7 +133,7 @@ Set the default controller name.
 
 ---
 
-### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L93)
+### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L114)
 
 `public function getDefaultAction(): string`
 
@@ -134,7 +147,7 @@ Get the default action name used when a route doesn't provide one.
 
 ---
 
-### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L104)
+### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L125)
 
 `public function setDefaultAction(string $defaultAction): static`
 
@@ -157,7 +170,7 @@ Set the default action name.
 
 ---
 
-### dispatch() · [source](../../src/Mvc/Dispatcher.php#L121)
+### dispatch() · [source](../../src/Mvc/Dispatcher.php#L142)
 
 `public function dispatch(array $routeInfo): Merlin\Http\Response`
 
@@ -178,23 +191,6 @@ Dispatch a request to the appropriate controller and action based on the provide
 - [ControllerNotFoundException](Mvc_Exceptions_ControllerNotFoundException.md)
 - [InvalidControllerException](Mvc_Exceptions_InvalidControllerException.md)
 - ActionNotFoundException
-
-
----
-
-### setControllerFactory() · [source](../../src/Mvc/Dispatcher.php#L500)
-
-`public function setControllerFactory(callable $factory): void`
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$factory` | callable | - |  |
-
-**➡️ Return value**
-
-- Type: void
 
 
 

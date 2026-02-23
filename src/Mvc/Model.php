@@ -21,12 +21,18 @@ abstract class Model
 	 * ------------------------------------------------------------- */
 
 	/**
-	 * Return the table or view name for this model. By default, it converts the class name from CamelCase to snake_case.
+	 * Return the table or view name for this model. By default, it converts the
+	 * short class name (without namespace) from CamelCase to snake_case.
 	 * Override this method if you want to specify a custom source.
 	 */
 	public function source(): string
 	{
-		return ModelMapping::toSnakeCase(static::class);
+		$class = static::class;
+		$pos = strrpos($class, '\\');
+		if ($pos !== false) {
+			$class = substr($class, $pos + 1);
+		}
+		return ModelMapping::convertModelToSource($class);
 	}
 
 	/**
@@ -517,17 +523,32 @@ abstract class Model
 	protected static array $defaultReadRoles = [];
 	protected static array $defaultWriteRoles = [];
 
+	/**
+	 * Set both the read and write database role for this model class.
+	 *
+	 * @param string $role Named role registered with {@see \Merlin\Db\DatabaseManager}.
+	 */
 	public static function setDefaultRole(string $role): void
 	{
 		self::$defaultReadRoles[static::class] = $role;
 		self::$defaultWriteRoles[static::class] = $role;
 	}
 
+	/**
+	 * Set the database role used for SELECT queries on this model class.
+	 *
+	 * @param string $role Named read role registered with {@see \Merlin\Db\DatabaseManager}.
+	 */
 	public static function setDefaultReadRole(string $role): void
 	{
 		self::$defaultReadRoles[static::class] = $role;
 	}
 
+	/**
+	 * Set the database role used for INSERT/UPDATE/DELETE queries on this model class.
+	 *
+	 * @param string $role Named write role registered with {@see \Merlin\Db\DatabaseManager}.
+	 */
 	public static function setDefaultWriteRole(string $role): void
 	{
 		self::$defaultWriteRoles[static::class] = $role;
@@ -553,12 +574,26 @@ abstract class Model
 		return $type;
 	}
 
+	/**
+	 * Return the database connection used for read (SELECT) queries.
+	 *
+	 * Resolves the configured read role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
+	 *
+	 * @return \Merlin\Db\Database
+	 */
 	public function readConnection(): Database
 	{
 		$role = $this->connectionRole('read');
 		return AppContext::instance()->dbManager()->getOrDefault($role);
 	}
 
+	/**
+	 * Return the database connection used for write (INSERT/UPDATE/DELETE) queries.
+	 *
+	 * Resolves the configured write role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
+	 *
+	 * @return \Merlin\Db\Database
+	 */
 	public function writeConnection(): Database
 	{
 		$role = $this->connectionRole('write');

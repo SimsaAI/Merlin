@@ -1,6 +1,8 @@
-# 🧩 Exception
+# 🧩 Class: Exception
 
 **Full name:** [Merlin\Exception](../../src/Exception.php)
+
+Base exception class for the Merlin framework.
 
 ## 🚀 Public methods
 

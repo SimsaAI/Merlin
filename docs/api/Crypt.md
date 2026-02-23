@@ -1,4 +1,4 @@
-# 🧩 Crypt
+# 🧩 Class: Crypt
 
 **Full name:** [Merlin\Crypt](../../src/Crypt.php)
 

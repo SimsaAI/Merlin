@@ -2,12 +2,11 @@
 namespace Merlin;
 
 use RuntimeException;
-use Merlin\Db\Database;
+use Merlin\Db\DatabaseManager;
 use Merlin\Http\Cookies;
+use Merlin\Http\Request as HttpRequest;
 use Merlin\Http\Session;
 use Merlin\Mvc\ViewEngine;
-use Merlin\Db\DatabaseManager;
-use Merlin\Http\Request as HttpRequest;
 
 class AppContext
 {
@@ -101,6 +100,11 @@ class AppContext
     }
 
 
+    /**
+     * Get the DatabaseManager instance. If it doesn't exist, it will be created.
+     *
+     * @return DatabaseManager The DatabaseManager instance.
+     */
     public function dbManager(): DatabaseManager
     {
         return $this->dbManager ??= new DatabaseManager();
@@ -289,22 +293,22 @@ class AppContext
 }
 
 /**
- * Class ResolvedRoute
- *
- * Represents the fully resolved route and execution context used by the
- * dispatcher to invoke the matched controller and action.
- *
- * This includes:
- * - the effective namespace (after applying route group namespaces)
- * - the resolved controller class
- * - the resolved action method name
- * - the resolved action method parameters
- * - route variables extracted from the URL
- * - route middleware groups
- * - route overrides (e.g. controller/action)
+ * ResolvedRoute represents the fully resolved route and execution context
+ * used by the dispatcher to invoke the matched controller and action.
  */
 class ResolvedRoute
 {
+    /**
+     * Create a new ResolvedRoute instance with the given parameters.
+     *
+     * @param string|null $namespace Effective namespace for the controller, after applying route group namespaces. Null if no namespace is used.
+     * @param string      $controller Resolved controller class name.
+     * @param string      $action Resolved action method name.
+     * @param array       $params Resolved action method parameters.
+     * @param array       $vars Associative array of route variables extracted from the URL (e.g. ['id' => '123']).
+     * @param array       $groups List of middleware groups to apply for this route.
+     * @param array       $override Associative array of route overrides (e.g. ['controller' => 'OtherController', 'action' => 'otherAction']).
+     */
     public function __construct(
         public ?string $namespace,
         public string $controller,

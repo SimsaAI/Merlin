@@ -1,6 +1,6 @@
 # Merlin MVC API
 
-## Classes overview
+## Classes & Interfaces overview
 
 ### `Merlin`
 
@@ -20,6 +20,10 @@
 - [ActionNotFoundException](Cli_Exceptions_ActionNotFoundException.md) `Merlin\Cli\Exceptions\ActionNotFoundException`
 - [InvalidTaskException](Cli_Exceptions_InvalidTaskException.md) `Merlin\Cli\Exceptions\InvalidTaskException`
 - [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md) `Merlin\Cli\Exceptions\TaskNotFoundException`
+
+### `Merlin\Cli\Tasks`
+
+- [SyncTask](Cli_Tasks_SyncTask.md) `Merlin\Cli\Tasks\SyncTask`
 
 ### `Merlin\Db`
 
@@ -52,6 +56,7 @@
 - [Controller](Mvc_Controller.md) `Merlin\Mvc\Controller`
 - [Dispatcher](Mvc_Dispatcher.md) `Merlin\Mvc\Dispatcher`
 - [Exception](Mvc_Exception.md) `Merlin\Mvc\Exception`
+- [MiddlewareInterface](Mvc_MiddlewareInterface.md) `Merlin\Mvc\MiddlewareInterface`
 - [Model](Mvc_Model.md) `Merlin\Mvc\Model`
 - [ModelMapping](Mvc_ModelMapping.md) `Merlin\Mvc\ModelMapping`
 - [Router](Mvc_Router.md) `Merlin\Mvc\Router`
@@ -62,4 +67,30 @@
 - [ActionNotFoundException](Mvc_Exceptions_ActionNotFoundException.md) `Merlin\Mvc\Exceptions\ActionNotFoundException`
 - [ControllerNotFoundException](Mvc_Exceptions_ControllerNotFoundException.md) `Merlin\Mvc\Exceptions\ControllerNotFoundException`
 - [InvalidControllerException](Mvc_Exceptions_InvalidControllerException.md) `Merlin\Mvc\Exceptions\InvalidControllerException`
+
+### `Merlin\Sync`
+
+- [CodeGenerator](Sync_CodeGenerator.md) `Merlin\Sync\CodeGenerator`
+- [ModelDiff](Sync_ModelDiff.md) `Merlin\Sync\ModelDiff`
+- [DiffOperation](Sync_DiffOperation.md) `Merlin\Sync\DiffOperation`
+- [AddProperty](Sync_AddProperty.md) `Merlin\Sync\AddProperty`
+- [RemoveProperty](Sync_RemoveProperty.md) `Merlin\Sync\RemoveProperty`
+- [UpdatePropertyType](Sync_UpdatePropertyType.md) `Merlin\Sync\UpdatePropertyType`
+- [UpdatePropertyComment](Sync_UpdatePropertyComment.md) `Merlin\Sync\UpdatePropertyComment`
+- [UpdateClassComment](Sync_UpdateClassComment.md) `Merlin\Sync\UpdateClassComment`
+- [ModelParser](Sync_ModelParser.md) `Merlin\Sync\ModelParser`
+- [ParsedModel](Sync_ParsedModel.md) `Merlin\Sync\ParsedModel`
+- [ParsedProperty](Sync_ParsedProperty.md) `Merlin\Sync\ParsedProperty`
+- [SyncResult](Sync_SyncResult.md) `Merlin\Sync\SyncResult`
+- [SyncRunner](Sync_SyncRunner.md) `Merlin\Sync\SyncRunner`
+
+### `Merlin\Sync\Schema`
+
+- [MySqlSchemaProvider](Sync_Schema_MySqlSchemaProvider.md) `Merlin\Sync\Schema\MySqlSchemaProvider`
+- [PostgresSchemaProvider](Sync_Schema_PostgresSchemaProvider.md) `Merlin\Sync\Schema\PostgresSchemaProvider`
+- [SchemaProvider](Sync_Schema_SchemaProvider.md) `Merlin\Sync\Schema\SchemaProvider`
+- [TableSchema](Sync_Schema_TableSchema.md) `Merlin\Sync\Schema\TableSchema`
+- [ColumnSchema](Sync_Schema_ColumnSchema.md) `Merlin\Sync\Schema\ColumnSchema`
+- [IndexSchema](Sync_Schema_IndexSchema.md) `Merlin\Sync\Schema\IndexSchema`
+- [SqliteSchemaProvider](Sync_Schema_SqliteSchemaProvider.md) `Merlin\Sync\Schema\SqliteSchemaProvider`
 

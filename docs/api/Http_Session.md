@@ -1,18 +1,23 @@
-# 🧩 Session
+# 🧩 Class: Session
 
 **Full name:** [Merlin\Http\Session](../../src/Http/Session.php)
 
+Wrapper around a PHP session array that provides typed accessors and
+a clean API for reading, writing, and clearing session data.
+
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Http/Session.php#L6)
+### __construct() · [source](../../src/Http/Session.php#L15)
 
 `public function __construct(array &$store): mixed`
 
+Create a new Session backed by the given store reference.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$store` | array | - |  |
+| `$store` | array | - | Reference to the underlying session array (typically $_SESSION). |
 
 **➡️ Return value**
 
@@ -21,16 +26,18 @@
 
 ---
 
-### get() · [source](../../src/Http/Session.php#L10)
+### get() · [source](../../src/Http/Session.php#L26)
 
 `public function get(string $key, mixed $default = null): mixed`
 
+Retrieve a value from the session.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$key` | string | - |  |
-| `$default` | mixed | `null` |  |
+| `$key` | string | - | Session key. |
+| `$default` | mixed | `null` | Value to return when the key is not set. |
 
 **➡️ Return value**
 
@@ -39,16 +46,18 @@
 
 ---
 
-### set() · [source](../../src/Http/Session.php#L15)
+### set() · [source](../../src/Http/Session.php#L37)
 
 `public function set(string $key, mixed $value): void`
 
+Store a value in the session.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$key` | string | - |  |
-| `$value` | mixed | - |  |
+| `$key` | string | - | Session key. |
+| `$value` | mixed | - | Value to store. |
 
 **➡️ Return value**
 
@@ -57,15 +66,17 @@
 
 ---
 
-### remove() · [source](../../src/Http/Session.php#L20)
+### remove() · [source](../../src/Http/Session.php#L47)
 
 `public function remove(string $key): void`
 
+Remove a key from the session.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$key` | string | - |  |
+| `$key` | string | - | Session key to unset. |
 
 **➡️ Return value**
 
@@ -74,26 +85,31 @@
 
 ---
 
-### has() · [source](../../src/Http/Session.php#L25)
+### has() · [source](../../src/Http/Session.php#L58)
 
 `public function has(string $key): bool`
+
+Check whether a key exists in the session.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$key` | string | - |  |
+| `$key` | string | - | Session key. |
 
 **➡️ Return value**
 
 - Type: bool
+- Description: True if the key is set and not null.
 
 
 ---
 
-### clear() · [source](../../src/Http/Session.php#L30)
+### clear() · [source](../../src/Http/Session.php#L66)
 
 `public function clear(): void`
+
+Remove all data from the session.
 
 **➡️ Return value**
 

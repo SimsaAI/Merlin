@@ -1,4 +1,4 @@
-# 🧩 Condition
+# 🧩 Class: Condition
 
 **Full name:** [Merlin\Db\Condition](../../src/Db/Condition.php)
 

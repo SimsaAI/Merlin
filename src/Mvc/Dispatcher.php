@@ -15,6 +15,9 @@ class Dispatcher
 
     protected AppContext $context;
 
+    /**
+     * Create a new Dispatcher and bind it to the current {@see AppContext} singleton.
+     */
     public function __construct()
     {
         $this->context = AppContext::instance();
@@ -23,6 +26,14 @@ class Dispatcher
 
     protected array $globalMiddleware = [];
 
+    /**
+     * Register a middleware that runs on every dispatched request.
+     *
+     * Global middleware is prepended to the pipeline before any group,
+     * controller, or action middleware.
+     *
+     * @param MiddlewareInterface $mw Middleware instance to add.
+     */
     public function addMiddleware(MiddlewareInterface $mw): void
     {
         $this->globalMiddleware[] = $mw;
@@ -30,6 +41,16 @@ class Dispatcher
 
     protected array $middlewareGroups = [];
 
+    /**
+     * Define a named middleware group that can be referenced from route definitions.
+     *
+     * Groups are applied after global middleware and before controller/action
+     * middleware. If several middleware groups are active for a route, they are
+     * applied in the order they are listed on the route.
+     *
+     * @param string $name       Unique group name (e.g. "auth", "admin").
+     * @param array  $middleware Array of middleware definitions accepted by the pipeline normalizer.
+     */
     public function defineMiddlewareGroup(string $name, array $middleware): void
     {
         $this->middlewareGroups[$name] = $middleware;
@@ -494,12 +515,5 @@ class Dispatcher
             throw new \UnexpectedValueException("Unsupported controller action return type: " . \get_debug_type($result));
     }
 
-    /** @var null|callable(string): Controller */
-    protected $controllerFactory = null;
-
-    public function setControllerFactory(callable $factory): void
-    {
-        $this->controllerFactory = $factory;
-    }
 
 }

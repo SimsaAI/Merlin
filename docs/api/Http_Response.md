@@ -1,20 +1,28 @@
-# 🧩 Response
+# 🧩 Class: Response
 
 **Full name:** [Merlin\Http\Response](../../src/Http/Response.php)
 
+Represents an HTTP response.
+
+Build a response by chaining setters and finish by calling {@see \send()},
+or use one of the static factory methods ({@see \json()}, {@see \html()},
+{@see \redirect()}, etc.) for common cases.
+
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Http/Response.php#L6)
+### __construct() · [source](../../src/Http/Response.php#L20)
 
 `public function __construct(int $status = 200, array $headers = [], string $body = ''): mixed`
+
+Create a new Response.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$status` | int | `200` |  |
-| `$headers` | array | `[]` |  |
-| `$body` | string | `''` |  |
+| `$status` | int | `200` | HTTP status code. |
+| `$headers` | array | `[]` | Associative array of response headers. |
+| `$body` | string | `''` | Response body. |
 
 **➡️ Return value**
 
@@ -23,15 +31,17 @@
 
 ---
 
-### setStatus() · [source](../../src/Http/Response.php#L13)
+### setStatus() · [source](../../src/Http/Response.php#L33)
 
 `public function setStatus(int $code): static`
 
+Set the HTTP status code.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$code` | int | - |  |
+| `$code` | int | - | HTTP status code (e.g. 200, 404). |
 
 **➡️ Return value**
 
@@ -40,16 +50,18 @@
 
 ---
 
-### setHeader() · [source](../../src/Http/Response.php#L19)
+### setHeader() · [source](../../src/Http/Response.php#L46)
 
 `public function setHeader(string $key, string $value): static`
 
+Set a response header.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$key` | string | - |  |
-| `$value` | string | - |  |
+| `$key` | string | - | Header name (e.g. "Content-Type"). |
+| `$value` | string | - | Header value. |
 
 **➡️ Return value**
 
@@ -58,15 +70,17 @@
 
 ---
 
-### write() · [source](../../src/Http/Response.php#L25)
+### write() · [source](../../src/Http/Response.php#L58)
 
 `public function write(string $text): static`
 
+Append text to the response body.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$text` | string | - |  |
+| `$text` | string | - | Content to append. |
 
 **➡️ Return value**
 
@@ -75,9 +89,11 @@
 
 ---
 
-### send() · [source](../../src/Http/Response.php#L31)
+### send() · [source](../../src/Http/Response.php#L67)
 
 `public function send(): void`
+
+Send the response: emit the status code, headers, and body.
 
 **➡️ Return value**
 
@@ -86,16 +102,18 @@
 
 ---
 
-### json() · [source](../../src/Http/Response.php#L42)
+### json() · [source](../../src/Http/Response.php#L85)
 
 `public static function json(mixed $data, int $status = 200): static`
 
+Create a JSON response.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$data` | mixed | - |  |
-| `$status` | int | `200` |  |
+| `$data` | mixed | - | Data to JSON-encode. |
+| `$status` | int | `200` | HTTP status code (default 200). |
 
 **➡️ Return value**
 
@@ -104,16 +122,18 @@
 
 ---
 
-### text() · [source](../../src/Http/Response.php#L51)
+### text() · [source](../../src/Http/Response.php#L101)
 
 `public static function text(string $text, int $status = 200): static`
 
+Create a plain-text response.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$text` | string | - |  |
-| `$status` | int | `200` |  |
+| `$text` | string | - | Response body. |
+| `$status` | int | `200` | HTTP status code (default 200). |
 
 **➡️ Return value**
 
@@ -122,16 +142,18 @@
 
 ---
 
-### html() · [source](../../src/Http/Response.php#L60)
+### html() · [source](../../src/Http/Response.php#L117)
 
 `public static function html(string $html, int $status = 200): static`
 
+Create an HTML response.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$html` | string | - |  |
-| `$status` | int | `200` |  |
+| `$html` | string | - | HTML content. |
+| `$status` | int | `200` | HTTP status code (default 200). |
 
 **➡️ Return value**
 
@@ -140,16 +162,18 @@
 
 ---
 
-### redirect() · [source](../../src/Http/Response.php#L69)
+### redirect() · [source](../../src/Http/Response.php#L133)
 
 `public static function redirect(string $url, int $status = 302): static`
 
+Create a redirect response.
+
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$url` | string | - |  |
-| `$status` | int | `302` |  |
+| `$url` | string | - | URL to redirect to. |
+| `$status` | int | `302` | HTTP redirect status code (default 302). |
 
 **➡️ Return value**
 
@@ -158,15 +182,17 @@
 
 ---
 
-### status() · [source](../../src/Http/Response.php#L78)
+### status() · [source](../../src/Http/Response.php#L148)
 
 `public static function status(int $status): static`
+
+Create a response with only a status code and an empty body.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$status` | int | - |  |
+| `$status` | int | - | HTTP status code. |
 
 **➡️ Return value**
 

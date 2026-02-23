@@ -6,6 +6,13 @@ use Merlin\Cli\Exceptions\ActionNotFoundException;
 use Merlin\Cli\Exceptions\InvalidTaskException;
 use Merlin\Cli\Exceptions\TaskNotFoundException;
 
+/**
+ * Console entry point for dispatching CLI tasks.
+ *
+ * Resolves a task class (a subclass of {@see Task}) and an action method based on
+ * the command-line arguments, converts string arguments to appropriate scalar types,
+ * and invokes the action.
+ */
 class Console
 {
 	protected string $defaultTask = "MainTask";
@@ -16,11 +23,22 @@ class Console
 
 	protected bool $parseParams = true;
 
+	/**
+	 * Get the default task class name used when no task is specified on the command line.
+	 *
+	 * @return string Default task class name (without namespace), e.g. "MainTask".
+	 */
 	public function getDefaultTask(): string
 	{
 		return $this->defaultTask;
 	}
 
+	/**
+	 * Set the default task class name used when no task is specified on the command line.
+	 *
+	 * @param string $defaultTask Task class name (without namespace), e.g. "MainTask".
+	 * @throws Exception If the given name is empty.
+	 */
 	public function setDefaultTask(string $defaultTask): void
 	{
 		if (empty($defaultTask)) {
@@ -29,11 +47,22 @@ class Console
 		$this->defaultTask = $defaultTask;
 	}
 
+	/**
+	 * Get the default action method name used when no action is specified on the command line.
+	 *
+	 * @return string Default action method name (without namespace), e.g. "mainAction".
+	 */
 	public function getDefaultAction(): string
 	{
 		return $this->defaultAction;
 	}
 
+	/**
+	 * Set the default action method name used when no action is specified on the command line.
+	 *
+	 * @param string $defaultAction Action method name, e.g. "mainAction".
+	 * @throws Exception If the given name is empty.
+	 */
 	public function setDefaultAction(string $defaultAction): void
 	{
 		if (empty($defaultAction)) {
@@ -42,11 +71,24 @@ class Console
 		$this->defaultAction = $defaultAction;
 	}
 
+	/**
+	 * Get the PHP namespace used to locate task classes.
+	 *
+	 * @return string Namespace string (always ends with a backslash), e.g. "App\\Tasks\\".
+	 */
 	public function getNamespace(): string
 	{
 		return $this->namespace;
 	}
 
+	/**
+	 * Set the PHP namespace used to locate task classes.
+	 *
+	 * A trailing backslash is added automatically if missing.
+	 * Pass an empty string to disable namespace prefixing.
+	 *
+	 * @param string $namespace Namespace to use, e.g. "App\\Tasks".
+	 */
 	public function setNamespace(string $namespace): void
 	{
 		if (!empty($namespace)) {
@@ -58,23 +100,44 @@ class Console
 		$this->namespace = $namespace;
 	}
 
+	/**
+	 * Check whether automatic parameter type coercion is enabled.
+	 *
+	 * When enabled, string arguments that look like integers, floats, booleans,
+	 * or NULL are converted to the corresponding PHP scalar before being passed
+	 * to the action method.
+	 *
+	 * @return bool True if parameter parsing is enabled.
+	 */
 	public function shouldParseParams(): bool
 	{
 		return $this->parseParams;
 	}
 
+	/**
+	 * Enable or disable automatic parameter type coercion.
+	 *
+	 * @param bool $parseParams True to enable coercion, false to pass all arguments as strings.
+	 */
 	public function setParseParams(bool $parseParams): void
 	{
 		$this->parseParams = $parseParams;
 	}
 
 	/**
-	 * @param string|null $task
-	 * @param string|null $action
-	 * @param array $params
-	 * @return mixed
-	 * @throws TaskNotFoundException
-	 * @throws ActionNotFoundException
+	 * Resolve and invoke a task action.
+	 *
+	 * Converts the task and action names to CamelCase, prepends the configured
+	 * namespace, instantiates the task class, optionally coerces the parameters,
+	 * and calls the action method.
+	 *
+	 * @param string|null $task   Task name as passed on the command line (e.g. "my-task"). Null falls back to the default task.
+	 * @param string|null $action Action name as passed on the command line (e.g. "run"). Null falls back to the default action.
+	 * @param array       $params Remaining command-line arguments passed as positional parameters to the action.
+	 * @return mixed The return value of the invoked action method.
+	 * @throws TaskNotFoundException   If the resolved task class does not exist.
+	 * @throws InvalidTaskException    If the resolved class is not a subclass of {@see Task}.
+	 * @throws ActionNotFoundException If the resolved method does not exist on the task.
 	 */
 	public function process(
 		?string $task = null,

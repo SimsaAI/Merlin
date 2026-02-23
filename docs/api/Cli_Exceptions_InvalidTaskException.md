@@ -1,4 +1,4 @@
-# 🧩 InvalidTaskException
+# 🧩 Class: InvalidTaskException
 
 **Full name:** [Merlin\Cli\Exceptions\InvalidTaskException](../../src/Cli/Exceptions/InvalidTaskException.php)
 

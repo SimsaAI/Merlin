@@ -1,4 +1,4 @@
-# 🧩 Paginator
+# 🧩 Class: Paginator
 
 **Full name:** [Merlin\Db\Paginator](../../src/Db/Paginator.php)
 

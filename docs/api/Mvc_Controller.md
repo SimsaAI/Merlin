@@ -1,4 +1,4 @@
-# 🧩 Controller
+# 🧩 Class: Controller
 
 **Full name:** [Merlin\Mvc\Controller](../../src/Mvc/Controller.php)
 

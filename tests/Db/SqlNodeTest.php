@@ -99,7 +99,7 @@ class SqlNodeTest extends TestCase
         $this->assertEquals("(x = '{\"a\",\"b\"}')", $sql);
     }
 
-    public function testParamNodeCreatesAutoBindParameter(): void
+    public function testParamNodeEmitsNamedBindingReference(): void
     {
         $db = new TestPgDatabase();
         $cb = new \Merlin\Db\Condition($db);
@@ -107,8 +107,9 @@ class SqlNodeTest extends TestCase
         $cb->where('col = :v', ['v' => Sql::param('id')]);
         $sql = $cb->toSql();
 
-        $this->assertStringContainsString('(col = :', $sql);
-        $this->assertStringContainsString('__p', $sql);
+        // Sql::param('id') should emit :id directly, referencing a manual binding by name
+        $this->assertStringContainsString('(col = :id)', $sql);
+        $this->assertStringNotContainsString('__p', $sql);
     }
 
     public function testJsonNodeSerialization(): void
@@ -130,7 +131,9 @@ class SqlNodeTest extends TestCase
 
         $sql = $cb->toSql();
         $this->assertStringContainsString("concat('pre_'", $sql);
-        $this->assertStringContainsString(':__p', $sql);
+        // Sql::param('id') inside a function should emit :id directly
+        $this->assertStringContainsString(':id', $sql);
+        $this->assertStringNotContainsString(':__p', $sql);
     }
 
     public function testCastDriverSpecificPg(): void

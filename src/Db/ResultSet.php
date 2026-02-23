@@ -24,6 +24,15 @@ class ResultSet implements \Iterator, \Countable
 	protected int $position = 0;
 	protected bool $initialized = false;
 
+	/**
+	 * Create a new ResultSet wrapping a PDO statement result.
+	 *
+	 * @param Database        $connection   Database connection used to execute the query.
+	 * @param \PDOStatement   $statement    The executed PDO statement.
+	 * @param string|null     $sqlStatement The original SQL string (used by reexecute()).
+	 * @param array|null      $boundParams  Bound parameters (used by reexecute()).
+	 * @param Model|null      $model        Optional model instance used for hydration (sets the fetch class).
+	 */
 	public function __construct(
 		Database $connection,
 		\PDOStatement $statement,
@@ -198,6 +207,14 @@ class ResultSet implements \Iterator, \Countable
 	 * Get all remaining models or objects from result set.
 	 * @return array<int, TModel>
 	 */
+	/**
+	 * Get all remaining rows hydrated as model instances.
+	 *
+	 * Calls {@see nextModel()} repeatedly until the result set is exhausted.
+	 * Returns an empty array when no model class was provided at construction.
+	 *
+	 * @return array<int, TModel>
+	 */
 	public function allModels(): array
 	{
 		// If no model available, we cannot hydrate
@@ -249,11 +266,13 @@ class ResultSet implements \Iterator, \Countable
 
 	// Iterator methods
 
+	/** Rewind is a no-op: the result set cursor is forward-only. */
 	public function rewind(): void
 	{
 		// The iterator is forwards-only, so we cannot rewind
 	}
 
+	/** Return the current row (fetched lazily on first access). */
 	public function current(): mixed
 	{
 		if (!$this->initialized) {
@@ -263,22 +282,29 @@ class ResultSet implements \Iterator, \Countable
 		return $this->currentRow;
 	}
 
+	/** Return the zero-based position of the current row within this traversal. */
 	public function key(): int
 	{
 		return $this->position;
 	}
 
+	/** Advance to the next row. */
 	public function next(): void
 	{
 		$this->currentRow = $this->fetch();
 		$this->position++;
 	}
 
+	/** Return true while the current row is not false/null (i.e., while rows remain). */
 	public function valid(): bool
 	{
 		return $this->currentRow !== false && $this->currentRow !== null;
 	}
 
+	/**
+	 * Return the number of rows affected/returned by the underlying statement.
+	 * @return int Row count as reported by PDOStatement::rowCount().
+	 */
 	public function count(): int
 	{
 		return $this->statement->rowCount();
