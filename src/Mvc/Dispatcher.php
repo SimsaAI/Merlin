@@ -21,7 +21,7 @@ class Dispatcher
     public function __construct()
     {
         $this->context = AppContext::instance();
-        $this->baseNamespace = 'App\\Controllers';
+        $this->baseNamespace = '\\App\\Controllers';
     }
 
     protected array $globalMiddleware = [];
@@ -59,6 +59,7 @@ class Dispatcher
     protected string $baseNamespace;
     protected string $defaultController = "IndexController";
     protected string $defaultAction = "indexAction";
+
     /**
      * Get the base namespace for controllers.
      *
@@ -145,11 +146,16 @@ class Dispatcher
         $vars = $routeInfo['vars'] ?? [];
         $override = $routeInfo['override'] ?? [];
 
-        if (isset($override['namespace'])) {
+        if (!empty($override['namespace'])) {
             $namespace = rtrim((string) $override['namespace'], '\\');
+            if (empty($namespace)) {
+                $namespace = $this->baseNamespace;
+            } elseif ($namespace[0] !== '\\' && !empty($this->baseNamespace)) {
+                $namespace = $this->baseNamespace . '\\' . $namespace;
+            }
         } else {
             $namespace = $this->baseNamespace;
-            if (isset($vars['namespace'])) {
+            if (!empty($vars['namespace'])) {
                 if ($namespace !== '') {
                     $namespace .= '\\';
                 }

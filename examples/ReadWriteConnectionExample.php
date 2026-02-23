@@ -70,7 +70,7 @@ $user = User::find(123);                           // → read replica
 $user = User::findOne(['email' => 'john@example.com']); // → read replica
 $users = User::findAll(['status' => 'active']);         // → read replica
 $exists = User::exists(['username' => 'alice']);        // → read replica
-$count = User::count(['status' => 'active']);           // → read replica
+$count = User::tally(['status' => 'active']);           // → read replica
 
 // Write operations automatically use the write connection
 $user = new User();
@@ -122,7 +122,7 @@ class TenantData extends Model
     /**
      * Override for complex connection logic (e.g., tenant-based routing)
      */
-    public function readConnection(): Database
+    public function modelReadConnection(): Database
     {
         // Example: Route based on tenant_id if set
         if (isset($this->tenant_id) && $this->tenant_id > 1000) {
@@ -139,6 +139,6 @@ class TenantData extends Model
         }
 
         // Default fallback (uses per-model static or Database global)
-        return parent::readConnection();
+        return parent::modelReadConnection();
     }
 }

@@ -9,11 +9,12 @@ class CodeGenerator
     {
         $code = file_get_contents($model->filePath);
 
-        // Separate additions from in-place modifications.
+        // Separate additions and accessor inserts from in-place modifications.
         // Modifications are applied first (bottom-to-top order ensures no drift when
         // we use regex / str_replace). Additions are appended in one block last.
         $adds = array_filter($operations, fn($op) => $op instanceof AddProperty);
-        $updates = array_filter($operations, fn($op) => !($op instanceof AddProperty));
+        $accessors = array_filter($operations, fn($op) => $op instanceof AddAccessor);
+        $updates = array_filter($operations, fn($op) => !($op instanceof AddProperty) && !($op instanceof AddAccessor));
 
         foreach ($updates as $op) {
             if ($op instanceof RemoveProperty) {
@@ -27,8 +28,13 @@ class CodeGenerator
             }
         }
 
-        if (!empty($adds)) {
-            $code = $this->insertProperties($code, $model, array_values($adds));
+        if (!empty($adds) || !empty($accessors)) {
+            $code = $this->insertPropertiesAndAccessors(
+                $code,
+                $model,
+                array_values($adds),
+                array_values($accessors)
+            );
         }
 
         return $code;
@@ -38,7 +44,7 @@ class CodeGenerator
     //  Insert new properties
     // -------------------------------------------------------------------------
 
-    private function insertProperties(string $code, ParsedModel $model, array $adds): string
+    private function insertPropertiesAndAccessors(string $code, ParsedModel $model, array $adds, array $accessors): string
     {
         $block = '';
 
@@ -47,13 +53,46 @@ class CodeGenerator
             if ($op->comment) {
                 $block .= "\n{$this->indent}/** {$op->comment} */";
             }
-            $block .= "\n{$this->indent}public {$op->type} \${$op->property};";
+            $block .= "\n{$this->indent}{$op->visibility} {$op->type} \${$op->property};";
+        }
+
+        foreach ($accessors as $op) {
+            /** @var AddAccessor $op */
+            $block .= $this->buildAccessorBlock($op);
         }
 
         // insertionOffset points to the char right after the last ';'
         // (or right after the opening '{' for empty classes).
         // We insert the block there; the existing whitespace/closing brace follows.
         return substr_replace($code, $block, $model->insertionOffset, 0);
+    }
+
+    private function buildAccessorBlock(AddAccessor $op): string
+    {
+        $baseType = ltrim($op->phpType, '?');
+        $paramType = '?' . $baseType;
+        $retType = $op->phpType . '|static';
+        $vis = $op->visibility;
+        $method = $op->methodName;
+        $prop = $op->property;
+        $i = $this->indent;
+        $ii = $i . $i;
+        $iii = $ii . $i;
+
+        return
+            "\n" .
+            "\n{$i}/**" .
+            "\n{$i} * @return {$op->phpType}" .
+            "\n{$i} * @param {$paramType} \$value" .
+            "\n{$i} */" .
+            "\n{$i}{$vis} function {$method}({$paramType} \$value = null): {$retType}" .
+            "\n{$i}{" .
+            "\n{$ii}if (\$value === null) {" .
+            "\n{$iii}return \$this->{$prop};" .
+            "\n{$ii}}" .
+            "\n{$ii}\$this->{$prop} = \$value;" .
+            "\n{$ii}return \$this;" .
+            "\n{$i}}";
     }
 
     // -------------------------------------------------------------------------

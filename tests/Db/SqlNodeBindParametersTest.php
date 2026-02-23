@@ -156,4 +156,114 @@ class SqlBindParametersTest extends TestCase
         $this->assertStringContainsString('+ 1', $sql1);
         $this->assertStringContainsString('+ 1', $sql2);
     }
+
+    // ---------------------------------------------------------------
+    // Sql::bind() — PDO named parameter tests
+    // ---------------------------------------------------------------
+
+    public function testBindUsesPdoBinding(): void
+    {
+        $node = Sql::bind('qty', 5);
+        $this->assertTrue($node->usesPdoBinding());
+    }
+
+    public function testRawDoesNotUsePdoBinding(): void
+    {
+        $node = Sql::raw('stock - :qty', ['qty' => 5]);
+        $this->assertFalse($node->usesPdoBinding());
+    }
+
+    public function testParamDoesNotUsePdoBinding(): void
+    {
+        $node = Sql::param('qty');
+        $this->assertFalse($node->usesPdoBinding());
+    }
+
+    /**
+     * Sql::bind() in a WHERE clause keeps :name as a real PDO param
+     * (not inlined), visible in the query log of the DB.
+     */
+    public function testBindKeepsPlaceholderInSql(): void
+    {
+        $builder = new TestUpdateBuilder($this->db);
+        $builder->setTableName('`posts`');
+        $builder->set('status', Sql::raw('active'))
+            ->where('id', Sql::bind('postId', 42));
+
+        $builder->update(); // execute against TestDatabase
+
+        $lastQuery = $this->db->getLastQuery();
+        $this->assertNotNull($lastQuery);
+        // SQL must contain the placeholder, not the inlined value
+        $this->assertStringContainsString(':postId', $lastQuery['sql']);
+        // Value must travel as a PDO param
+        $this->assertArrayHasKey('postId', $lastQuery['params']);
+        $this->assertSame(42, $lastQuery['params']['postId']);
+    }
+
+    public function testBindSurfacesValueInGetBindings(): void
+    {
+        $builder = new TestUpdateBuilder($this->db);
+        $builder->setTableName('`posts`');
+        $builder->set('status', Sql::raw('active'))
+            ->where('id', Sql::bind('postId', 99));
+
+        $builder->update();
+
+        $lastQuery = $this->db->getLastQuery();
+        $this->assertArrayHasKey('postId', $lastQuery['params']);
+        $this->assertSame(99, $lastQuery['params']['postId']);
+    }
+
+    public function testMultipleBindNodesBubbleUp(): void
+    {
+        $builder = new TestUpdateBuilder($this->db);
+        $builder->setTableName('`posts`');
+        $builder->set('status', Sql::raw('active'))
+            ->where('id', Sql::bind('postId', 7))
+            ->where('author_id', Sql::bind('authorId', 3));
+
+        $builder->update();
+
+        $lastQuery = $this->db->getLastQuery();
+        $this->assertStringContainsString(':postId', $lastQuery['sql']);
+        $this->assertStringContainsString(':authorId', $lastQuery['sql']);
+        $this->assertSame(7, $lastQuery['params']['postId']);
+        $this->assertSame(3, $lastQuery['params']['authorId']);
+    }
+
+    public function testBindInSetClauseBubblesUp(): void
+    {
+        $builder = new TestUpdateBuilder($this->db);
+        $builder->setTableName('`products`');
+        $builder->set('price', Sql::bind('newPrice', 19.99))
+            ->where('id = 1');
+
+        $builder->update();
+
+        $lastQuery = $this->db->getLastQuery();
+        $this->assertStringContainsString(':newPrice', $lastQuery['sql']);
+        $this->assertArrayHasKey('newPrice', $lastQuery['params']);
+        $this->assertSame(19.99, $lastQuery['params']['newPrice']);
+    }
+
+    /**
+     * Sql::raw() with $bindParams still inlines values (existing behavior).
+     */
+    public function testRawStillInlinesValues(): void
+    {
+        $builder = new TestUpdateBuilder($this->db);
+        $builder->setTableName('`posts`');
+        $builder->set('view_count', Sql::raw('view_count + :inc', ['inc' => 5]))
+            ->where('id = 1');
+
+        $builder->update();
+
+        $lastQuery = $this->db->getLastQuery();
+        // :inc must be replaced with the literal value in the SQL
+        $this->assertStringNotContainsString(':inc', $lastQuery['sql']);
+        $this->assertStringContainsString('+ 5', $lastQuery['sql']);
+        // No PDO params for inlined values
+        $this->assertArrayNotHasKey('inc', $lastQuery['params']);
+    }
 }

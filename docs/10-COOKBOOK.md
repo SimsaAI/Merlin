@@ -19,7 +19,7 @@ $users = User::query()
     ->offset(($page - 1) * $perPage)
     ->select();
 
-$total = User::query()->where('status', 'active')->count();
+$total = User::query()->where('status', 'active')->tally();
 ```
 
 ## 2) Find or Create

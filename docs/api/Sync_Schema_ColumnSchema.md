@@ -13,7 +13,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Sync/Schema/SchemaProvider.php#L32)
+### __construct() · [source](../../src/Sync/Schema/SchemaProvider.php#L36)
 
 `public function __construct(string $name, string $type, bool $nullable, mixed $default, bool $primary, string|null $comment): mixed`
 

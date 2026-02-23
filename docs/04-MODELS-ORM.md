@@ -21,9 +21,9 @@ class User extends Model
     public string $email;
 
     // Optional overrides:
-    // public function source(): string { return 'users'; }
-    // public function schema(): ?string { return 'public'; }
-    // public function idFields(): array { return ['id']; }
+    // public function modelSource(): string { return 'users'; }
+    // public function modelSchema(): ?string { return 'public'; }
+    // public function modelIdFields(): array { return ['id']; }
 }
 ```
 
@@ -49,7 +49,7 @@ $user = User::findOne(['email' => 'john@example.com']);
 $users = User::findAll(['status' => 'active']);
 
 $exists = User::exists(['email' => 'john@example.com']);
-$count = User::count(['status' => 'active']);
+$count = User::tally(['status' => 'active']);
 ```
 
 Composite key lookup:

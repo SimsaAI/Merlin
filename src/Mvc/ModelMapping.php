@@ -52,7 +52,6 @@ class ModelMapping
 	 * Enable or disable automatic table name pluralization.
 	 * When enabled, model names are converted to plural snake_case table names
 	 * (e.g. User → users, AdminUser → admin_users, Person → people).
-	 * Explicit source names passed to add() are never modified.
 	 */
 	public static function usePluralTableNames(bool $enable): void
 	{

@@ -71,7 +71,45 @@ the manual bindings supplied via Query::bind().
 
 ---
 
-### func() · [source](../../src/Db/Sql.php#L106)
+### bind() · [source](../../src/Db/Sql.php#L109)
+
+`public static function bind(string $name, mixed $value): static`
+
+Bound parameter — emits :name in the SQL and propagates the value as a
+real PDO named parameter (not inlined as an escaped literal).
+
+The value is merged into Query::$subQueryBindings and reaches
+Database::query() via PDO execute().
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$name` | string | - | Parameter name |
+| `$value` | mixed | - | Parameter value |
+
+**➡️ Return value**
+
+- Type: static
+
+
+---
+
+### usesPdoBinding() · [source](../../src/Db/Sql.php#L121)
+
+`public function usesPdoBinding(): bool`
+
+Whether this node's bind parameters should be passed as real PDO named
+parameters rather than inlined as escaped literals.
+
+**➡️ Return value**
+
+- Type: bool
+
+
+---
+
+### func() · [source](../../src/Db/Sql.php#L132)
 
 `public static function func(string $name, array $args = []): static`
 
@@ -91,7 +129,7 @@ SQL function call
 
 ---
 
-### cast() · [source](../../src/Db/Sql.php#L117)
+### cast() · [source](../../src/Db/Sql.php#L143)
 
 `public static function cast(mixed $value, string $type): static`
 
@@ -111,7 +149,7 @@ Type cast (driver-specific syntax)
 
 ---
 
-### pgArray() · [source](../../src/Db/Sql.php#L127)
+### pgArray() · [source](../../src/Db/Sql.php#L153)
 
 `public static function pgArray(array $values): static`
 
@@ -130,7 +168,7 @@ PostgreSQL array literal
 
 ---
 
-### csList() · [source](../../src/Db/Sql.php#L137)
+### csList() · [source](../../src/Db/Sql.php#L163)
 
 `public static function csList(array $values): static`
 
@@ -149,9 +187,9 @@ Comma-separated list (for IN clauses)
 
 ---
 
-### raw() · [source](../../src/Db/Sql.php#L148)
+### raw() · [source](../../src/Db/Sql.php#L174)
 
-`public static function raw(string $sql, array $bindParams = []): static`
+`public static function raw(string $sql, array $inlineValues = []): static`
 
 Raw SQL (unescaped, passed through as-is)
 
@@ -160,7 +198,7 @@ Raw SQL (unescaped, passed through as-is)
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$sql` | string | - | Raw SQL string |
-| `$bindParams` | array | `[]` | Optional bind parameters ['param_name' => value] |
+| `$inlineValues` | array | `[]` | Optional values to be replaced in the SQL (e.g. for :name placeholders), treated as literal values (escaped) |
 
 **➡️ Return value**
 
@@ -169,7 +207,7 @@ Raw SQL (unescaped, passed through as-is)
 
 ---
 
-### value() · [source](../../src/Db/Sql.php#L160)
+### value() · [source](../../src/Db/Sql.php#L186)
 
 `public static function value(mixed $value): static`
 
@@ -188,7 +226,7 @@ Literal value (will be properly quoted/escaped)
 
 ---
 
-### json() · [source](../../src/Db/Sql.php#L170)
+### json() · [source](../../src/Db/Sql.php#L196)
 
 `public static function json(mixed $value): static`
 
@@ -207,7 +245,7 @@ JSON value (serialized as JSON literal)
 
 ---
 
-### concat() · [source](../../src/Db/Sql.php#L182)
+### concat() · [source](../../src/Db/Sql.php#L208)
 
 `public static function concat(mixed ...$parts): static`
 
@@ -228,7 +266,7 @@ MySQL: uses CONCAT() function
 
 ---
 
-### expr() · [source](../../src/Db/Sql.php#L194)
+### expr() · [source](../../src/Db/Sql.php#L220)
 
 `public static function expr(mixed ...$parts): static`
 
@@ -249,7 +287,7 @@ Plain strings are treated as raw SQL tokens (not serialized)
 
 ---
 
-### case() · [source](../../src/Db/Sql.php#L203)
+### case() · [source](../../src/Db/Sql.php#L229)
 
 `public static function case(): Merlin\Db\SqlCase`
 
@@ -263,7 +301,7 @@ CASE expression builder
 
 ---
 
-### subQuery() · [source](../../src/Db/Sql.php#L213)
+### subQuery() · [source](../../src/Db/Sql.php#L239)
 
 `public static function subQuery(Merlin\Db\Query $query): static`
 
@@ -282,7 +320,7 @@ Subquery expression - wraps a Query instance as a subquery
 
 ---
 
-### as() · [source](../../src/Db/Sql.php#L223)
+### as() · [source](../../src/Db/Sql.php#L249)
 
 `public function as(string $alias): static`
 
@@ -301,7 +339,7 @@ Add alias to this expression (returns aliased node)
 
 ---
 
-### getBindParams() · [source](../../src/Db/Sql.php#L233)
+### getBindParams() · [source](../../src/Db/Sql.php#L259)
 
 `public function getBindParams(): array`
 
@@ -315,7 +353,7 @@ Get bind parameters associated with this node
 
 ---
 
-### toSql() · [source](../../src/Db/Sql.php#L295)
+### toSql() · [source](../../src/Db/Sql.php#L321)
 
 `public function toSql(string $driver, callable $serialize, callable|null $protectIdentifier = null): string`
 
@@ -337,7 +375,7 @@ Serialize node to SQL string
 
 ---
 
-### __toString() · [source](../../src/Db/Sql.php#L462)
+### __toString() · [source](../../src/Db/Sql.php#L488)
 
 `public function __toString(): string`
 

@@ -10,7 +10,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Sync/Schema/SchemaProvider.php#L45)
+### __construct() · [source](../../src/Sync/Schema/SchemaProvider.php#L49)
 
 `public function __construct(string $name, bool $unique, array $columns): mixed`
 

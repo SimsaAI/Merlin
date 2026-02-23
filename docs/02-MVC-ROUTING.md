@@ -17,7 +17,7 @@ $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
 
 // Configure dispatcher
 $dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers');
+$dispatcher->setBaseNamespace('\\App\\Controllers');
 
 $route = $router->match('/users/42', 'GET');
 if ($route !== null) {
@@ -119,21 +119,47 @@ $router->addType('slug', fn(string $v) => mb_ereg('^[a-z0-9-]+$', $v));
 $router->add('GET', '/posts/{slug:slug}', 'PostController::showAction');
 ```
 
-## Prefix and Middleware Groups
+## Prefix, Namespace, Controller, and Middleware Groups
 
-Organize related routes with common prefixes or middleware. This reduces repetition and makes route structure clearer.
+Organize related routes with common prefixes, shared namespaces, a common controller, or middleware. Groups can be nested freely.
 
 ```php
+// URL prefix
 $router->prefix('/admin', function (Router $r) {
     $r->add('GET', '/users', 'AdminController::usersAction');
 });
 
+// Namespace prefix — prepended to handlers inside the group
+$router->namespace('Admin', function (Router $r) {
+    $r->add('GET', '/dashboard', 'DashboardController::viewAction');
+    // resolves to Admin\DashboardController::viewAction
+    $r->add('GET', '/users',     'UserController::listAction');
+});
+
+// Controller group — all routes share the same controller
+$router->controller('UserController', function (Router $r) {
+    $r->add('GET',  '/users',       '::listAction');
+    $r->add('POST', '/users',       '::createAction');
+    $r->add('GET',  '/users/{id}',  '::viewAction');
+});
+
+// Middleware group — name must match a group registered in Dispatcher
 $router->middleware('auth', function (Router $r) {
     $r->add('GET', '/dashboard', 'DashboardController::indexAction');
 });
 ```
 
-Route group middleware names are attached to route info and consumed by `Dispatcher` middleware groups.
+Groups can be nested:
+
+```php
+$router->prefix('/api', function (Router $r) {
+    $r->namespace('Api', function (Router $r) {
+        $r->middleware('auth', function (Router $r) {
+            $r->add('GET', '/orders', 'OrderController::listAction');
+        });
+    });
+});
+```
 
 ## Dispatcher Configuration
 
@@ -141,10 +167,12 @@ The Dispatcher handles controller resolution and default values:
 
 ```php
 $dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers'); // Default: 'App\\Controllers'
+$dispatcher->setBaseNamespace('\\App\\Controllers'); // Default: '\\App\\Controllers'
 $dispatcher->setDefaultController('IndexController'); // Default: 'IndexController'
-$dispatcher->setDefaultAction('indexAction'); // Default: 'indexAction'
+$dispatcher->setDefaultAction('indexAction');         // Default: 'indexAction'
 ```
+
+> **Note:** The base namespace should start with a leading backslash (`\`). Relative namespace overrides from the Router's `namespace()` groups are appended to it automatically.
 
 ## Route Information in AppContext
 

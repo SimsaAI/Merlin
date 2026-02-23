@@ -4,14 +4,18 @@ namespace Merlin\Sync\Schema;
 interface SchemaProvider
 {
     /**
-     * @return string[]  Liste aller Tabellen im aktuellen Schema
+     * @param  string|null $schema  Database schema to scan (used by PostgreSQL; ignored by MySQL/SQLite).
+     *                              When null the provider falls back to its engine default.
+     * @return string[]
      */
-    public function listTables(): array;
+    public function listTables(?string $schema = null): array;
 
     /**
-     * @return TableSchema  Struktur einer Tabelle
+     * @param  string|null $schema  Database schema (used by PostgreSQL; ignored by MySQL/SQLite).
+     *                              When null the provider falls back to its engine default.
+     * @return TableSchema
      */
-    public function getTableSchema(string $table): TableSchema;
+    public function getTableSchema(string $table, ?string $schema = null): TableSchema;
 }
 
 class TableSchema

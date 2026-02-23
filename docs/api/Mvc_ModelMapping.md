@@ -25,7 +25,7 @@ Create ModelMapping from array config
 
 ---
 
-### usePluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L57)
+### usePluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L56)
 
 `public static function usePluralTableNames(bool $enable): void`
 
@@ -33,7 +33,6 @@ Enable or disable automatic table name pluralization.
 
 When enabled, model names are converted to plural snake_case table names
 (e.g. User → users, AdminUser → admin_users, Person → people).
-Explicit source names passed to add() are never modified.
 
 **🧭 Parameters**
 
@@ -48,7 +47,7 @@ Explicit source names passed to add() are never modified.
 
 ---
 
-### usingPluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L65)
+### usingPluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L64)
 
 `public static function usingPluralTableNames(): bool`
 
@@ -61,7 +60,7 @@ Returns whether automatic table name pluralization is enabled.
 
 ---
 
-### add() · [source](../../src/Mvc/ModelMapping.php#L77)
+### add() · [source](../../src/Mvc/ModelMapping.php#L76)
 
 `public function add(string $name, string|null $source = null, string|null $schema = null): static`
 
@@ -82,7 +81,7 @@ Add model mapping
 
 ---
 
-### get() · [source](../../src/Mvc/ModelMapping.php#L97)
+### get() · [source](../../src/Mvc/ModelMapping.php#L96)
 
 `public function get(string $name): array|null`
 
@@ -101,7 +100,7 @@ Get model mapping by name
 
 ---
 
-### toArray() · [source](../../src/Mvc/ModelMapping.php#L107)
+### toArray() · [source](../../src/Mvc/ModelMapping.php#L106)
 
 `public function toArray(): array`
 
@@ -114,7 +113,7 @@ Get all model mappings as an array
 
 ---
 
-### convertModelToSource() · [source](../../src/Mvc/ModelMapping.php#L120)
+### convertModelToSource() · [source](../../src/Mvc/ModelMapping.php#L119)
 
 `public static function convertModelToSource(string $modelName): string`
 
@@ -137,7 +136,7 @@ When pluralization is enabled, the last word segment is pluralized (e.g. AdminUs
 
 ---
 
-### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L150)
+### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L149)
 
 `public static function toSnakeCase(string $name): string`
 
@@ -161,7 +160,7 @@ Multiple separators are unified into a single underscore, and duplicate undersco
 
 ---
 
-### pluralize() · [source](../../src/Mvc/ModelMapping.php#L259)
+### pluralize() · [source](../../src/Mvc/ModelMapping.php#L258)
 
 `public static function pluralize(string $word): string`
 

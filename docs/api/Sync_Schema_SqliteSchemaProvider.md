@@ -23,7 +23,13 @@
 
 ### listTables() · [source](../../src/Sync/Schema/SqliteSchemaProvider.php#L12)
 
-`public function listTables(): array`
+`public function listTables(string|null $schema = null): array`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$schema` | string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -34,13 +40,14 @@
 
 ### getTableSchema() · [source](../../src/Sync/Schema/SqliteSchemaProvider.php#L21)
 
-`public function getTableSchema(string $table): Merlin\Sync\Schema\TableSchema`
+`public function getTableSchema(string $table, string|null $schema = null): Merlin\Sync\Schema\TableSchema`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$table` | string | - |  |
+| `$schema` | string\|null | `null` |  |
 
 **➡️ Return value**
 

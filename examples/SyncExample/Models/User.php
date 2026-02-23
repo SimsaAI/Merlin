@@ -5,7 +5,8 @@ namespace SyncExample\Models;
 use Merlin\Mvc\Model;
 
 /**
- * Run `php console.php sync model Models/User.php --apply` to populate properties.
+ * Sync: php console.php sync model Models/User.php --apply
+ * With accessors: php console.php sync model Models/User.php --apply --generate-accessors --field-visibility=protected
  */
 class User extends Model
 {

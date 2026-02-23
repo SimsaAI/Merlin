@@ -14,7 +14,7 @@ class DummyModel extends \Merlin\Mvc\Model
     public $name;
     public $_internal;
 
-    public function idFields(): array
+    public function modelIdFields(): array
     {
         return ['id'];
     }

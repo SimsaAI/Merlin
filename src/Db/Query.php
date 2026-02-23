@@ -118,8 +118,6 @@ class Query extends Condition
 
     protected bool $returnSql = false;
 
-    protected int $autoBindRestorePoint = 0;
-
     /* -------------------------------------------------------------
      *  SELECT-SPECIFIC PROPERTIES
      * ------------------------------------------------------------- */
@@ -188,8 +186,8 @@ class Query extends Condition
 
         if ($this->model !== null) {
             return $this->isReadQuery
-                ? $this->model->readConnection()
-                : $this->model->writeConnection();
+                ? $this->model->modelReadConnection()
+                : $this->model->modelWriteConnection();
         }
 
         $role = $this->isReadQuery ? 'read' : 'write';
@@ -695,7 +693,6 @@ class Query extends Condition
      */
     public function toSql(): string
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
         $db = $this->getDb();
         $query = $this->compileSelect($db);
@@ -710,7 +707,6 @@ class Query extends Condition
      */
     public function select(array|string|null $columns = null): ResultSet|string
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
         $db = $this->getDb();
 
@@ -767,7 +763,6 @@ class Query extends Condition
 
     protected function runInsert(?array $data, bool $upsert): bool|string|array|ResultSet
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
         $db = $this->getDb();
 
@@ -802,7 +797,6 @@ class Query extends Condition
      */
     public function update(?array $data = null): int|string|array|ResultSet
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
         $db = $this->getDb();
 
@@ -833,7 +827,6 @@ class Query extends Condition
      */
     public function delete(): int|string|array|ResultSet
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
         $db = $this->getDb();
 
@@ -859,7 +852,6 @@ class Query extends Condition
      */
     public function truncate(): int|string
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = false;
         $db = $this->getDb();
 
@@ -881,7 +873,6 @@ class Query extends Condition
      */
     public function exists(): bool|string
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
         $db = $this->getDb();
 
@@ -907,9 +898,8 @@ class Query extends Condition
      * @return int|string Number of matching rows or SQL string
      * @throws Exception
      */
-    public function count(): int|string
+    public function tally(): int|string
     {
-        $this->autoBindRestorePoint = $this->autoBindCounter;
         $this->isReadQuery = true;
         $db = $this->getDb();
 
@@ -1125,7 +1115,7 @@ class Query extends Condition
                 case 'pgsql':
                     if (empty($this->conflictTarget)) {
                         if (isset($this->model)) {
-                            $this->conflictTarget = $this->model->idFields();
+                            $this->conflictTarget = $this->model->modelIdFields();
                             if (empty($this->conflictTarget)) {
                                 throw new LogicException(
                                     "PostgreSQL requires a conflict target for UPSERT. No conflict target set and model does not define any ID fields."
@@ -1445,11 +1435,8 @@ class Query extends Condition
 
     protected function prepareQueryForReturn(string $query)
     {
-        // Get all bind parameters for this query including auto-generated ones from sub-conditions
+        // Get all bind parameters for this query
         $bindParams = $this->getBindings();
-
-        // Reset auto-generated parameters from before compilation so they can be reused for the next query if needed
-        $this->autoBindCounter = $this->autoBindRestorePoint;
 
         // Replace bound parameters in query string for debugging purposes
         foreach ($bindParams as $key => $value) {
@@ -1514,8 +1501,8 @@ class Query extends Condition
         } elseif (self::$useModels) {
             // Get table from model instance
             $model = self::getModel($modelName);
-            $table = $this->quoteIdentifier($model->source());
-            $schema = $model->schema();
+            $table = $this->quoteIdentifier($model->modelSource());
+            $schema = $model->modelSchema();
         } else {
             // Use model name as table name
             $items = explode('.', $modelName);
@@ -1595,12 +1582,6 @@ class Query extends Condition
                     fn($model) => $this->getTableName($model)
                 );
 
-                // Merge auto-bind parameters from sub-condition
-                $this->automaticBindings = array_merge(
-                    $column->automaticBindings,
-                    $this->automaticBindings
-                );
-
                 $protected[$index] = '(' . $column->toSql() . ')';
                 continue;
             }
@@ -1608,7 +1589,7 @@ class Query extends Condition
             if ($column instanceof Sql) {
                 $protected[$index] = $column->toSql(
                     $db->getDriver(),
-                    fn($v, $p = false) => $this->serializeScalar($v, $p),
+                    fn($v) => $this->serializeScalar($v),
                     fn($identifier) => $this->protectIdentifier($identifier, self::PI_COLUMN)
                 );
                 continue;
@@ -1627,8 +1608,7 @@ class Query extends Condition
      */
     public function getBindings(): array
     {
-        return $this->manualBindings +
-            \array_slice($this->automaticBindings, 0, $this->autoBindCounter) + $this->subQueryBindings;
+        return $this->manualBindings + $this->subQueryBindings;
     }
 
     /**
@@ -1653,11 +1633,7 @@ class Query extends Condition
      */
     protected function executeQuery(Database $db, string $query): bool|ResultSet
     {
-        // Get all bind parameters for this query including auto-generated ones from sub-conditions
         $bindParams = $this->getBindings();
-
-        // Reset auto-generated parameters from before compilation so they can be reused for the next query if needed
-        $this->autoBindCounter = $this->autoBindRestorePoint;
 
         $result = $db->query($query, $bindParams);
 

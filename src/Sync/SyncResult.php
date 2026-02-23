@@ -52,6 +52,12 @@ class SyncResult
         return array_values(array_filter($this->operations, fn($op) => $op instanceof UpdatePropertyType));
     }
 
+    /** @return AddAccessor[] */
+    public function addedAccessors(): array
+    {
+        return array_values(array_filter($this->operations, fn($op) => $op instanceof AddAccessor));
+    }
+
     /**
      * Human-readable summary line.
      */
@@ -69,9 +75,12 @@ class SyncResult
         $added = count($this->addedProperties());
         $removed = count($this->removedProperties());
         $typed = count($this->typeChanges());
+        $accessors = count($this->addedAccessors());
 
         if ($added)
             $parts[] = "+{$added} added";
+        if ($accessors)
+            $parts[] = "+{$accessors} accessor(s)";
         if ($removed)
             $parts[] = "-{$removed} deprecated";
         if ($typed)

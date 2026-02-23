@@ -49,16 +49,6 @@ class Condition
 	protected bool $needOperator = false;
 
 	/**
-	 * @var int
-	 */
-	protected int $autoBindCounter = 0;
-
-	/**
-	 * @var array
-	 */
-	protected array $automaticBindings = [];
-
-	/**
 	 * @var array
 	 */
 	protected array $subQueryBindings = [];
@@ -689,43 +679,39 @@ class Condition
 	/**
 	 * Serialize a value to SQL (handles Sql instances)
 	 * @param mixed $value
-	 * @param bool $param Whether to serialize as a bind parameter
 	 * @return string
 	 */
-	protected function serializeScalar($value, bool $param = false): string
+	protected function serializeScalar($value): string
 	{
 		// Sql instances serialize themselves
 		if ($value instanceof Sql) {
 
 			$result = $value->toSql(
 				$this->getDb()->getDriver(),
-				fn($v, $p = false) => $this->serializeScalar($v, $p),
+				fn($v) => $this->serializeScalar($v),
 				fn($identifier) => $this->protectIdentifier($identifier, self::PI_COLUMN)
 			);
 
 			// merge bind parameters from node into current builder
 			$nodeBindParams = $value->getBindParams();
 			if (!empty($nodeBindParams)) {
-				$result = $this->replacePlaceholders(
-					$result,
-					$nodeBindParams
-				);
+				if ($value->usesPdoBinding()) {
+					// PDO path: keep :name placeholder in SQL, bubble value up
+					// so it reaches Database::query() as a real named parameter
+					$this->subQueryBindings = $nodeBindParams + $this->subQueryBindings;
+				} else {
+					// Inline path: replace :name with escaped literal
+					$result = $this->replacePlaceholders(
+						$result,
+						$nodeBindParams
+					);
+				}
 			}
 
 			return $result;
 		}
 
-		if ($param) {
-			// Param mode: create bind parameter
-			$id = spl_object_id($this); // ensure unique ID for objects
-			$name = "__p{$id}_" . (++$this->autoBindCounter);
-			$this->automaticBindings[$name] = $value;
-			return ':' . $name;
-		} else {
-			// Literal mode: escape to SQL literal
-			return $this->escapeValue($value);
-		}
-
+		return $this->escapeValue($value);
 	}
 
 	/**
@@ -735,6 +721,11 @@ class Condition
 	 */
 	protected function escapeValue($value)
 	{
+		// Sql nodes serialize themselves (and bubble PDO bindings if applicable)
+		if ($value instanceof Sql) {
+			return $this->serializeScalar($value);
+		}
+
 		// PostgreSQL Array Support
 		if (is_array($value)) {
 			// special array with value + escape flag
@@ -991,6 +982,6 @@ class Condition
 	 */
 	public function getBindings(): array
 	{
-		return \array_slice($this->automaticBindings, 0, $this->autoBindCounter) + $this->subQueryBindings;
+		return $this->subQueryBindings;
 	}
 }

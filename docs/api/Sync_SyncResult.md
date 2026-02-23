@@ -92,7 +92,18 @@ Holds the result of synchronising a single model file against the database schem
 
 ---
 
-### summary() · [source](../../src/Sync/SyncResult.php#L58)
+### addedAccessors() · [source](../../src/Sync/SyncResult.php#L56)
+
+`public function addedAccessors(): array`
+
+**➡️ Return value**
+
+- Type: array
+
+
+---
+
+### summary() · [source](../../src/Sync/SyncResult.php#L64)
 
 `public function summary(): string`
 

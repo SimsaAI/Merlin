@@ -7,13 +7,17 @@
  *   php console.php <task> <action> [args...]
  *
  * Sync examples:
- *   php console.php sync all  Models --dry-run
- *   php console.php sync all  Models --apply
+ *   php console.php sync all  Models                                          # dry-run
+ *   php console.php sync all  Models --apply                                  # apply
+ *   php console.php sync all  Models --apply --generate-accessors             # with getters/setters
+ *   php console.php sync all  Models --apply --field-visibility=protected     # protected fields
+ *   php console.php sync all  Models --apply --no-deprecate                   # skip @deprecated tags
+ *   php console.php sync all  Models --apply --create-missing \
+ *       --namespace=SyncExample\\Models                                        # scaffold new models
  *   php console.php sync model Models/User.php --apply
- *   php console.php sync model Models/User.php --apply --database=read
+ *   php console.php sync model Models/User.php --apply --generate-accessors
+ *   php console.php sync make Order Models --namespace=SyncExample\\Models --apply
  */
-
-declare(strict_types=1);
 
 use Merlin\Cli\Exception as CliException;
 
@@ -27,7 +31,7 @@ $console = new Console();
 
 // Point the task resolver to the framework's built-in tasks namespace.
 // This makes the 'sync' task resolve to \Merlin\Cli\Tasks\SyncTask.
-$console->setNamespace('Merlin\\Cli\\Tasks');
+$console->setNamespace('\\Merlin\\Cli\\Tasks');
 
 try {
     $console->process(
@@ -39,10 +43,14 @@ try {
     $script = basename($argv[0]);
     echo <<<"EOT"
 Usage:
-   php $script sync all Models --dry-run
-   php $script sync all Models --apply
+   php $script sync all  Models
+   php $script sync all  Models --apply
+   php $script sync all  Models --apply --generate-accessors
+   php $script sync all  Models --apply --field-visibility=protected
+   php $script sync all  Models --apply --no-deprecate
+   php $script sync all  Models --apply --create-missing --namespace=SyncExample\\Models
    php $script sync model Models/User.php --apply
-   php $script sync model Models/User.php --apply --database=read
+   php $script sync make  Order Models --namespace=SyncExample\\Models --apply
 
 
 EOT;

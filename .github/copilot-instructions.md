@@ -126,7 +126,7 @@ User::findOrFail($id);                    // static or throws
 User::findOne(['email' => $email]);       // ?static matching conditions
 User::findAll(['status' => 'active']);    // ResultSet
 User::exists(['email' => $email]);        // bool
-User::count(['status' => 'active']);      // int
+User::tally(['status' => 'active']);      // int (row count)
 User::create(['email' => 'a@b.com']);     // insert + return model
 User::forceCreate(['email' => 'a@b.com']);// insert ignoring fillable guard
 User::firstOrCreate(['email' => $e], ['name' => $n]);
@@ -149,8 +149,8 @@ $user->getState();      // returns snapshot or null
 $user->hasChanged();    // true if fields differ from snapshot
 
 // Connection access
-$user->readConnection();   // Database (read role)
-$user->writeConnection();  // Database (write role)
+$user->modelReadConnection();   // Database (read role)
+$user->modelWriteConnection();  // Database (write role)
 ```
 
 Model has **no `toArray()` method**. Use direct property access or build your own array from model fields.
@@ -190,7 +190,7 @@ After this middleware runs, `AppContext::instance()->session()` returns a `Sessi
 
 ```php
 $dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers');
+$dispatcher->setBaseNamespace('\\App\\Controllers');
 $dispatcher->setDefaultController('IndexController');
 $dispatcher->setDefaultAction('indexAction');
 
@@ -313,6 +313,19 @@ $router->prefix('/admin', function (Router $r) {
     $r->add('GET', '/users',     'Admin\UserController::indexAction');
 });
 
+// Namespace group – prepended to handler strings inside the callback
+$router->namespace('Admin', function (Router $r) {
+    $r->add('GET', '/dashboard', 'DashboardController::indexAction');
+    $r->add('GET', '/users',     'UserController::indexAction');
+});
+
+// Controller group – all routes inside share the same controller
+$router->controller('UserController', function (Router $r) {
+    $r->add('GET',  '/users',      '::listAction');
+    $r->add('POST', '/users',      '::createAction');
+    $r->add('GET',  '/users/{id}', '::viewAction');
+});
+
 // Middleware group (name must match a group defined in Dispatcher)
 $router->middleware('auth', function (Router $r) {
     $r->add('GET', '/account', 'AccountController::indexAction');
@@ -406,7 +419,7 @@ $router->add('GET', '/', 'IndexController::indexAction');
 
 // Dispatcher (no constructor args)
 $dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers');
+$dispatcher->setBaseNamespace('\\App\\Controllers');
 $dispatcher->addMiddleware(new SessionMiddleware());
 
 $path   = $ctx->request()->getPath();

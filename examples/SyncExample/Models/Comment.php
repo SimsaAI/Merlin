@@ -5,7 +5,8 @@ namespace SyncExample\Models;
 use Merlin\Mvc\Model;
 
 /**
- * Run `php console.php sync model Models/Comment.php --apply` to populate properties.
+ * Sync: php console.php sync model Models/Comment.php --apply
+ * With accessors: php console.php sync model Models/Comment.php --apply --generate-accessors --field-visibility=protected
  */
 class Comment extends Model
 {

@@ -4,7 +4,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Router.php#L31)
+### __construct() · [source](../../src/Mvc/Router.php#L33)
 
 `public function __construct(): mixed`
 
@@ -17,7 +17,7 @@ Create a new Router instance.
 
 ---
 
-### addType() · [source](../../src/Mvc/Router.php#L63)
+### addType() · [source](../../src/Mvc/Router.php#L65)
 
 `public function addType(string $name, callable $validator): static`
 
@@ -47,7 +47,7 @@ $router->add('GET', '/blog/{slug:slug}', 'Blog::view');
 
 ---
 
-### add() · [source](../../src/Mvc/Router.php#L77)
+### add() · [source](../../src/Mvc/Router.php#L79)
 
 `public function add(array|string|null $method, string $pattern, array|string|null $handler = null): static`
 
@@ -69,7 +69,7 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 ---
 
-### setName() · [source](../../src/Mvc/Router.php#L122)
+### setName() · [source](../../src/Mvc/Router.php#L150)
 
 `public function setName(string $name): static`
 
@@ -93,7 +93,7 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 ---
 
-### hasNamedRoute() · [source](../../src/Mvc/Router.php#L141)
+### hasNamedRoute() · [source](../../src/Mvc/Router.php#L169)
 
 `public function hasNamedRoute(string $name): bool`
 
@@ -113,7 +113,7 @@ Check if a named route exists.
 
 ---
 
-### urlFor() · [source](../../src/Mvc/Router.php#L155)
+### urlFor() · [source](../../src/Mvc/Router.php#L183)
 
 `public function urlFor(string $name, array $params = [], array $query = []): string`
 
@@ -139,7 +139,7 @@ Generate a URL for a named route, substituting parameters as needed.
 
 ---
 
-### prefix() · [source](../../src/Mvc/Router.php#L182)
+### prefix() · [source](../../src/Mvc/Router.php#L210)
 
 `public function prefix(string $prefix, callable $callback): void`
 
@@ -168,7 +168,7 @@ $router->prefix('/admin', function($r) {
 
 ---
 
-### middleware() · [source](../../src/Mvc/Router.php#L201)
+### middleware() · [source](../../src/Mvc/Router.php#L232)
 
 `public function middleware(array|string $name, callable $callback): void`
 
@@ -197,7 +197,65 @@ $router->middleware('auth', function($r) {
 
 ---
 
-### match() · [source](../../src/Mvc/Router.php#L440)
+### namespace() · [source](../../src/Mvc/Router.php#L262)
+
+`public function namespace(string $namespace, callable $callback): void`
+
+Define a group of routes that share a common namespace for their handlers. This allows you to organize related controllers together and avoid repeating the same namespace for each route handler. The callback function receives the router instance as an argument, allowing you to define routes within the group using the same `add()` method. The namespace is automatically prepended to all route handlers defined within the group. You can also nest groups within groups for more complex route hierarchies. Namespaces that start with a backslash will be treated as absolute and will not be prefixed with the parent group namespace.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$namespace` | string | - | Namespace prefix for the group (e.g., "Admin") |
+| `$callback` | callable | - | Function that receives the router instance to define routes within the group |
+
+**➡️ Return value**
+
+- Type: void
+
+**💡 Example**
+
+```php
+$router->namespace('Admin', function($r) {
+    $r->add('GET', '/dashboard', 'Dashboard::view');
+    $r->add('GET', '/users', 'UserController::list');
+});
+```
+
+
+---
+
+### controller() · [source](../../src/Mvc/Router.php#L287)
+
+`public function controller(string $controller, callable $callback): void`
+
+Define a group of routes that share a common controller. This allows you to organize related controllers together and avoid repeating the same controller name for each route handler. The callback function receives the router instance as an argument, allowing you to define routes within the group using the same `add()` method. The controller is automatically added to all route handlers defined within the group. You can also nest groups within groups for more complex route hierarchies.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$controller` | string | - | Controller name for the group (e.g., "Admin") |
+| `$callback` | callable | - | Function that receives the router instance to define routes within the group |
+
+**➡️ Return value**
+
+- Type: void
+
+**💡 Example**
+
+```php
+$router->controller('Admin', function($r) {
+    $r->add('GET', '/dashboard', '::view');
+    $r->add('GET', '/users', '::list');
+});
+```
+
+
+---
+
+### match() · [source](../../src/Mvc/Router.php#L521)
 
 `public function match(string $uri, string $method = 'GET'): array|null`
 

@@ -9,7 +9,7 @@ class SqliteSchemaProvider implements SchemaProvider
     {
     }
 
-    public function listTables(): array
+    public function listTables(?string $schema = null): array
     {
         $stmt = $this->pdo->query("
             SELECT name FROM sqlite_master WHERE type='table'
@@ -18,7 +18,7 @@ class SqliteSchemaProvider implements SchemaProvider
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public function getTableSchema(string $table): TableSchema
+    public function getTableSchema(string $table, ?string $schema = null): TableSchema
     {
         return new TableSchema(
             $table,

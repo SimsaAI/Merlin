@@ -208,11 +208,18 @@ $deleted = User::query()
 ```php
 // Simple where with inline value
 $exists = User::query()->where('email', 'john@example.com')->exists();
-$total = User::query()->where('status', 'active')->count();
+$total = User::query()->where('status', 'active')->tally();
 
 // With bound parameters
 $exists = User::query()->where('email = :email')->bind(['email' => 'john@example.com'])->exists();
-$total = User::query()->where('status = :status')->bind(['status' => 'active'])->count();
+$total = User::query()->where('status = :status')->bind(['status' => 'active'])->tally();
+```
+
+> **Note:** The query builder method is `tally()` (not `count()`) to avoid collisions with SQL aggregate columns named `count`. The static model helper `Model::tally()` works the same way.
+
+```php
+// Model-level tally
+$active = User::tally(['status' => 'active']);
 ```
 
 ## Pagination with Paginator
@@ -249,6 +256,27 @@ $messages = Query::new()
     ->execute();
 // Returns the LAST 3 messages, not the first 3.
 ```
+
+## Sql::bind() — PDO-Bound Parameters in Expressions
+
+Use `Sql::bind(name, value)` when you need a value to travel through as a **real PDO named parameter** (`:name`) instead of being inlined as an escaped literal. This is useful for values that must go through the PDO layer, e.g. for full-text vectors, JSON blobs, or binary data.
+
+```php
+use Merlin\Db\Sql;
+
+// :qty is kept as a PDO placeholder; 5 is bound at execute time
+User::query()
+    ->where('id', Sql::bind('userId', 42))
+    ->update(['stock' => Sql::raw('stock - :dec', ['dec' => 1])]);
+```
+
+Contrast with existing helpers:
+
+| Helper | SQL output | Value delivery |
+|---|---|---|
+| `Sql::raw('x + :n', ['n'=>1])` | `x + 1` (literal) | Inlined (escaped) |
+| `Sql::param('n')` | `:n` | Placeholder only — value must be supplied via `Query::bind()` |
+| `Sql::bind('n', 1)` | `:n` | Placeholder **and** value bubbled as PDO param |
 
 ## Returning SQL Without Executing
 

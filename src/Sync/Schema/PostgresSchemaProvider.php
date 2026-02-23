@@ -9,80 +9,129 @@ class PostgresSchemaProvider implements SchemaProvider
     {
     }
 
-    public function listTables(): array
+    /**
+     * Lists tables, views, materialized views, and foreign tables.
+     */
+    public function listTables(?string $schema = null): array
     {
-        $stmt = $this->pdo->query("
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-        ");
+        if ($schema === null) {
+            $schema = $this->getCurrentSchemas();
+        } else {
+            $schema = [$schema];
+        }
 
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $in = implode(',', array_fill(0, count($schema), '?'));
+
+        $stmt = $this->pdo->prepare("
+            SELECT n.nspname AS schema, c.relname AS name, c.relkind
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname IN ($in)
+              AND c.relkind IN ('r','v','m','f')  -- table, view, matview, foreign table
+            ORDER BY n.nspname, c.relname
+        ");
+        $stmt->execute($schema);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getTableSchema(string $table): TableSchema
+    public function getTableSchema(string $table, ?string $schema = null): TableSchema
     {
-        $columns = $this->loadColumns($table);
-        $indexes = $this->loadIndexes($table);
-        $comment = $this->loadTableComment($table);
+        [$schema, $relkind] = $this->resolveTable($table, $schema);
+
+        $columns = $this->loadColumns($table, $schema);
+        $indexes = $this->loadIndexes($table, $schema);
+        $comment = $this->loadTableComment($table, $schema);
 
         return new TableSchema(
             $table,
             $comment,
             $columns,
-            $indexes
+            $indexes,
+            //$schema,
+            //$relkind
         );
     }
 
-    private function loadTableComment(string $table): ?string
+    /**
+     * Returns the schema that PostgreSQL would use based on the search_path.
+     */
+    private function resolveTable(string $table, ?string $schema): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT obj_description(pg_class.oid) AS comment
-            FROM pg_class
-            WHERE relname = ?
-            AND relkind = 'r'
-        ");
-        $stmt->execute([$table]);
+        if ($schema !== null) {
+            $stmt = $this->pdo->prepare("
+                SELECT n.nspname, c.relkind
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.relname = ? AND n.nspname = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$table, $schema]);
+        } else {
+            // consider search_path
+            $stmt = $this->pdo->prepare("
+                SELECT n.nspname, c.relkind
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.relname = ?
+                ORDER BY n.nspname = ANY (current_schemas(true)) DESC
+                LIMIT 1
+            ");
+            $stmt->execute([$table]);
+        }
 
-        $comment = $stmt->fetchColumn();
-        return $comment !== '' ? $comment : null;
+        $row = $stmt->fetch(PDO::FETCH_NUM);
+
+        if (!$row) {
+            throw new \RuntimeException("Table '$table' not found in any schema.");
+        }
+
+        return $row; // [schema, relkind]
     }
 
-    private function loadColumns(string $table): array
+    private function loadTableComment(string $table, string $schema): ?string
     {
         $stmt = $this->pdo->prepare("
-            SELECT 
-                column_name,
-                data_type,
-                is_nullable,
-                column_default,
-                pgd.description AS comment,
-                (SELECT EXISTS (
-                    SELECT 1 FROM information_schema.table_constraints tc
-                    JOIN information_schema.key_column_usage kcu
-                    ON tc.constraint_name = kcu.constraint_name
-                    WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY'
-                    AND kcu.column_name = c.column_name
-                )) AS primary_key
-            FROM information_schema.columns c
-            LEFT JOIN pg_catalog.pg_statio_all_tables AS st
-                ON st.relname = c.table_name
-            LEFT JOIN pg_catalog.pg_description pgd
-                ON pgd.objoid = st.relid AND pgd.objsubid = c.ordinal_position
-            WHERE table_schema = 'public' AND table_name = ?
-            ORDER BY ordinal_position
+            SELECT obj_description(c.oid) AS comment
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relname = ? AND n.nspname = ?
         ");
-        $stmt->execute([$table, $table]);
+        $stmt->execute([$table, $schema]);
+
+        $comment = $stmt->fetchColumn();
+        return ($comment !== '' && $comment !== false) ? $comment : null;
+    }
+
+    private function loadColumns(string $table, string $schema): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT
+                a.attname AS name,
+                pg_catalog.format_type(a.atttypid, a.atttypmod) AS type,
+                NOT a.attnotnull AS nullable,
+                pg_get_expr(ad.adbin, ad.adrelid) AS default,
+                col_description(a.attrelid, a.attnum) AS comment,
+                ix.indisprimary AS primary
+            FROM pg_attribute a
+            JOIN pg_class c ON c.oid = a.attrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            LEFT JOIN pg_attrdef ad ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
+            LEFT JOIN pg_index ix ON ix.indrelid = c.oid AND a.attnum = ANY(ix.indkey) AND ix.indisprimary
+            WHERE c.relname = ? AND n.nspname = ? AND a.attnum > 0 AND NOT a.attisdropped
+            ORDER BY a.attnum
+        ");
+        $stmt->execute([$table, $schema]);
 
         $cols = [];
 
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $col) {
             $cols[] = new ColumnSchema(
-                name: $col['column_name'],
-                type: $col['data_type'],
-                nullable: $col['is_nullable'] === 'YES',
-                default: $col['column_default'],
-                primary: $col['primary_key'] === 't',
+                name: $col['name'],
+                type: $col['type'],
+                nullable: (bool) $col['nullable'],
+                default: $col['default'],
+                primary: (bool) $col['primary'],
                 comment: $col['comment'] ?: null
             );
         }
@@ -90,28 +139,44 @@ class PostgresSchemaProvider implements SchemaProvider
         return $cols;
     }
 
-    private function loadIndexes(string $table): array
+    private function loadIndexes(string $table, string $schema): array
     {
         $stmt = $this->pdo->prepare("
-            SELECT indexname, indexdef
-            FROM pg_indexes
-            WHERE schemaname = 'public' AND tablename = ?
+            SELECT
+                i.relname AS name,
+                ix.indisunique AS unique,
+                array_agg(a.attname ORDER BY x.ordinality) AS columns
+            FROM pg_class t
+            JOIN pg_namespace n ON n.oid = t.relnamespace
+            JOIN pg_index ix ON ix.indrelid = t.oid
+            JOIN pg_class i ON i.oid = ix.indexrelid
+            JOIN LATERAL unnest(ix.indkey) WITH ORDINALITY AS x(attnum, ordinality) ON true
+            LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = x.attnum
+            WHERE n.nspname = ? AND t.relname = ?
+            GROUP BY i.relname, ix.indisunique
+            ORDER BY i.relname
         ");
-        $stmt->execute([$table]);
+        $stmt->execute([$schema, $table]);
 
         $indexes = [];
 
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            preg_match('/\((.+)\)/', $row['indexdef'], $m);
-            $columns = array_map('trim', explode(',', $m[1]));
-
             $indexes[] = new IndexSchema(
-                name: $row['indexname'],
-                unique: str_contains($row['indexdef'], 'UNIQUE'),
-                columns: $columns
+                name: $row['name'],
+                unique: (bool) $row['unique'],
+                columns: $row['columns'] ?? []
             );
         }
 
         return $indexes;
+    }
+
+    /**
+     * Returns the schemas from the current search_path.
+     */
+    private function getCurrentSchemas(): array
+    {
+        $stmt = $this->pdo->query("SELECT unnest(current_schemas(true))");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }

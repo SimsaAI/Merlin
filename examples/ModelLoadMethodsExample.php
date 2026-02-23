@@ -47,7 +47,7 @@ class UserProduct extends Model
     public string $created_at;
 
     // Composite primary key
-    public function idFields(): array
+    public function modelIdFields(): array
     {
         return ['user_id', 'product_id'];
     }
@@ -61,7 +61,7 @@ class CartItem extends Model
     public int $quantity;
 
     // Composite primary key with 3 fields
-    public function idFields(): array
+    public function modelIdFields(): array
     {
         return ['cart_id', 'product_id', 'user_id'];
     }
@@ -197,15 +197,15 @@ if (UserProduct::exists(['user_id' => 10, 'product_id' => 25])) {
 // ============================================================================
 
 // Count all users
-$totalUsers = User::count();
+$totalUsers = User::tally();
 echo "Total users: {$totalUsers}\n";
 
 // Count by condition
-$activeUsers = User::count(['status' => 'active']);
+$activeUsers = User::tally(['status' => 'active']);
 echo "Active users: {$activeUsers}\n";
 
 // Count by multiple conditions
-$count = UserProduct::count([
+$count = UserProduct::tally([
     'user_id' => 10,
     'quantity' => 0
 ]);
@@ -312,7 +312,7 @@ $count = User::query()
     ->fetchColumn();
 
 // New way: using count
-$count = User::count(['status' => 'active']);
+$count = User::tally(['status' => 'active']);
 
 
 // Note: For complex queries, you can still use the builder pattern

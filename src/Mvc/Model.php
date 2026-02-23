@@ -22,24 +22,32 @@ abstract class Model
 
 	/**
 	 * Return the table or view name for this model. By default, it converts the
-	 * short class name (without namespace) from CamelCase to snake_case.
+	 * short class name (without namespace) from CamelCase to snake_case and applies pluralization if enabled (e.g. User → users, AdminUser → admin_users, Person → people).
 	 * Override this method if you want to specify a custom source.
 	 */
-	public function source(): string
+	public function modelSource(): string
 	{
+		if (isset($this->__sourceCache)) {
+			return $this->__sourceCache;
+		}
 		$class = static::class;
+		// Strip namespace to get short class name
 		$pos = strrpos($class, '\\');
 		if ($pos !== false) {
 			$class = substr($class, $pos + 1);
 		}
-		return ModelMapping::convertModelToSource($class);
+		// Convert to snake_case and apply pluralization if enabled
+		$this->__sourceCache = ModelMapping::convertModelToSource($class);
+		return $this->__sourceCache;
 	}
+
+	protected $__sourceCache;
 
 	/**
 	 * Return the database schema for this model, if applicable. By default, it returns null.
 	 * Override this method if you want to specify a schema (e.g. for PostgreSQL).
 	 */
-	public function schema(): ?string
+	public function modelSchema(): ?string
 	{
 		return null;
 	}
@@ -49,7 +57,7 @@ abstract class Model
 	 * Override this method if your model has a different primary key or composite keys.
 	 * @return array List of primary key field names
 	 */
-	public function idFields(): array
+	public function modelIdFields(): array
 	{
 		return ['id'];
 	}
@@ -67,7 +75,7 @@ abstract class Model
 	public static function query(?string $alias = null): Query
 	{
 		$instance = new static();
-		return Query::new($instance->readConnection())
+		return Query::new($instance->modelReadConnection())
 			->table(static::class, $alias);
 	}
 
@@ -163,7 +171,7 @@ abstract class Model
 		$instance = new static();
 		$builder = static::query();
 
-		$idFields = $instance->idFields();
+		$idFields = $instance->modelIdFields();
 
 		if (\is_array($id)) {
 			if (\count($id) !== \count($idFields)) {
@@ -250,24 +258,24 @@ abstract class Model
 	}
 
 	/**
-	 * Count the number of models matching the given conditions. Returns the count as an integer.
+	 * Count the number of models matching the given conditions. Returns the count as an integer. tally() is an alias for count() to avoid collision with database fields named "count".
 	 * @param array $conditions Associative array of field conditions to count
 	 * @return int The count of matching models
 	 */
-	public static function count(array $conditions = []): int
+	public static function tally(array $conditions = []): int
 	{
 		$builder = static::query();
 		foreach ($conditions as $field => $value) {
 			$builder->where($field, $value);
 		}
-		return $builder->count();
+		return $builder->tally();
 	}
 
 	/* -------------------------------------------------------------
 	 *  STATE HANDLING
 	 * ------------------------------------------------------------- */
 
-	protected $__state__;
+	protected $__state;
 
 	/**
 	 * Save the current state of the model for change tracking. This method clones the current instance and stores it in the __state__ property. It should be called after loading or saving the model to establish a baseline for detecting changes.
@@ -275,7 +283,7 @@ abstract class Model
 	 */
 	public function saveState(): static
 	{
-		$this->__state__ = clone $this;
+		$this->__state = clone $this;
 		return $this;
 	}
 
@@ -285,7 +293,7 @@ abstract class Model
 	 */
 	public function loadState(): static
 	{
-		$state = $this->__state__ ?? null;
+		$state = $this->__state ?? null;
 		if ($state) {
 			$excluded = self::__getExcludedProperties();
 			foreach ($state as $field => $value) {
@@ -303,25 +311,25 @@ abstract class Model
 	 */
 	public function getState(): ?static
 	{
-		return $this->__state__;
+		return $this->__state;
 	}
 
 	protected function __updateState(array $values): void
 	{
-		if ($this->__state__) {
+		if ($this->__state) {
 			foreach ($values as $k => $v) {
-				$this->__state__->$k = $v;
+				$this->__state->$k = $v;
 			}
 		}
 	}
 
-	protected static array $excludedPropertiesCache = [];
+	protected static array $__excludedPropertiesCache = [];
 
 	protected static function __getExcludedProperties(): array
 	{
 		$class = static::class;
 
-		if (!isset(self::$excludedPropertiesCache[$class])) {
+		if (!isset(self::$__excludedPropertiesCache[$class])) {
 			$excluded = [];
 			$reflect = new ReflectionClass($class);
 
@@ -331,10 +339,10 @@ abstract class Model
 				}
 			}
 
-			self::$excludedPropertiesCache[$class] = $excluded;
+			self::$__excludedPropertiesCache[$class] = $excluded;
 		}
 
-		return self::$excludedPropertiesCache[$class];
+		return self::$__excludedPropertiesCache[$class];
 	}
 
 	protected function __getChangedValues(): array
@@ -342,8 +350,8 @@ abstract class Model
 		$excluded = self::__getExcludedProperties();
 		$current = array_diff_key(get_object_vars($this), $excluded);
 
-		if ($this->__state__) {
-			$original = array_diff_key(get_object_vars($this->__state__), $excluded);
+		if ($this->__state) {
+			$original = array_diff_key(get_object_vars($this->__state), $excluded);
 			return array_diff_assoc($current, $original);
 		}
 
@@ -374,7 +382,7 @@ abstract class Model
 			return false;
 		}
 
-		$idFields = $this->idFields();
+		$idFields = $this->modelIdFields();
 		$hasAllIds = true;
 
 		foreach ($idFields as $field) {
@@ -422,7 +430,7 @@ abstract class Model
 
 	protected function __performUpdate(array $values): bool
 	{
-		foreach ($this->idFields() as $field) {
+		foreach ($this->modelIdFields() as $field) {
 			unset($values[$field]);
 		}
 
@@ -431,7 +439,7 @@ abstract class Model
 		}
 
 		$builder = static::query();
-		foreach ($this->idFields() as $field) {
+		foreach ($this->modelIdFields() as $field) {
 			if (!isset($this->$field)) {
 				throw new Exception("ID field '$field' not set");
 			}
@@ -447,7 +455,7 @@ abstract class Model
 	{
 		$excluded = self::__getExcludedProperties();
 
-		$idFields = $this->idFields();
+		$idFields = $this->modelIdFields();
 		$missingMap = [];
 		foreach ($idFields as $field) {
 			$missingMap[$field] = true;
@@ -471,7 +479,7 @@ abstract class Model
 			$builder->conflict($idFields);
 		}
 
-		$db = $this->writeConnection();
+		$db = $this->modelWriteConnection();
 
 		if ($db->getDriver() === 'pgsql') {
 			$result = $builder->returning(['*'])->insert($values);
@@ -506,7 +514,7 @@ abstract class Model
 	public function delete(): bool
 	{
 		$builder = static::query();
-		foreach ($this->idFields() as $field) {
+		foreach ($this->modelIdFields() as $field) {
 			if (!isset($this->$field)) {
 				throw new Exception("ID field '$field' not set");
 			}
@@ -520,8 +528,8 @@ abstract class Model
 	 *  CONNECTIONS
 	 * ------------------------------------------------------------- */
 
-	protected static array $defaultReadRoles = [];
-	protected static array $defaultWriteRoles = [];
+	protected static array $__defaultReadRoles = [];
+	protected static array $__defaultWriteRoles = [];
 
 	/**
 	 * Set both the read and write database role for this model class.
@@ -530,8 +538,8 @@ abstract class Model
 	 */
 	public static function setDefaultRole(string $role): void
 	{
-		self::$defaultReadRoles[static::class] = $role;
-		self::$defaultWriteRoles[static::class] = $role;
+		self::$__defaultReadRoles[static::class] = $role;
+		self::$__defaultWriteRoles[static::class] = $role;
 	}
 
 	/**
@@ -541,7 +549,7 @@ abstract class Model
 	 */
 	public static function setDefaultReadRole(string $role): void
 	{
-		self::$defaultReadRoles[static::class] = $role;
+		self::$__defaultReadRoles[static::class] = $role;
 	}
 
 	/**
@@ -551,14 +559,14 @@ abstract class Model
 	 */
 	public static function setDefaultWriteRole(string $role): void
 	{
-		self::$defaultWriteRoles[static::class] = $role;
+		self::$__defaultWriteRoles[static::class] = $role;
 	}
 
-	protected function connectionRole(string $type): string
+	protected function __connectionRole(string $type): string
 	{
 		$map = $type === 'read'
-			? static::$defaultReadRoles
-			: static::$defaultWriteRoles;
+			? static::$__defaultReadRoles
+			: static::$__defaultWriteRoles;
 
 		// Check for specific model role
 		if (isset($map[static::class])) {
@@ -581,9 +589,9 @@ abstract class Model
 	 *
 	 * @return \Merlin\Db\Database
 	 */
-	public function readConnection(): Database
+	public function modelReadConnection(): Database
 	{
-		$role = $this->connectionRole('read');
+		$role = $this->__connectionRole('read');
 		return AppContext::instance()->dbManager()->getOrDefault($role);
 	}
 
@@ -594,9 +602,9 @@ abstract class Model
 	 *
 	 * @return \Merlin\Db\Database
 	 */
-	public function writeConnection(): Database
+	public function modelWriteConnection(): Database
 	{
-		$role = $this->connectionRole('write');
+		$role = $this->__connectionRole('write');
 		return AppContext::instance()->dbManager()->getOrDefault($role);
 	}
 

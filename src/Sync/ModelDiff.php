@@ -8,13 +8,20 @@ class ModelDiff
     /**
      * @return DiffOperation[]
      */
-    public function diff(TableSchema $table, ParsedModel $model): array
+    public function diff(TableSchema $table, ParsedModel $model, ?SyncOptions $options = null): array
     {
         $ops = [];
 
-        // Build DB column map
+        $generateAccessors = $options?->generateAccessors ?? false;
+        $fieldVisibility = $options?->fieldVisibility ?? 'public';
+        $deprecate = $options?->deprecate ?? true;
+
+        // Build DB column map, skipping underscore-prefixed column names
         $dbCols = [];
         foreach ($table->columns as $col) {
+            if (str_starts_with($col->name, '_')) {
+                continue;
+            }
             $dbCols[$col->name] = $col;
         }
 
@@ -29,13 +36,30 @@ class ModelDiff
                 $op->type = $this->mapColumnToPhpType($col);
                 $op->nullable = $col->nullable && !$col->primary;
                 $op->comment = $col->comment;
+                $op->visibility = $fieldVisibility;
                 $ops[] = $op;
+
+                if ($generateAccessors) {
+                    $acc = new AddAccessor();
+                    $acc->property = $name;
+                    $acc->phpType = $op->type;
+                    $acc->methodName = $this->camelize($name);
+                    $acc->visibility = $fieldVisibility;
+                    $ops[] = $acc;
+                }
             }
         }
 
-        // 2. Orphaned properties (PHP → DB): mark @deprecated
+        // 2. Orphaned properties (PHP → DB): optionally mark @deprecated
+        //    Properties starting with '_' are ignored entirely.
         foreach ($phpProps as $name => $prop) {
+            if (str_starts_with($name, '_')) {
+                continue;
+            }
             if (!isset($dbCols[$name])) {
+                if (!$deprecate) {
+                    continue;
+                }
                 $op = new RemoveProperty();
                 $op->property = $name;
                 $ops[] = $op;
@@ -122,6 +146,11 @@ class ModelDiff
     {
         return trim((string) $comment);
     }
+
+    private function camelize(string $name): string
+    {
+        return lcfirst(str_replace('_', '', ucwords($name, '_')));
+    }
 }
 
 abstract class DiffOperation
@@ -134,11 +163,23 @@ class AddProperty extends DiffOperation
     public string $type;
     public bool $nullable = false;
     public ?string $comment;
+    /** Visibility modifier: 'public', 'protected', or 'private' */
+    public string $visibility = 'public';
 }
 
 class RemoveProperty extends DiffOperation
 {
     public bool $markDeprecated = true;
+}
+
+class AddAccessor extends DiffOperation
+{
+    /** PHP type string including nullability, e.g. 'string', '?int' */
+    public string $phpType;
+    /** Camelized method name, e.g. 'userId' */
+    public string $methodName;
+    /** Visibility modifier: 'public', 'protected', or 'private' */
+    public string $visibility = 'public';
 }
 
 class UpdatePropertyType extends DiffOperation

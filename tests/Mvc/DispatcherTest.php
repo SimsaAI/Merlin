@@ -140,7 +140,7 @@ class DispatcherTest extends TestCase
     private function routeWithOverride(string $controllerClass, string $action, array $params = [], array $groups = []): array
     {
         $pos = strrpos($controllerClass, '\\');
-        $namespace = $pos === false ? '' : substr($controllerClass, 0, $pos);
+        $namespace = $pos === false ? '' : '\\' . substr($controllerClass, 0, $pos);
         $controller = $pos === false ? $controllerClass : substr($controllerClass, $pos + 1);
 
         return [
@@ -229,7 +229,7 @@ class DispatcherTest extends TestCase
     public function testDynamicVarsAddSuffixesButOverrideDoesNot(): void
     {
         $disp = new Dispatcher();
-        $disp->setBaseNamespace('Merlin\\Tests\\Mvc');
+        $disp->setBaseNamespace('\\Merlin\\Tests\\Mvc');
 
         $res = $disp->dispatch([
             'vars' => [
@@ -251,14 +251,14 @@ class DispatcherTest extends TestCase
             'override' => [
                 'controller' => 'RoutingStateController',
                 'action' => 'fromOverride',
-                'namespace' => 'Merlin\\Tests\\Mvc',
+                'namespace' => '\\Merlin\\Tests\\Mvc',
             ],
             'groups' => [],
         ]);
 
         $this->assertEquals('application/json', $this->responseHeaders($res)['Content-Type']);
         $payload = json_decode($this->responseBody($res), true);
-        $this->assertEquals('Merlin\\Tests\\Mvc\\RoutingStateController', $payload['controller']);
+        $this->assertEquals('\\Merlin\\Tests\\Mvc\\RoutingStateController', $payload['controller']);
         $this->assertEquals('fromOverride', $payload['action']);
     }
 
@@ -267,7 +267,7 @@ class DispatcherTest extends TestCase
         $context = new AppContext();
         AppContext::setInstance($context); // Ensure singleton instance is used
         $disp = new Dispatcher();
-        $disp->setBaseNamespace('Merlin\\Tests\\Mvc');
+        $disp->setBaseNamespace('\\Merlin\\Tests\\Mvc');
 
         $res = $disp->dispatch([
             'vars' => [
@@ -279,7 +279,7 @@ class DispatcherTest extends TestCase
             'override' => [
                 'controller' => 'RoutingStateController',
                 'action' => 'fromOverride',
-                'namespace' => 'Merlin\\Tests\\Mvc',
+                'namespace' => '\\Merlin\\Tests\\Mvc',
             ],
         ]);
 
@@ -291,7 +291,7 @@ class DispatcherTest extends TestCase
         $stored = $context->route();
         $this->assertNotNull($stored);
         $this->assertSame([], $stored->groups);
-        $this->assertSame('Merlin\\Tests\\Mvc\\RoutingStateController', $stored->controller);
+        $this->assertSame('\\Merlin\\Tests\\Mvc\\RoutingStateController', $stored->controller);
         $this->assertSame('fromOverride', $stored->action);
         $this->assertSame(['x', 'y'], $stored->vars['args']);
         $this->assertSame([42, ['x', 'y']], $stored->params);
@@ -313,7 +313,7 @@ class DispatcherTest extends TestCase
             'override' => [
                 'controller' => 'RoutingStateController',
                 'action' => 'fromOverride',
-                'namespace' => 'Merlin\\Tests\\Mvc',
+                'namespace' => '\\Merlin\\Tests\\Mvc',
             ],
         ]);
 

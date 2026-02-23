@@ -21,9 +21,17 @@
 
 ---
 
-### listTables() · [source](../../src/Sync/Schema/PostgresSchemaProvider.php#L12)
+### listTables() · [source](../../src/Sync/Schema/PostgresSchemaProvider.php#L15)
 
-`public function listTables(): array`
+`public function listTables(string|null $schema = null): array`
+
+Lists tables, views, materialized views, and foreign tables.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$schema` | string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -32,15 +40,16 @@
 
 ---
 
-### getTableSchema() · [source](../../src/Sync/Schema/PostgresSchemaProvider.php#L23)
+### getTableSchema() · [source](../../src/Sync/Schema/PostgresSchemaProvider.php#L38)
 
-`public function getTableSchema(string $table): Merlin\Sync\Schema\TableSchema`
+`public function getTableSchema(string $table, string|null $schema = null): Merlin\Sync\Schema\TableSchema`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$table` | string | - |  |
+| `$schema` | string\|null | `null` |  |
 
 **➡️ Return value**
 

@@ -75,12 +75,14 @@
 - [DiffOperation](Sync_DiffOperation.md) `Merlin\Sync\DiffOperation`
 - [AddProperty](Sync_AddProperty.md) `Merlin\Sync\AddProperty`
 - [RemoveProperty](Sync_RemoveProperty.md) `Merlin\Sync\RemoveProperty`
+- [AddAccessor](Sync_AddAccessor.md) `Merlin\Sync\AddAccessor`
 - [UpdatePropertyType](Sync_UpdatePropertyType.md) `Merlin\Sync\UpdatePropertyType`
 - [UpdatePropertyComment](Sync_UpdatePropertyComment.md) `Merlin\Sync\UpdatePropertyComment`
 - [UpdateClassComment](Sync_UpdateClassComment.md) `Merlin\Sync\UpdateClassComment`
 - [ModelParser](Sync_ModelParser.md) `Merlin\Sync\ModelParser`
 - [ParsedModel](Sync_ParsedModel.md) `Merlin\Sync\ParsedModel`
 - [ParsedProperty](Sync_ParsedProperty.md) `Merlin\Sync\ParsedProperty`
+- [SyncOptions](Sync_SyncOptions.md) `Merlin\Sync\SyncOptions`
 - [SyncResult](Sync_SyncResult.md) `Merlin\Sync\SyncResult`
 - [SyncRunner](Sync_SyncRunner.md) `Merlin\Sync\SyncRunner`
 

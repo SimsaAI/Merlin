@@ -428,8 +428,8 @@ class Database
 	{
 		if (!empty($table) && !empty($field) && $this->driverName === 'pgsql') {
 			if ($table instanceof Model) {
-				$schema = $table->schema();
-				$table = $table->source();
+				$schema = $table->modelSchema();
+				$table = $table->modelSource();
 				if (!empty($schema)) {
 					$table = "$schema.$table";
 				}

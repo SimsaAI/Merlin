@@ -6,7 +6,7 @@ Fluent builder for CASE expressions
 
 ## 🚀 Public methods
 
-### when() · [source](../../src/Db/Sql.php#L486)
+### when() · [source](../../src/Db/Sql.php#L512)
 
 `public function when(mixed $condition, mixed $then): static`
 
@@ -26,7 +26,7 @@ Add WHEN condition THEN result clause
 
 ---
 
-### else() · [source](../../src/Db/Sql.php#L497)
+### else() · [source](../../src/Db/Sql.php#L523)
 
 `public function else(mixed $value): static`
 
@@ -45,7 +45,7 @@ Set ELSE default value
 
 ---
 
-### end() · [source](../../src/Db/Sql.php#L507)
+### end() · [source](../../src/Db/Sql.php#L533)
 
 `public function end(): Merlin\Db\Sql`
 

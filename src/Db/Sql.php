@@ -98,6 +98,32 @@ class Sql
     }
 
     /**
+     * Bound parameter — emits :name in the SQL and propagates the value as a
+     * real PDO named parameter (not inlined as an escaped literal).
+     * The value is merged into Query::$subQueryBindings and reaches
+     * Database::query() via PDO execute().
+     * @param string $name Parameter name
+     * @param mixed $value Parameter value
+     * @return $this
+     */
+    public static function bind(string $name, mixed $value): static
+    {
+        $node = new static(static::TYPE_PARAM, $name);
+        $node->bindParams[$name] = $value;
+        return $node;
+    }
+
+    /**
+     * Whether this node's bind parameters should be passed as real PDO named
+     * parameters rather than inlined as escaped literals.
+     * @return bool
+     */
+    public function usesPdoBinding(): bool
+    {
+        return $this->type === static::TYPE_PARAM && !empty($this->bindParams);
+    }
+
+    /**
      * SQL function call
      * @param string $name Function name
      * @param array $args Function arguments (scalars or Sql instances)
@@ -142,13 +168,13 @@ class Sql
     /**
      * Raw SQL (unescaped, passed through as-is)
      * @param string $sql Raw SQL string
-     * @param array $bindParams Optional bind parameters ['param_name' => value]
+     * @param array $inlineValues Optional values to be replaced in the SQL (e.g. for :name placeholders), treated as literal values (escaped)
      * @return $this
      */
-    public static function raw(string $sql, array $bindParams = []): static
+    public static function raw(string $sql, array $inlineValues = []): static
     {
         $node = new static(static::TYPE_RAW, $sql);
-        $node->bindParams = $bindParams;
+        $node->bindParams = $inlineValues;
         return $node;
     }
 

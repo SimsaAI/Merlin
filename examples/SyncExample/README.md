@@ -42,7 +42,7 @@ No changes needed for the quick start.
 ### 3. Preview changes (dry-run)
 
 ```bash
-php console.php sync all Models --dry-run
+php console.php sync all Models
 ```
 
 Expected output:
@@ -199,15 +199,27 @@ Any PHP property that no longer has a matching column is marked `@deprecated` in
 ## CLI Reference
 
 ```
-php console.php sync all  <directory> [--apply] [--database=<role>]
-php console.php sync model <file>      [--apply] [--database=<role>]
+php console.php sync all   <directory> [--apply] [--database=<role>]
+                            [--generate-accessors] [--field-visibility=<vis>]
+                            [--no-deprecate] [--create-missing] [--namespace=<ns>]
+php console.php sync model <file>       [--apply] [--database=<role>]
+                            [--generate-accessors] [--field-visibility=<vis>]
+                            [--no-deprecate]
+php console.php sync make  <ClassName>  <directory> [--namespace=<ns>] [--apply]
+                            [--database=<role>] [--generate-accessors]
+                            [--field-visibility=<vis>] [--no-deprecate]
 ```
 
-| Flag                | Description                                           |
-| ------------------- | ----------------------------------------------------- |
-| _(none)_            | Dry-run mode: preview changes without modifying files |
-| `--apply`           | Apply changes and write updated model files to disk   |
-| `--database=<role>` | Use a specific database role (default: `read`)        |
+| Flag                       | Description                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| _(none)_                   | Dry-run mode: preview changes without modifying files                                    |
+| `--apply`                  | Apply changes and write updated model files to disk                                      |
+| `--database=<role>`        | Use a specific database role (default: `read`)                                           |
+| `--generate-accessors`     | Generate a camelized getter/setter method for each new property                          |
+| `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`                       |
+| `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed                    |
+| `--create-missing`         | (`sync all` only) Scaffold model files for tables that have no matching model yet        |
+| `--namespace=<ns>`         | PHP namespace to use when scaffolding new model files (required with `--create-missing`) |
 
 ---
 
@@ -216,9 +228,11 @@ php console.php sync model <file>      [--apply] [--database=<role>]
 1. **ModelParser** tokenises the PHP file and extracts class properties + metadata
 2. **SchemaProvider** (MySQL / PostgreSQL / SQLite) introspects the live database schema for the model's table
 3. **ModelDiff** computes the difference between PHP properties and DB columns:
-   - Missing PHP property → `AddProperty` operation
-   - Missing DB column → `RemoveProperty` (marks existing property `@deprecated`)
+   - Missing PHP property → `AddProperty` operation (respects `--field-visibility`)
+   - Missing DB column → `RemoveProperty` (marks existing property `@deprecated`, unless `--no-deprecate`)
    - Type mismatch → `UpdatePropertyType`
    - Comment mismatch → `UpdatePropertyComment`
+   - With `--generate-accessors`: an `AddAccessor` is paired with each added property, producing a camelized dual-purpose getter/setter
+   - Column names starting with `_` and properties starting with `_` are always skipped
 4. **CodeGenerator** applies the operations to the PHP source file using string manipulation and regex
 5. **SyncRunner** orchestrates the pipeline and writes the result back to disk

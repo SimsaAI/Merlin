@@ -32,15 +32,15 @@ class SyncRunner
      * @param bool   $dryRun   When true the file is NOT written; changes are only calculated
      * @param string $dbRole   Database role to introspect (falls back to default if not registered)
      */
-    public function syncModel(string $filePath, bool $dryRun = false, string $dbRole = 'read'): SyncResult
+    public function syncModel(string $filePath, bool $dryRun = false, string $dbRole = 'read', ?SyncOptions $options = null): SyncResult
     {
         try {
             // 1. Parse the model file
             $parser = new ModelParser($filePath);
             $parsed = $parser->parse();
 
-            // 2. Resolve the table name by instantiating the model via reflection
-            $tableName = $this->resolveTableName($parsed->className);
+            // 2. Resolve the table name and optional DB schema from the model
+            [$tableName, $modelSchema] = $this->resolveModelInfo($parsed->className);
 
             // 3. Get the database connection for the requested role
             $db = $this->dbManager->getOrDefault($dbRole);
@@ -48,11 +48,11 @@ class SyncRunner
             // 4. Build schema provider from the connection's driver
             $provider = $this->buildProvider($db);
 
-            // 5. Fetch table schema
-            $tableSchema = $provider->getTableSchema($tableName);
+            // 5. Fetch table schema (schema param used by PostgreSQL, ignored by others)
+            $tableSchema = $provider->getTableSchema($tableName, $modelSchema);
 
             // 6. Calculate diff
-            $ops = $this->diff->diff($tableSchema, $parsed);
+            $ops = $this->diff->diff($tableSchema, $parsed, $options);
 
             if (empty($ops)) {
                 return new SyncResult(
@@ -98,11 +98,11 @@ class SyncRunner
      * @param string   $dbRole
      * @return SyncResult[]
      */
-    public function syncAll(array $modelFiles, bool $dryRun = false, string $dbRole = 'read'): array
+    public function syncAll(array $modelFiles, bool $dryRun = false, string $dbRole = 'read', ?SyncOptions $options = null): array
     {
         $results = [];
         foreach ($modelFiles as $file) {
-            $results[] = $this->syncModel($file, $dryRun, $dbRole);
+            $results[] = $this->syncModel($file, $dryRun, $dbRole, $options);
         }
         return $results;
     }
@@ -111,20 +111,96 @@ class SyncRunner
     //  Helpers
     // -------------------------------------------------------------------------
 
-    private function resolveTableName(string $className): string
+    /**
+     * Return all table names in the database for the given role and optional schema.
+     *
+     * @param  string|null $schema  DB schema to scan (PostgreSQL only; pass null to use server default).
+     * @return string[]
+     */
+    public function listDatabaseTables(string $dbRole = 'read', ?string $schema = null): array
+    {
+        $db = $this->dbManager->getOrDefault($dbRole);
+        return $this->buildProvider($db)->listTables($schema);
+    }
+
+    /**
+     * Scaffold a new model file. Throws if the file already exists.
+     *
+     * The generated class includes an explicit modelSource() override so the
+     * table name is always unambiguous to subsequent sync operations.
+     * If $schema is given, a modelSchema() override is also generated.
+     */
+    public function createModelFile(
+        string $filePath,
+        string $namespace,
+        string $className,
+        string $tableName,
+        ?string $schema = null
+    ): void {
+        if (file_exists($filePath)) {
+            throw new RuntimeException("File already exists: {$filePath}");
+        }
+
+        $dir = dirname($filePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $schemaMethod = $schema !== null
+            ? "\n    public function modelSchema(): ?string { return '{$schema}'; }\n"
+            : '';
+
+        $content = <<<PHP
+<?php
+
+namespace {$namespace};
+
+use Merlin\Mvc\Model;
+
+class {$className} extends Model
+{
+    public function modelSource(): string { return '{$tableName}'; }{$schemaMethod}
+    // Properties will be added automatically by the sync task.
+}
+PHP;
+
+        file_put_contents($filePath, $content);
+    }
+
+    /**
+     * Resolve the table name for a model file without calculating a full diff.
+     * Returns null if the file cannot be parsed or the class is not a valid Model.
+     */
+    public function getModelTableName(string $filePath): ?string
+    {
+        try {
+            $parser = new ModelParser($filePath);
+            $parsed = $parser->parse();
+            [$table] = $this->resolveModelInfo($parsed->className);
+            return $table;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Instantiate the model class (without calling its constructor) and extract
+     * both the table name (modelSource) and the optional DB schema (modelSchema).
+     *
+     * @return array{0: string, 1: ?string}  [$tableName, $schema]
+     */
+    private function resolveModelInfo(string $className): array
     {
         $ref = new \ReflectionClass($className);
-
-        // Instantiate without calling constructor so abstract-ish  lightweight classes work
         $instance = $ref->newInstanceWithoutConstructor();
 
-        if (!method_exists($instance, 'source')) {
+        if (!$instance instanceof \Merlin\Mvc\Model) {
             throw new RuntimeException(
-                "Class {$className} does not have a source() method – is it a Merlin Model?"
+                "Class {$className} is not an instance of Merlin\\Mvc\\Model"
             );
         }
 
-        return $instance->source();
+        return [$instance->modelSource(), $instance->modelSchema()];
     }
 
     private function buildProvider(Database $db): SchemaProvider

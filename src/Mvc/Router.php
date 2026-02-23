@@ -22,6 +22,8 @@ class Router
     protected array $types = [];    // type validators
     protected array $middlewareGroupStack = [];
     protected array $prefixGroupStack = [];
+    protected array $namespaceGroupStack = [];
+    protected array $controllerGroupStack = [];
     protected array $namedRoutes = []; // [name] => ['tokens'=>...]
     protected ?array $lastAddedTokens = null;
 
@@ -90,6 +92,32 @@ class Router
             $prefix = implode('/', $this->prefixGroupStack);
             $pattern = "$prefix/" . ltrim($pattern, '/');
         }
+
+        if (!empty($this->namespaceGroupStack)) {
+            $namespace = end($this->namespaceGroupStack);
+            if (\is_string($handler)) {
+                $handler = "$namespace\\$handler";
+            } elseif (empty($handler['namespace'])) {
+                $handler['namespace'] = $namespace;
+            } else {
+                $handler['namespace'] = $namespace . '\\' . $handler['namespace'];
+            }
+        }
+
+        if (!empty($this->controllerGroupStack)) {
+            $controller = implode('', $this->controllerGroupStack);
+            if (\is_string($handler)) {
+                $pos = strpos($handler, '::');
+                if ($pos === false) {
+                    $handler = "$controller::$handler";
+                } elseif ($pos === 0) {
+                    $handler = "$controller$handler";
+                }
+            } elseif (empty($handler['controller'])) {
+                $handler['controller'] = $controller;
+            }
+        }
+
         $tokens = $this->parsePattern($pattern);
         $this->lastAddedTokens = $tokens;
 
@@ -181,6 +209,9 @@ class Router
      */
     public function prefix(string $prefix, callable $callback): void
     {
+        if (empty($prefix)) {
+            throw new InvalidArgumentException('Prefix cannot be empty');
+        }
         $this->prefixGroupStack[] = trim($prefix, '/');
         $callback($this);
         array_pop($this->prefixGroupStack);
@@ -201,6 +232,9 @@ class Router
     public function middleware(string|array $name, callable $callback): void
     {
         if (\is_string($name)) {
+            if (empty($name)) {
+                throw new InvalidArgumentException('Middleware group name cannot be empty');
+            }
             $count = 1;
             $this->middlewareGroupStack[] = $name;
         } else {
@@ -211,6 +245,53 @@ class Router
         }
         $callback($this);
         array_splice($this->middlewareGroupStack, -$count);
+    }
+
+    /**
+     * Define a group of routes that share a common namespace for their handlers. This allows you to organize related controllers together and avoid repeating the same namespace for each route handler. The callback function receives the router instance as an argument, allowing you to define routes within the group using the same `add()` method. The namespace is automatically prepended to all route handlers defined within the group. You can also nest groups within groups for more complex route hierarchies. Namespaces that start with a backslash will be treated as absolute and will not be prefixed with the parent group namespace.
+     *
+     * @param string $namespace Namespace prefix for the group (e.g., "Admin")
+     * @param callable $callback Function that receives the router instance to define routes within the group
+     *
+     * @example
+     * $router->namespace('Admin', function($r) {
+     *     $r->add('GET', '/dashboard', 'Dashboard::view');
+     *     $r->add('GET', '/users', 'UserController::list');
+     * });
+     */
+    public function namespace(string $namespace, callable $callback): void
+    {
+        if (empty($namespace)) {
+            throw new InvalidArgumentException('Namespace cannot be empty');
+        }
+        if ($namespace[0] !== '\\') {
+            $namespace = end($this->namespaceGroupStack) . '\\' . $namespace;
+        }
+        $this->namespaceGroupStack[] = $namespace;
+        $callback($this);
+        array_pop($this->namespaceGroupStack);
+    }
+
+    /**
+     * Define a group of routes that share a common controller. This allows you to organize related controllers together and avoid repeating the same controller name for each route handler. The callback function receives the router instance as an argument, allowing you to define routes within the group using the same `add()` method. The controller is automatically added to all route handlers defined within the group. You can also nest groups within groups for more complex route hierarchies.
+     *
+     * @param string $controller Controller name for the group (e.g., "Admin")
+     * @param callable $callback Function that receives the router instance to define routes within the group
+     *
+     * @example
+     * $router->controller('Admin', function($r) {
+     *     $r->add('GET', '/dashboard', '::view');
+     *     $r->add('GET', '/users', '::list');
+     * });
+     */
+    public function controller(string $controller, callable $callback): void
+    {
+        if (empty($controller)) {
+            throw new InvalidArgumentException('Controller name cannot be empty');
+        }
+        $this->controllerGroupStack[] = $controller;
+        $callback($this);
+        array_pop($this->controllerGroupStack);
     }
 
     protected function storeRoute(string $method, array $tokens, string|array|null $handler, array $groups): void
@@ -602,10 +683,26 @@ class Router
             $override = [];
         } elseif (\is_array($handler)) {
             $override = $handler;
+            if (!empty($override['controller'])) {
+                $namespacePart = strstr($override['controller'], '\\', true);
+                if ($namespacePart !== false) {
+                    if (!empty($override['namespace'])) {
+                        $override['namespace'] .= '\\' . $namespacePart;
+                    } else {
+                        $override['namespace'] = $namespacePart;
+                    }
+                    $override['controller'] = substr($override['controller'], strlen($namespacePart) + 1);
+                }
+            }
         } else {
             $override = [];
             $handler = trim($handler);
             if ($handler !== '') {
+                $namespacePart = strstr($handler, '\\', true);
+                if ($namespacePart !== false) {
+                    $override['namespace'] = $namespacePart;
+                    $handler = substr($handler, strlen($namespacePart) + 1);
+                }
                 $controllerPart = strstr($handler, '::', true);
                 if ($controllerPart === false) {
                     $override['controller'] = $handler;
