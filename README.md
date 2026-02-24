@@ -114,7 +114,7 @@ $ctx->dbManager()->set('default',
 // specified as 'ControllerClass::methodName' or as array syntax
 // ['controller' => 'ControllerClass', 'action' => 'methodName'] for more
 // complex cases.
-$router = new Router();
+$router = $ctx->router();
 $router->add('GET', '/hello/{name}', 'IndexController::helloAction');
 
 // Match the incoming request
@@ -302,7 +302,9 @@ $report = Query::new()
 
 ### CLI Tasks
 
-Build command-line tools and scripts:
+Build command-line tools and scripts. `Console` auto-discovers tasks from PSR-4 namespaces, parses options, and renders color-highlighted help pages.
+
+**console.php** — minimal entry point:
 
 ```php
 <?php
@@ -310,15 +312,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use Merlin\Cli\Console;
 
-$task = $argv[1] ?? null;
-$action = $argv[2] ?? null;
-$params = array_slice($argv, 3);
-
 $console = new Console();
-$console->process($task, $action, $params);
+$console->addNamespace('App\\Tasks');   // discover App\Tasks\*Task.php
+$console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
-Create a task:
+**Create a task** — extend `Task`, add `*Action` methods:
 
 ```php
 <?php
@@ -326,22 +325,47 @@ namespace App\Tasks;
 
 use Merlin\Cli\Task;
 
+/**
+ * Database maintenance utilities.
+ *
+ * Usage:
+ *   php console.php database migrate [--direction=<up|down>]
+ *
+ * Examples:
+ *   php console.php database migrate            # migrate up
+ *   php console.php database migrate --direction=down
+ */
 class DatabaseTask extends Task
 {
-    public function migrateAction(string $direction = 'up'): void
+    public function migrateAction(string $target = 'latest'): void
     {
-        echo "Running migration: {$direction}\n";
-        // Your migration logic here
+        $direction = $this->opt('direction', 'up');
+        $this->info("Migrating {$direction} to {$target}…");
+        // migration logic here
+        $this->success("Done.");
     }
 }
 ```
 
-Run tasks from the command line:
+**Run tasks** from the command line — options are separated from positional arguments automatically:
 
 ```bash
-php console.php database migrate up
-php console.php hello world John
+php console.php database migrate latest --direction=down
+php console.php help               # color overview with all tasks and actions
+php console.php help database      # color detail page for one task
 ```
+
+**Task output helpers** (all ANSI-colored when the terminal supports it):
+
+| Method                                | Color                 |
+| ------------------------------------- | --------------------- |
+| `$this->line($text)`                  | plain                 |
+| `$this->info($text)`                  | cyan                  |
+| `$this->success($text)`               | bright green          |
+| `$this->warn($text)`                  | bright yellow         |
+| `$this->error($text)`                 | bright red prefix     |
+| `$this->muted($text)`                 | gray                  |
+| `$this->style($text, 'bold', 'cyan')` | arbitrary ANSI styles |
 
 ## Project Structure
 

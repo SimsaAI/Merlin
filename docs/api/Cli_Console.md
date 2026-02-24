@@ -2,52 +2,61 @@
 
 **Full name:** [Merlin\Cli\Console](../../src/Cli/Console.php)
 
-Console entry point for dispatching CLI tasks.
-
-Resolves a task class (a subclass of {@see \Task}) and an action method based on
-the command-line arguments, converts string arguments to appropriate scalar types,
-and invokes the action.
-
 ## 🚀 Public methods
 
-### getDefaultTask() · [source](../../src/Cli/Console.php#L31)
+### __construct() · [source](../../src/Cli/Console.php#L35)
 
-`public function getDefaultTask(): string`
-
-Get the default task class name used when no task is specified on the command line.
-
-**➡️ Return value**
-
-- Type: string
-- Description: Default task class name (without namespace), e.g. "MainTask".
-
-
----
-
-### setDefaultTask() · [source](../../src/Cli/Console.php#L42)
-
-`public function setDefaultTask(string $defaultTask): void`
-
-Set the default task class name used when no task is specified on the command line.
+`public function __construct(string|null $scriptName = null): mixed`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$defaultTask` | string | - | Task class name (without namespace), e.g. "MainTask". |
+| `$scriptName` | string\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: mixed
+
+
+---
+
+### addNamespace() · [source](../../src/Cli/Console.php#L41)
+
+`public function addNamespace(string $ns): void`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$ns` | string | - |  |
 
 **➡️ Return value**
 
 - Type: void
 
-**⚠️ Throws**
 
-- Exception  If the given name is empty.
+---
+
+### addTaskPath() · [source](../../src/Cli/Console.php#L49)
+
+`public function addTaskPath(string $path, bool $registerAutoload = false): void`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$path` | string | - |  |
+| `$registerAutoload` | bool | `false` |  |
+
+**➡️ Return value**
+
+- Type: void
 
 
 ---
 
-### getDefaultAction() · [source](../../src/Cli/Console.php#L55)
+### getDefaultAction() · [source](../../src/Cli/Console.php#L65)
 
 `public function getDefaultAction(): string`
 
@@ -56,12 +65,12 @@ Get the default action method name used when no action is specified on the comma
 **➡️ Return value**
 
 - Type: string
-- Description: Default action method name (without namespace), e.g. "mainAction".
+- Description: Default action method name (without namespace), e.g. "indexAction".
 
 
 ---
 
-### setDefaultAction() · [source](../../src/Cli/Console.php#L66)
+### setDefaultAction() · [source](../../src/Cli/Console.php#L76)
 
 `public function setDefaultAction(string $defaultAction): void`
 
@@ -71,7 +80,7 @@ Set the default action method name used when no action is specified on the comma
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$defaultAction` | string | - | Action method name, e.g. "mainAction". |
+| `$defaultAction` | string | - | Action method name, e.g. "indexAction". |
 
 **➡️ Return value**
 
@@ -79,39 +88,22 @@ Set the default action method name used when no action is specified on the comma
 
 **⚠️ Throws**
 
-- Exception  If the given name is empty.
+- InvalidArgumentException  If the given name is empty.
 
 
 ---
 
-### getNamespace() · [source](../../src/Cli/Console.php#L79)
+### enableColors() · [source](../../src/Cli/Console.php#L100)
 
-`public function getNamespace(): string`
+`public function enableColors(bool $colors): void`
 
-Get the PHP namespace used to locate task classes.
-
-**➡️ Return value**
-
-- Type: string
-- Description: Namespace string (always ends with a backslash), e.g. "App\\Tasks\\".
-
-
----
-
-### setNamespace() · [source](../../src/Cli/Console.php#L92)
-
-`public function setNamespace(string $namespace): void`
-
-Set the PHP namespace used to locate task classes.
-
-A trailing backslash is added automatically if missing.
-Pass an empty string to disable namespace prefixing.
+Enable or disable ANSI color output explicitly.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$namespace` | string | - | Namespace to use, e.g. "App\\Tasks". |
+| `$colors` | bool | - |  |
 
 **➡️ Return value**
 
@@ -120,9 +112,180 @@ Pass an empty string to disable namespace prefixing.
 
 ---
 
-### shouldParseParams() · [source](../../src/Cli/Console.php#L112)
+### hasColors() · [source](../../src/Cli/Console.php#L106)
 
-`public function shouldParseParams(): bool`
+`public function hasColors(): bool`
+
+Check whether ANSI color output is enabled.
+
+**➡️ Return value**
+
+- Type: bool
+
+
+---
+
+### style() · [source](../../src/Cli/Console.php#L118)
+
+`public function style(string $text, string ...$styles): string`
+
+Apply one or more named ANSI styles to a string.
+
+Style names: bold, dim, red, green, yellow, blue, magenta, cyan, white, gray,
+             bred, bgreen, byellow, bcyan
+
+When color support is disabled, the text is returned unchanged.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+| `$styles` | string | - |  |
+
+**➡️ Return value**
+
+- Type: string
+
+
+---
+
+### writeln() · [source](../../src/Cli/Console.php#L131)
+
+`public function writeln(string $text = ''): void`
+
+Write a line to stdout (newline appended).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | `''` |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### line() · [source](../../src/Cli/Console.php#L137)
+
+`public function line(string $text): void`
+
+Plain informational line.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### success() · [source](../../src/Cli/Console.php#L143)
+
+`public function success(string $text): void`
+
+Success message (bright green).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### warn() · [source](../../src/Cli/Console.php#L149)
+
+`public function warn(string $text): void`
+
+Warning message (bright yellow).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### error() · [source](../../src/Cli/Console.php#L155)
+
+`public function error(string $text): void`
+
+Error message (bright red).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### muted() · [source](../../src/Cli/Console.php#L161)
+
+`public function muted(string $text): void`
+
+Muted / dimmed text.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### info() · [source](../../src/Cli/Console.php#L167)
+
+`public function info(string $text): void`
+
+Informational message (cyan).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$text` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### shouldCoerceParams() · [source](../../src/Cli/Console.php#L185)
+
+`public function shouldCoerceParams(): bool`
 
 Check whether automatic parameter type coercion is enabled.
 
@@ -133,14 +296,14 @@ to the action method.
 **➡️ Return value**
 
 - Type: bool
-- Description: True if parameter parsing is enabled.
+- Description: True if parameter coercion is enabled.
 
 
 ---
 
-### setParseParams() · [source](../../src/Cli/Console.php#L122)
+### setCoerceParams() · [source](../../src/Cli/Console.php#L195)
 
-`public function setParseParams(bool $parseParams): void`
+`public function setCoerceParams(bool $coerceParams): void`
 
 Enable or disable automatic parameter type coercion.
 
@@ -148,7 +311,7 @@ Enable or disable automatic parameter type coercion.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$parseParams` | bool | - | True to enable coercion, false to pass all arguments as strings. |
+| `$coerceParams` | bool | - | True to enable coercion, false to pass all arguments as strings. |
 
 **➡️ Return value**
 
@@ -157,34 +320,66 @@ Enable or disable automatic parameter type coercion.
 
 ---
 
-### process() · [source](../../src/Cli/Console.php#L142)
+### process() · [source](../../src/Cli/Console.php#L207)
 
-`public function process(string|null $task = null, string|null $action = null, array $params = []): mixed`
+`public function process(string|null $task = null, string|null $action = null, array $params = []): void`
 
-Resolve and invoke a task action.
-
-Converts the task and action names to CamelCase, prepends the configured
-namespace, instantiates the task class, optionally coerces the parameters,
-and calls the action method.
+Process the given task, action, and parameters.
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$task` | string\|null | `null` | Task name as passed on the command line (e.g. "my-task"). Null falls back to the default task. |
-| `$action` | string\|null | `null` | Action name as passed on the command line (e.g. "run"). Null falls back to the default action. |
-| `$params` | array | `[]` | Remaining command-line arguments passed as positional parameters to the action. |
+| `$task` | string\|null | `null` | The name of the task to execute. |
+| `$action` | string\|null | `null` | The name of the action to execute within the task. |
+| `$params` | array | `[]` | An array of parameters to pass to the action method. |
 
 **➡️ Return value**
 
-- Type: mixed
-- Description: The return value of the invoked action method.
+- Type: void
 
-**⚠️ Throws**
 
-- [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md)  If the resolved task class does not exist.
-- [InvalidTaskException](Cli_Exceptions_InvalidTaskException.md)  If the resolved class is not a subclass of {@see \Task}.
-- ActionNotFoundException  If the resolved method does not exist on the task.
+---
+
+### autodiscover() · [source](../../src/Cli/Console.php#L299)
+
+`public function autodiscover(): void`
+
+Autodiscover tasks in all registered namespaces and paths
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### helpOverview() · [source](../../src/Cli/Console.php#L471)
+
+`public function helpOverview(): void`
+
+Built-in help task
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### helpTask() · [source](../../src/Cli/Console.php#L497)
+
+`public function helpTask(string $task): void`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$task` | string | - |  |
+
+**➡️ Return value**
+
+- Type: void
 
 
 

@@ -19,8 +19,6 @@
  *   php console.php sync make Order Models --namespace=SyncExample\\Models --apply
  */
 
-use Merlin\Cli\Exception as CliException;
-
 chdir(__DIR__);
 
 require __DIR__ . '/bootstrap.php';
@@ -29,29 +27,8 @@ use Merlin\Cli\Console;
 
 $console = new Console();
 
-// Point the task resolver to the framework's built-in tasks namespace.
-// This makes the 'sync' task resolve to \Merlin\Cli\Tasks\SyncTask.
-$console->setNamespace('\\Merlin\\Cli\\Tasks');
-
-try {
-    $console->process(
-        $argv[1] ?? null,
-        $argv[2] ?? null,
-        array_slice($argv, 3)
-    );
-} catch (CliException) {
-    $script = basename($argv[0]);
-    echo <<<"EOT"
-Usage:
-   php $script sync all  Models
-   php $script sync all  Models --apply
-   php $script sync all  Models --apply --generate-accessors
-   php $script sync all  Models --apply --field-visibility=protected
-   php $script sync all  Models --apply --no-deprecate
-   php $script sync all  Models --apply --create-missing --namespace=SyncExample\\Models
-   php $script sync model Models/User.php --apply
-   php $script sync make  Order Models --namespace=SyncExample\\Models --apply
-
-
-EOT;
-}
+$console->process(
+    $argv[1] ?? null,
+    $argv[2] ?? null,
+    array_slice($argv, 3)
+);

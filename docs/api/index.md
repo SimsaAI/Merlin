@@ -12,14 +12,7 @@
 ### `Merlin\Cli`
 
 - [Console](Cli_Console.md) `Merlin\Cli\Console`
-- [Exception](Cli_Exception.md) `Merlin\Cli\Exception`
 - [Task](Cli_Task.md) `Merlin\Cli\Task`
-
-### `Merlin\Cli\Exceptions`
-
-- [ActionNotFoundException](Cli_Exceptions_ActionNotFoundException.md) `Merlin\Cli\Exceptions\ActionNotFoundException`
-- [InvalidTaskException](Cli_Exceptions_InvalidTaskException.md) `Merlin\Cli\Exceptions\InvalidTaskException`
-- [TaskNotFoundException](Cli_Exceptions_TaskNotFoundException.md) `Merlin\Cli\Exceptions\TaskNotFoundException`
 
 ### `Merlin\Cli\Tasks`
 

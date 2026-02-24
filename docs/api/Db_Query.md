@@ -25,7 +25,7 @@ Query::new()->table('users')->where('id', 5)->delete();
 
 // EXISTS / COUNT
 $exists = Query::new()->table('users')->where('email', 'test@example.com')->exists();
-$count = Query::new()->table('users')->where('active', 1)->tally();
+$count = Query::new()->table('users')->where('active', 1)->count();
 ```
 
 ## 🚀 Public methods
@@ -38,13 +38,14 @@ Enable or disable automatic model resolution for queries. If enabled, the query 
 
 **🧭 Parameters**
 
-| Name         | Type | Default | Description |
-| ------------ | ---- | ------- | ----------- |
-| `$useModels` | bool | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$useModels` | bool | - |  |
 
 **➡️ Return value**
 
 - Type: void
+
 
 ---
 
@@ -56,17 +57,18 @@ Set the model mapping instance to use for resolving model class names to table n
 
 **🧭 Parameters**
 
-| Name            | Type                                      | Default | Description |
-| --------------- | ----------------------------------------- | ------- | ----------- |
-| `$modelMapping` | [ModelMapping](Mvc_ModelMapping.md)\|null | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$modelMapping` | [ModelMapping](Mvc_ModelMapping.md)\|null | - |  |
 
 **➡️ Return value**
 
 - Type: void
 
+
 ---
 
-### \_\_construct() · [source](../../src/Db/Query.php#L160)
+### __construct() · [source](../../src/Db/Query.php#L160)
 
 `public function __construct(Merlin\Db\Database|null $db = null, Merlin\Mvc\Model|null $model = null): mixed`
 
@@ -74,14 +76,15 @@ Constructor. Can optionally pass a Database connection to use for this query, or
 
 **🧭 Parameters**
 
-| Name     | Type                             | Default | Description |
-| -------- | -------------------------------- | ------- | ----------- |
-| `$db`    | [Database](Db_Database.md)\|null | `null`  |             |
-| `$model` | [Model](Mvc_Model.md)\|null      | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
+| `$model` | [Model](Mvc_Model.md)\|null | `null` |  |
 
 **➡️ Return value**
 
 - Type: mixed
+
 
 ---
 
@@ -93,13 +96,14 @@ Factory method to create a new Query instance. Can optionally pass a Database co
 
 **🧭 Parameters**
 
-| Name  | Type                             | Default | Description |
-| ----- | -------------------------------- | ------- | ----------- |
-| `$db` | [Database](Db_Database.md)\|null | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$db` | [Database](Db_Database.md)\|null | `null` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -111,10 +115,10 @@ Set the table for this query. Can be either a table name or a model class name. 
 
 **🧭 Parameters**
 
-| Name     | Type         | Default | Description                    |
-| -------- | ------------ | ------- | ------------------------------ |
-| `$name`  | string       | -       | Table name or model class name |
-| `$alias` | string\|null | `null`  | Optional table alias           |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$name` | string | - | Table name or model class name |
+| `$alias` | string\|null | `null` | Optional table alias |
 
 **➡️ Return value**
 
@@ -123,6 +127,7 @@ Set the table for this query. Can be either a table name or a model class name. 
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -134,10 +139,10 @@ Set the source for this query from a subquery or raw table expression. The subqu
 
 **🧭 Parameters**
 
-| Name      | Type                         | Default | Description                      |
-| --------- | ---------------------------- | ------- | -------------------------------- |
-| `$source` | [Query](Db_Query.md)\|string | -       | Subquery or raw table expression |
-| `$alias`  | string\|null                 | `null`  | Optional alias for the subquery  |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$source` | [Query](Db_Query.md)\|string | - | Subquery or raw table expression |
+| `$alias` | string\|null | `null` | Optional alias for the subquery |
 
 **➡️ Return value**
 
@@ -146,6 +151,7 @@ Set the source for this query from a subquery or raw table expression. The subqu
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -157,13 +163,14 @@ Set columns for SELECT queries. Can be either a comma-separated string or an arr
 
 **🧭 Parameters**
 
-| Name       | Type          | Default | Description |
-| ---------- | ------------- | ------- | ----------- |
-| `$columns` | array\|string | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$columns` | array\|string | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -176,14 +183,15 @@ Set the LIMIT and optional OFFSET for SELECT queries
 
 **🧭 Parameters**
 
-| Name      | Type      | Default | Description                   |
-| --------- | --------- | ------- | ----------------------------- |
-| `$limit`  | int       | -       | Number of rows to limit       |
-| `$offset` | int\|null | `null`  | Optional offset for the limit |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$limit` | int | - | Number of rows to limit |
+| `$offset` | int\|null | `null` | Optional offset for the limit |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -195,13 +203,14 @@ Sets an OFFSET clause for SELECT queries
 
 **🧭 Parameters**
 
-| Name      | Type | Default | Description              |
-| --------- | ---- | ------- | ------------------------ |
-| `$offset` | int  | -       | Number of rows to offset |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$offset` | int | - | Number of rows to offset |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -210,20 +219,20 @@ Sets an OFFSET clause for SELECT queries
 `public function values(object|array $values, bool $escape = true): static`
 
 Adds values for INSERT or UPDATE queries. Can be either:
-
 - An associative array of column => value pairs
 - An object with public properties
 
 **🧭 Parameters**
 
-| Name      | Type          | Default | Description |
-| --------- | ------------- | ------- | ----------- |
-| `$values` | object\|array | -       |             |
-| `$escape` | bool          | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$values` | object\|array | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -237,14 +246,15 @@ Each item in the list should be an array of column => value pairs.
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description |
-| ------------- | ----- | ------- | ----------- |
-| `$valuesList` | array | `[]`    |             |
-| `$escape`     | bool  | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$valuesList` | array | `[]` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -258,6 +268,7 @@ Check if any values have been set for this query
 
 - Type: bool
 
+
 ---
 
 ### set() · [source](../../src/Db/Query.php#L356)
@@ -265,21 +276,21 @@ Check if any values have been set for this query
 `public function set(array|string $column, mixed $value = null, bool $escape = true): static`
 
 Set a value for INSERT or UPDATE queries. Can be either:
-
 - A single column name and value pair
 - An associative array of column => value pairs
 
 **🧭 Parameters**
 
-| Name      | Type          | Default | Description |
-| --------- | ------------- | ------- | ----------- |
-| `$column` | array\|string | -       |             |
-| `$value`  | mixed         | `null`  |             |
-| `$escape` | bool          | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$column` | array\|string | - |  |
+| `$value` | mixed | `null` |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -291,11 +302,11 @@ Adds an INNER join to the query
 
 **🧭 Parameters**
 
-| Name          | Type                                       | Default | Description |
-| ------------- | ------------------------------------------ | ------- | ----------- |
-| `$model`      | [Query](Db_Query.md)\|string               | -       |             |
-| `$alias`      | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -304,6 +315,7 @@ Adds an INNER join to the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -315,11 +327,11 @@ Adds a LEFT join to the query
 
 **🧭 Parameters**
 
-| Name          | Type                                       | Default | Description |
-| ------------- | ------------------------------------------ | ------- | ----------- |
-| `$model`      | [Query](Db_Query.md)\|string               | -       |             |
-| `$alias`      | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -328,6 +340,7 @@ Adds a LEFT join to the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -339,11 +352,11 @@ Adds a RIGHT join to the query
 
 **🧭 Parameters**
 
-| Name          | Type                                       | Default | Description |
-| ------------- | ------------------------------------------ | ------- | ----------- |
-| `$model`      | [Query](Db_Query.md)\|string               | -       |             |
-| `$alias`      | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -352,6 +365,7 @@ Adds a RIGHT join to the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -363,11 +377,11 @@ Adds a CROSS join to the query
 
 **🧭 Parameters**
 
-| Name          | Type                                       | Default | Description |
-| ------------- | ------------------------------------------ | ------- | ----------- |
-| `$model`      | [Query](Db_Query.md)\|string               | -       |             |
-| `$alias`      | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -376,6 +390,7 @@ Adds a CROSS join to the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -387,12 +402,12 @@ Add a JOIN clause to the query
 
 **🧭 Parameters**
 
-| Name          | Type                                       | Default | Description |
-| ------------- | ------------------------------------------ | ------- | ----------- |
-| `$model`      | [Query](Db_Query.md)\|string               | -       |             |
-| `$alias`      | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null`  |             |
-| `$type`       | string\|null                               | `null`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$model` | [Query](Db_Query.md)\|string | - |  |
+| `$alias` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$conditions` | [Condition](Db_Condition.md)\|string\|null | `null` |  |
+| `$type` | string\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -401,6 +416,7 @@ Add a JOIN clause to the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -412,13 +428,14 @@ Set ORDER BY clause
 
 **🧭 Parameters**
 
-| Name       | Type          | Default | Description |
-| ---------- | ------------- | ------- | ----------- |
-| `$orderBy` | array\|string | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$orderBy` | array\|string | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -430,13 +447,14 @@ Bind parameters for prepared statements. Can be either an associative array or a
 
 **🧭 Parameters**
 
-| Name          | Type          | Default | Description |
-| ------------- | ------------- | ------- | ----------- |
-| `$bindParams` | object\|array | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$bindParams` | object\|array | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -448,13 +466,14 @@ Set whether to return the SQL string instead of executing the query
 
 **🧭 Parameters**
 
-| Name         | Type | Default | Description |
-| ------------ | ---- | ------- | ----------- |
-| `$returnSql` | bool | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$returnSql` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -466,13 +485,14 @@ Set DISTINCT modifier for SELECT queries
 
 **🧭 Parameters**
 
-| Name        | Type | Default | Description |
-| ----------- | ---- | ------- | ----------- |
-| `$distinct` | bool | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$distinct` | bool | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -484,13 +504,14 @@ Set a string to be injected before the column list in SELECT queries (e.g. for S
 
 **🧭 Parameters**
 
-| Name      | Type   | Default | Description |
-| --------- | ------ | ------- | ----------- |
-| `$inject` | string | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$inject` | string | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -502,13 +523,14 @@ Set GROUP BY clause
 
 **🧭 Parameters**
 
-| Name       | Type          | Default | Description |
-| ---------- | ------------- | ------- | ----------- |
-| `$groupBy` | array\|string | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$groupBy` | array\|string | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -520,13 +542,14 @@ Sets a FOR UPDATE clause (MySQL/PostgreSQL) or FOR SHARE (PostgreSQL)
 
 **🧭 Parameters**
 
-| Name         | Type | Default | Description |
-| ------------ | ---- | ------- | ----------- |
-| `$forUpdate` | bool | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$forUpdate` | bool | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -538,13 +561,14 @@ Sets a LOCK IN SHARE MODE / FOR SHARE clause (MySQL/PostgreSQL)
 
 **🧭 Parameters**
 
-| Name          | Type | Default | Description |
-| ------------- | ---- | ------- | ----------- |
-| `$sharedLock` | bool | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$sharedLock` | bool | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -556,13 +580,14 @@ Mark this as a REPLACE INTO operation (MySQL/SQLite)
 
 **🧭 Parameters**
 
-| Name       | Type | Default | Description |
-| ---------- | ---- | ------- | ----------- |
-| `$replace` | bool | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$replace` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -574,13 +599,14 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 
 **🧭 Parameters**
 
-| Name      | Type | Default | Description |
-| --------- | ---- | ------- | ----------- |
-| `$ignore` | bool | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$ignore` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -589,20 +615,20 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 `public function updateValues(array $updateValues, bool $escape = true): static`
 
 Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
-
 - List array -> EXCLUDED/VALUES mode
 - Assoc array -> explicit values
 
 **🧭 Parameters**
 
-| Name            | Type  | Default | Description |
-| --------------- | ----- | ------- | ----------- |
-| `$updateValues` | array | -       |             |
-| `$escape`       | bool  | `true`  |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$updateValues` | array | - |  |
+| `$escape` | bool | `true` |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -611,19 +637,19 @@ Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
 `public function conflict(array|string $columnsOrConstraint): static`
 
 Set conflict target for ON CONFLICT clause (PostgreSQL). Can be either:
-
 - Array with column names
 - String with column names or constraint name
 
 **🧭 Parameters**
 
-| Name                   | Type          | Default | Description |
-| ---------------------- | ------------- | ------- | ----------- |
-| `$columnsOrConstraint` | array\|string | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$columnsOrConstraint` | array\|string | - |  |
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -635,9 +661,9 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 **🧭 Parameters**
 
-| Name       | Type                | Default | Description |
-| ---------- | ------------------- | ------- | ----------- |
-| `$columns` | array\|string\|null | -       |             |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$columns` | array\|string\|null | - |  |
 
 **➡️ Return value**
 
@@ -646,6 +672,7 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -663,6 +690,7 @@ Compile and return the SQL string for this query without executing it
 
 - Exception
 
+
 ---
 
 ### select() · [source](../../src/Db/Query.php#L708)
@@ -673,9 +701,9 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 **🧭 Parameters**
 
-| Name       | Type                | Default | Description                                                                                                         |
-| ---------- | ------------------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
-| `$columns` | array\|string\|null | `null`  | Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names. |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$columns` | array\|string\|null | `null` | Columns to select, or null to ignore parameter. Can be either a comma-separated string or an array of column names. |
 
 **➡️ Return value**
 
@@ -684,6 +712,7 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -702,6 +731,7 @@ Execute SELECT query and return first model or null or return SQL string if retu
 
 - Exception
 
+
 ---
 
 ### insert() · [source](../../src/Db/Query.php#L748)
@@ -712,9 +742,9 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 **🧭 Parameters**
 
-| Name    | Type        | Default | Description    |
-| ------- | ----------- | ------- | -------------- |
-| `$data` | array\|null | `null`  | Data to insert |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$data` | array\|null | `null` | Data to insert |
 
 **➡️ Return value**
 
@@ -724,6 +754,7 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -735,9 +766,9 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 **🧭 Parameters**
 
-| Name    | Type        | Default | Description    |
-| ------- | ----------- | ------- | -------------- |
-| `$data` | array\|null | `null`  | Data to insert |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$data` | array\|null | `null` | Data to insert |
 
 **➡️ Return value**
 
@@ -747,6 +778,7 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -758,9 +790,9 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 **🧭 Parameters**
 
-| Name    | Type        | Default | Description    |
-| ------- | ----------- | ------- | -------------- |
-| `$data` | array\|null | `null`  | Data to update |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$data` | array\|null | `null` | Data to update |
 
 **➡️ Return value**
 
@@ -770,6 +802,7 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -788,6 +821,7 @@ Execute DELETE query
 
 - Exception
 
+
 ---
 
 ### truncate() · [source](../../src/Db/Query.php#L853)
@@ -805,6 +839,7 @@ Execute TRUNCATE query or return SQL string if returnSql is enabled
 
 - Exception
 
+
 ---
 
 ### exists() · [source](../../src/Db/Query.php#L874)
@@ -820,6 +855,7 @@ Check if any rows exist matching the query
 **⚠️ Throws**
 
 - Exception
+
 
 ---
 
@@ -838,6 +874,7 @@ Count rows matching the query
 
 - Exception
 
+
 ---
 
 ### getBindings() · [source](../../src/Db/Query.php#L1609)
@@ -850,6 +887,7 @@ Get bind parameters
 
 - Type: array
 
+
 ---
 
 ### paginate() · [source](../../src/Db/Query.php#L1621)
@@ -860,15 +898,16 @@ Create a paginator for the current query
 
 **🧭 Parameters**
 
-| Name        | Type | Default | Description                                                             |
-| ----------- | ---- | ------- | ----------------------------------------------------------------------- |
-| `$page`     | int  | `1`     | Page number (1-based)                                                   |
-| `$pageSize` | int  | `30`    | Number of items per page                                                |
-| `$reverse`  | bool | `false` | Whether to reverse the order of results (for efficient deep pagination) |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$page` | int | `1` | Page number (1-based) |
+| `$pageSize` | int | `30` | Number of items per page |
+| `$reverse` | bool | `false` | Whether to reverse the order of results (for efficient deep pagination) |
 
 **➡️ Return value**
 
 - Type: [Paginator](Db_Paginator.md)
+
 
 ---
 
@@ -881,6 +920,8 @@ Return the number of affected rows for write operations or the number of rows in
 **➡️ Return value**
 
 - Type: int
+
+
 
 ---
 

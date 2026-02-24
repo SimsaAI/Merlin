@@ -46,11 +46,9 @@ class SyncTask extends Task
      * Scan a directory recursively, find all PHP files that extend Model,
      * and sync each one against the database.
      *
-     * @param string $dir     Directory to scan (required)
-     * @param string ...$args Optional flags: --apply, --database=<role>, --generate-accessors,
-     *                        --field-visibility=<vis>, --no-deprecate, --create-missing, --namespace=<ns>
+     * @param string $dir Directory to scan (required)
      */
-    public function allAction(string $dir = '', string ...$args): void
+    public function allAction(string $dir = ''): void
     {
         if ($dir === '') {
             $this->error("Usage: sync all <models-directory> [--apply] [--database=<role>] [--generate-accessors] [--field-visibility=<vis>] [--no-deprecate] [--create-missing] [--namespace=<ns>]");
@@ -62,15 +60,15 @@ class SyncTask extends Task
             return;
         }
 
-        $dryRun = !in_array('--apply', $args, true);
-        $dbRole = $this->extractFlag('--database=', $args, 'read');
-        $options = $this->buildOptions($args);
-        $createMissing = in_array('--create-missing', $args, true);
+        $dryRun = !isset($this->options['apply']);
+        $dbRole = $this->options['database'] ?? 'read';
+        $options = $this->buildOptions();
+        $createMissing = isset($this->options['create-missing']);
         $files = $this->findModelFiles($dir);
         $runner = $this->buildRunner();
 
         if ($createMissing) {
-            $namespace = $this->extractFlag('--namespace=', $args, '') ?: $this->detectNamespace($dir);
+            $namespace = ($this->options['namespace'] ?? '') ?: $this->detectNamespace($dir);
 
             try {
                 $allTables = $runner->listDatabaseTables($dbRole);
@@ -132,11 +130,9 @@ class SyncTask extends Task
     /**
      * Sync a single model file against the database.
      *
-     * @param string $file    Path to the PHP model file (required)
-     * @param string ...$args Optional flags: --apply, --database=<role>, --generate-accessors,
-     *                        --field-visibility=<vis>, --no-deprecate
+     * @param string $file Path to the PHP model file (required)
      */
-    public function modelAction(string $file = '', string ...$args): void
+    public function modelAction(string $file = ''): void
     {
         if ($file === '') {
             $this->error("Usage: sync model <file> [--apply] [--database=<role>] [--generate-accessors] [--field-visibility=<vis>] [--no-deprecate]");
@@ -149,9 +145,9 @@ class SyncTask extends Task
             return;
         }
 
-        $dryRun = !in_array('--apply', $args, true);
-        $dbRole = $this->extractFlag('--database=', $args, 'read');
-        $options = $this->buildOptions($args);
+        $dryRun = !isset($this->options['apply']);
+        $dbRole = $this->options['database'] ?? 'read';
+        $options = $this->buildOptions();
 
         $this->line(
             $dryRun
@@ -171,10 +167,8 @@ class SyncTask extends Task
      *
      * @param string $className Short class name without namespace (e.g. User)
      * @param string $dir       Target directory for the new file
-     * @param string ...$args   Optional flags: --apply, --database=<role>, --namespace=<ns>,
-     *                          --generate-accessors, --field-visibility=<vis>, --no-deprecate
      */
-    public function makeAction(string $className = '', string $dir = '', string ...$args): void
+    public function makeAction(string $className = '', string $dir = ''): void
     {
         if ($className === '' || $dir === '') {
             $this->error("Usage: sync make <ClassName> <directory> [--namespace=<ns>] [--apply] [--database=<role>]");
@@ -186,10 +180,10 @@ class SyncTask extends Task
             return;
         }
 
-        $dryRun = !in_array('--apply', $args, true);
-        $dbRole = $this->extractFlag('--database=', $args, 'read');
-        $namespace = $this->extractFlag('--namespace=', $args, '') ?: $this->detectNamespace($dir);
-        $options = $this->buildOptions($args);
+        $dryRun = !isset($this->options['apply']);
+        $dbRole = $this->options['database'] ?? 'read';
+        $namespace = ($this->options['namespace'] ?? '') ?: $this->detectNamespace($dir);
+        $options = $this->buildOptions();
 
         $tableName = $this->deriveTableName($className);
         $filePath = rtrim($dir, '/\\') . DIRECTORY_SEPARATOR . $className . '.php';
@@ -249,23 +243,12 @@ class SyncTask extends Task
         return $files;
     }
 
-    /** Extract a named flag value from args, e.g. '--database=' returns the role after '='. */
-    private function extractFlag(string $prefix, array $args, string $default = ''): string
-    {
-        foreach ($args as $arg) {
-            if (str_starts_with($arg, $prefix)) {
-                return substr($arg, strlen($prefix));
-            }
-        }
-        return $default;
-    }
-
-    private function buildOptions(array $args): SyncOptions
+    private function buildOptions(): SyncOptions
     {
         return new SyncOptions(
-            generateAccessors: in_array('--generate-accessors', $args, true),
-            fieldVisibility: $this->extractFlag('--field-visibility=', $args, 'public'),
-            deprecate: !in_array('--no-deprecate', $args, true),
+            generateAccessors: isset($this->options['generate-accessors']),
+            fieldVisibility: $this->options['field-visibility'] ?? 'public',
+            deprecate: !isset($this->options['deprecate']) || $this->options['deprecate'],
         );
     }
 
@@ -299,24 +282,29 @@ class SyncTask extends Task
         $totalErrors = 0;
 
         foreach ($results as $result) {
-            $this->line($result->summary());
-
             if ($result->isSuccess() && $result->hasChanges()) {
+                $this->warn($result->summary());
                 foreach ($result->operations as $op) {
-                    $this->line('    • ' . $this->describeOp($op));
+                    $this->line('    ' . $this->style('•', 'yellow') . ' ' . $this->describeOp($op));
                 }
                 $totalChanges++;
             } elseif (!$result->isSuccess()) {
+                $this->error($result->summary());
                 $totalErrors++;
+            } else {
+                $this->muted($result->summary());
             }
         }
 
-        $this->line('');
-        $this->line(sprintf(
-            'Done. %d model(s) with changes, %d error(s).',
-            $totalChanges,
-            $totalErrors
-        ));
+        $this->writeln();
+        $summary = sprintf('Done. %d model(s) with changes, %d error(s).', $totalChanges, $totalErrors);
+        if ($totalErrors > 0) {
+            $this->error($summary);
+        } elseif ($totalChanges > 0) {
+            $this->warn($summary);
+        } else {
+            $this->success($summary);
+        }
     }
 
     private function describeOp(object $op): string
@@ -339,13 +327,4 @@ class SyncTask extends Task
         };
     }
 
-    private function line(string $text): void
-    {
-        echo $text . PHP_EOL;
-    }
-
-    private function error(string $text): void
-    {
-        echo '[ERROR] ' . $text . PHP_EOL;
-    }
 }

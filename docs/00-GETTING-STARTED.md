@@ -56,7 +56,7 @@ $ctx->dbManager()->set('default', new Database('mysql:host=localhost;dbname=myap
 $ctx->view()->setPath(__DIR__ . '/../views');
 
 // Set up routing
-$router = new Router();
+$router = $ctx->router();
 $router->add('GET', '/', 'IndexController::indexAction');
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction')->setName('user.view');
 
@@ -148,19 +148,20 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use Merlin\Cli\Console;
 
-$task = $argv[1] ?? null;
-$action = $argv[2] ?? null;
-$params = array_slice($argv, 3);
-
 $console = new Console();
-// $console->setNamespace('App\\Tasks'); (default is already set to this)
-$console->process($task, $action, $params);
+$console->addNamespace('App\\Tasks'); // discover App\Tasks\*Task.php
+$console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
+
+`Console` auto-discovers every class whose name ends in `Task` under the registered namespace and registers it under a lowercase task name (`HelloTask` → `hello`). The built-in `Merlin\Cli\Tasks` namespace (containing `SyncTask`) is always included automatically.
 
 Run:
 
 ```bash
-php console.php hello world Merlin
+php console.php hello world Merlin    # positional args
+php console.php hello world --shout   # boolean flag
+php console.php help                  # color overview of all tasks
+php console.php help hello            # detailed help for one task
 ```
 
 ## About composer.json

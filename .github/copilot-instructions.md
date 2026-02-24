@@ -284,9 +284,12 @@ class AdminController extends Controller
 ## Router
 
 ```php
+use Merlin\AppContext;
 use Merlin\Mvc\Router;
 
-$router = new Router();
+$ctx = AppContext::instance();
+
+$router = $ctx->router();
 $router->add('GET', '/', 'IndexController::indexAction');
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
 
@@ -414,7 +417,7 @@ $ctx->dbManager()->set('default', new Database('mysql:host=localhost;dbname=myap
 $ctx->view()->setPath(__DIR__ . '/../views');
 
 // Routing
-$router = new Router();
+$router = $ctx->router();
 $router->add('GET', '/', 'IndexController::indexAction');
 
 // Dispatcher (no constructor args)

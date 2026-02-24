@@ -1,6 +1,7 @@
 <?php
 namespace Merlin;
 
+use Merlin\Mvc\Router;
 use RuntimeException;
 use Merlin\Db\DatabaseManager;
 use Merlin\Http\Cookies;
@@ -36,6 +37,8 @@ class AppContext
     protected ?Session $session = null;
 
     protected ?Cookies $cookies = null;
+
+    protected ?Router $router = null;
 
     protected ?ResolvedRoute $route = null;
 
@@ -108,6 +111,16 @@ class AppContext
     public function dbManager(): DatabaseManager
     {
         return $this->dbManager ??= new DatabaseManager();
+    }
+
+    /**
+     * Get the Router instance. If it doesn't exist, it will be created.
+     *
+     * @return Router The Router instance.
+     */
+    public function router(): Router
+    {
+        return $this->router ??= new Router();
     }
 
     // --- Critical Services ---

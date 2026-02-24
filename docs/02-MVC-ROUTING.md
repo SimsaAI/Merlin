@@ -8,10 +8,13 @@
 ## Basic Usage
 
 ```php
+use Merlin\AppContext;
 use Merlin\Mvc\Dispatcher;
 use Merlin\Mvc\Router;
 
-$router = new Router();
+$ctx = AppContext::instance();
+
+$router = $ctx->router();
 $router->add('GET', '/', 'IndexController::indexAction');
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
 

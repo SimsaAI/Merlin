@@ -29,11 +29,16 @@ Examples:
   php console.php sync model src/Models/User.php --apply
   php console.php sync make  User src/Models --namespace=App\\Models --apply
 
+## 🔐 Public Properties
+
+- `public` [Console](Cli_Console.md) `$console` · [source](../../src/Cli/Tasks/SyncTask.php)
+- `public` array `$options` · [source](../../src/Cli/Tasks/SyncTask.php)
+
 ## 🚀 Public methods
 
-### allAction() · [source](../../src/Cli/Tasks/SyncTask.php#L53)
+### allAction() · [source](../../src/Cli/Tasks/SyncTask.php#L51)
 
-`public function allAction(string $dir = '', string ...$args): void`
+`public function allAction(string $dir = ''): void`
 
 Scan a directory recursively, find all PHP files that extend Model,
 and sync each one against the database.
@@ -43,7 +48,6 @@ and sync each one against the database.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$dir` | string | `''` | Directory to scan (required) |
-| `$args` | string | - | Optional flags: --apply, --database=<role>, --generate-accessors,<br>--field-visibility=<vis>, --no-deprecate, --create-missing, --namespace=<ns> |
 
 **➡️ Return value**
 
@@ -52,9 +56,9 @@ and sync each one against the database.
 
 ---
 
-### modelAction() · [source](../../src/Cli/Tasks/SyncTask.php#L139)
+### modelAction() · [source](../../src/Cli/Tasks/SyncTask.php#L135)
 
-`public function modelAction(string $file = '', string ...$args): void`
+`public function modelAction(string $file = ''): void`
 
 Sync a single model file against the database.
 
@@ -63,7 +67,6 @@ Sync a single model file against the database.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$file` | string | `''` | Path to the PHP model file (required) |
-| `$args` | string | - | Optional flags: --apply, --database=<role>, --generate-accessors,<br>--field-visibility=<vis>, --no-deprecate |
 
 **➡️ Return value**
 
@@ -72,9 +75,9 @@ Sync a single model file against the database.
 
 ---
 
-### makeAction() · [source](../../src/Cli/Tasks/SyncTask.php#L177)
+### makeAction() · [source](../../src/Cli/Tasks/SyncTask.php#L171)
 
-`public function makeAction(string $className = '', string $dir = '', string ...$args): void`
+`public function makeAction(string $className = '', string $dir = ''): void`
 
 Scaffold a new model class from a database table and immediately sync its properties.
 
@@ -84,7 +87,6 @@ Scaffold a new model class from a database table and immediately sync its proper
 |---|---|---|---|
 | `$className` | string | `''` | Short class name without namespace (e.g. User) |
 | `$dir` | string | `''` | Target directory for the new file |
-| `$args` | string | - | Optional flags: --apply, --database=<role>, --namespace=<ns>,<br>--generate-accessors, --field-visibility=<vis>, --no-deprecate |
 
 **➡️ Return value**
 

@@ -17,6 +17,7 @@ Override this method if you want to specify a custom source.
 
 - Type: string
 
+
 ---
 
 ### modelSchema() · [source](../../src/Mvc/Model.php#L50)
@@ -30,6 +31,7 @@ Override this method if you want to specify a schema (e.g. for PostgreSQL).
 **➡️ Return value**
 
 - Type: string|null
+
 
 ---
 
@@ -46,6 +48,7 @@ Override this method if your model has a different primary key or composite keys
 - Type: array
 - Description: List of primary key field names
 
+
 ---
 
 ### query() · [source](../../src/Mvc/Model.php#L75)
@@ -58,13 +61,14 @@ You can also use selectBuilder(), insertBuilder(), updateBuilder(), and deleteBu
 
 **🧭 Parameters**
 
-| Name     | Type         | Default | Description                               |
-| -------- | ------------ | ------- | ----------------------------------------- |
-| `$alias` | string\|null | `null`  | Optional alias for the model in the query |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$alias` | string\|null | `null` | Optional alias for the model in the query |
 
 **➡️ Return value**
 
 - Type: [Query](Db_Query.md)
+
 
 ---
 
@@ -76,14 +80,15 @@ Create a new model instance with the given values and save it to the database. R
 
 **🧭 Parameters**
 
-| Name      | Type  | Default | Description                                               |
-| --------- | ----- | ------- | --------------------------------------------------------- |
-| `$values` | array | -       | Associative array of field values to set on the new model |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$values` | array | - | Associative array of field values to set on the new model |
 
 **➡️ Return value**
 
 - Type: static
 - Description: The created model instance
+
 
 ---
 
@@ -95,14 +100,15 @@ Force create a new model instance with the given values, bypassing any checks fo
 
 **🧭 Parameters**
 
-| Name      | Type  | Default | Description                                               |
-| --------- | ----- | ------- | --------------------------------------------------------- |
-| `$values` | array | -       | Associative array of field values to set on the new model |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$values` | array | - | Associative array of field values to set on the new model |
 
 **➡️ Return value**
 
 - Type: static
 - Description: The created model instance
+
 
 ---
 
@@ -114,15 +120,16 @@ Find the first model matching the given conditions or create a new one with the 
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                                                              |
-| ------------- | ----- | ------- | ---------------------------------------------------------------------------------------- |
-| `$conditions` | array | -       | Associative array of field conditions to find the model                                  |
-| `$values`     | array | `[]`    | Additional values to set on the model if it needs to be created (merged with conditions) |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | - | Associative array of field conditions to find the model |
+| `$values` | array | `[]` | Additional values to set on the model if it needs to be created (merged with conditions) |
 
 **➡️ Return value**
 
 - Type: static
 - Description: The found or created model instance
+
 
 ---
 
@@ -134,15 +141,16 @@ Find the first model matching the given conditions or update it with the provide
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                                                        |
-| ------------- | ----- | ------- | ---------------------------------------------------------------------------------- |
-| `$conditions` | array | -       | Associative array of field conditions to find the model                            |
-| `$values`     | array | `[]`    | Values to set on the model if found (updated) or merged with conditions if created |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | - | Associative array of field conditions to find the model |
+| `$values` | array | `[]` | Values to set on the model if found (updated) or merged with conditions if created |
 
 **➡️ Return value**
 
 - Type: static
 - Description: The found, updated, or created model instance
+
 
 ---
 
@@ -154,13 +162,14 @@ Finds a model by its ID(s)
 
 **🧭 Parameters**
 
-| Name  | Type  | Default | Description                                                |
-| ----- | ----- | ------- | ---------------------------------------------------------- |
-| `$id` | mixed | -       | Single ID value or array of ID values (for composite keys) |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
 **➡️ Return value**
 
 - Type: static|null
+
 
 ---
 
@@ -172,9 +181,9 @@ Finds a model by its ID(s) or throws an exception if not found
 
 **🧭 Parameters**
 
-| Name  | Type  | Default | Description                                                |
-| ----- | ----- | ------- | ---------------------------------------------------------- |
-| `$id` | mixed | -       | Single ID value or array of ID values (for composite keys) |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$id` | mixed | - | Single ID value or array of ID values (for composite keys) |
 
 **➡️ Return value**
 
@@ -182,7 +191,8 @@ Finds a model by its ID(s) or throws an exception if not found
 
 **⚠️ Throws**
 
-- Exception if the model is not found
+- Exception  if the model is not found
+
 
 ---
 
@@ -194,14 +204,15 @@ Finds the first model matching the given conditions or returns null if none foun
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                             |
-| ------------- | ----- | ------- | ------------------------------------------------------- |
-| `$conditions` | array | -       | Associative array of field conditions to find the model |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | - | Associative array of field conditions to find the model |
 
 **➡️ Return value**
 
 - Type: static|null
 - Description: The found model instance or null if not found
+
 
 ---
 
@@ -213,14 +224,15 @@ Find all models matching the given conditions. If no conditions are provided, it
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                              |
-| ------------- | ----- | ------- | -------------------------------------------------------- |
-| `$conditions` | array | `[]`    | Associative array of field conditions to find the models |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | `[]` | Associative array of field conditions to find the models |
 
 **➡️ Return value**
 
 - Type: [ResultSet](Db_ResultSet.md)
 - Description: The found model instances as a ResultSet
+
 
 ---
 
@@ -232,14 +244,15 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                                  |
-| ------------- | ----- | ------- | ------------------------------------------------------------ |
-| `$conditions` | array | -       | Associative array of field conditions to check for existence |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | - | Associative array of field conditions to check for existence |
 
 **➡️ Return value**
 
 - Type: bool
 - Description: True if a matching model exists, false otherwise
+
 
 ---
 
@@ -247,18 +260,19 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 `public static function tally(array $conditions = []): int`
 
-Count the number of models matching the given conditions. Returns the count as an integer. Named `tally()` to avoid collision with database fields named `count`.
+Count the number of models matching the given conditions. Returns the count as an integer. tally() is an alias for count() to avoid collision with database fields named "count".
 
 **🧭 Parameters**
 
-| Name          | Type  | Default | Description                                    |
-| ------------- | ----- | ------- | ---------------------------------------------- |
-| `$conditions` | array | `[]`    | Associative array of field conditions to count |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$conditions` | array | `[]` | Associative array of field conditions to count |
 
 **➡️ Return value**
 
 - Type: int
 - Description: The count of matching models
+
 
 ---
 
@@ -266,11 +280,12 @@ Count the number of models matching the given conditions. Returns the count as a
 
 `public function saveState(): static`
 
-Save the current state of the model for change tracking. This method clones the current instance and stores it in the **state** property. It should be called after loading or saving the model to establish a baseline for detecting changes.
+Save the current state of the model for change tracking. This method clones the current instance and stores it in the __state__ property. It should be called after loading or saving the model to establish a baseline for detecting changes.
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -278,11 +293,12 @@ Save the current state of the model for change tracking. This method clones the 
 
 `public function loadState(): static`
 
-Load the saved state of the model back into the current instance. This method copies all properties from the **state** clone back to the current instance, except for any properties that start with '\_\_' which are considered internal and excluded from state tracking. It should be called before saving if you want to revert any unsaved changes back to the last saved state.
+Load the saved state of the model back into the current instance. This method copies all properties from the __state__ clone back to the current instance, except for any properties that start with '__' which are considered internal and excluded from state tracking. It should be called before saving if you want to revert any unsaved changes back to the last saved state.
 
 **➡️ Return value**
 
 - Type: static
+
 
 ---
 
@@ -297,18 +313,20 @@ Get the saved state object for this model. This returns the clone of the model t
 - Type: static|null
 - Description: The saved state object or null if no state saved
 
+
 ---
 
 ### hasChanged() · [source](../../src/Mvc/Model.php#L365)
 
 `public function hasChanged(): bool`
 
-Check if any fields have changed since the last saveState() call. This compares the current field values to the saved state and returns true if there are any differences, or false if all values are the same. It ignores any properties that start with '\_\_' as they are considered internal.
+Check if any fields have changed since the last saveState() call. This compares the current field values to the saved state and returns true if there are any differences, or false if all values are the same. It ignores any properties that start with '__' as they are considered internal.
 
 **➡️ Return value**
 
 - Type: bool
 - Description: True if any fields have changed, false otherwise
+
 
 ---
 
@@ -323,6 +341,7 @@ Save the model to the database. If the model has all ID fields set, it performs 
 - Type: bool
 - Description: True if the model was saved (inserted or updated), false if there were no changes to save
 
+
 ---
 
 ### insert() · [source](../../src/Mvc/Model.php#L406)
@@ -335,6 +354,7 @@ Insert the model as a new record in the database. This method performs an INSERT
 
 - Type: bool
 - Description: True if the model was inserted successfully
+
 
 ---
 
@@ -349,6 +369,7 @@ Update the existing record in the database with any changed fields. This method 
 - Type: bool
 - Description: True if the model was updated successfully, false if there were no changes to update
 
+
 ---
 
 ### delete() · [source](../../src/Mvc/Model.php#L514)
@@ -362,6 +383,7 @@ Delete the model from the database. This method requires that all ID fields are 
 - Type: bool
 - Description: True if the model was deleted successfully
 
+
 ---
 
 ### setDefaultRole() · [source](../../src/Mvc/Model.php#L539)
@@ -372,13 +394,14 @@ Set both the read and write database role for this model class.
 
 **🧭 Parameters**
 
-| Name    | Type   | Default | Description                                                   |
-| ------- | ------ | ------- | ------------------------------------------------------------- |
-| `$role` | string | -       | Named role registered with {@see \Merlin\Db\DatabaseManager}. |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$role` | string | - | Named role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
 - Type: void
+
 
 ---
 
@@ -390,13 +413,14 @@ Set the database role used for SELECT queries on this model class.
 
 **🧭 Parameters**
 
-| Name    | Type   | Default | Description                                                        |
-| ------- | ------ | ------- | ------------------------------------------------------------------ |
-| `$role` | string | -       | Named read role registered with {@see \Merlin\Db\DatabaseManager}. |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$role` | string | - | Named read role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
 - Type: void
+
 
 ---
 
@@ -408,13 +432,14 @@ Set the database role used for INSERT/UPDATE/DELETE queries on this model class.
 
 **🧭 Parameters**
 
-| Name    | Type   | Default | Description                                                         |
-| ------- | ------ | ------- | ------------------------------------------------------------------- |
-| `$role` | string | -       | Named write role registered with {@see \Merlin\Db\DatabaseManager}. |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$role` | string | - | Named write role registered with {@see \Merlin\Db\DatabaseManager}. |
 
 **➡️ Return value**
 
 - Type: void
+
 
 ---
 
@@ -430,6 +455,7 @@ Resolves the configured read role via {@see \Merlin\Db\DatabaseManager::getOrDef
 
 - Type: [Database](Db_Database.md)
 
+
 ---
 
 ### modelWriteConnection() · [source](../../src/Mvc/Model.php#L605)
@@ -443,6 +469,8 @@ Resolves the configured write role via {@see \Merlin\Db\DatabaseManager::getOrDe
 **➡️ Return value**
 
 - Type: [Database](Db_Database.md)
+
+
 
 ---
 
