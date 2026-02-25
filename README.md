@@ -34,6 +34,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 - **Prepared Statements** - SQL injection protection by default
 - **Read/Write Splitting** - Built-in support for master/replica database setups
 - **Connection Pooling** - Automatic reconnection and connection management
+- **Schema Introspection** - Introspect database schema for dynamic models and migrations
 
 ### HTTP Utilities
 
@@ -45,9 +46,14 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 
 ### CLI Tools
 
-- **Console** - Task dispatcher for command-line operations
+- **Console** - Powerful CLI dispatcher with:
+  - Auto-discovery of tasks from namespaces
+  - Flexible task grouping and custom namespaces
+  - Rich color output and styled help pages
+  - Option parsing, argument separation, and interactive prompts
+  - Built-in help and task listing
 - **Tasks** - Structured CLI commands with parameter parsing
-- **Perfect for** - Database migrations, cron jobs, data imports, maintenance scripts
+- **Sync Task** - built-in sync task for generating/applying model and schema changes
 
 ### Additional Features
 
