@@ -6,23 +6,26 @@ CLI task for synchronising PHP model properties from the database schema (DB→P
 and for scaffolding new model files from database tables.
 
 Usage:
-  php console.php sync all   <models-dir> [--apply] [--database=<role>]
-                             [--generate-accessors] [--field-visibility=<public|protected|private>]
-                             [--no-deprecate] [--create-missing] [--namespace=<ns>]
-  php console.php sync model <file>        [--apply] [--database=<role>]
-                             [--generate-accessors] [--field-visibility=<public|protected|private>]
+  sync all   <models-dir> [--apply] [--database=<role>]
+                             [--generate-accessors] [--no-deprecate]
+                             [--field-visibility=<public|protected|private>]
+                             [--create-missing] [--namespace=<ns>]
+  sync model <file> [--apply] [--database=<role>]
+                             [--generate-accessors]
+                             [--field-visibility=<public|protected|private>]
                              [--no-deprecate]
-  php console.php sync make  <ClassName>   <directory> [--apply] [--database=<role>]
-                             [--namespace=<ns>] [--generate-accessors]
-                             [--field-visibility=<public|protected|private>] [--no-deprecate]
+  sync make  <ClassName>   <directory> [--apply]
+                             [--database=<role>] [--namespace=<ns>]
+                             [--generate-accessors] [--no-deprecate]
+                             [--field-visibility=<public|protected|private>]
 
 By default the task runs in **dry-run** mode and only reports changes.
 Pass --apply to write the updated model files to disk.
 
 Examples:
-  php console.php sync all  src/Models                                  # dry-run
-  php console.php sync all  src/Models --apply                          # apply
-  php console.php sync all  src/Models --apply --generate-accessors     # with accessors
+  php console.php sync all  src/Models                              # dry-run
+  php console.php sync all  src/Models --apply                      # apply
+  php console.php sync all  src/Models --apply --generate-accessors # with accessors
   php console.php sync all  src/Models --apply --field-visibility=protected
   php console.php sync all  src/Models --apply --no-deprecate
   php console.php sync all  src/Models --apply --create-missing --namespace=App\\Models
@@ -36,7 +39,7 @@ Examples:
 
 ## 🚀 Public methods
 
-### allAction() · [source](../../src/Cli/Tasks/SyncTask.php#L51)
+### allAction() · [source](../../src/Cli/Tasks/SyncTask.php#L54)
 
 `public function allAction(string $dir = ''): void`
 
@@ -56,7 +59,7 @@ and sync each one against the database.
 
 ---
 
-### modelAction() · [source](../../src/Cli/Tasks/SyncTask.php#L135)
+### modelAction() · [source](../../src/Cli/Tasks/SyncTask.php#L138)
 
 `public function modelAction(string $file = ''): void`
 
@@ -75,7 +78,7 @@ Sync a single model file against the database.
 
 ---
 
-### makeAction() · [source](../../src/Cli/Tasks/SyncTask.php#L171)
+### makeAction() · [source](../../src/Cli/Tasks/SyncTask.php#L174)
 
 `public function makeAction(string $className = '', string $dir = ''): void`
 

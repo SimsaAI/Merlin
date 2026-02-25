@@ -13,7 +13,7 @@ class Console
     protected bool $coerceParams = false;
     protected bool $colors;
 
-    private const ANSI = [
+    protected const ANSI = [
         'reset' => "\033[0m",
         'bold' => "\033[1m",
         'dim' => "\033[2m",
@@ -28,7 +28,17 @@ class Console
         'bred' => "\033[91m",
         'bgreen' => "\033[92m",
         'byellow' => "\033[93m",
+        'bblue' => "\033[94m",
+        'bmagenta' => "\033[95m",
         'bcyan' => "\033[96m",
+        'bg-black' => "\033[40m",
+        'bg-red' => "\033[41m",
+        'bg-green' => "\033[42m",
+        'bg-yellow' => "\033[43m",
+        'bg-blue' => "\033[44m",
+        'bg-magenta' => "\033[45m",
+        'bg-cyan' => "\033[46m",
+        'bg-white' => "\033[47m",
     ];
     protected string $defaultAction = "indexAction";
 
@@ -155,6 +165,12 @@ class Console
     public function error(string $text): void
     {
         $this->writeln($this->style('[ERROR] ', 'bred', 'bold') . $text);
+    }
+
+    /** Critical message (red on white bg). */
+    public function critical(string $text): void
+    {
+        $this->writeln($this->style('[CRITICAL] ', 'red', 'bg-white', 'bold') . $text);
     }
 
     /** Muted / dimmed text. */
@@ -470,28 +486,64 @@ class Console
     /** Built-in help task */
     public function helpOverview(): void
     {
-        $this->writeln($this->style('Available tasks:', 'bold', 'white'));
         $this->writeln();
+        $this->writeln("Usage: $this->scriptName <task> <action> [args...]");
+        $this->writeln();
+        $this->writeln($this->style('Available tasks and actions:', 'bold', 'white'));
+        $termWidth = $this->terminalWidth();
         foreach ($this->tasks as $name => $class) {
             if ($name === 'help') {
                 continue;
             }
+            $this->writeln();
             $desc = $this->extractShortDescription($class);
-            $label = str_pad($name, 20);
-            $this->writeln('  ' . $this->style($label, 'bcyan', 'bold') . $this->style($desc, 'gray'));
 
+            // Task label column
+            $labelWidth = 20;
+            $leftPad = 2; // leading spaces printed before label
+            $avail = max(10, $termWidth - $leftPad - $labelWidth - 1);
+            $descLines = $this->wrapText($desc, $avail);
+
+            $labelStyled = $this->style(str_pad($name, $labelWidth), 'bcyan', 'bold');
+            if (count($descLines) > 0 && $descLines[0] !== '') {
+                $this->writeln('  ' . $labelStyled . ' ' . $this->style($descLines[0], 'bold'));
+            } else {
+                $this->writeln('  ' . $labelStyled);
+            }
+
+            // remaining wrapped description lines (align under description column)
+            for ($i = 1; $i < count($descLines); $i++) {
+                $this->writeln('  ' . str_repeat(' ', $labelWidth) . ' ' . $this->style($descLines[$i], 'bold'));
+            }
+
+            // Actions: action column is printed with 4 leading spaces + 2 spaces before the name
+            $actionLabelInner = 16; // the str_pad width used for actions
+            $actionLeft = 4 + 2; // visual indent
+            $actionAvail = max(10, $termWidth - $actionLeft - $actionLabelInner - 1);
             foreach ($this->extractActionDescriptions($class) as $action => $actionDesc) {
-                $actionLabel = str_pad('', 4) . str_pad($action, 16);
-                $suffix = $actionDesc !== '' ? $this->style($actionDesc, 'gray') : '';
+                if ($actionDesc === '') {
+                    $this->writeln(
+                        $this->style('    ', 'dim')
+                        . $this->style('  ' . str_pad($action, $actionLabelInner), 'bgreen', 'bold')
+                    );
+                    continue;
+                }
+
+                $actionLines = $this->wrapText($actionDesc, $actionAvail);
+                $first = array_shift($actionLines);
                 $this->writeln(
                     $this->style('    ', 'dim')
-                    . $this->style('  ' . str_pad($action, 16), 'cyan')
-                    . $suffix
+                    . $this->style('  ' . str_pad($action, $actionLabelInner), 'bgreen', 'bold')
+                    . ' ' . $this->style($first)
                 );
+                foreach ($actionLines as $ln) {
+                    $this->writeln($this->style('    ', 'dim') . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
+                }
             }
         }
         $this->writeln();
-        $this->writeln($this->style('Run "' . $this->scriptName . ' help <task>" for details.', 'dim'));
+        $this->writeln($this->style('Run "' . $this->scriptName . ' help <task>" for details.'));
+        $this->writeln();
     }
 
     public function helpTask(string $task): void
@@ -503,39 +555,67 @@ class Console
             return;
         }
 
+        $termWidth = $this->terminalWidth();
+
         $ref = new ReflectionClass($class);
         $doc = $ref->getDocComment() ?: '';
         $info = static::parseDocComment($doc, $this->scriptName);
 
-        $this->writeln($this->style($taskKey, 'bcyan', 'bold'));
-        $this->writeln($this->style(str_repeat('─', strlen($taskKey) + 2), 'cyan'));
+        $this->writeln();
+        $this->writeln($this->style('Task: ', 'green', 'bold') . $this->style($taskKey, 'bcyan', 'bold'));
+        //$this->writeln('      ' . $this->style(str_repeat('─', strlen($taskKey)), 'cyan'));
         $this->writeln();
         $this->writeln($info['description']);
         $this->writeln();
 
         // list available actions
-        $actions = [];
-        foreach ($ref->getMethods() as $m) {
-            if ($m->isPublic() && preg_match('/([a-zA-Z0-9_]+)Action$/', $m->getName(), $mm)) {
-                $actions[] = $this->methodToActionName($m->getName());
-            }
-        }
+        $actions = $this->extractActionDescriptions($class);
 
         if (!empty($actions)) {
-            $this->writeln($this->style('Actions:', 'bold', 'yellow'));
-            foreach ($actions as $a) {
-                $this->writeln('  ' . $this->style('•', 'yellow') . ' ' . $this->style($a, 'bcyan'));
+            $this->writeln($this->style('Actions:', 'bold', 'green'));
+
+            $actionLabelInner = 16;
+            $leadingSpaces = 2; // two leading spaces before task
+            // description starts after: leading + task + ' ' + actionLabel + ' '
+            $descStartCol = $leadingSpaces + strlen($taskKey) + 1 + $actionLabelInner + 1;
+            $actionAvail = max(10, $termWidth - $descStartCol);
+
+            $addNewLine = false;
+            foreach ($actions as $action => $actionDesc) {
+                if ($addNewLine) {
+                    $this->writeln();
+                } else {
+                    $addNewLine = true;
+                }
+                $lines = $this->wrapText($actionDesc, $actionAvail);
+                $first = array_shift($lines);
+
+                $this->writeln(
+                    str_repeat(' ', $leadingSpaces)
+                    . $this->style($taskKey, 'white', 'bold')
+                    . ' '
+                    . $this->style(str_pad($action, $actionLabelInner), 'bcyan', 'bold')
+                    . ($first !== '' ? ' ' . $this->style($first) : '')
+                );
+
+                // continuation lines: indent to description column
+                $continuationIndent = str_repeat(' ', $descStartCol);
+                foreach ($lines as $ln) {
+                    $this->writeln($continuationIndent . $this->style($ln));
+                }
+
             }
             $this->writeln();
         }
 
+        $this->writeln($this->style('Usage:', 'bold', 'green'));
+        $actionsList = implode('|', array_keys($actions)) ?: '<action>';
+        $this->writeln('  ' . $this->style('php ' . $this->scriptName, 'dim') . ' ' . $this->style($taskKey, 'white', 'bold') . ' ' . $this->style($actionsList, 'bcyan', 'bold') . ' [args...]');
         if ($info['usage']) {
-            $this->writeln($this->style('Usage:', 'bold', 'yellow'));
-            foreach (explode("\n", $info['usage']) as $l) {
-                $this->writeln($this->highlightCommandLine($l, $taskKey));
-            }
-            $this->writeln();
+            $this->renderUsageBlock($info['usage'], $taskKey, $termWidth);
         }
+        $this->writeln();
+
         if ($info['options']) {
             $this->writeln($this->style('Options:', 'bold', 'yellow'));
             foreach (explode("\n", $info['options']) as $l) {
@@ -543,8 +623,9 @@ class Console
             }
             $this->writeln();
         }
+
         if ($info['examples']) {
-            $this->writeln($this->style('Examples:', 'bold', 'yellow'));
+            $this->writeln($this->style('Examples:', 'bold', 'green'));
             foreach (explode("\n", $info['examples']) as $l) {
                 $this->writeln($this->highlightCommandLine($l, $taskKey));
             }
@@ -650,14 +731,14 @@ class Console
         // [--option], [--key=<val>], [<placeholder>] …
         if ($token[0] === '[' && str_ends_with($token, ']')) {
             $inner = substr($token, 1, -1);
-            return $this->style('[', 'green')
+            return $this->style('[', 'bmagenta')
                 . $this->highlightCliToken($inner)
-                . $this->style(']', 'green');
+                . $this->style(']', 'bmagenta');
         }
 
         // <placeholder> or <a|b|c>
         if ($token[0] === '<' && str_ends_with($token, '>')) {
-            return $this->style($token, 'byellow');
+            return $this->style($token, 'white');
         }
 
         // --flag or --key=<val> or --key=literal
@@ -665,16 +746,16 @@ class Console
             if (str_contains($token, '=')) {
                 [$flag, $val] = explode('=', $token, 2);
                 $coloredVal = ($val !== '' && $val[0] === '<')
-                    ? $this->style($val, 'byellow')
+                    ? $this->style($val, 'white')
                     : $this->style($val, 'white');
-                return $this->style($flag . '=', 'green') . $coloredVal;
+                return $this->style($flag . '=', 'bmagenta') . $coloredVal;
             }
-            return $this->style($token, 'green');
+            return $this->style($token, 'bmagenta');
         }
 
         // short option -f
         if (strlen($token) >= 2 && $token[0] === '-') {
-            return $this->style($token, 'green');
+            return $this->style($token, 'bmagenta');
         }
 
         // Plain positional argument (e.g. src/Models, User.php)
@@ -816,7 +897,13 @@ class Console
         return [$params, $options];
     }
 
-    protected function coerceParam(string $param): int|float|bool|null|string
+    /**
+     * Coerce a string parameter to int, float, bool, or null if it looks like one of those.
+     * Otherwise return the original string. Empty string is returned as-is.
+     * @param string $param The parameter string to coerce.
+     * @return int|float|bool|null|string The coerced value, or original string if no coercion applied.
+     */
+    public function coerceParam(string $param): int|float|bool|null|string
     {
         static $boolMap = [
         'true' => true,
@@ -866,12 +953,11 @@ class Console
         $doc = str_replace('console.php', $scriptName, $doc);
         $sections = ['description' => '', 'usage' => '', 'options' => '', 'examples' => '',];
         $current = 'description';
+        $doc = str_replace("\r", '', $doc);
         foreach (explode("\n", $doc) as $line) {
             $trim = trim($line);
             if ($trim === '') {
-                if ($current !== 'description') {
-                    $sections[$current] .= "\n";
-                }
+                $sections[$current] .= "\n";
                 continue;
             }
             if (stripos($trim, 'Usage:') === 0) {
@@ -886,13 +972,226 @@ class Console
                 $current = 'examples';
                 continue;
             }
-            $sections[$current] .= $line . "\n";
+            if ($current === 'description') {
+                $line .= " ";
+            } else {
+                $line .= "\n";
+            }
+            $sections[$current] .= $line;
         }
-        foreach ($sections as &$s) {
-            $s = rtrim($s);
+        foreach ($sections as $key => $s) {
+            $sections[$key] = rtrim($s);
         }
-        //$sections['description'] = trim($sections['description']);
         return $sections;
+    }
+
+    /**
+     * Return detected terminal width (columns). Falls back to 80.
+     */
+    public function terminalWidth(): int
+    {
+        static $w = null;
+        if ($w !== null) {
+            return $w;
+        }
+
+        $default = 80;
+
+        // 1) ENV
+        $cols = getenv('COLUMNS');
+        if ($cols !== false && (int) $cols > 0) {
+            $w = (int) $cols;
+            return $w;
+        }
+
+        // 2) tput (Unix)
+        if (function_exists('exec')) {
+            // only try tput when we are in a real terminal
+            if (function_exists('posix_isatty') && @posix_isatty(STDOUT)) {
+                $out = [];
+                @exec('tput cols 2>/dev/null', $out);
+                if (!empty($out) && is_array($out) && (int) $out[0] > 0) {
+                    $w = (int) $out[0];
+                    return $w;
+                }
+            }
+
+            // 3) Windows: try to parse "mode CON" output for "Columns: N"
+            if (stripos(PHP_OS, 'WIN') === 0) {
+                $out = [];
+                @exec('mode CON 2>&1', $out);
+                if (!empty($out) && is_array($out)) {
+                    $columnPos = 1; // usually the second number in the line "Columns: 120"
+                    foreach ($out as $line) {
+                        if (preg_match('/\b(\d{2,4})\b/', $line, $m)) {
+                            if ($columnPos-- > 0) {
+                                continue; // skip until we reach the column number
+                            }
+                            $w = (int) $m[1];
+                            return $w;
+                        }
+                    }
+                }
+            }
+        }
+
+        $w = $default;
+        return $w;
+    }
+
+
+    /**
+     * Parse and render a Usage block:
+     *  - Lines starting with 'php' or the task name open a new usage entry.
+     *  - Lines starting with '[', '<', or '-' are continuations of the current entry.
+     *  - All other non-blank lines are treated as prose and rendered inline.
+     *  - Argument columns across all entries are aligned to the longest left side.
+     */
+    protected function renderUsageBlock(string $usageText, string $taskKey, int $termWidth): void
+    {
+        $taskPattern = '/^' . preg_quote($taskKey, '/') . '\b/i';
+
+        // ── Pass 1: split into 'entry' and 'prose' items ─────────────────────
+        $items = [];
+        $currentEntry = null;
+        $emptyLine = false;
+
+        foreach (explode("\n", $usageText) as $ln) {
+            $ln = rtrim($ln);
+            $trim = ltrim($ln);
+
+            if ($trim === '') {
+                if ($currentEntry !== null) {
+                    $items[] = ['type' => 'entry', 'text' => $currentEntry];
+                    $currentEntry = null;
+                }
+                $emptyLine = true;
+                continue;
+            }
+
+            $trim = preg_replace('/^php\d*(?:\.exe)?\b\s*/i', '', $trim);
+            $trim = preg_replace('/^\w+\.php\b\s*/i', '', $trim);
+            $isEntryStart = (bool) preg_match('/^php\d*(?:\.exe)?\b/i', $trim)
+                || (bool) preg_match($taskPattern, $trim);
+            $isContinuation = (bool) preg_match('/^[\[<\-]/', $trim);
+
+            if ($isEntryStart) {
+                if ($currentEntry !== null) {
+                    $items[] = ['type' => 'entry', 'text' => $currentEntry];
+                }
+                $currentEntry = $trim;
+            } elseif ($isContinuation && $currentEntry !== null) {
+                $currentEntry .= ' ' . $trim;
+            } else {
+                if ($currentEntry !== null) {
+                    $items[] = ['type' => 'entry', 'text' => $currentEntry];
+                    $currentEntry = null;
+                }
+                if (!$emptyLine && !empty($items) && end($items)['type'] === 'prose') {
+                    // append to previous prose block
+                    $items[count($items) - 1]['text'] .= ' ' . $trim;
+                } else {
+                    $items[] = ['type' => 'prose', 'text' => $trim];
+                }
+            }
+            $emptyLine = false;
+        }
+        if ($currentEntry !== null) {
+            $items[] = ['type' => 'entry', 'text' => $currentEntry];
+        }
+
+        // ── Pass 2: parse each entry, find max left-column width ─────────────
+        $maxLeftLen = 0;
+        foreach ($items as &$item) {
+            if ($item['type'] !== 'entry') {
+                continue;
+            }
+            $parts = preg_split('/\s+/', $item['text']);
+            $isPhp = (bool) preg_match('/^php\d*(?:\.exe)?$/i', $parts[0]);
+            $actionIdx = $isPhp ? 3 : 1;
+            $actionIdx = min($actionIdx, count($parts) - 1);
+            $leftParts = array_slice($parts, 0, $actionIdx + 1);
+            $restParts = array_slice($parts, $actionIdx + 1);
+            $leftPlain = implode(' ', $leftParts);
+
+            $item['isPhp'] = $isPhp;
+            $item['leftParts'] = $leftParts;
+            $item['leftPlain'] = $leftPlain;
+            $item['rest'] = implode(' ', $restParts);
+
+            $maxLeftLen = max($maxLeftLen, strlen($leftPlain));
+        }
+        unset($item);
+
+        // ── Pass 3: render ───────────────────────────────────────────────────
+        $leadingSpaces = 2;
+        $descStartCol = $leadingSpaces + $maxLeftLen + 1;
+        $argAvail = max(10, $termWidth - $descStartCol);
+        $contIndent = str_repeat(' ', $descStartCol);
+        $addEmptyLine = true;
+
+        foreach ($items as $item) {
+
+            if ($item['type'] === 'prose') {
+                if ($addEmptyLine) {
+                    $this->writeln();
+                    $addEmptyLine = false;
+                }
+                $this->writeln(str_repeat(' ', $leadingSpaces) . $this->style($item['text'], 'dim'));
+                continue;
+            }
+
+            $addEmptyLine = true;
+            $this->writeln();
+
+            // Style left tokens
+            $leftStyled = [];
+            foreach ($item['leftParts'] as $i => $tok) {
+                if ($item['isPhp']) {
+                    $leftStyled[] = match ($i) {
+                        0, 1 => $this->style($tok, 'dim'),
+                        2 => $this->style($tok, 'bold', 'white'),
+                        default => $this->style($tok, 'bold', 'bcyan'),
+                    };
+                } else {
+                    $leftStyled[] = $i === 0
+                        ? $this->style($tok, 'bold', 'white')
+                        : $this->style($tok, 'bold', 'bcyan');
+                }
+            }
+
+            // Pad left side so all args start at the same column
+            $padding = str_repeat(' ', $maxLeftLen - strlen($item['leftPlain']));
+            $argLines = $this->wrapText($item['rest'], $argAvail);
+            $firstArg = array_shift($argLines);
+
+            $this->writeln(
+                str_repeat(' ', $leadingSpaces)
+                . implode(' ', $leftStyled)
+                . $padding
+                . ($firstArg !== '' ? ' ' . $this->highlightCommandLine($firstArg) : '')
+            );
+            foreach ($argLines as $al) {
+                $this->writeln($contIndent . $this->highlightCommandLine($al));
+            }
+        }
+    }
+
+    /**
+     * Word-wrap a text block into an array of lines for the given column width.
+     * Lines are trimmed of trailing whitespace. Empty input returns an array with one empty string.
+     * @param string $text The text to wrap.
+     * @param int $width The maximum column width for wrapping.
+     */
+    public function wrapText(string $text, int $width): array
+    {
+        $width = max(10, (int) $width);
+        if ($text === '') {
+            return [''];
+        }
+        $wrapped = wordwrap($text, $width, "\n");
+        $lines = explode("\n", $wrapped);
+        return array_map(fn($l) => rtrim($l), $lines);
     }
 
 }
