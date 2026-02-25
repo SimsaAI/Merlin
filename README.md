@@ -50,7 +50,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
   - Auto-discovery of tasks from namespaces
   - Flexible task grouping and custom namespaces
   - Rich color output and styled help pages
-  - Option parsing, argument separation, and interactive prompts
+  - Option parsing and argument separation
   - Built-in help and task listing
 - **Tasks** - Structured CLI commands with parameter parsing
 - **Sync Task** - built-in sync task for generating/applying model and schema changes
