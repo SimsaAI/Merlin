@@ -5,6 +5,9 @@ use Merlin\Mvc\Router;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+
 class RouterTest extends TestCase
 {
     public function testBasicParametricRoute(): void
