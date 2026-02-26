@@ -307,14 +307,6 @@ class UserTask extends Task
 
 ---
 
-## Error Types
-
-- `Merlin\Cli\Exceptions\TaskNotFoundException`
-- `Merlin\Cli\Exceptions\ActionNotFoundException`
-- `Merlin\Cli\Exceptions\InvalidTaskException`
-
----
-
 ## See Also
 
 - [src/Cli/Console.php](../src/Cli/Console.php)
