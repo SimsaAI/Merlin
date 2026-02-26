@@ -61,12 +61,19 @@ class Console
     protected $muteStyles = ['gray', '#a3a3a3'];
     protected $commentStyles = ['gray', '#bdbdbd'];
 
+    /**
+     * @param string|null $scriptName Optional custom script name for help output. Defaults to the basename of argv[0].
+     */
     public function __construct(string $scriptName = null)
     {
         $this->scriptName = $scriptName ?? basename($_SERVER['argv'][0] ?? 'console.php');
         $this->useColors = $this->detectColorSupport();
     }
 
+    /**
+     * Register a namespace to search for tasks. Namespaces are resolved to directories via PSR-4 rules.
+     * By default, "Merlin\\Cli\\Tasks" and "App\\Tasks" are registered.
+     */
     public function addNamespace(string $ns): void
     {
         $ns = trim($ns, '\\');
@@ -75,6 +82,10 @@ class Console
         }
     }
 
+    /**
+     * Register a directory path to search for task classes. This is in addition to any namespaces registered via addNamespace().
+     * You can set $registerAutoload to true to automatically register a simple PSR-4 autoloader for this path.
+     */
     public function addTaskPath(string $path, bool $registerAutoload = false): void
     {
         $path = rtrim($path, DIRECTORY_SEPARATOR);
@@ -599,8 +610,7 @@ class Console
     }
 
     /**
-     * Parse the namespace and class name directly from file content, then register
-     * the task if it is a valid Task subclass. This avoids any path/namespace guessing.
+     * Parse the namespace and class name directly from file content, then register the task if it is a valid Task subclass. This avoids any path/namespace guessing.
      */
     protected function registerTaskFile(string $file): void
     {
@@ -701,6 +711,10 @@ class Console
         $this->writeln();
     }
 
+    /**
+     * Built-in help task for a specific task
+     * @param string $task The name of the task to display help for
+     */
     public function helpTask(string $task): void
     {
         $taskKey = strtolower($task);
