@@ -406,7 +406,7 @@ php console.php help database      # detail page for one task
 
 **Using Built-in Tasks**
 
-Merlin includes built-in tasks for common development operations. The `model-sync` task synchronizes your PHP models with the database schema and supports these subcommands and options:
+Merlin includes a built-in task for common development operations. The `model-sync` task synchronizes your PHP models with the database schema and supports these actions and options:
 
 ```bash
 # Auto-discover App\Models via PSR-4 and preview differences (no args needed)
