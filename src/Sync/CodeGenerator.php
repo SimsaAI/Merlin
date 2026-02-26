@@ -69,30 +69,36 @@ class CodeGenerator
 
     private function buildAccessorBlock(AddAccessor $op): string
     {
-        $baseType = ltrim($op->phpType, '?');
-        $paramType = '?' . $baseType;
-        $retType = $op->phpType . '|static';
+        $type = $op->phpType;
         $vis = $op->visibility;
-        $method = $op->methodName;
+        $base = ucfirst($op->methodName);
         $prop = $op->property;
         $i = $this->indent;
         $ii = $i . $i;
-        $iii = $ii . $i;
 
-        return
+        $getter =
             "\n" .
             "\n{$i}/**" .
-            "\n{$i} * @return {$op->phpType}" .
-            "\n{$i} * @param {$paramType} \$value" .
+            "\n{$i} * @return {$type}" .
             "\n{$i} */" .
-            "\n{$i}{$vis} function {$method}({$paramType} \$value = null): {$retType}" .
+            "\n{$i}{$vis} function get{$base}(): {$type}" .
             "\n{$i}{" .
-            "\n{$ii}if (\$value === null) {" .
-            "\n{$iii}return \$this->{$prop};" .
-            "\n{$ii}}" .
+            "\n{$ii}return \$this->{$prop};" .
+            "\n{$i}}";
+
+        $setter =
+            "\n" .
+            "\n{$i}/**" .
+            "\n{$i} * @param {$type} \$value" .
+            "\n{$i} * @return static" .
+            "\n{$i} */" .
+            "\n{$i}{$vis} function set{$base}({$type} \$value): static" .
+            "\n{$i}{" .
             "\n{$ii}\$this->{$prop} = \$value;" .
             "\n{$ii}return \$this;" .
             "\n{$i}}";
+
+        return $getter . $setter;
     }
 
     // -------------------------------------------------------------------------

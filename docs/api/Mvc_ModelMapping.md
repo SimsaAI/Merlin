@@ -158,29 +158,6 @@ Multiple separators are unified into a single underscore, and duplicate undersco
 - Description: The converted snake_case string.
 
 
----
-
-### pluralize() · [source](../../src/Mvc/ModelMapping.php#L258)
-
-`public static function pluralize(string $word): string`
-
-Return the plural form of a word (always lowercase).
-
-Returns the word unchanged if it appears to be already plural.
-Irregular plurals are applied first; regular suffix rules are used otherwise.
-
-**🧭 Parameters**
-
-| Name | Type | Default | Description |
-|---|---|---|---|
-| `$word` | string | - | Singular word. |
-
-**➡️ Return value**
-
-- Type: string
-- Description: Pluralized lowercase word.
-
-
 
 ---
 

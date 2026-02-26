@@ -53,12 +53,26 @@ $router->add('GET', '/blog/{slug}', 'BlogController::showAction');
 
 Add type constraints to validate parameters automatically. This helps prevent invalid data from reaching your controllers and makes routes more self-documenting.
 
-Built-in types: `int`, `alpha`, `alnum`, `uuid`, `*` (matches any remaining path segments, captured as an array).
+Built-in types: `int`, `alpha`, `alnum`, `uuid`, `regex`, `*` (matches any remaining path segments, captured as an array).
 
 ```php
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
 $router->add('GET', '/tags/{name:alpha}', 'TagController::showAction');
 ```
+
+#### Regex Type
+
+Use the `regex` type to match URL segments against a custom regular expression pattern. This is useful when the built-in types don't meet your needs. The pattern should be a valid PCRE regex without delimiters.
+
+```php
+// Match ISO date format
+$router->add('GET', '/articles/{date:regex(\d{4}-\d{2}-\d{2})}', 'ArticleController::showAction');
+
+// Match namespaced API routes (e.g., v1 and v2)
+$router->add('GET', '/api/{namespace:regex(v[1-2])}/users', 'ApiController::usersAction');
+```
+
+The regex pattern is matched using PCRE's `preg_match()` function. Ensure your pattern is specific enough to avoid unintended matches, and remember that the pattern is matched against individual URL segments only, not across segment boundaries.
 
 ### Routing Variables
 
@@ -118,7 +132,7 @@ $url = $router->urlFor('user.view', ['id' => 42], ['tab' => 'profile']);
 Define your own validation rules for route parameters. This is useful for application-specific formats like slugs, SKUs, or reference codes.
 
 ```php
-$router->addType('slug', fn(string $v) => mb_ereg('^[a-z0-9-]+$', $v));
+$router->addType('slug', fn(string $v) => preg_match('/^[a-z0-9-]+$/', $v));
 $router->add('GET', '/posts/{slug:slug}', 'PostController::showAction');
 ```
 

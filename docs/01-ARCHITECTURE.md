@@ -127,5 +127,5 @@ $ctx->dbManager()->set('default', new Database(...));
 - Router custom parameter validators via `addType()`
 - Router route groups via `prefix()`, `namespace()`, `controller()`, and `middleware()`
 - Dispatcher middleware groups and controller factory
-- Model overrides: `modelSource()`, `modelSchema()`, `modelIdFields()`, `modelReadConnection()`, `modelWriteConnection()`
+- Model overrides: `source()`, `schema()`, `idFields()`, `readConnection()`, `writeConnection()`
 - Query SQL escape hatches via `Sql` nodes (`Sql::bind()` for PDO-bound params)

@@ -15,7 +15,7 @@ response is sent.
 
 `public function process(Merlin\AppContext $context, callable $next): Merlin\Http\Response|null`
 
-Start the PHP session, expose it through {@see AppContext::session()},
+Start the PHP session, expose it through [`AppContext::session()`](AppContext.md#session),
 invoke the next middleware, then flush the session to storage.
 
 **🧭 Parameters**

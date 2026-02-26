@@ -13,33 +13,47 @@ use Merlin\Sync\SyncRunner;
  * and for scaffolding new model files from database tables.
  *
  * Usage:
- *   sync all   <models-dir> [--apply] [--database=<role>]
- *                              [--generate-accessors] [--no-deprecate]
- *                              [--field-visibility=<public|protected|private>]
- *                              [--create-missing] [--namespace=<ns>]
- *   sync model <file> [--apply] [--database=<role>]
- *                              [--generate-accessors] 
- *                              [--field-visibility=<public|protected|private>]
- *                              [--no-deprecate]
- *   sync make  <ClassName>   <directory> [--apply] 
- *                              [--database=<role>] [--namespace=<ns>] 
- *                              [--generate-accessors] [--no-deprecate]
- *                              [--field-visibility=<public|protected|private>]
+ *   model-sync all   <models-dir> [--apply] [--database=<role>]
+ *                                 [--generate-accessors] [--no-deprecate]
+ *                                 [--field-visibility=<public|protected|private>]
+ *                                 [--create-missing] [--namespace=<ns>]
+ *   model-sync model <file> [--apply] [--database=<role>]
+ *                                 [--generate-accessors] 
+ *                                 [--field-visibility=<public|protected|private>]
+ *                                 [--no-deprecate]
+ *   model-sync make  <ClassName>  <directory> [--apply] 
+ *                                 [--database=<role>] [--namespace=<ns>] 
+ *                                 [--generate-accessors] [--no-deprecate]
+ *                                 [--field-visibility=<public|protected|private>]
  *
  * By default the task runs in **dry-run** mode and only reports changes.
  * Pass --apply to write the updated model files to disk.
+ * 
+ * Options:
+ *   --database=<role>           Database role to use for schema introspection 
+ *                               (default: "read")
+ *   --generate-accessors        Also generate getter/setter methods for each 
+ *                               property
+ *   --field-visibility=<vis>    Visibility for generated properties (default: 
+ *                               "public")
+ *   --no-deprecate              Don't add @deprecated tags to removed 
+ *                               properties
+ *   --create-missing            Create new model files for tables that don't 
+ *                               have a corresponding model yet
+ *   --namespace=<ns>            Namespace to use when creating new model files 
+ *                               (required if --create-missing is used)
  *
  * Examples:
- *   php console.php sync all  src/Models                              # dry-run
- *   php console.php sync all  src/Models --apply                      # apply
- *   php console.php sync all  src/Models --apply --generate-accessors # with accessors
- *   php console.php sync all  src/Models --apply --field-visibility=protected
- *   php console.php sync all  src/Models --apply --no-deprecate
- *   php console.php sync all  src/Models --apply --create-missing --namespace=App\\Models
- *   php console.php sync model src/Models/User.php --apply
- *   php console.php sync make  User src/Models --namespace=App\\Models --apply
+ *   php console.php model-sync all  src/Models                              # dry-run
+ *   php console.php model-sync all  src/Models --apply                      # apply
+ *   php console.php model-sync all  src/Models --apply --generate-accessors # with accessors
+ *   php console.php model-sync all  src/Models --apply --field-visibility=protected
+ *   php console.php model-sync all  src/Models --apply --no-deprecate
+ *   php console.php model-sync all  src/Models --apply --create-missing --namespace=App\\Models
+ *   php console.php model-sync model src/Models/User.php --apply
+ *   php console.php model-sync make  User src/Models --namespace=App\\Models --apply
  */
-class SyncTask extends Task
+class ModelSyncTask extends Task
 {
     // -------------------------------------------------------------------------
     //  Actions
@@ -286,9 +300,9 @@ class SyncTask extends Task
 
         foreach ($results as $result) {
             if ($result->isSuccess() && $result->hasChanges()) {
-                $this->warn($result->summary());
+                $this->info($result->summary());
                 foreach ($result->operations as $op) {
-                    $this->line('    ' . $this->style('•', 'yellow') . ' ' . $this->describeOp($op));
+                    $this->line('    ' . $this->style('•', 'bmagenta') . ' ' . $this->describeOp($op));
                 }
                 $totalChanges++;
             } elseif (!$result->isSuccess()) {
@@ -304,7 +318,7 @@ class SyncTask extends Task
         if ($totalErrors > 0) {
             $this->error($summary);
         } elseif ($totalChanges > 0) {
-            $this->warn($summary);
+            $this->info($summary);
         } else {
             $this->success($summary);
         }

@@ -77,7 +77,7 @@ class PostTag extends Model
     public int $post_id;
     public int $tag_id;
 
-    public function modelIdFields(): array
+    public function idFields(): array
     {
         return ['post_id', 'tag_id'];
     }

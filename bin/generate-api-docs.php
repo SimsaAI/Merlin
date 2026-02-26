@@ -127,9 +127,9 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
             $summary = trim((string) $block->getSummary());
             $desc = trim((string) $block->getDescription());
             if ($summary)
-                $md .= $summary . "\n\n";
+                $md .= resolveInlineTags($summary, $classRegistry) . "\n\n";
             if ($desc)
-                $md .= $desc . "\n\n";
+                $md .= resolveInlineTags($desc, $classRegistry) . "\n\n";
             if ($block->hasTag('deprecated')) {
                 $tag = current($block->getTagsByName('deprecated'));
                 $md .= "**🛑 Deprecated**: " . safeTagToString($tag) . "\n\n";
@@ -223,9 +223,9 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
             $summary = trim((string) $block->getSummary());
             $desc = trim((string) $block->getDescription());
             if ($summary)
-                $md .= $summary . "\n\n";
+                $md .= resolveInlineTags($summary, $classRegistry) . "\n\n";
             if ($desc)
-                $md .= $desc . "\n\n";
+                $md .= resolveInlineTags($desc, $classRegistry) . "\n\n";
             if ($block->hasTag('deprecated')) {
                 $tag = current($block->getTagsByName('deprecated'));
                 $md .= "**🛑 Deprecated**: " . safeTagToString($tag) . "\n\n";
@@ -251,7 +251,7 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
             $linkedTypeForTable = escapeTablePipes(linkType($typeStr, $classRegistry, 'doc'));
             $default = $p->isDefaultValueAvailable() ? formatDefaultValue($p->getDefaultValue()) : null;
             $desc = $paramTagMap[$p->getName()] ?? $paramTagMap[$p->getPosition()] ?? '';
-            $desc = $desc ? str_replace("\n", "<br>", trim($desc)) : '';
+            $desc = $desc ? str_replace("\n", "<br>", resolveInlineTags(trim($desc), $classRegistry)) : '';
             if (isset($default)) {
                 $default = "`{$default}`";
             } else {
@@ -275,7 +275,7 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
     $md .= "**➡️ Return value**\n\n";
     $md .= "- Type: " . $linkedReturn . "\n";
     if ($returnDesc) {
-        $md .= "- Description: " . str_replace("\n", "<br>", $returnDesc) . "\n";
+        $md .= "- Description: " . str_replace("\n", "<br>", resolveInlineTags($returnDesc, $classRegistry)) . "\n";
     }
     $md .= "\n";
 
@@ -287,7 +287,7 @@ function generateMethodDoc(ReflectionMethod $method, $docFactory, array $classRe
                 $exTypeStr = ltrim(trim((string) $t->getType()), '\\');
                 $exDesc = trim((string) $t->getDescription());
                 $linkedExType = linkType($exTypeStr, $classRegistry, 'doc');
-                $md .= "- " . $linkedExType . ($exDesc ? "  " . $exDesc : "") . "\n";
+                $md .= "- " . $linkedExType . ($exDesc ? "  " . resolveInlineTags($exDesc, $classRegistry) : "") . "\n";
             } else {
                 $md .= "- " . safeTagToString($t) . "\n";
             }
@@ -414,6 +414,45 @@ function linkType(string $typeStr, array $classRegistry, string $mode = 'doc', b
         }
     }
     return $result;
+}
+
+/**
+ * Resolve {@see \Ns\Class}, {@see \Ns\Class::method()} and bare {@see \method()}
+ * inline tags in prose text to markdown links, using the class registry.
+ * Falls back to inline code when the target is not found.
+ */
+function resolveInlineTags(string $text, array $classRegistry): string
+{
+    // Handles all forms:
+    //   {@see \Ns\Class}
+    //   {@see \Ns\Class::method()}
+    //   {@see \bareMethod()}   (method-only, no class qualifier)
+    //   {@see bareMethod()}
+    //   {@see $variable()}     (variable callable – rendered as inline code)
+    return preg_replace_callback(
+        '/\{@(?:see|link)\s+(\$?\\\\?[A-Za-z0-9_\\\\]+)(?:::([A-Za-z0-9_]+))?(\(\))?\s*\}/',
+        function (array $m) use ($classRegistry): string {
+            $fqcn = ltrim($m[1], '\\');
+            $method = ($m[2] ?? '') !== '' ? $m[2] : null;
+            $hasParens = ($m[3] ?? '') !== '';
+
+            if (isset($classRegistry[$fqcn])) {
+                $info = $classRegistry[$fqcn];
+                $docLink = $info['docLink'];
+                if ($method) {
+                    $anchor = strtolower($method);
+                    $label = $info['short'] . '::' . $method . '()';
+                    return "[`{$label}`]({$docLink}#{$anchor})";
+                }
+                return "[`{$info['short']}`]({$docLink})";
+            }
+
+            // Unknown target (bare method name, external class, etc.) – inline code
+            $raw = $fqcn . ($method ? '::' . $method . '()' : ($hasParens ? '()' : ''));
+            return "`{$raw}`";
+        },
+        $text
+    );
 }
 
 /**

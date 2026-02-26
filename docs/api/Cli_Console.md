@@ -4,7 +4,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Cli/Console.php#L45)
+### __construct() · [source](../../src/Cli/Console.php#L54)
 
 `public function __construct(string|null $scriptName = null): mixed`
 
@@ -21,7 +21,7 @@
 
 ---
 
-### addNamespace() · [source](../../src/Cli/Console.php#L51)
+### addNamespace() · [source](../../src/Cli/Console.php#L60)
 
 `public function addNamespace(string $ns): void`
 
@@ -38,7 +38,7 @@
 
 ---
 
-### addTaskPath() · [source](../../src/Cli/Console.php#L59)
+### addTaskPath() · [source](../../src/Cli/Console.php#L68)
 
 `public function addTaskPath(string $path, bool $registerAutoload = false): void`
 
@@ -56,7 +56,7 @@
 
 ---
 
-### getDefaultAction() · [source](../../src/Cli/Console.php#L75)
+### getDefaultAction() · [source](../../src/Cli/Console.php#L84)
 
 `public function getDefaultAction(): string`
 
@@ -70,7 +70,7 @@ Get the default action method name used when no action is specified on the comma
 
 ---
 
-### setDefaultAction() · [source](../../src/Cli/Console.php#L86)
+### setDefaultAction() · [source](../../src/Cli/Console.php#L95)
 
 `public function setDefaultAction(string $defaultAction): void`
 
@@ -93,7 +93,7 @@ Set the default action method name used when no action is specified on the comma
 
 ---
 
-### enableColors() · [source](../../src/Cli/Console.php#L110)
+### enableColors() · [source](../../src/Cli/Console.php#L119)
 
 `public function enableColors(bool $colors): void`
 
@@ -112,7 +112,7 @@ Enable or disable ANSI color output explicitly.
 
 ---
 
-### hasColors() · [source](../../src/Cli/Console.php#L116)
+### hasColors() · [source](../../src/Cli/Console.php#L125)
 
 `public function hasColors(): bool`
 
@@ -125,7 +125,27 @@ Check whether ANSI color output is enabled.
 
 ---
 
-### style() · [source](../../src/Cli/Console.php#L128)
+### color() · [source](../../src/Cli/Console.php#L130)
+
+`public function color(string|int $r, int|null $g = null, int|null $b = null, mixed $background = false): string`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$r` | string\|int | - |  |
+| `$g` | int\|null | `null` |  |
+| `$b` | int\|null | `null` |  |
+| `$background` | mixed | `false` |  |
+
+**➡️ Return value**
+
+- Type: string
+
+
+---
+
+### style() · [source](../../src/Cli/Console.php#L183)
 
 `public function style(string $text, string ...$styles): string`
 
@@ -150,7 +170,7 @@ When color support is disabled, the text is returned unchanged.
 
 ---
 
-### writeln() · [source](../../src/Cli/Console.php#L141)
+### writeln() · [source](../../src/Cli/Console.php#L196)
 
 `public function writeln(string $text = ''): void`
 
@@ -169,7 +189,7 @@ Write a line to stdout (newline appended).
 
 ---
 
-### line() · [source](../../src/Cli/Console.php#L147)
+### line() · [source](../../src/Cli/Console.php#L202)
 
 `public function line(string $text): void`
 
@@ -188,7 +208,7 @@ Plain informational line.
 
 ---
 
-### success() · [source](../../src/Cli/Console.php#L153)
+### success() · [source](../../src/Cli/Console.php#L208)
 
 `public function success(string $text): void`
 
@@ -207,7 +227,7 @@ Success message (bright green).
 
 ---
 
-### warn() · [source](../../src/Cli/Console.php#L159)
+### warn() · [source](../../src/Cli/Console.php#L214)
 
 `public function warn(string $text): void`
 
@@ -226,7 +246,7 @@ Warning message (bright yellow).
 
 ---
 
-### error() · [source](../../src/Cli/Console.php#L165)
+### error() · [source](../../src/Cli/Console.php#L220)
 
 `public function error(string $text): void`
 
@@ -245,7 +265,7 @@ Error message (bright red).
 
 ---
 
-### critical() · [source](../../src/Cli/Console.php#L171)
+### critical() · [source](../../src/Cli/Console.php#L226)
 
 `public function critical(string $text): void`
 
@@ -264,7 +284,7 @@ Critical message (red on white bg).
 
 ---
 
-### muted() · [source](../../src/Cli/Console.php#L177)
+### muted() · [source](../../src/Cli/Console.php#L232)
 
 `public function muted(string $text): void`
 
@@ -283,7 +303,7 @@ Muted / dimmed text.
 
 ---
 
-### info() · [source](../../src/Cli/Console.php#L183)
+### info() · [source](../../src/Cli/Console.php#L238)
 
 `public function info(string $text): void`
 
@@ -302,7 +322,7 @@ Informational message (cyan).
 
 ---
 
-### shouldCoerceParams() · [source](../../src/Cli/Console.php#L201)
+### shouldCoerceParams() · [source](../../src/Cli/Console.php#L256)
 
 `public function shouldCoerceParams(): bool`
 
@@ -320,7 +340,7 @@ to the action method.
 
 ---
 
-### setCoerceParams() · [source](../../src/Cli/Console.php#L211)
+### setCoerceParams() · [source](../../src/Cli/Console.php#L266)
 
 `public function setCoerceParams(bool $coerceParams): void`
 
@@ -339,7 +359,7 @@ Enable or disable automatic parameter type coercion.
 
 ---
 
-### process() · [source](../../src/Cli/Console.php#L223)
+### process() · [source](../../src/Cli/Console.php#L278)
 
 `public function process(string|null $task = null, string|null $action = null, array $params = []): void`
 
@@ -360,7 +380,7 @@ Process the given task, action, and parameters.
 
 ---
 
-### autodiscover() · [source](../../src/Cli/Console.php#L315)
+### autodiscover() · [source](../../src/Cli/Console.php#L372)
 
 `public function autodiscover(): void`
 
@@ -373,7 +393,7 @@ Autodiscover tasks in all registered namespaces and paths
 
 ---
 
-### helpOverview() · [source](../../src/Cli/Console.php#L487)
+### helpOverview() · [source](../../src/Cli/Console.php#L544)
 
 `public function helpOverview(): void`
 
@@ -386,7 +406,7 @@ Built-in help task
 
 ---
 
-### helpTask() · [source](../../src/Cli/Console.php#L549)
+### helpTask() · [source](../../src/Cli/Console.php#L606)
 
 `public function helpTask(string $task): void`
 
@@ -403,7 +423,7 @@ Built-in help task
 
 ---
 
-### coerceParam() · [source](../../src/Cli/Console.php#L906)
+### coerceParam() · [source](../../src/Cli/Console.php#L954)
 
 `public function coerceParam(string $param): string|int|float|bool|null`
 
@@ -425,7 +445,7 @@ Otherwise return the original string. Empty string is returned as-is.
 
 ---
 
-### terminalWidth() · [source](../../src/Cli/Console.php#L991)
+### terminalWidth() · [source](../../src/Cli/Console.php#L1040)
 
 `public function terminalWidth(): int`
 
@@ -438,7 +458,7 @@ Return detected terminal width (columns). Falls back to 80.
 
 ---
 
-### wrapText() · [source](../../src/Cli/Console.php#L1186)
+### wrapText() · [source](../../src/Cli/Console.php#L1304)
 
 `public function wrapText(string $text, int $width): array`
 

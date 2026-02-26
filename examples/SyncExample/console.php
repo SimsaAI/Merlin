@@ -7,16 +7,16 @@
  *   php console.php <task> <action> [args...]
  *
  * Sync examples:
- *   php console.php sync all  Models                                          # dry-run
- *   php console.php sync all  Models --apply                                  # apply
- *   php console.php sync all  Models --apply --generate-accessors             # with getters/setters
- *   php console.php sync all  Models --apply --field-visibility=protected     # protected fields
- *   php console.php sync all  Models --apply --no-deprecate                   # skip @deprecated tags
- *   php console.php sync all  Models --apply --create-missing \
+ *   php console.php model-sync all  Models                                          # dry-run
+ *   php console.php model-sync all  Models --apply                                  # apply
+ *   php console.php model-sync all  Models --apply --generate-accessors             # with getters/setters
+ *   php console.php model-sync all  Models --apply --field-visibility=protected     # protected fields
+ *   php console.php model-sync all  Models --apply --no-deprecate                   # skip @deprecated tags
+ *   php console.php model-sync all  Models --apply --create-missing \
  *       --namespace=SyncExample\\Models                                        # scaffold new models
- *   php console.php sync model Models/User.php --apply
- *   php console.php sync model Models/User.php --apply --generate-accessors
- *   php console.php sync make Order Models --namespace=SyncExample\\Models --apply
+ *   php console.php model-sync model Models/User.php --apply
+ *   php console.php model-sync model Models/User.php --apply --generate-accessors
+ *   php console.php model-sync make Order Models --namespace=SyncExample\\Models --apply
  */
 
 chdir(__DIR__);

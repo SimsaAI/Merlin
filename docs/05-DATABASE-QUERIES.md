@@ -208,18 +208,18 @@ $deleted = User::query()
 ```php
 // Simple where with inline value
 $exists = User::query()->where('email', 'john@example.com')->exists();
-$total = User::query()->where('status', 'active')->tally();
+$total = User::query()->where('status', 'active')->count();
 
 // With bound parameters
 $exists = User::query()->where('email = :email')->bind(['email' => 'john@example.com'])->exists();
-$total = User::query()->where('status = :status')->bind(['status' => 'active'])->tally();
+$total = User::query()->where('status = :status')->bind(['status' => 'active'])->count();
 ```
 
-> **Note:** The query builder method is `tally()` (not `count()`) to avoid collisions with SQL aggregate columns named `count`. The static model helper `Model::tally()` works the same way.
+> **Note:** The query builder method is `count()` (not `count()`) to avoid collisions with SQL aggregate columns named `count`. The static model helper `Model::count()` works the same way.
 
 ```php
-// Model-level tally
-$active = User::tally(['status' => 'active']);
+// Model-level count
+$active = User::count(['status' => 'active']);
 ```
 
 ## Pagination with Paginator

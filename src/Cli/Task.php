@@ -77,7 +77,7 @@ abstract class Task
      * @param mixed $default The default value to return if the option is not set.
      * @return mixed The option value or the default if not set.
      */
-    public function opt(string $key, mixed $default = null): mixed
+    public function option(string $key, mixed $default = null): mixed
     {
         return $this->options[$key] ?? $default;
     }

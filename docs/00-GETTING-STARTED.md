@@ -153,14 +153,14 @@ $console->addNamespace('App\\Tasks'); // discover App\Tasks\*Task.php
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
-`Console` auto-discovers every class whose name ends in `Task` under the registered namespace and registers it under a lowercase task name (`HelloTask` → `hello`). The built-in `Merlin\Cli\Tasks` namespace (containing `SyncTask`) is always included automatically.
+`Console` auto-discovers every class whose name ends in `Task` under the registered namespace and registers it under a lowercase task name (`HelloTask` → `hello`). The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is always included automatically.
 
 Run:
 
 ```bash
 php console.php hello world Merlin    # positional args
 php console.php hello world --shout   # boolean flag
-php console.php help                  # color overview of all tasks
+php console.php help                  # overview of all tasks
 php console.php help hello            # detailed help for one task
 ```
 

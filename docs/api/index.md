@@ -16,7 +16,7 @@
 
 ### `Merlin\Cli\Tasks`
 
-- [SyncTask](Cli_Tasks_SyncTask.md) `Merlin\Cli\Tasks\SyncTask`
+- [ModelSyncTask](Cli_Tasks_ModelSyncTask.md) `Merlin\Cli\Tasks\ModelSyncTask`
 
 ### `Merlin\Db`
 

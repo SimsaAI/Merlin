@@ -8,7 +8,7 @@
 
 `public function __construct(): mixed`
 
-Create a new Dispatcher and bind it to the current {@see AppContext} singleton.
+Create a new Dispatcher and bind it to the current [`AppContext`](AppContext.md) singleton.
 
 **➡️ Return value**
 

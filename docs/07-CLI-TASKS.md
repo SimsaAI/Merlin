@@ -1,6 +1,6 @@
 # CLI Tasks
 
-**Build command-line tools** â€” Create powerful CLI applications for cron jobs, database migrations, data imports, and maintenance scripts. Tasks are auto-discovered from PSR-4 namespaces, receive parsed options, and can produce color-highlighted output via a simple output API.
+**Build command-line tools** – Create powerful CLI applications for cron jobs, database migrations, data imports, and maintenance scripts. Tasks are auto-discovered from PSR-4 namespaces, receive parsed options, and can produce color-highlighted output via a simple output API.
 
 Merlin provides `Merlin\Cli\Console` (dispatcher + help system) and `Merlin\Cli\Task` (base class for every task).
 
@@ -24,16 +24,16 @@ $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 Call signature on the command line:
 
 ```
-php console.php <task> [<action>] [<arg1> <arg2> â€¦] [--option] [--key=value]
+php console.php <task> [<action>] [<arg1> <arg2> …] [--option] [--key=value]
 ```
 
-`Console` separates positional arguments from options automatically before calling the action method. Options are available inside the task via `$this->options` or `$this->opt()`.
+`Console` separates positional arguments from options automatically before calling the action method. Options are available inside the task via `$this->options` or `$this->option()`.
 
 ---
 
 ## Task Discovery
 
-`Console` scans every registered namespace for files matching `*Task.php`, loads them, and registers any class that extends `Merlin\Cli\Task` under a lowercase task name derived from the class name (`DatabaseTask` â†’ `database`).
+`Console` scans every registered namespace for files matching `*Task.php`, loads them, and registers any class that extends `Merlin\Cli\Task` under a lowercase task name derived from the class name (`DatabaseTask` → `database`).
 
 ```php
 // Register one or more PSR-4 namespaces (any *Task.php inside will be found)
@@ -44,7 +44,7 @@ $console->addNamespace('App\\Admin\\Tasks');
 $console->addTaskPath('/path/to/extra/tasks', registerAutoload: true);
 ```
 
-The built-in `Merlin\Cli\Tasks` namespace (containing `SyncTask`) is **always** included. Discovery resolves paths from `composer.json` PSR-4 entries â€” no path guessing.
+The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is **always** included. Discovery resolves paths from `composer.json` PSR-4 entries – no path guessing.
 
 ### Naming Rules
 
@@ -58,7 +58,7 @@ The built-in `Merlin\Cli\Tasks` namespace (containing `SyncTask`) is **always** 
 
 ## Writing a Task
 
-Extend `Task` and add public `*Action` methods. Positional arguments map to method parameters by position; options are available via `$this->options` / `$this->opt()`.
+Extend `Task` and add public `*Action` methods. Positional arguments map to method parameters by position; options are available via `$this->options` / `$this->option()`.
 
 ```php
 <?php
@@ -85,9 +85,9 @@ class DatabaseTask extends Task
      */
     public function migrateAction(string $target = 'latest'): void
     {
-        $direction = $this->opt('direction', 'up');
-        $this->info("Migrating {$direction} to {$target}â€¦");
-        // â€¦ migration logic â€¦
+        $direction = $this->option('direction', 'up');
+        $this->info("Migrating {$direction} to {$target}…");
+        // … migration logic …
         $this->success("Migration complete.");
     }
 
@@ -96,10 +96,10 @@ class DatabaseTask extends Task
      */
     public function seedAction(): void
     {
-        if ($this->opt('truncate')) {
-            $this->warn("Truncating tables before seedingâ€¦");
+        if ($this->option('truncate')) {
+            $this->warn("Truncating tables before seeding…");
         }
-        // â€¦ seed logic â€¦
+        // … seed logic …
         $this->success("Seeding complete.");
     }
 }
@@ -112,46 +112,66 @@ class DatabaseTask extends Task
 Options (`--flag`, `--key=value`, `--no-flag`) are parsed from the command line **before** calling the action method and are available as an associative array.
 
 ```php
-// Option --apply        â†’ $this->options['apply']  = true
-// Option --no-apply     â†’ $this->options['apply']  = false
-// Option --database=read â†’ $this->options['database'] = 'read'
-// Option --count 5      â†’ $this->options['count']   = 5   (with coercion on)
+// Option --apply        → $this->options['apply']  = true
+// Option --no-apply     → $this->options['apply']  = false
+// Option --database=read → $this->options['database'] = 'read'
+// Option --count 5      → $this->options['count']   = 5   (with coercion on)
 
 // Direct access
 $dryRun = !isset($this->options['apply']);
 $role   = $this->options['database'] ?? 'read';
 
 // Helper with default
-$role = $this->opt('database', 'read');
-$dryRun = !$this->opt('apply', false);
+$role = $this->option('database', 'read');
+$dryRun = !$this->option('apply', false);
 ```
 
 ---
 
 ## Output Helpers
 
-All output methods are available inside a task via `$this->â€¦`. They delegate to the `Console` instance, which handles ANSI color automatically (enabled when the terminal supports it, disabled when piped).
+All output methods are available inside a task via `$this->…`. They delegate to the `Console` instance, which handles ANSI color automatically (enabled when the terminal supports it, disabled when piped).
 
-| Method                                | Output style                |
-| ------------------------------------- | --------------------------- |
-| `$this->writeln($text)`               | bare line (no color)        |
-| `$this->line($text)`                  | plain white                 |
-| `$this->info($text)`                  | cyan                        |
-| `$this->success($text)`               | bright green                |
-| `$this->warn($text)`                  | bright yellow               |
-| `$this->error($text)`                 | bright red `[ERROR]` prefix |
-| `$this->muted($text)`                 | gray / dim                  |
-| `$this->style($text, 'bold', 'cyan')` | arbitrary named styles      |
+| Method                                | Output style                      |
+| ------------------------------------- | --------------------------------- |
+| `$this->writeln($text)`               | bare line (no color)              |
+| `$this->line($text)`                  | plain white                       |
+| `$this->info($text)`                  | cyan                              |
+| `$this->success($text)`               | bright green                      |
+| `$this->warn($text)`                  | bright yellow                     |
+| `$this->error($text)`                 | bright red `[ERROR]` prefix       |
+| `$this->critical($text)`              | red on white `[CRITICAL]` prefix  |
+| `$this->muted($text)`                 | gray / dim                        |
+| `$this->style($text, 'bold', 'cyan')` | arbitrary named or rgb hex styles |
 
 ### Available Style Names
 
 `bold`, `dim`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray`,
-`bred`, `bgreen`, `byellow`, `bcyan`
+`bred`, `bgreen`, `byellow`, `bcyan`, `bmagenta`, `bwhite`, `bg-red`, `bg-green`, `bg-yellow`, `bg-blue`, `bg-magenta`, `bg-cyan`, `bg-white`
+
+### RGB Color Styles
+
+You can use RGB color styles for custom output. The `Console::color()` and `Console::style()` methods accept RGB values or hex codes:
+
+```php
+$console->style('Custom RGB', $console->color(255, 0, 128));         // foreground RGB
+$console->style('Custom BG', $console->color(0, 128, 255, true));    // background RGB
+$console->style('Hex', '#ff00ff');                  // hex foreground
+$console->style('Hex BG', 'bg:#00ff00');            // hex background
+```
+
+You can combine named styles and RGB/hex styles:
+
+```php
+$console->style('Bold magenta with 16 color fallback', 'bold', 'bmagenta', '#ff00ff');
+```
+
+When color support is disabled, the text is returned unchanged.
 
 ```php
 public function importAction(string $file = ''): void
 {
-    $this->info("Importing {$file}â€¦");
+    $this->info("Importing {$file}…");
 
     foreach ($rows as $i => $row) {
         if ($row['error']) {
@@ -169,22 +189,20 @@ public function importAction(string $file = ''): void
 
 ## Help System
 
-The built-in help system is powered automatically from **PHPDoc comments** on the task class and its action methods. No extra configuration required.
+The built-in help system is parsing automatically **PHPDoc comments** on the task class and its action methods. To show the help page for a task, run:
 
 ```
-php console.php help                 # color overview: all tasks + actions + descriptions
+php console.php help                 # overview: all tasks + actions + descriptions
 php console.php help <task>          # detail page: description, actions, usage, examples
 ```
 
 The detail page parses these doc-comment sections:
 
 ```
-Usage:    â€” syntax-highlighted with interpreter/task/action/placeholders/options colored
-Options:  â€” shown in gray
-Examples: â€” syntax-highlighted like Usage
+Usage:    – syntax-highlighted with task/action/placeholders/options
+Options:  – shown in gray
+Examples: – syntax-highlighted like Usage
 ```
-
-Placeholders `<like-this>` are colored bright yellow; `[--options]` are green; `# comments` in examples are gray.
 
 ### Example doc-comment
 
@@ -204,7 +222,7 @@ Placeholders `<like-this>` are colored bright yellow; `[--options]` are green; `
  *   php console.php import run data.csv --truncate         # clear first
  *   php console.php import run data.csv --batch=500        # large batches
  */
-class ImportTask extends Task { â€¦ }
+class ImportTask extends Task { … }
 ```
 
 ---
@@ -230,7 +248,7 @@ echo $console->style('Hello!', 'bold', 'bgreen');
 $console->setDefaultAction('indexAction');
 $console->getDefaultAction();
 
-// Parameter type coercion ("5" â†’ 5, "true" â†’ true, "null" â†’ null)
+// Parameter type coercion ("5" → 5, "true" → true, "null" → null)
 $console->setCoerceParams(true);
 $console->shouldCoerceParams();
 ```
@@ -266,7 +284,7 @@ class UserTask extends Task
      */
     public function cleanupAction(): void
     {
-        $days   = $this->opt('days', 30);
+        $days   = $this->option('days', 30);
         $cutoff = date('Y-m-d', strtotime("-{$days} days"));
 
         $deleted = User::query()
@@ -306,49 +324,49 @@ class UserTask extends Task
 
 ## Built-in: Sync Task
 
-Merlin ships with a ready-made `SyncTask` that keeps your PHP model files in sync with the live database schema (DB â†’ PHP). It is registered under the `Merlin\Cli\Tasks` namespace and is auto-discovered â€” **no extra setup required**.
+Merlin ships with a ready-made `ModelSyncTask` that keeps your PHP model files in sync with the live database schema (DB → PHP). It is registered under the `Merlin\Cli\Tasks` namespace and is auto-discovered – **no extra setup required**.
 
 ### Commands
 
 ```bash
-php console.php sync all   <directory> [options]              # scan a directory of model files
-php console.php sync model <file>       [options]              # sync a single model file
-php console.php sync make  <ClassName>  <directory> [options]  # scaffold a new model file
+php console.php model-sync all   <directory> [options]              # scan a directory of model files
+php console.php model-sync model <file>       [options]              # sync a single model file
+php console.php model-sync make  <ClassName>  <directory> [options]  # scaffold a new model file
 ```
 
 ### Options
 
-| Flag                       | Description                                                                   |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| _(none)_                   | Dry-run: preview changes without writing files                                |
-| `--apply`                  | Write the updated model files to disk                                         |
-| `--database=<role>`        | Database role to introspect (default: `read`)                                 |
-| `--generate-accessors`     | Generate a camelized getter/setter for each new property                      |
-| `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`            |
-| `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed         |
-| `--create-missing`         | (`sync all` only) Scaffold model files for tables that have no matching model |
-| `--namespace=<ns>`         | PHP namespace for scaffolded model files (required with `--create-missing`)   |
+| Flag                       | Description                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| _(none)_                   | Dry-run: preview changes without writing files                                      |
+| `--apply`                  | Write the updated model files to disk                                               |
+| `--database=<role>`        | Database role to introspect (default: `read`)                                       |
+| `--generate-accessors`     | Generate a camelized getter/setter for each new property                            |
+| `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`                  |
+| `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed               |
+| `--create-missing`         | (`model-sync all` only) Scaffold model files for tables that have no matching model |
+| `--namespace=<ns>`         | PHP namespace for scaffolded model files (required with `--create-missing`)         |
 
 ### Examples
 
 ```bash
 # Preview changes for all models in a directory
-php console.php sync all Models
+php console.php model-sync all Models
 
 # Apply changes
-php console.php sync all Models --apply
+php console.php model-sync all Models --apply
 
 # Apply with protected properties and accessor methods
-php console.php sync all Models --apply --generate-accessors --field-visibility=protected
+php console.php model-sync all Models --apply --generate-accessors --field-visibility=protected
 
 # Scaffold models for any DB tables not yet represented, then sync them
-php console.php sync all Models --apply --create-missing --namespace=App\\Models
+php console.php model-sync all Models --apply --create-missing --namespace=App\\Models
 
 # Sync a single file
-php console.php sync model Models/User.php --apply
+php console.php model-sync model Models/User.php --apply
 
 # Scaffold a brand-new model from a DB table and immediately populate its properties
-php console.php sync make Order Models --namespace=App\\Models --apply
+php console.php model-sync make Order Models --namespace=App\\Models --apply
 ```
 
 ### How it works

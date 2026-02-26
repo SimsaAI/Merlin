@@ -21,11 +21,22 @@ class User extends Model
     public string $email;
 
     // Optional overrides:
-    // public function modelSource(): string { return 'users'; }
-    // public function modelSchema(): ?string { return 'public'; }
-    // public function modelIdFields(): array { return ['id']; }
+    // public function source(): string { return 'users'; }
+    // public function schema(): ?string { return 'public'; }
+    // public function idFields(): array { return ['id']; }
 }
 ```
+
+By default, Merlin converts model class names to table names using snake_case (e.g., `User` → `user`, `AdminUser` → `admin_user`). To enable automatic pluralization of table names (e.g., `User` → `users`, `AdminUser` → `admin_users`), use the `ModelMapping` utility:
+
+```php
+use Merlin\Mvc\ModelMapping;
+
+// Enable pluralization globally
+ModelMapping::usePluralTableNames(true);
+```
+
+When enabled, the last word segment of the table name is pluralized (with support for irregular plurals like `person` → `people`). You can still override the source table per-model using the `source()` method if needed.
 
 ## Query Access
 
@@ -49,7 +60,7 @@ $user = User::findOne(['email' => 'john@example.com']);
 $users = User::findAll(['status' => 'active']);
 
 $exists = User::exists(['email' => 'john@example.com']);
-$count = User::tally(['status' => 'active']);
+$count = User::count(['status' => 'active']);
 ```
 
 Composite key lookup:

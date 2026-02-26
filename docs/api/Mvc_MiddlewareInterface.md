@@ -6,7 +6,7 @@ Contract for all middleware classes in the Merlin pipeline.
 
 Implementations receive the application context and a callable representing
 the remainder of the pipeline. They can short-circuit processing by returning
-a {@see \Response} directly, or continue by calling {@see $next()} and
+a [`Response`](Http_Response.md) directly, or continue by calling `$next()` and
 optionally modifying its result.
 
 ## 🚀 Public methods

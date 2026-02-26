@@ -40,7 +40,7 @@ class SyncRunner
             $parsed = $parser->parse();
 
             // 2. Resolve the table name and optional DB schema from the model
-            [$tableName, $modelSchema] = $this->resolveModelInfo($parsed->className);
+            [$tableName, $schema] = $this->resolveModelInfo($parsed->className);
 
             // 3. Get the database connection for the requested role
             $db = $this->dbManager->getOrDefault($dbRole);
@@ -49,7 +49,7 @@ class SyncRunner
             $provider = $this->buildProvider($db);
 
             // 5. Fetch table schema (schema param used by PostgreSQL, ignored by others)
-            $tableSchema = $provider->getTableSchema($tableName, $modelSchema);
+            $tableSchema = $provider->getTableSchema($tableName, $schema);
 
             // 6. Calculate diff
             $ops = $this->diff->diff($tableSchema, $parsed, $options);
@@ -126,9 +126,9 @@ class SyncRunner
     /**
      * Scaffold a new model file. Throws if the file already exists.
      *
-     * The generated class includes an explicit modelSource() override so the
+     * The generated class includes an explicit source() override so the
      * table name is always unambiguous to subsequent sync operations.
-     * If $schema is given, a modelSchema() override is also generated.
+     * If $schema is given, a schema() override is also generated.
      */
     public function createModelFile(
         string $filePath,
@@ -147,7 +147,7 @@ class SyncRunner
         }
 
         $schemaMethod = $schema !== null
-            ? "\n    public function modelSchema(): ?string { return '{$schema}'; }\n"
+            ? "\n    public function schema(): ?string { return '{$schema}'; }\n"
             : '';
 
         $content = <<<PHP
@@ -159,7 +159,7 @@ use Merlin\Mvc\Model;
 
 class {$className} extends Model
 {
-    public function modelSource(): string { return '{$tableName}'; }{$schemaMethod}
+    public function source(): string { return '{$tableName}'; }{$schemaMethod}
     // Properties will be added automatically by the sync task.
 }
 PHP;
@@ -185,7 +185,7 @@ PHP;
 
     /**
      * Instantiate the model class (without calling its constructor) and extract
-     * both the table name (modelSource) and the optional DB schema (modelSchema).
+     * both the table name (source) and the optional DB schema (schema).
      *
      * @return array{0: string, 1: ?string}  [$tableName, $schema]
      */
@@ -200,7 +200,7 @@ PHP;
             );
         }
 
-        return [$instance->modelSource(), $instance->modelSchema()];
+        return [$instance->source(), $instance->schema()];
     }
 
     private function buildProvider(Database $db): SchemaProvider

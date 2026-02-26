@@ -105,7 +105,7 @@ class Paginator
     public function execute($fetchMode = \PDO::FETCH_DEFAULT): array
     {
         // Count query
-        $this->totalItems = $this->builder->tally();
+        $this->totalItems = $this->builder->count();
         $this->totalPages = $this->pageSize ? (int) ceil($this->totalItems / $this->pageSize) : 1;
 
         $offset = ($this->page - 1) * $this->pageSize;

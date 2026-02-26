@@ -186,8 +186,8 @@ class Query extends Condition
 
         if ($this->model !== null) {
             return $this->isReadQuery
-                ? $this->model->modelReadConnection()
-                : $this->model->modelWriteConnection();
+                ? $this->model->readConnection()
+                : $this->model->writeConnection();
         }
 
         $role = $this->isReadQuery ? 'read' : 'write';
@@ -462,7 +462,10 @@ class Query extends Condition
             $conditions = $alias;
             $alias = null;
 
-        } elseif (\is_string($alias) && $this->looksLikeCondition($alias)) {
+        } elseif (
+            \is_string($alias) &&
+            preg_match('/[=<>!]| LIKE | IN | IS | BETWEEN /i', $alias)
+        ) {
             $conditions = $alias;
             $alias = null;
 
@@ -487,11 +490,6 @@ class Query extends Condition
         ];
 
         return $this;
-    }
-
-    private function looksLikeCondition(string $str): bool
-    {
-        return mb_eregi('[=<>!]| LIKE | IN | IS | BETWEEN ', $str);
     }
 
     /**
@@ -898,7 +896,7 @@ class Query extends Condition
      * @return int|string Number of matching rows or SQL string
      * @throws Exception
      */
-    public function tally(): int|string
+    public function count(): int|string
     {
         $this->isReadQuery = true;
         $db = $this->getDb();
@@ -1115,7 +1113,7 @@ class Query extends Condition
                 case 'pgsql':
                     if (empty($this->conflictTarget)) {
                         if (isset($this->model)) {
-                            $this->conflictTarget = $this->model->modelIdFields();
+                            $this->conflictTarget = $this->model->idFields();
                             if (empty($this->conflictTarget)) {
                                 throw new LogicException(
                                     "PostgreSQL requires a conflict target for UPSERT. No conflict target set and model does not define any ID fields."
@@ -1501,8 +1499,8 @@ class Query extends Condition
         } elseif (self::$useModels) {
             // Get table from model instance
             $model = self::getModel($modelName);
-            $table = $this->quoteIdentifier($model->modelSource());
-            $schema = $model->modelSchema();
+            $table = $this->quoteIdentifier($model->source());
+            $schema = $model->schema();
         } else {
             // Use model name as table name
             $items = explode('.', $modelName);

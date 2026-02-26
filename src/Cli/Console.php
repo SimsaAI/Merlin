@@ -6,12 +6,13 @@ use ReflectionClass;
 
 class Console
 {
-    protected array $namespaces = ['Merlin\\Cli\\Tasks'];
+    protected array $namespaces = ['Merlin\\Cli\\Tasks', 'App\\Tasks'];
     protected array $taskPaths = [];
     protected array $tasks = []; // taskName => class
     protected string $scriptName;
     protected bool $coerceParams = false;
-    protected bool $colors;
+    protected bool $useColors;
+    protected string $defaultAction = "indexAction";
 
     protected const ANSI = [
         'reset' => "\033[0m",
@@ -40,12 +41,20 @@ class Console
         'bg-cyan' => "\033[46m",
         'bg-white' => "\033[47m",
     ];
-    protected string $defaultAction = "indexAction";
+
+    protected $sectionStyles = ['bmagenta', '#e998ee'];
+    protected $taskStyles = ['bold', 'bgreen', '#21e194'];
+    protected $actionStyles = ['bcyan', 'bold', '#2cc4eb'];
+    protected $optionStyles = ['white', '#e7dbbd'];
+    protected $braceStyles = ['bold', 'bgreen', '#23D18B'];
+    protected $requiredArgStyles = ['white'];
+    protected $muteStyles = ['gray', '#a3a3a3'];
+    protected $commentStyles = ['gray', '#bdbdbd'];
 
     public function __construct(string $scriptName = null)
     {
         $this->scriptName = $scriptName ?? basename($_SERVER['argv'][0] ?? 'console.php');
-        $this->colors = $this->detectColorSupport();
+        $this->useColors = $this->detectColorSupport();
     }
 
     public function addNamespace(string $ns): void
@@ -109,14 +118,60 @@ class Console
      */
     public function enableColors(bool $colors): void
     {
-        $this->colors = $colors;
+        $this->useColors = $colors;
     }
 
     /** Check whether ANSI color output is enabled. */
     public function hasColors(): bool
     {
-        return $this->colors;
+        return $this->useColors;
     }
+
+    public function color(string|int $r, ?int $g = null, ?int $b = null, $background = false): string
+    {
+        if (!$this->useColors) {
+            return '';
+        }
+
+        $code = $background ? 48 : 38;
+
+        // Hex-Mode?
+        if ($g === null && $b === null) {
+            $hex = (string) $r;
+
+            if (str_starts_with($hex, 'bg:')) {
+                // Set Background explicitly
+                $code = 48;
+                $hex = substr($hex, 3);
+            } elseif (str_starts_with($hex, 'fg:')) {
+                // Set Foreground explicitly
+                $code = 38;
+                $hex = substr($hex, 3);
+            } elseif (str_starts_with($hex, "\033")) {
+                // Already an ANSI code
+                return $hex;
+            }
+
+            // Remove '#' character
+            $hex = ltrim($hex, '#');
+
+            // Short form #abc → #aabbcc
+            if (strlen($hex) === 3) {
+                $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+            }
+
+            if (strlen($hex) !== 6) {
+                return '';
+            }
+
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+
+        return "\033[{$code};2;{$r};{$g};{$b}m";
+    }
+
 
     /**
      * Apply one or more named ANSI styles to a string.
@@ -127,12 +182,12 @@ class Console
      */
     public function style(string $text, string ...$styles): string
     {
-        if (!$this->colors || empty($styles)) {
+        if (!$this->useColors || empty($styles)) {
             return $text;
         }
         $open = '';
         foreach ($styles as $s) {
-            $open .= self::ANSI[$s] ?? '';
+            $open .= self::ANSI[$s] ?? $this->color($s) ?: $s;
         }
         return $open . $text . self::ANSI['reset'];
     }
@@ -182,7 +237,7 @@ class Console
     /** Informational message (cyan). */
     public function info(string $text): void
     {
-        $this->writeln($this->style($text, 'cyan'));
+        $this->writeln($this->style($text, 'bcyan'));
     }
 
     // -------------------------------------------------------------------------
@@ -281,7 +336,9 @@ class Console
             ) {
                 $method = $this->defaultAction;
             } else {
-                echo "Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'.\n";
+                if (!empty($actionName)) {
+                    echo "Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'.\n";
+                }
                 $this->helpTask($taskKey);
                 return;
             }
@@ -475,7 +532,7 @@ class Console
         $short = preg_replace('/Task$/', '', $short);
         $parts = preg_split('/(?=[A-Z])/', $short, -1, PREG_SPLIT_NO_EMPTY);
         $parts = array_map(fn($p) => strtolower($p), $parts);
-        return $parts[0] ?? strtolower($short);
+        return implode('-', $parts) ?: strtolower($short);
     }
 
     protected function registerBuiltInHelp(): void
@@ -504,7 +561,7 @@ class Console
             $avail = max(10, $termWidth - $leftPad - $labelWidth - 1);
             $descLines = $this->wrapText($desc, $avail);
 
-            $labelStyled = $this->style(str_pad($name, $labelWidth), 'bcyan', 'bold');
+            $labelStyled = $this->style(str_pad($name, $labelWidth), ...$this->taskStyles);
             if (count($descLines) > 0 && $descLines[0] !== '') {
                 $this->writeln('  ' . $labelStyled . ' ' . $this->style($descLines[0], 'bold'));
             } else {
@@ -523,8 +580,8 @@ class Console
             foreach ($this->extractActionDescriptions($class) as $action => $actionDesc) {
                 if ($actionDesc === '') {
                     $this->writeln(
-                        $this->style('    ', 'dim')
-                        . $this->style('  ' . str_pad($action, $actionLabelInner), 'bgreen', 'bold')
+                        '    '
+                        . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     );
                     continue;
                 }
@@ -532,12 +589,12 @@ class Console
                 $actionLines = $this->wrapText($actionDesc, $actionAvail);
                 $first = array_shift($actionLines);
                 $this->writeln(
-                    $this->style('    ', 'dim')
-                    . $this->style('  ' . str_pad($action, $actionLabelInner), 'bgreen', 'bold')
+                    '    '
+                    . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     . ' ' . $this->style($first)
                 );
                 foreach ($actionLines as $ln) {
-                    $this->writeln($this->style('    ', 'dim') . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
+                    $this->writeln('    ' . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
                 }
             }
         }
@@ -556,13 +613,14 @@ class Console
         }
 
         $termWidth = $this->terminalWidth();
+        $sectionStyles = $this->sectionStyles;
 
         $ref = new ReflectionClass($class);
         $doc = $ref->getDocComment() ?: '';
         $info = static::parseDocComment($doc, $this->scriptName);
 
         $this->writeln();
-        $this->writeln($this->style('Task: ', 'green', 'bold') . $this->style($taskKey, 'bcyan', 'bold'));
+        $this->writeln($this->style('Task: ', ...$sectionStyles) . $this->style($taskKey, ...$this->taskStyles));
         //$this->writeln('      ' . $this->style(str_repeat('─', strlen($taskKey)), 'cyan'));
         $this->writeln();
         $this->writeln($info['description']);
@@ -572,29 +630,21 @@ class Console
         $actions = $this->extractActionDescriptions($class);
 
         if (!empty($actions)) {
-            $this->writeln($this->style('Actions:', 'bold', 'green'));
+            $this->writeln($this->style('Actions:', ...$sectionStyles));
 
             $actionLabelInner = 16;
             $leadingSpaces = 2; // two leading spaces before task
             // description starts after: leading + task + ' ' + actionLabel + ' '
-            $descStartCol = $leadingSpaces + strlen($taskKey) + 1 + $actionLabelInner + 1;
+            $descStartCol = $leadingSpaces + $actionLabelInner + 1;
             $actionAvail = max(10, $termWidth - $descStartCol);
 
-            $addNewLine = false;
             foreach ($actions as $action => $actionDesc) {
-                if ($addNewLine) {
-                    $this->writeln();
-                } else {
-                    $addNewLine = true;
-                }
                 $lines = $this->wrapText($actionDesc, $actionAvail);
                 $first = array_shift($lines);
 
                 $this->writeln(
                     str_repeat(' ', $leadingSpaces)
-                    . $this->style($taskKey, 'white', 'bold')
-                    . ' '
-                    . $this->style(str_pad($action, $actionLabelInner), 'bcyan', 'bold')
+                    . $this->style(str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     . ($first !== '' ? ' ' . $this->style($first) : '')
                 );
 
@@ -608,24 +658,22 @@ class Console
             $this->writeln();
         }
 
-        $this->writeln($this->style('Usage:', 'bold', 'green'));
+        $this->writeln($this->style('Usage:', ...$sectionStyles));
         $actionsList = implode('|', array_keys($actions)) ?: '<action>';
-        $this->writeln('  ' . $this->style('php ' . $this->scriptName, 'dim') . ' ' . $this->style($taskKey, 'white', 'bold') . ' ' . $this->style($actionsList, 'bcyan', 'bold') . ' [args...]');
+        $this->writeln('  ' . $this->style('php ' . $this->scriptName, ...$this->muteStyles) . ' ' . $this->style($taskKey, ...$this->taskStyles) . ' ' . $this->style($actionsList, ...$this->actionStyles) . ' [args...]');
         if ($info['usage']) {
             $this->renderUsageBlock($info['usage'], $taskKey, $termWidth);
         }
         $this->writeln();
 
         if ($info['options']) {
-            $this->writeln($this->style('Options:', 'bold', 'yellow'));
-            foreach (explode("\n", $info['options']) as $l) {
-                $this->writeln($this->style($l, 'gray'));
-            }
+            $this->writeln($this->style('Options:', ...$sectionStyles));
+            $this->renderOptionsBlock($info['options'], $termWidth);
             $this->writeln();
         }
 
         if ($info['examples']) {
-            $this->writeln($this->style('Examples:', 'bold', 'green'));
+            $this->writeln($this->style('Examples:', ...$sectionStyles));
             foreach (explode("\n", $info['examples']) as $l) {
                 $this->writeln($this->highlightCommandLine($l, $taskKey));
             }
@@ -650,7 +698,7 @@ class Console
      */
     protected function highlightCommandLine(string $line, ?string $taskName = null): string
     {
-        if (!$this->colors) {
+        if (!$this->useColors) {
             return $line;
         }
 
@@ -685,7 +733,7 @@ class Console
             }
 
             if ($inComment) {
-                $result .= $this->style($part, 'gray');
+                $result .= $this->style($part, ...$this->commentStyles);
                 continue;
             }
 
@@ -696,17 +744,17 @@ class Console
             // Comment marker
             if ($part[0] === '#') {
                 $inComment = true;
-                $result .= $this->style($part, 'gray');
+                $result .= $this->style($part, ...$this->commentStyles);
                 $wordIndex++;
                 continue;
             }
 
             if ($isCommand) {
                 $result .= match ($wordIndex) {
-                    0 => $this->style($part, 'dim'),                   // php
-                    1 => $this->style($part, 'dim'),                   // script
-                    2 => $this->style($part, 'bold', 'white'),         // task
-                    3 => $this->style($part, 'bold', 'bcyan'),         // action
+                    0 => $this->style($part, ...$this->muteStyles),                   // php
+                    1 => $this->style($part, ...$this->muteStyles),                   // script
+                    2 => $this->style($part, ...$this->taskStyles),         // task
+                    3 => $this->style($part, ...$this->actionStyles),         // action
                     default => $this->highlightCliToken($part),
                 };
             } else {
@@ -731,14 +779,14 @@ class Console
         // [--option], [--key=<val>], [<placeholder>] …
         if ($token[0] === '[' && str_ends_with($token, ']')) {
             $inner = substr($token, 1, -1);
-            return $this->style('[', 'bmagenta')
+            return $this->style('[', ...$this->braceStyles)
                 . $this->highlightCliToken($inner)
-                . $this->style(']', 'bmagenta');
+                . $this->style(']', ...$this->braceStyles);
         }
 
         // <placeholder> or <a|b|c>
         if ($token[0] === '<' && str_ends_with($token, '>')) {
-            return $this->style($token, 'white');
+            return $this->style($token, ...$this->requiredArgStyles);
         }
 
         // --flag or --key=<val> or --key=literal
@@ -746,16 +794,16 @@ class Console
             if (str_contains($token, '=')) {
                 [$flag, $val] = explode('=', $token, 2);
                 $coloredVal = ($val !== '' && $val[0] === '<')
-                    ? $this->style($val, 'white')
+                    ? $this->style($val, ...$this->requiredArgStyles)
                     : $this->style($val, 'white');
-                return $this->style($flag . '=', 'bmagenta') . $coloredVal;
+                return $this->style($flag, ...$this->optionStyles) . $this->style('=', 'gray') . $coloredVal;
             }
-            return $this->style($token, 'bmagenta');
+            return $this->style($token, ...$this->optionStyles);
         }
 
         // short option -f
         if (strlen($token) >= 2 && $token[0] === '-') {
-            return $this->style($token, 'bmagenta');
+            return $this->style($token, ...$this->optionStyles);
         }
 
         // Plain positional argument (e.g. src/Models, User.php)
@@ -950,6 +998,7 @@ class Console
     {
         $doc = trim(preg_replace('/^\/\*\*|\*\/$/', '', $doc));
         $doc = preg_replace('/^\s*\*\s?/m', '', $doc);
+        $doc = preg_replace('/^\s*[\w-]+\.php/', $scriptName, $doc);
         $doc = str_replace('console.php', $scriptName, $doc);
         $sections = ['description' => '', 'usage' => '', 'options' => '', 'examples' => '',];
         $current = 'description';
@@ -1137,7 +1186,7 @@ class Console
                     $this->writeln();
                     $addEmptyLine = false;
                 }
-                $this->writeln(str_repeat(' ', $leadingSpaces) . $this->style($item['text'], 'dim'));
+                $this->writeln(str_repeat(' ', $leadingSpaces) . $this->style($item['text'], ...$this->commentStyles));
                 continue;
             }
 
@@ -1149,14 +1198,14 @@ class Console
             foreach ($item['leftParts'] as $i => $tok) {
                 if ($item['isPhp']) {
                     $leftStyled[] = match ($i) {
-                        0, 1 => $this->style($tok, 'dim'),
-                        2 => $this->style($tok, 'bold', 'white'),
-                        default => $this->style($tok, 'bold', 'bcyan'),
+                        0, 1 => $this->style($tok, ...$this->muteStyles),
+                        2 => $this->style($tok, ...$this->taskStyles),
+                        default => $this->style($tok, ...$this->actionStyles),
                     };
                 } else {
                     $leftStyled[] = $i === 0
-                        ? $this->style($tok, 'bold', 'white')
-                        : $this->style($tok, 'bold', 'bcyan');
+                        ? $this->style($tok, ...$this->taskStyles)
+                        : $this->style($tok, ...$this->actionStyles);
                 }
             }
 
@@ -1173,6 +1222,75 @@ class Console
             );
             foreach ($argLines as $al) {
                 $this->writeln($contIndent . $this->highlightCommandLine($al));
+            }
+        }
+    }
+
+    /**
+     * Parse and render an Options block:
+     *  - Lines starting with '-' open a new option entry (token + description split at 2+ spaces).
+     *  - All other non-blank lines are treated as continuation text of the current option.
+     *  - All option names are left-aligned to the longest token; descriptions are word-wrapped.
+     *  - The option token is coloured via highlightCliToken(); descriptions are rendered in gray.
+     */
+    protected function renderOptionsBlock(string $optionsText, int $termWidth): void
+    {
+        // ── Pass 1: parse into token => full-description pairs ───────────────
+        $options = [];
+        $currentToken = null;
+
+        foreach (explode("\n", $optionsText) as $line) {
+            $trim = trim($line);
+            if ($trim === '') {
+                continue;
+            }
+            if (str_starts_with($trim, '-')) {
+                // New option line – split at first run of 2+ spaces
+                $parts = preg_split('/\s{2,}/', $trim, 2);
+                $currentToken = $parts[0];
+                $options[$currentToken] = isset($parts[1]) ? trim($parts[1]) : '';
+            } elseif ($currentToken !== null) {
+                // Continuation line – join into description
+                $options[$currentToken] .= ' ' . $trim;
+            }
+        }
+
+        if (empty($options)) {
+            return;
+        }
+
+        // ── Pass 2: find max token length for alignment ──────────────────────
+        $maxTokenLen = 0;
+        foreach (array_keys($options) as $token) {
+            $maxTokenLen = max($maxTokenLen, strlen($token));
+        }
+
+        // ── Pass 3: render ───────────────────────────────────────────────────
+        $leadingSpaces = 2;
+        $gap = 2;
+        $descStartCol = $leadingSpaces + $maxTokenLen + $gap;
+        $descAvail = max(10, $termWidth - $descStartCol);
+        $contIndent = str_repeat(' ', $descStartCol);
+
+        foreach ($options as $token => $description) {
+            $coloredToken = $this->highlightCliToken($token);
+            $padding = str_repeat(' ', $maxTokenLen - strlen($token) + $gap);
+
+            if ($description === '') {
+                $this->writeln(str_repeat(' ', $leadingSpaces) . $coloredToken);
+                continue;
+            }
+
+            $lines = $this->wrapText($description, $descAvail);
+            $first = array_shift($lines);
+            $this->writeln(
+                str_repeat(' ', $leadingSpaces)
+                . $coloredToken
+                . $padding
+                . $this->style($first, 'white')
+            );
+            foreach ($lines as $ln) {
+                $this->writeln($contIndent . $this->style($ln, 'white'));
             }
         }
     }

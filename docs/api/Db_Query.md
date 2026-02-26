@@ -420,7 +420,7 @@ Add a JOIN clause to the query
 
 ---
 
-### orderBy() · [source](../../src/Db/Query.php#L502)
+### orderBy() · [source](../../src/Db/Query.php#L500)
 
 `public function orderBy(array|string $orderBy): static`
 
@@ -439,7 +439,7 @@ Set ORDER BY clause
 
 ---
 
-### bind() · [source](../../src/Db/Query.php#L515)
+### bind() · [source](../../src/Db/Query.php#L513)
 
 `public function bind(object|array $bindParams): static`
 
@@ -458,7 +458,7 @@ Bind parameters for prepared statements. Can be either an associative array or a
 
 ---
 
-### returnSql() · [source](../../src/Db/Query.php#L529)
+### returnSql() · [source](../../src/Db/Query.php#L527)
 
 `public function returnSql(bool $returnSql = true): static`
 
@@ -477,7 +477,7 @@ Set whether to return the SQL string instead of executing the query
 
 ---
 
-### distinct() · [source](../../src/Db/Query.php#L544)
+### distinct() · [source](../../src/Db/Query.php#L542)
 
 `public function distinct(bool $distinct): static`
 
@@ -496,7 +496,7 @@ Set DISTINCT modifier for SELECT queries
 
 ---
 
-### injectBeforeColumns() · [source](../../src/Db/Query.php#L555)
+### injectBeforeColumns() · [source](../../src/Db/Query.php#L553)
 
 `public function injectBeforeColumns(string $inject): static`
 
@@ -515,7 +515,7 @@ Set a string to be injected before the column list in SELECT queries (e.g. for S
 
 ---
 
-### groupBy() · [source](../../src/Db/Query.php#L566)
+### groupBy() · [source](../../src/Db/Query.php#L564)
 
 `public function groupBy(array|string $groupBy): static`
 
@@ -534,7 +534,7 @@ Set GROUP BY clause
 
 ---
 
-### forUpdate() · [source](../../src/Db/Query.php#L579)
+### forUpdate() · [source](../../src/Db/Query.php#L577)
 
 `public function forUpdate(bool $forUpdate): static`
 
@@ -553,7 +553,7 @@ Sets a FOR UPDATE clause (MySQL/PostgreSQL) or FOR SHARE (PostgreSQL)
 
 ---
 
-### sharedLock() · [source](../../src/Db/Query.php#L590)
+### sharedLock() · [source](../../src/Db/Query.php#L588)
 
 `public function sharedLock(bool $sharedLock): static`
 
@@ -572,7 +572,7 @@ Sets a LOCK IN SHARE MODE / FOR SHARE clause (MySQL/PostgreSQL)
 
 ---
 
-### replace() · [source](../../src/Db/Query.php#L605)
+### replace() · [source](../../src/Db/Query.php#L603)
 
 `public function replace(bool $replace = true): static`
 
@@ -591,7 +591,7 @@ Mark this as a REPLACE INTO operation (MySQL/SQLite)
 
 ---
 
-### ignore() · [source](../../src/Db/Query.php#L616)
+### ignore() · [source](../../src/Db/Query.php#L614)
 
 `public function ignore(bool $ignore = true): static`
 
@@ -610,7 +610,7 @@ Set IGNORE modifier for INSERT (MySQL/SQLite) or ON CONFLICT DO NOTHING (Postgre
 
 ---
 
-### updateValues() · [source](../../src/Db/Query.php#L630)
+### updateValues() · [source](../../src/Db/Query.php#L628)
 
 `public function updateValues(array $updateValues, bool $escape = true): static`
 
@@ -632,7 +632,7 @@ Set values for ON CONFLICT/ON DUPLICATE KEY UPDATE clause. Can be either:
 
 ---
 
-### conflict() · [source](../../src/Db/Query.php#L661)
+### conflict() · [source](../../src/Db/Query.php#L659)
 
 `public function conflict(array|string $columnsOrConstraint): static`
 
@@ -653,7 +653,7 @@ Set conflict target for ON CONFLICT clause (PostgreSQL). Can be either:
 
 ---
 
-### returning() · [source](../../src/Db/Query.php#L673)
+### returning() · [source](../../src/Db/Query.php#L671)
 
 `public function returning(array|string|null $columns): static`
 
@@ -676,7 +676,7 @@ Set columns to return from an INSERT/UPDATE/DELETE query. Supported by PostgreSQ
 
 ---
 
-### toSql() · [source](../../src/Db/Query.php#L694)
+### toSql() · [source](../../src/Db/Query.php#L692)
 
 `public function toSql(): string`
 
@@ -693,7 +693,7 @@ Compile and return the SQL string for this query without executing it
 
 ---
 
-### select() · [source](../../src/Db/Query.php#L708)
+### select() · [source](../../src/Db/Query.php#L706)
 
 `public function select(array|string|null $columns = null): Merlin\Db\ResultSet|string`
 
@@ -716,7 +716,7 @@ Execute SELECT query and return ResultSet or return SQL string if returnSql is e
 
 ---
 
-### first() · [source](../../src/Db/Query.php#L733)
+### first() · [source](../../src/Db/Query.php#L731)
 
 `public function first(): Merlin\Mvc\Model|string|null`
 
@@ -734,7 +734,7 @@ Execute SELECT query and return first model or null or return SQL string if retu
 
 ---
 
-### insert() · [source](../../src/Db/Query.php#L748)
+### insert() · [source](../../src/Db/Query.php#L746)
 
 `public function insert(array|null $data = null): Merlin\Db\ResultSet|array|string|bool`
 
@@ -758,7 +758,7 @@ Execute INSERT or UPSERT query or return SQL string if returnSql is enabled
 
 ---
 
-### upsert() · [source](../../src/Db/Query.php#L759)
+### upsert() · [source](../../src/Db/Query.php#L757)
 
 `public function upsert(array|null $data = null): Merlin\Db\ResultSet|array|string|bool`
 
@@ -782,7 +782,7 @@ Execute UPSERT query (INSERT with ON CONFLICT/ON DUPLICATE KEY UPDATE) or return
 
 ---
 
-### update() · [source](../../src/Db/Query.php#L798)
+### update() · [source](../../src/Db/Query.php#L796)
 
 `public function update(array|null $data = null): Merlin\Db\ResultSet|array|string|int`
 
@@ -806,7 +806,7 @@ Execute UPDATE query or return SQL string if returnSql is enabled
 
 ---
 
-### delete() · [source](../../src/Db/Query.php#L828)
+### delete() · [source](../../src/Db/Query.php#L826)
 
 `public function delete(): Merlin\Db\ResultSet|array|string|int`
 
@@ -824,7 +824,7 @@ Execute DELETE query
 
 ---
 
-### truncate() · [source](../../src/Db/Query.php#L853)
+### truncate() · [source](../../src/Db/Query.php#L851)
 
 `public function truncate(): string|int`
 
@@ -842,7 +842,7 @@ Execute TRUNCATE query or return SQL string if returnSql is enabled
 
 ---
 
-### exists() · [source](../../src/Db/Query.php#L874)
+### exists() · [source](../../src/Db/Query.php#L872)
 
 `public function exists(): string|bool`
 
@@ -859,9 +859,9 @@ Check if any rows exist matching the query
 
 ---
 
-### tally() · [source](../../src/Db/Query.php#L901)
+### count() · [source](../../src/Db/Query.php#L899)
 
-`public function tally(): string|int`
+`public function count(): string|int`
 
 Count rows matching the query
 
@@ -877,7 +877,7 @@ Count rows matching the query
 
 ---
 
-### getBindings() · [source](../../src/Db/Query.php#L1609)
+### getBindings() · [source](../../src/Db/Query.php#L1607)
 
 `public function getBindings(): array`
 
@@ -890,7 +890,7 @@ Get bind parameters
 
 ---
 
-### paginate() · [source](../../src/Db/Query.php#L1621)
+### paginate() · [source](../../src/Db/Query.php#L1619)
 
 `public function paginate(int $page = 1, int $pageSize = 30, bool $reverse = false): Merlin\Db\Paginator`
 
@@ -911,7 +911,7 @@ Create a paginator for the current query
 
 ---
 
-### getRowCount() · [source](../../src/Db/Query.php#L1660)
+### getRowCount() · [source](../../src/Db/Query.php#L1658)
 
 `public function getRowCount(): int`
 

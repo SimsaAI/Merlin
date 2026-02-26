@@ -4,7 +4,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Router.php#L33)
+### __construct() · [source](../../src/Mvc/Router.php#L31)
 
 `public function __construct(): mixed`
 
@@ -17,7 +17,7 @@ Create a new Router instance.
 
 ---
 
-### addType() · [source](../../src/Mvc/Router.php#L65)
+### addType() · [source](../../src/Mvc/Router.php#L63)
 
 `public function addType(string $name, callable $validator): static`
 
@@ -47,7 +47,7 @@ $router->add('GET', '/blog/{slug:slug}', 'Blog::view');
 
 ---
 
-### add() · [source](../../src/Mvc/Router.php#L79)
+### add() · [source](../../src/Mvc/Router.php#L77)
 
 `public function add(array|string|null $method, string $pattern, array|string|null $handler = null): static`
 
@@ -69,7 +69,7 @@ Add a new route to the router. The route can be defined for specific HTTP method
 
 ---
 
-### setName() · [source](../../src/Mvc/Router.php#L150)
+### setName() · [source](../../src/Mvc/Router.php#L148)
 
 `public function setName(string $name): static`
 
@@ -93,7 +93,7 @@ Assign a name to the most recently added route. This allows you to generate URLs
 
 ---
 
-### hasNamedRoute() · [source](../../src/Mvc/Router.php#L169)
+### hasNamedRoute() · [source](../../src/Mvc/Router.php#L167)
 
 `public function hasNamedRoute(string $name): bool`
 
@@ -113,7 +113,7 @@ Check if a named route exists.
 
 ---
 
-### urlFor() · [source](../../src/Mvc/Router.php#L183)
+### urlFor() · [source](../../src/Mvc/Router.php#L181)
 
 `public function urlFor(string $name, array $params = [], array $query = []): string`
 
@@ -139,7 +139,7 @@ Generate a URL for a named route, substituting parameters as needed.
 
 ---
 
-### prefix() · [source](../../src/Mvc/Router.php#L210)
+### prefix() · [source](../../src/Mvc/Router.php#L208)
 
 `public function prefix(string $prefix, callable $callback): void`
 
@@ -168,7 +168,7 @@ $router->prefix('/admin', function($r) {
 
 ---
 
-### middleware() · [source](../../src/Mvc/Router.php#L232)
+### middleware() · [source](../../src/Mvc/Router.php#L230)
 
 `public function middleware(array|string $name, callable $callback): void`
 
@@ -197,7 +197,7 @@ $router->middleware('auth', function($r) {
 
 ---
 
-### namespace() · [source](../../src/Mvc/Router.php#L262)
+### namespace() · [source](../../src/Mvc/Router.php#L260)
 
 `public function namespace(string $namespace, callable $callback): void`
 
@@ -226,7 +226,7 @@ $router->namespace('Admin', function($r) {
 
 ---
 
-### controller() · [source](../../src/Mvc/Router.php#L287)
+### controller() · [source](../../src/Mvc/Router.php#L285)
 
 `public function controller(string $controller, callable $callback): void`
 
@@ -255,7 +255,7 @@ $router->controller('Admin', function($r) {
 
 ---
 
-### match() · [source](../../src/Mvc/Router.php#L521)
+### match() · [source](../../src/Mvc/Router.php#L519)
 
 `public function match(string $uri, string $method = 'GET'): array|null`
 

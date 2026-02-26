@@ -201,7 +201,7 @@ Get first model or object from result set.
 
 Get all remaining rows hydrated as model instances.
 
-Calls {@see \nextModel()} repeatedly until the result set is exhausted.
+Calls `nextModel()` repeatedly until the result set is exhausted.
 Returns an empty array when no model class was provided at construction.
 
 **➡️ Return value**

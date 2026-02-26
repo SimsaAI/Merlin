@@ -15,8 +15,6 @@ class Router
     protected const KIND_REGEX = 5;
     protected const KIND_REGEX_OPT = 6;
 
-
-
     protected array $static = [];   // [method][path] => ['handler'=>..., 'namespace'=>...]
     protected array $groups = [];   // [method][firstSegment] => [route, ...]
     protected array $types = [];    // type validators
@@ -450,7 +448,7 @@ class Router
                         throw new RuntimeException("Route parameter '$name' does not match type '$type'");
                     }
                 } else {
-                    if (!mb_ereg('^' . $type . '$', $value)) {
+                    if (!preg_match('/^' . $type . '$/', $value)) {
                         throw new RuntimeException("Route parameter '$name' does not match regex '$type'");
                     }
                 }
@@ -473,7 +471,7 @@ class Router
                         throw new RuntimeException("Route parameter '$name' does not match type '$type'");
                     }
                 } else {
-                    if (!mb_ereg('^' . $type . '$', $value)) {
+                    if (!preg_match('/^' . $type . '$/', $value)) {
                         throw new RuntimeException("Route parameter '$name' does not match regex '$type'");
                     }
                 }

@@ -176,7 +176,7 @@ class AddAccessor extends DiffOperation
 {
     /** PHP type string including nullability, e.g. 'string', '?int' */
     public string $phpType;
-    /** Camelized method name, e.g. 'userId' */
+    /** Base camelized name used to build getX() / setX() accessors, e.g. 'userId' → getUserId() / setUserId() */
     public string $methodName;
     /** Visibility modifier: 'public', 'protected', or 'private' */
     public string $visibility = 'public';

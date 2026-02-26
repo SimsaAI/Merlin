@@ -25,7 +25,7 @@ abstract class Model
 	 * short class name (without namespace) from CamelCase to snake_case and applies pluralization if enabled (e.g. User → users, AdminUser → admin_users, Person → people).
 	 * Override this method if you want to specify a custom source.
 	 */
-	public function modelSource(): string
+	public function source(): string
 	{
 		if (isset($this->__sourceCache)) {
 			return $this->__sourceCache;
@@ -47,7 +47,7 @@ abstract class Model
 	 * Return the database schema for this model, if applicable. By default, it returns null.
 	 * Override this method if you want to specify a schema (e.g. for PostgreSQL).
 	 */
-	public function modelSchema(): ?string
+	public function schema(): ?string
 	{
 		return null;
 	}
@@ -57,7 +57,7 @@ abstract class Model
 	 * Override this method if your model has a different primary key or composite keys.
 	 * @return array List of primary key field names
 	 */
-	public function modelIdFields(): array
+	public function idFields(): array
 	{
 		return ['id'];
 	}
@@ -75,7 +75,7 @@ abstract class Model
 	public static function query(?string $alias = null): Query
 	{
 		$instance = new static();
-		return Query::new($instance->modelReadConnection())
+		return Query::new($instance->readConnection())
 			->table(static::class, $alias);
 	}
 
@@ -171,7 +171,7 @@ abstract class Model
 		$instance = new static();
 		$builder = static::query();
 
-		$idFields = $instance->modelIdFields();
+		$idFields = $instance->idFields();
 
 		if (\is_array($id)) {
 			if (\count($id) !== \count($idFields)) {
@@ -258,17 +258,17 @@ abstract class Model
 	}
 
 	/**
-	 * Count the number of models matching the given conditions. Returns the count as an integer. tally() is an alias for count() to avoid collision with database fields named "count".
+	 * Count the number of models matching the given conditions. Returns the count as an integer. count() is an alias for count() to avoid collision with database fields named "count".
 	 * @param array $conditions Associative array of field conditions to count
 	 * @return int The count of matching models
 	 */
-	public static function tally(array $conditions = []): int
+	public static function count(array $conditions = []): int
 	{
 		$builder = static::query();
 		foreach ($conditions as $field => $value) {
 			$builder->where($field, $value);
 		}
-		return $builder->tally();
+		return $builder->count();
 	}
 
 	/* -------------------------------------------------------------
@@ -382,7 +382,7 @@ abstract class Model
 			return false;
 		}
 
-		$idFields = $this->modelIdFields();
+		$idFields = $this->idFields();
 		$hasAllIds = true;
 
 		foreach ($idFields as $field) {
@@ -430,7 +430,7 @@ abstract class Model
 
 	protected function __performUpdate(array $values): bool
 	{
-		foreach ($this->modelIdFields() as $field) {
+		foreach ($this->idFields() as $field) {
 			unset($values[$field]);
 		}
 
@@ -439,7 +439,7 @@ abstract class Model
 		}
 
 		$builder = static::query();
-		foreach ($this->modelIdFields() as $field) {
+		foreach ($this->idFields() as $field) {
 			if (!isset($this->$field)) {
 				throw new Exception("ID field '$field' not set");
 			}
@@ -455,7 +455,7 @@ abstract class Model
 	{
 		$excluded = self::__getExcludedProperties();
 
-		$idFields = $this->modelIdFields();
+		$idFields = $this->idFields();
 		$missingMap = [];
 		foreach ($idFields as $field) {
 			$missingMap[$field] = true;
@@ -479,7 +479,7 @@ abstract class Model
 			$builder->conflict($idFields);
 		}
 
-		$db = $this->modelWriteConnection();
+		$db = $this->writeConnection();
 
 		if ($db->getDriver() === 'pgsql') {
 			$result = $builder->returning(['*'])->insert($values);
@@ -514,7 +514,7 @@ abstract class Model
 	public function delete(): bool
 	{
 		$builder = static::query();
-		foreach ($this->modelIdFields() as $field) {
+		foreach ($this->idFields() as $field) {
 			if (!isset($this->$field)) {
 				throw new Exception("ID field '$field' not set");
 			}
@@ -589,7 +589,7 @@ abstract class Model
 	 *
 	 * @return \Merlin\Db\Database
 	 */
-	public function modelReadConnection(): Database
+	public function readConnection(): Database
 	{
 		$role = $this->__connectionRole('read');
 		return AppContext::instance()->dbManager()->getOrDefault($role);
@@ -602,7 +602,7 @@ abstract class Model
 	 *
 	 * @return \Merlin\Db\Database
 	 */
-	public function modelWriteConnection(): Database
+	public function writeConnection(): Database
 	{
 		$role = $this->__connectionRole('write');
 		return AppContext::instance()->dbManager()->getOrDefault($role);

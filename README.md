@@ -52,7 +52,6 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
   - Rich color output and styled help pages
   - Option parsing and argument separation
   - Built-in help and task listing
-- **Tasks** - Structured CLI commands with parameter parsing
 - **Sync Task** - built-in sync task for generating/applying model and schema changes
 
 ### Additional Features
@@ -189,7 +188,7 @@ $newUser->save();
 $newUser->delete();
 
 // Count records
-$count = User::tally(['status' => 'active']);
+$count = User::count(['status' => 'active']);
 
 // Check existence
 $exists = User::exists(['email' => 'john@example.com']);
@@ -245,10 +244,38 @@ $results = Order::query('o')
     ->having('COUNT(*) >', 5)
     ->select([
         'u.username',
-        Sql::expr('COUNT(*)')->as('order_count'),
+        Sql::raw('COUNT(*)')->as('order_count'),
         Sql::func('SUM', 'o.total')->as('total_spent'),
         $latestOrder,
     ]);
+```
+
+#### Subqueries as Sources
+
+A `Query` instance can be passed directly to `->from()` or to any join method (`->join()`, `->leftJoin()`, `->innerJoin()`, `->rightJoin()`, `->crossJoin()`). The subquery is wrapped in parentheses automatically and its bind parameters are propagated to the outer query — no manual merging required.
+
+```php
+use Merlin\Db\Query;
+
+// Build the subquery independently
+$completedOrders = Order::query()
+    ->where('status', 'completed')
+    ->where('created_at > :since', ['since' => '2025-01-01'])
+    ->groupBy('user_id')
+    ->columns(['user_id', 'SUM(total) AS total_spent']);
+
+// Use it as a derived table with ->from()
+$topBuyers = Query::new()
+    ->from($completedOrders, 'co')
+    ->where('co.total_spent >', 500)
+    ->orderBy('co.total_spent DESC')
+    ->select();
+
+// Or join it alongside another table
+$report = User::query()
+    ->leftJoin($completedOrders, 'co', 'co.user_id = u.id')
+    ->columns(['u.username', 'co.total_spent'])
+    ->select();
 ```
 
 #### Using the Query Builder Directly on Tables
@@ -276,34 +303,46 @@ $results = Query::new()
     ]);
 ```
 
-#### Subqueries as Table Sources
+#### Using ModelMapping for Dynamic Model References
 
-A `Query` instance can be passed directly to `->from()` or to any join method (`->join()`, `->leftJoin()`, `->innerJoin()`, `->rightJoin()`, `->crossJoin()`). The subquery is wrapped in parentheses automatically and its bind parameters are propagated to the outer query — no manual merging required.
+`ModelMapping` allows you to refer to models in queries without creating actual PHP model classes. This is useful when you want the convenience of model names in your queries but don't need the full Active Record functionality.
+
+Set up a `ModelMapping` to map model names to their source tables and optional schemas:
 
 ```php
 use Merlin\Db\Query;
+use Merlin\Mvc\ModelMapping;
 
-// Build the subquery independently
-$completedOrders = Query::new()
-    ->table('orders')
-    ->where('status', 'completed')
-    ->where('created_at > :since', ['since' => '2025-01-01'])
-    ->groupBy('user_id')
-    ->columns(['user_id', 'SUM(total) AS total_spent']);
+// Create model mappings
+$mapping = ModelMapping::fromArray([
+    'User' => 'users',                    // simple: "Model" => "table"
+    'Order' => ['source' => 'orders', 'schema' => 'public'],  // with schema
+    'Product' => ['source' => 'products'],
+]);
 
-// Use it as a derived table with ->from()
-$topBuyers = Query::new()
-    ->from($completedOrders, 'co')
-    ->where('co.total_spent >', 500)
-    ->orderBy('co.total_spent DESC')
+// Register the mapping globally
+Query::setModelMapping($mapping);
+Query::useModels(true);
+
+// Now you can reference models by name in queries
+$results = Query::new()
+    ->from('User', 'u')
+    ->join('Order', 'o', 'u.id = o.user_id')
+    ->where('o.status', 'completed')
+    ->columns(['u.username', 'o.id', 'o.total'])
     ->select();
+```
 
-// Or join it alongside another table
-$report = Query::new()
-    ->table('users', 'u')
-    ->leftJoin($completedOrders, 'co', 'co.user_id = u.id')
-    ->columns(['u.username', 'co.total_spent'])
-    ->select();
+You can also enable automatic table name pluralization for models:
+
+```php
+ModelMapping::usePluralTableNames(true);
+
+// Now "User" automatically maps to "users", "Order" to "orders", etc.
+// (without needing explicit mappings for every model)
+$mapping = ModelMapping::fromArray([
+    'User' => true,    // uses auto-pluralized table name
+]);
 ```
 
 ### CLI Tasks
@@ -345,7 +384,7 @@ class DatabaseTask extends Task
 {
     public function migrateAction(string $target = 'latest'): void
     {
-        $direction = $this->opt('direction', 'up');
+        $direction = $this->option('direction', 'up');
         $this->info("Migrating {$direction} to {$target}…");
         // migration logic here
         $this->success("Done.");
@@ -357,21 +396,9 @@ class DatabaseTask extends Task
 
 ```bash
 php console.php database migrate latest --direction=down
-php console.php help               # color overview with all tasks and actions
-php console.php help database      # color detail page for one task
+php console.php help               # overview with all tasks and actions
+php console.php help database      # detail page for one task
 ```
-
-**Task output helpers** (all ANSI-colored when the terminal supports it):
-
-| Method                                | Color                 |
-| ------------------------------------- | --------------------- |
-| `$this->line($text)`                  | plain                 |
-| `$this->info($text)`                  | cyan                  |
-| `$this->success($text)`               | bright green          |
-| `$this->warn($text)`                  | bright yellow         |
-| `$this->error($text)`                 | bright red prefix     |
-| `$this->muted($text)`                 | gray                  |
-| `$this->style($text, 'bold', 'cyan')` | arbitrary ANSI styles |
 
 ## Project Structure
 
@@ -510,7 +537,7 @@ Check out the `examples/` directory for complete working examples:
 
 - **[AdvancedQueryBuilderExample.php](examples/AdvancedQueryBuilderExample.php)** - Complex queries with joins, subqueries, window functions, and aggregations. Perfect for learning sophisticated query patterns.
 - **[CompositeKeyExamples.php](examples/CompositeKeyExamples.php)** - Working with models that have composite primary keys, such as many-to-many junction tables and multi-tenant databases.
-- **[ModelLoadMethodsExample.php](examples/ModelLoadMethodsExample.php)** - Using convenience methods like `find()`, `findOne()`, `findAll()`, `exists()`, and `tally()` for retrieving model data.
+- **[ModelLoadMethodsExample.php](examples/ModelLoadMethodsExample.php)** - Using convenience methods like `find()`, `findOne()`, `findAll()`, `exists()`, and `count()` for retrieving model data.
 - **[ReadWriteConnectionExample.php](examples/ReadWriteConnectionExample.php)** - Setting up separate read and write database connections for master/replica configurations and improved scalability.
 - **[SaveCreateUpdateExample.php](examples/SaveCreateUpdateExample.php)** - Complete CRUD operations including `create()`, `update()`, `save()`, `delete()`, and tracking changes with `hasChanged()`.
 - **[SqlNodeExample.php](examples/SqlNodeExample.php)** - Advanced SQL expressions using the `Sql` class for raw SQL, functions, subqueries, and complex conditions within the query builder.

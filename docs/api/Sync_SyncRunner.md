@@ -91,9 +91,9 @@ Return all table names in the database for the given role and optional schema.
 
 Scaffold a new model file. Throws if the file already exists.
 
-The generated class includes an explicit modelSource() override so the
+The generated class includes an explicit source() override so the
 table name is always unambiguous to subsequent sync operations.
-If $schema is given, a modelSchema() override is also generated.
+If $schema is given, a schema() override is also generated.
 
 **🧭 Parameters**
 

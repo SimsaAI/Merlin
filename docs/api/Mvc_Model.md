@@ -4,9 +4,9 @@
 
 ## 🚀 Public methods
 
-### modelSource() · [source](../../src/Mvc/Model.php#L28)
+### source() · [source](../../src/Mvc/Model.php#L28)
 
-`public function modelSource(): string`
+`public function source(): string`
 
 Return the table or view name for this model. By default, it converts the
 short class name (without namespace) from CamelCase to snake_case and applies pluralization if enabled (e.g. User → users, AdminUser → admin_users, Person → people).
@@ -20,9 +20,9 @@ Override this method if you want to specify a custom source.
 
 ---
 
-### modelSchema() · [source](../../src/Mvc/Model.php#L50)
+### schema() · [source](../../src/Mvc/Model.php#L50)
 
-`public function modelSchema(): string|null`
+`public function schema(): string|null`
 
 Return the database schema for this model, if applicable. By default, it returns null.
 
@@ -35,9 +35,9 @@ Override this method if you want to specify a schema (e.g. for PostgreSQL).
 
 ---
 
-### modelIdFields() · [source](../../src/Mvc/Model.php#L60)
+### idFields() · [source](../../src/Mvc/Model.php#L60)
 
-`public function modelIdFields(): array`
+`public function idFields(): array`
 
 Return the name of the primary key field(s) for this model. By default, it returns ['id'].
 
@@ -256,11 +256,11 @@ Check if any model exists matching the given conditions. Returns true if at leas
 
 ---
 
-### tally() · [source](../../src/Mvc/Model.php#L265)
+### count() · [source](../../src/Mvc/Model.php#L265)
 
-`public static function tally(array $conditions = []): int`
+`public static function count(array $conditions = []): int`
 
-Count the number of models matching the given conditions. Returns the count as an integer. tally() is an alias for count() to avoid collision with database fields named "count".
+Count the number of models matching the given conditions. Returns the count as an integer. count() is an alias for count() to avoid collision with database fields named "count".
 
 **🧭 Parameters**
 
@@ -396,7 +396,7 @@ Set both the read and write database role for this model class.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - | Named role registered with {@see \Merlin\Db\DatabaseManager}. |
+| `$role` | string | - | Named role registered with [`DatabaseManager`](Db_DatabaseManager.md). |
 
 **➡️ Return value**
 
@@ -415,7 +415,7 @@ Set the database role used for SELECT queries on this model class.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - | Named read role registered with {@see \Merlin\Db\DatabaseManager}. |
+| `$role` | string | - | Named read role registered with [`DatabaseManager`](Db_DatabaseManager.md). |
 
 **➡️ Return value**
 
@@ -434,7 +434,7 @@ Set the database role used for INSERT/UPDATE/DELETE queries on this model class.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$role` | string | - | Named write role registered with {@see \Merlin\Db\DatabaseManager}. |
+| `$role` | string | - | Named write role registered with [`DatabaseManager`](Db_DatabaseManager.md). |
 
 **➡️ Return value**
 
@@ -443,13 +443,13 @@ Set the database role used for INSERT/UPDATE/DELETE queries on this model class.
 
 ---
 
-### modelReadConnection() · [source](../../src/Mvc/Model.php#L592)
+### readConnection() · [source](../../src/Mvc/Model.php#L592)
 
-`public function modelReadConnection(): Merlin\Db\Database`
+`public function readConnection(): Merlin\Db\Database`
 
 Return the database connection used for read (SELECT) queries.
 
-Resolves the configured read role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
+Resolves the configured read role via [`DatabaseManager::getOrDefault()`](Db_DatabaseManager.md#getordefault).
 
 **➡️ Return value**
 
@@ -458,13 +458,13 @@ Resolves the configured read role via {@see \Merlin\Db\DatabaseManager::getOrDef
 
 ---
 
-### modelWriteConnection() · [source](../../src/Mvc/Model.php#L605)
+### writeConnection() · [source](../../src/Mvc/Model.php#L605)
 
-`public function modelWriteConnection(): Merlin\Db\Database`
+`public function writeConnection(): Merlin\Db\Database`
 
 Return the database connection used for write (INSERT/UPDATE/DELETE) queries.
 
-Resolves the configured write role via {@see \Merlin\Db\DatabaseManager::getOrDefault()}.
+Resolves the configured write role via [`DatabaseManager::getOrDefault()`](Db_DatabaseManager.md#getordefault).
 
 **➡️ Return value**
 

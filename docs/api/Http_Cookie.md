@@ -4,9 +4,9 @@
 
 Represents a single HTTP cookie with optional transparent encryption.
 
-Use the static {@see \make()} factory or construct directly, then call
-{@see \send()} to emit the Set-Cookie header. Read the cookie value with
-{@see \value()}, which handles decryption automatically.
+Use the static `make()` factory or construct directly, then call
+`send()` to emit the Set-Cookie header. Read the cookie value with
+`value()`, which handles decryption automatically.
 
 ## 🚀 Public methods
 
@@ -84,7 +84,7 @@ Read the cookie value, lazily loading it from $_COOKIE and decrypting if needed.
 
 `public function set(mixed $value): static`
 
-Set the cookie value (in memory; call {@see send()} to persist).
+Set the cookie value (in memory; call `send()` to persist).
 
 **🧭 Parameters**
 
@@ -150,7 +150,7 @@ Enable or disable transparent encryption for this cookie.
 
 `public function cipher(string $cipher): static`
 
-Set the encryption cipher to use (one of the {@see \Merlin\Crypt}::CIPHER_* constants).
+Set the encryption cipher to use (one of the [`Crypt`](Crypt.md)::CIPHER_* constants).
 
 **🧭 Parameters**
 

@@ -5,7 +5,7 @@
 Base class for all CLI task classes.
 
 Extend this class to create a CLI task. Public methods ending in "Action"
-are automatically discoverable by {@see \Console}.
+are automatically discoverable by [`Console`](Cli_Console.md).
 
 ## 🔐 Public Properties
 
@@ -14,9 +14,9 @@ are automatically discoverable by {@see \Console}.
 
 ## 🚀 Public methods
 
-### opt() · [source](../../src/Cli/Task.php#L80)
+### option() · [source](../../src/Cli/Task.php#L80)
 
-`public function opt(string $key, mixed $default = null): mixed`
+`public function option(string $key, mixed $default = null): mixed`
 
 Retrieve a parsed option value by key, with an optional default.
 

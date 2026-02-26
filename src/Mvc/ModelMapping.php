@@ -255,7 +255,7 @@ class ModelMapping
 	 * @param string $word Singular word.
 	 * @return string Pluralized lowercase word.
 	 */
-	public static function pluralize(string $word): string
+	protected static function pluralize(string $word): string
 	{
 		$word = mb_strtolower($word);
 

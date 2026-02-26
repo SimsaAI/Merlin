@@ -46,7 +46,7 @@ class UserProduct extends Model
     public float $price;
     public string $added_at;
 
-    public function modelIdFields(): array
+    public function idFields(): array
     {
         return ['user_id', 'product_id'];
     }
@@ -78,12 +78,12 @@ class TenantData extends Model
     public string $data;
     public string $created_at;
 
-    public function modelIdFields(): array
+    public function idFields(): array
     {
         return ['tenant_id', 'id'];
     }
 
-    public function modelSource(): string
+    public function source(): string
     {
         return 'tenant_data';
     }
@@ -112,7 +112,7 @@ class TextModel extends Model
     public string $key;
     public string $value;
 
-    public function modelSource(): string
+    public function source(): string
     {
         // Returns: text_en, text_de, text_fr, etc.
         return 'text_' . ($GLOBALS['lang'] ?? 'en');
@@ -196,7 +196,7 @@ class CartItem extends Model
     public int $product_id;
     public int $quantity;
 
-    public function modelIdFields(): array
+    public function idFields(): array
     {
         return ['user_id', 'product_id'];
     }

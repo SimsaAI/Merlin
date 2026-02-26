@@ -2,7 +2,7 @@
 
 **Full name:** [Merlin\Http\Cookies](../../src/Http/Cookies.php)
 
-Cookie jar that manages a collection of {@see Cookie} instances for the current request.
+Cookie jar that manages a collection of [`Cookie`](Http_Cookie.md) instances for the current request.
 
 Acts as a central registry for reading incoming cookies and building/sending
 outgoing Set-Cookie headers.
@@ -15,7 +15,7 @@ outgoing Set-Cookie headers.
 
 Read a cookie value from the incoming request.
 
-If the cookie was set in this request via {@see \set()}, its in-memory value is
+If the cookie was set in this request via `set()`, its in-memory value is
 returned; otherwise the value is read from $_COOKIE.
 
 **🧭 Parameters**
@@ -36,7 +36,7 @@ returned; otherwise the value is read from $_COOKIE.
 
 `public function cookie(string $name): Merlin\Http\Cookie`
 
-Get (or lazily create) a {@see Cookie} instance for the given name.
+Get (or lazily create) a [`Cookie`](Http_Cookie.md) instance for the given name.
 
 Use this when you need to configure encryption, path, etc. before reading
 or sending the cookie.
@@ -58,9 +58,9 @@ or sending the cookie.
 
 `public function set(string $name, mixed $value, int $expires = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): Merlin\Http\Cookie`
 
-Create and register a new {@see Cookie} with the given parameters.
+Create and register a new [`Cookie`](Http_Cookie.md) with the given parameters.
 
-The cookie is not sent until {@see \sendAll()} (or {@see \Cookie::send()}) is called.
+The cookie is not sent until `sendAll()` (or [`Cookie::send()`](Http_Cookie.md#send)) is called.
 
 **🧭 Parameters**
 

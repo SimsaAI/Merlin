@@ -4,9 +4,9 @@
 
 Represents an HTTP response.
 
-Build a response by chaining setters and finish by calling {@see \send()},
-or use one of the static factory methods ({@see \json()}, {@see \html()},
-{@see \redirect()}, etc.) for common cases.
+Build a response by chaining setters and finish by calling `send()`,
+or use one of the static factory methods (`json()`, `html()`,
+`redirect()`, etc.) for common cases.
 
 ## 🚀 Public methods
 
