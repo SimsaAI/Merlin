@@ -25,7 +25,7 @@ Create ModelMapping from array config
 
 ---
 
-### usePluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L56)
+### usePluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L64)
 
 `public static function usePluralTableNames(bool $enable): void`
 
@@ -47,7 +47,7 @@ When enabled, model names are converted to plural snake_case table names
 
 ---
 
-### usingPluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L64)
+### usingPluralTableNames() · [source](../../src/Mvc/ModelMapping.php#L72)
 
 `public static function usingPluralTableNames(): bool`
 
@@ -60,7 +60,7 @@ Returns whether automatic table name pluralization is enabled.
 
 ---
 
-### add() · [source](../../src/Mvc/ModelMapping.php#L76)
+### add() · [source](../../src/Mvc/ModelMapping.php#L84)
 
 `public function add(string $name, string|null $source = null, string|null $schema = null): static`
 
@@ -81,7 +81,7 @@ Add model mapping
 
 ---
 
-### get() · [source](../../src/Mvc/ModelMapping.php#L96)
+### get() · [source](../../src/Mvc/ModelMapping.php#L104)
 
 `public function get(string $name): array|null`
 
@@ -100,7 +100,7 @@ Get model mapping by name
 
 ---
 
-### toArray() · [source](../../src/Mvc/ModelMapping.php#L106)
+### toArray() · [source](../../src/Mvc/ModelMapping.php#L114)
 
 `public function toArray(): array`
 
@@ -113,7 +113,7 @@ Get all model mappings as an array
 
 ---
 
-### convertModelToSource() · [source](../../src/Mvc/ModelMapping.php#L119)
+### convertModelToSource() · [source](../../src/Mvc/ModelMapping.php#L127)
 
 `public static function convertModelToSource(string $modelName): string`
 
@@ -136,7 +136,7 @@ When pluralization is enabled, the last word segment is pluralized (e.g. AdminUs
 
 ---
 
-### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L149)
+### toSnakeCase() · [source](../../src/Mvc/ModelMapping.php#L157)
 
 `public static function toSnakeCase(string $name): string`
 

@@ -22,45 +22,71 @@ abstract class Task
     //  Output helpers – delegate to the Console for consistent color support
     // -------------------------------------------------------------------------
 
-    protected function writeln(string $text = ''): void
+    /** Write text without a newline. */
+    public function write(string $text = ''): void
+    {
+        $this->console->write($text);
+    }
+
+    /** Write a line of text with a newline. */
+    public function writeln(string $text = ''): void
     {
         $this->console->writeln($text);
     }
 
-    protected function line(string $text): void
+    /** Write to STDERR without a newline. */
+    public function stderr(string $text = ''): void
+    {
+        $this->console->stderr($text);
+    }
+
+    /** Write to STDERR with a newline. */
+    public function stderrln(string $text = ''): void
+    {
+        $this->console->stderrln($text);
+    }
+
+    /** Plain message with no styling. Newline is appended. */
+    public function line(string $text): void
     {
         $this->console->line($text);
     }
 
-    protected function info(string $text): void
+    /** Informational message (cyan). Newline is appended. */
+    public function info(string $text): void
     {
         $this->console->info($text);
     }
 
-    protected function success(string $text): void
+    /** Success message (green). Newline is appended. */
+    public function success(string $text): void
     {
         $this->console->success($text);
     }
 
-    protected function warn(string $text): void
+    /** Warning message (yellow). Newline is appended. */
+    public function warn(string $text): void
     {
         $this->console->warn($text);
     }
 
-    protected function error(string $text): void
+    /** Error message (white on red) to STDERR. Newline is appended. */
+    public function error(string $text): void
     {
         $this->console->error($text);
     }
 
-    protected function muted(string $text): void
+    /** Muted / dimmed text (gray). Newline is appended. */
+    public function muted(string $text): void
     {
         $this->console->muted($text);
     }
 
     /**
-     * Apply one or more named ANSI styles to a string via the Console.
-     * Style names: bold, dim, red, green, yellow, blue, magenta, cyan,
-     *              white, gray, bred, bgreen, byellow, bcyan
+     * Apply one or more named ANSI styles or custom colors to a string via the Console. (@see Console::style)
+     * @param string $text The text to style.
+     * @param string ...$styles One or more style names (e.g. "red", "bold") or custom colors (e.g. "#ff0000", "bg:#00ff00", "bg #00ff00").
+     * @return string The styled text.
      */
     protected function style(string $text, string ...$styles): string
     {

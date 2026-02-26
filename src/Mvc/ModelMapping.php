@@ -31,6 +31,14 @@ class ModelMapping
 					'source' => $config,
 					'schema' => null,
 				];
+			} elseif (\is_bool($config) && $config === true) {
+				// "User" => true  (auto-generate source name)
+				$config = [
+					'source' => static::convertModelToSource($name),
+					'schema' => null,
+				];
+			} elseif (!\is_array($config)) {
+				throw new \InvalidArgumentException("Model config must be a string, an array, or true for model '$name'");
 			} elseif (empty($config['source'])) {
 				throw new \InvalidArgumentException("Model source cannot be empty for model '$name'");
 			} elseif (!\is_string($config['source'])) {

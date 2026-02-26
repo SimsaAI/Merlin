@@ -16,6 +16,7 @@ class Console
 
     protected const ANSI = [
         'reset' => "\033[0m",
+        // basic styles
         'bold' => "\033[1m",
         'dim' => "\033[2m",
         'red' => "\033[31m",
@@ -25,6 +26,7 @@ class Console
         'magenta' => "\033[35m",
         'cyan' => "\033[36m",
         'white' => "\033[37m",
+        // Bright variants (prefix with 'b')
         'gray' => "\033[90m",
         'bred' => "\033[91m",
         'bgreen' => "\033[92m",
@@ -32,6 +34,7 @@ class Console
         'bblue' => "\033[94m",
         'bmagenta' => "\033[95m",
         'bcyan' => "\033[96m",
+        // Background colors (prefix with 'bg-')
         'bg-black' => "\033[40m",
         'bg-red' => "\033[41m",
         'bg-green' => "\033[42m",
@@ -42,12 +45,19 @@ class Console
         'bg-white' => "\033[47m",
     ];
 
+
+    public const STYLE_ERROR = ['bg-red', 'white', 'bold'];
+    public const STYLE_WARN = ['byellow'];
+    public const STYLE_INFO = ['bcyan'];
+    public const STYLE_SUCCESS = ['bgreen'];
+    public const STYLE_MUTED = ['gray'];
+
     protected $sectionStyles = ['bmagenta', '#e998ee'];
     protected $taskStyles = ['bold', 'bgreen', '#21e194'];
     protected $actionStyles = ['bcyan', 'bold', '#2cc4eb'];
     protected $optionStyles = ['white', '#e7dbbd'];
     protected $braceStyles = ['bold', 'bgreen', '#23D18B'];
-    protected $requiredArgStyles = ['white'];
+    protected $requiredArgStyles = ['bold', 'white'];
     protected $muteStyles = ['gray', '#a3a3a3'];
     protected $commentStyles = ['gray', '#bdbdbd'];
 
@@ -127,6 +137,15 @@ class Console
         return $this->useColors;
     }
 
+    /**
+     * Generate an ANSI escape code for a custom RGB color.
+     *
+     * @param string|int $r Either a hex color code (e.g. "#ff0000" or "bg:#00ff00" or "bg #00ff00") or the red component (0-255).
+     * @param int|null $g The green component (0-255), required if $r is not a hex code.
+     * @param int|null $b The blue component (0-255), required if $r is not a hex code.
+     * @param bool $background Whether this color is for background (true) or foreground (false).
+     * @return string The ANSI escape code for the specified color, or an empty string if colors are disabled or input is invalid.
+     */
     public function color(string|int $r, ?int $g = null, ?int $b = null, $background = false): string
     {
         if (!$this->useColors) {
@@ -139,14 +158,14 @@ class Console
         if ($g === null && $b === null) {
             $hex = (string) $r;
 
-            if (str_starts_with($hex, 'bg:')) {
+            if (str_starts_with($hex, 'bg')) {
                 // Set Background explicitly
                 $code = 48;
-                $hex = substr($hex, 3);
-            } elseif (str_starts_with($hex, 'fg:')) {
+                $hex = ltrim(substr($hex, 2), ' :;-');
+            } elseif (str_starts_with($hex, 'fg')) {
                 // Set Foreground explicitly
                 $code = 38;
-                $hex = substr($hex, 3);
+                $hex = ltrim(substr($hex, 2), ' :;-');
             } elseif (str_starts_with($hex, "\033")) {
                 // Already an ANSI code
                 return $hex;
@@ -174,9 +193,9 @@ class Console
 
 
     /**
-     * Apply one or more named ANSI styles to a string.
-     * Style names: bold, dim, red, green, yellow, blue, magenta, cyan, white, gray,
-     *              bred, bgreen, byellow, bcyan
+     * Apply one or more named ANSI styles or a custom color to a string.
+     * Style names: bold, dim, red, green, yellow, blue, magenta, cyan, white, gray, bred, bgreen, byellow, bcyan, bg-red, bg-green, bg-yellow, bg-blue, bg-magenta, bg-cyan, bg-white
+     * Custom colors can be specified via hex code (e.g. "#ff0000" or "bg:#00ff00" or "bg #00ff00").
      *
      * When color support is disabled, the text is returned unchanged.
      */
@@ -192,10 +211,28 @@ class Console
         return $open . $text . self::ANSI['reset'];
     }
 
+    /** Write text to stdout. */
+    public function write(string $text = ''): void
+    {
+        echo $text;
+    }
+
     /** Write a line to stdout (newline appended). */
     public function writeln(string $text = ''): void
     {
         echo $text . PHP_EOL;
+    }
+
+    /** Write text to stderr. */
+    public function stderr(string $text): void
+    {
+        fwrite(STDERR, $text);
+    }
+
+    /** Write a line to stderr (newline appended). */
+    public function stderrln(string $text): void
+    {
+        fwrite(STDERR, $text . PHP_EOL);
     }
 
     /** Plain informational line. */
@@ -204,40 +241,44 @@ class Console
         $this->writeln($text);
     }
 
-    /** Success message (bright green). */
-    public function success(string $text): void
-    {
-        $this->writeln($this->style($text, 'bgreen'));
-    }
-
-    /** Warning message (bright yellow). */
-    public function warn(string $text): void
-    {
-        $this->writeln($this->style($text, 'byellow'));
-    }
-
-    /** Error message (bright red). */
-    public function error(string $text): void
-    {
-        $this->writeln($this->style('[ERROR] ', 'bred', 'bold') . $text);
-    }
-
-    /** Critical message (red on white bg). */
-    public function critical(string $text): void
-    {
-        $this->writeln($this->style('[CRITICAL] ', 'red', 'bg-white', 'bold') . $text);
-    }
-
-    /** Muted / dimmed text. */
-    public function muted(string $text): void
-    {
-        $this->writeln($this->style($text, 'gray'));
-    }
-
-    /** Informational message (cyan). */
+    /**
+     * Write an informational message (cyan). Newline is appended automatically.
+     */
     public function info(string $text): void
     {
-        $this->writeln($this->style($text, 'bcyan'));
+        $this->writeln($this->style($text, ...static::STYLE_INFO));
+    }
+
+    /**
+     * Write a success message (green). Newline is appended automatically.
+     */
+    public function success(string $text): void
+    {
+        $this->writeln($this->style($text, ...static::STYLE_SUCCESS));
+    }
+
+    /** 
+     * Write a warning message (yellow). Newline is appended automatically.
+     */
+    public function warn(string $text): void
+    {
+        $this->writeln($this->style($text, ...static::STYLE_WARN));
+    }
+
+    /** 
+     * Write an error message (white on red) to STDERR. Newline is appended automatically.
+     */
+    public function error(string $text): void
+    {
+        $this->stderrln($this->style($text, ...static::STYLE_ERROR));
+    }
+
+    /** 
+     * Write a muted / dimmed message. Newline is appended automatically.
+     */
+    public function muted(string $text): void
+    {
+        $this->writeln($this->style($text, ...static::STYLE_MUTED));
     }
 
     // -------------------------------------------------------------------------
@@ -307,19 +348,19 @@ class Console
         $taskKey = strtolower($taskName);
 
         if (!isset($this->tasks[$taskKey])) {
-            echo "Task '{$taskName}' not found. Run '{$this->scriptName} help' for available tasks.\n";
+            $this->stderr("Task '{$taskName}' not found. Run '{$this->scriptName} help' for available tasks.\n");
             return;
         }
 
         $class = $this->tasks[$taskKey];
         if (!class_exists($class)) {
-            echo "Task class '{$class}' not loadable.\n";
+            $this->stderr("Task class '{$class}' not loadable.\n");
             return;
         }
 
         $task = new $class();
         if (!$task instanceof Task) {
-            echo "Task class '{$class}' is not a valid Task.\n";
+            $this->stderrln("Task class '{$class}' is not a valid Task.");
             return;
         }
 
@@ -337,7 +378,9 @@ class Console
                 $method = $this->defaultAction;
             } else {
                 if (!empty($actionName)) {
-                    echo "Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'.\n";
+                    $this->stderrln("Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'. Showing task help.");
+                } else {
+                    $this->stderrln("No action specified for task '{$taskName}', and no default action found. Showing task help.");
                 }
                 $this->helpTask($taskKey);
                 return;
@@ -384,10 +427,86 @@ class Console
 
     protected function discoverNamespaceViaComposer(string $ns): void
     {
-        $map = $this->readComposerPsr4();
-        $nsClean = rtrim($ns, '\\');
+        $path = $this->resolvePsr4Path($ns);
+        if ($path !== null) {
+            $this->discoverPath($path);
+        }
+    }
 
-        // Find the longest matching PSR-4 prefix for this namespace
+    protected function discoverComposerNamespaces(): void
+    {
+        foreach ($this->readComposerPsr4() as $dir) {
+            // Recursively find every *Task.php under this PSR-4 root
+            foreach ($this->scanDirectory($dir, 'Task.php') as $file) {
+                $this->registerTaskFile($file);
+            }
+        }
+    }
+
+    /**
+     * Return the full PSR-4 map from the nearest composer.json.
+     * Result is cached for the lifetime of this Console instance.
+     *
+     * @return array<string,string> namespace prefix => absolute directory
+     */
+    public function readComposerPsr4(): array
+    {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+        $composerDir = $this->findComposerRoot();
+        if ($composerDir === null) {
+            return $cache = [];
+        }
+        $json = json_decode(file_get_contents($composerDir . '/composer.json'), true);
+        $raw = $json['autoload']['psr-4'] ?? [];
+        $result = [];
+        foreach ($raw as $ns => $dir) {
+            $result[$ns] = rtrim($composerDir . DIRECTORY_SEPARATOR . ltrim($dir, '/\\'), DIRECTORY_SEPARATOR);
+        }
+        return $cache = $result;
+    }
+
+    /**
+     * Walk up the directory tree from this file until composer.json is found.
+     * Falls back to the current working directory.
+     */
+    public function findComposerRoot(): ?string
+    {
+        static $cache = false;
+        if ($cache !== false) {
+            return $cache;
+        }
+        $dir = __DIR__;
+        while (true) {
+            if (is_file($dir . '/composer.json')) {
+                return $cache = $dir;
+            }
+            $parent = dirname($dir);
+            if ($parent === $dir) {
+                break;
+            }
+            $dir = $parent;
+        }
+        // Fallback: check current working directory
+        $dir = getcwd();
+        if (is_file($dir . '/composer.json')) {
+            return $cache = $dir;
+        }
+        return $cache = null;
+    }
+
+    /**
+     * Resolve a PHP namespace to an absolute directory using the PSR-4 map.
+     * Falls back to guessing a path relative to the current working directory.
+     *
+     * Example: "App\\Models" => "/project/src/Models"
+     */
+    public function resolvePsr4Path(string $namespace): ?string
+    {
+        $map = $this->readComposerPsr4();
+        $nsClean = rtrim($namespace, '\\');
         $bestPrefix = null;
         $bestDir = null;
         foreach ($map as $prefix => $dir) {
@@ -399,86 +518,73 @@ class Console
                 }
             }
         }
-
         if ($bestPrefix !== null) {
-            // Derive the exact subdirectory from the namespace suffix
             $suffix = ltrim(substr($nsClean, strlen($bestPrefix)), '\\');
             $path = $suffix
                 ? $bestDir . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $suffix)
                 : $bestDir;
-            if (is_dir($path)) {
-                $this->discoverPath($path);
-            }
-            return;
+            return is_dir($path) ? $path : null;
         }
-
-        // Fallback: try to locate a directory matching the namespace under cwd
+        // Fallback: guess from cwd
         $guess = getcwd() . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $nsClean);
-        if (is_dir($guess)) {
-            $this->discoverPath($guess);
-        }
+        return is_dir($guess) ? $guess : null;
     }
 
-    protected function discoverComposerNamespaces(): void
-    {
-        $map = $this->readComposerPsr4();
-        foreach ($map as $dir) {
-            // Recursively find every *Task.php under this PSR-4 root
-            $this->discoverPathRecursive($dir);
-        }
-    }
-
-    protected function discoverPathRecursive(string $dir): void
+    /**
+     * Recursively scan $dir and return sorted absolute paths to files whose
+     * name ends with $suffix (default ".php").
+     *
+     * @return string[]
+     */
+    public function scanDirectory(string $dir, string $suffix = '.php'): array
     {
         if (!is_dir($dir)) {
-            return;
+            return [];
         }
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
         );
+        $files = [];
         foreach ($iterator as $file) {
             /** @var \SplFileInfo $file */
-            if ($file->isFile() && str_ends_with($file->getFilename(), 'Task.php')) {
-                $this->registerTaskFile($file->getPathname());
+            if ($file->isFile() && str_ends_with($file->getFilename(), $suffix)) {
+                $files[] = $file->getRealPath();
             }
         }
+        sort($files);
+        return $files;
     }
 
-    protected function readComposerPsr4(): array
+    /**
+     * Extract the fully-qualified class name from a PHP source file by
+     * parsing its namespace declaration and the file's base name.
+     */
+    public function extractClassFromFile(string $file): ?string
     {
-        $composerDir = $this->findComposerRoot();
-        if ($composerDir === null) {
-            return [];
+        $content = file_get_contents($file);
+        if (!$content) {
+            return null;
         }
-        $json = json_decode(file_get_contents($composerDir . DIRECTORY_SEPARATOR . 'composer.json'), true);
-        $raw = $json['autoload']['psr-4'] ?? [];
-        // Resolve all directories to absolute paths
-        $result = [];
-        foreach ($raw as $ns => $dir) {
-            $result[$ns] = rtrim($composerDir . DIRECTORY_SEPARATOR . ltrim($dir, '/\\'), DIRECTORY_SEPARATOR);
-        }
-        return $result;
-    }
-
-    protected function findComposerRoot(): ?string
-    {
-        // Walk up from the directory of this file until we find composer.json
-        $dir = __DIR__;
-        while (true) {
-            if (is_file($dir . DIRECTORY_SEPARATOR . 'composer.json')) {
-                return $dir;
-            }
-            $parent = dirname($dir);
-            if ($parent === $dir) {
-                break;
-            }
-            $dir = $parent;
-        }
-        // Fallback: cwd
-        if (is_file(getcwd() . DIRECTORY_SEPARATOR . 'composer.json')) {
-            return getcwd();
+        $base = basename($file, '.php');
+        if (preg_match('/^\s*namespace\s+([^;]+);/m', $content, $m)) {
+            return trim($m[1]) . '\\' . $base;
         }
         return null;
+    }
+
+    /**
+     * Detect the PHP namespace declared in any .php file directly inside $dir.
+     * Returns an empty string if none is found.
+     */
+    public function detectNamespace(string $dir): string
+    {
+        foreach (glob(rtrim($dir, '/\\') . '/*.php') ?: [] as $file) {
+            $code = @file_get_contents($file);
+            if ($code && preg_match('/^namespace\s+([\w\\\\]+)\s*;/m', $code, $m)) {
+                return $m[1];
+            }
+        }
+        return '';
     }
 
     protected function discoverPath(string $path): void
@@ -515,15 +621,7 @@ class Console
 
     protected function resolveClassFromFile(string $file): ?string
     {
-        $content = file_get_contents($file);
-        if (!$content) {
-            return null;
-        }
-        $base = basename($file, '.php');
-        if (preg_match('/^\s*namespace\s+([^;]+);/m', $content, $m)) {
-            return trim($m[1]) . '\\' . $base;
-        }
-        return null;
+        return $this->extractClassFromFile($file);
     }
 
     protected function taskNameFromClass(string $class): string
@@ -608,7 +706,7 @@ class Console
         $taskKey = strtolower($task);
         $class = $this->tasks[$taskKey] ?? null;
         if (!$class) {
-            $this->error("Task '{$task}' not found.");
+            $this->writeln("Task '{$task}' not found.");
             return;
         }
 
@@ -623,7 +721,7 @@ class Console
         $this->writeln($this->style('Task: ', ...$sectionStyles) . $this->style($taskKey, ...$this->taskStyles));
         //$this->writeln('      ' . $this->style(str_repeat('─', strlen($taskKey)), 'cyan'));
         $this->writeln();
-        $this->writeln($info['description']);
+        $this->writeln($this->style($info['description'], 'bold', 'white'));
         $this->writeln();
 
         // list available actions

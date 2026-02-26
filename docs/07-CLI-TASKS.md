@@ -17,7 +17,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Merlin\Cli\Console;
 
 $console = new Console();
-$console->addNamespace('App\\Tasks');   // discover App\Tasks\*Task.php
+// App\Tasks is included automatically; add other namespaces as needed:
+// $console->addNamespace('App\\Admin\\Tasks');
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
@@ -36,15 +37,15 @@ php console.php <task> [<action>] [<arg1> <arg2> …] [--option] [--key=value]
 `Console` scans every registered namespace for files matching `*Task.php`, loads them, and registers any class that extends `Merlin\Cli\Task` under a lowercase task name derived from the class name (`DatabaseTask` → `database`).
 
 ```php
-// Register one or more PSR-4 namespaces (any *Task.php inside will be found)
-$console->addNamespace('App\\Tasks');
-$console->addNamespace('App\\Admin\\Tasks');
+// App\Tasks is included automatically
+// Register additional PSR-4 namespaces (any *Task.php inside will be found)
+$console->addNamespace('App\\Extra\\Tasks');
 
 // Register a raw filesystem directory (optionally set up a simple autoloader)
 $console->addTaskPath('/path/to/extra/tasks', registerAutoload: true);
 ```
 
-The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is **always** included. Discovery resolves paths from `composer.json` PSR-4 entries – no path guessing.
+The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is **always** included. Discovery resolves paths from `composer.json` PSR-4 entries.
 
 ### Naming Rules
 
@@ -134,13 +135,15 @@ All output methods are available inside a task via `$this->…`. They delegate t
 
 | Method                                | Output style                      |
 | ------------------------------------- | --------------------------------- |
-| `$this->writeln($text)`               | bare line (no color)              |
+| `$this->write($text)`                 | write text                        |
+| `$this->writeln($text)`               | write line                        |
+| `$this->stderr($text)`                | write to stderr                   |
+| `$this->stderrln($text)`              | write line to stderr              |
 | `$this->line($text)`                  | plain white                       |
-| `$this->info($text)`                  | cyan                              |
+| `$this->info($text)`                  | bright cyan                       |
 | `$this->success($text)`               | bright green                      |
 | `$this->warn($text)`                  | bright yellow                     |
-| `$this->error($text)`                 | bright red `[ERROR]` prefix       |
-| `$this->critical($text)`              | red on white `[CRITICAL]` prefix  |
+| `$this->error($text)`                 | white on red                      |
 | `$this->muted($text)`                 | gray / dim                        |
 | `$this->style($text, 'bold', 'cyan')` | arbitrary named or rgb hex styles |
 
@@ -154,16 +157,17 @@ All output methods are available inside a task via `$this->…`. They delegate t
 You can use RGB color styles for custom output. The `Console::color()` and `Console::style()` methods accept RGB values or hex codes:
 
 ```php
+$console->style('Hex', '#ff00ff');                  // hex foreground
+$console->style('Hex BG', 'bg #00ff00');            // hex background
 $console->style('Custom RGB', $console->color(255, 0, 128));         // foreground RGB
 $console->style('Custom BG', $console->color(0, 128, 255, true));    // background RGB
-$console->style('Hex', '#ff00ff');                  // hex foreground
-$console->style('Hex BG', 'bg:#00ff00');            // hex background
 ```
 
 You can combine named styles and RGB/hex styles:
 
 ```php
-$console->style('Bold magenta with 16 color fallback', 'bold', 'bmagenta', '#ff00ff');
+// RGB color with named style fallback (e.g., for unsupported terminals)
+$console->style('Magenta text', 'bold', 'bmagenta', '#ff60ff');
 ```
 
 When color support is disabled, the text is returned unchanged.
@@ -233,7 +237,7 @@ class ImportTask extends Task { … }
 $console = new Console('myscript.php');  // custom script name shown in help
 
 // Namespace / path registration
-$console->addNamespace('App\\Tasks');
+$console->addNamespace('App\\Admin\\Tasks');
 $console->addTaskPath('/extra/tasks', registerAutoload: true);
 
 // Colors
@@ -242,7 +246,7 @@ $console->enableColors(false);  // force off (e.g. for CI)
 $console->hasColors();          // bool
 
 // Color a string directly (useful for custom Console subclasses)
-echo $console->style('Hello!', 'bold', 'bgreen');
+echo $console->style('Hello!', 'bold', 'bgreen', '#5aff5a');
 
 // Default action (called when no action arg is provided; default: "indexAction")
 $console->setDefaultAction('indexAction');
@@ -307,6 +311,37 @@ class UserTask extends Task
 
 ---
 
+## Console Discovery API
+
+`Console` exposes several **public** helper methods that tasks can call via `$this->console`. These are the same primitives used internally for task auto-discovery, and they are useful when writing tasks that need to locate model or other class files at runtime.
+
+```php
+// Read the PSR-4 map from composer.json (result is cached per-instance)
+$map = $this->console->readComposerPsr4(); // ['App\\' => '/project/src', ...]
+
+// Find the root directory that contains composer.json
+$root = $this->console->findComposerRoot(); // '/project'
+
+// Resolve a namespace to an absolute directory path
+$dir = $this->console->resolvePsr4Path('App\\Models'); // '/project/src/Models'
+
+// Recursively list all .php files in a directory
+$files = $this->console->scanDirectory('/project/src/Models');          // *.php
+$tasks = $this->console->scanDirectory('/project/src/Tasks', 'Task.php'); // *Task.php
+
+// Parse the FQCN from a PHP source file
+$class = $this->console->extractClassFromFile('/project/src/Models/User.php');
+// => 'App\\Models\\User'
+
+// Detect the namespace used by files in a directory
+$ns = $this->console->detectNamespace('/project/src/Models');
+// => 'App\\Models'
+```
+
+All of these work without any framework bootstrap — they only need `composer.json` to be present in an ancestor directory.
+
+---
+
 ## See Also
 
 - [src/Cli/Console.php](../src/Cli/Console.php)
@@ -321,10 +356,15 @@ Merlin ships with a ready-made `ModelSyncTask` that keeps your PHP model files i
 ### Commands
 
 ```bash
-php console.php model-sync all   <directory> [options]              # scan a directory of model files
-php console.php model-sync model <file>       [options]              # sync a single model file
-php console.php model-sync make  <ClassName>  <directory> [options]  # scaffold a new model file
+php console.php model-sync all   [<directory>] [options]              # scan a directory of model files (auto-discovers App\Models if omitted)
+php console.php model-sync model <file>        [options]              # sync a single model file
+php console.php model-sync make  <ClassName>  [<directory>] [options]  # scaffold a new model file (auto-discovers App\Models if omitted)
 ```
+
+When no `<directory>` is given, `model-sync all` and `model-sync make` automatically resolve the target directory in this order:
+
+1. The `App\Models` namespace resolved via the PSR-4 entries in `composer.json`
+2. Common relative paths: `app/Models`, `src/Models`, `App/Models` (relative to cwd)
 
 ### Options
 
@@ -342,23 +382,29 @@ php console.php model-sync make  <ClassName>  <directory> [options]  # scaffold 
 ### Examples
 
 ```bash
-# Preview changes for all models in a directory
-php console.php model-sync all Models
+# Auto-discover App\Models and preview changes (no args needed)
+php console.php model-sync all
+
+# Preview changes for all models in an explicit directory
+php console.php model-sync all src/Models
 
 # Apply changes
-php console.php model-sync all Models --apply
+php console.php model-sync all src/Models --apply
 
 # Apply with protected properties and accessor methods
-php console.php model-sync all Models --apply --generate-accessors --field-visibility=protected
+php console.php model-sync all src/Models --apply --generate-accessors --field-visibility=protected
 
 # Scaffold models for any DB tables not yet represented, then sync them
-php console.php model-sync all Models --apply --create-missing --namespace=App\\Models
+php console.php model-sync all src/Models --apply --create-missing --namespace=App\\Models
 
 # Sync a single file
-php console.php model-sync model Models/User.php --apply
+php console.php model-sync model src/Models/User.php --apply
 
-# Scaffold a brand-new model from a DB table and immediately populate its properties
-php console.php model-sync make Order Models --namespace=App\\Models --apply
+# Scaffold a new model – auto-discover App\Models directory
+php console.php model-sync make Order
+
+# Scaffold a new model into an explicit directory
+php console.php model-sync make Order src/Models --namespace=App\\Models --apply
 ```
 
 ### How it works

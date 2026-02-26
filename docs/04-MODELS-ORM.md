@@ -153,6 +153,86 @@ For a single-database setup, register one connection – models fall through to 
 AppContext::instance()->dbManager()->set('default', new Database(...));
 ```
 
+## Using ModelMapping Without Model Classes
+
+`ModelMapping` lets you query the database using logical model names without defining PHP model classes. This is useful for rapid prototyping, dynamic table mappings, or when you need query-builder convenience for tables that don't warrant a full Active Record class.
+
+### Register a mapping
+
+```php
+use Merlin\Db\Query;
+use Merlin\Mvc\ModelMapping;
+
+$mapping = ModelMapping::fromArray([
+    // simple: name => table
+    'User'    => 'users',
+    // explicit, no schema:
+    'Product' => ['source' => 'products'],
+    // explicit with schema:
+    'Order'   => ['source' => 'orders', 'schema' => 'public'],
+]);
+
+Query::setModelMapping($mapping);
+Query::useModels(true);
+```
+
+Once registered, use the logical name wherever `Query` accepts a table or model reference:
+
+```php
+$results = Query::new()
+    ->table('User')
+    ->where('status', 'active')
+    ->select();
+
+// Joins also use logical names
+$results = Query::new()
+    ->table('User')
+    ->join('Order', Condition::new()->where('User.id = Order.user_id'))
+    ->columns(['User.id', 'User.email', 'Order.total'])
+    ->select();
+```
+
+### Auto-generated table names
+
+Pass `true` as the value to let `ModelMapping` derive the table name automatically from the model name (snake_case, or pluralized when `usePluralTableNames` is enabled):
+
+```php
+ModelMapping::usePluralTableNames(true); // User → users, AdminUser → admin_users
+
+$mapping = ModelMapping::fromArray([
+    'User'    => true,  // auto: "users"
+    'Product' => true,  // auto: "products"
+]);
+
+Query::setModelMapping($mapping);
+Query::useModels(true);
+```
+
+### Fluent builder
+
+Use the `add()` method to build mappings programmatically:
+
+```php
+$mapping = (new ModelMapping())
+    ->add('User', 'users')
+    ->add('Order', 'orders', 'public'); // third arg is the schema
+
+Query::setModelMapping($mapping);
+```
+
+### Resetting
+
+Pass `null` to remove the mapping and revert to normal model-class resolution:
+
+```php
+Query::setModelMapping(null);
+
+// Or disable model mode entirely for literal table-name queries
+Query::useModels(false);
+```
+
+> **Note:** `ModelMapping` only affects `Query`-level operations. The Active Record helpers (`User::find()`, `User::create()`, etc.) still require a PHP class that extends `Model`.
+
 ## Related
 
 - [Database Queries](05-DATABASE-QUERIES.md)

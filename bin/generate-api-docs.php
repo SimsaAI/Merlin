@@ -152,7 +152,7 @@ function generateClassDoc(ReflectionClass $reflector, $docFactory, array $classR
         foreach ($constants as $constant) {
             $name = $constant->getName();
             $value = $constant->getValue();
-            $md .= "- **{$name}** = `" . var_export($value, true) . "`\n";
+            $md .= "- **{$name}** = `" . short_var_export($value) . "`\n";
         }
         $md .= "\n";
     }
@@ -606,6 +606,49 @@ function formatDefaultValue($value): string
     if (is_object($value))
         return get_class($value);
     return (string) $value;
+}
+
+/**
+ * Export a value similar to var_export but using short array syntax ([]) and
+ * a readable, indented format for arrays.
+ */
+function short_var_export($value, int $indent = 0): string
+{
+    if (is_array($value)) {
+        if (empty($value)) {
+            return '[]';
+        }
+        $isAssoc = array_keys($value) !== range(0, count($value) - 1);
+        $pad = str_repeat(' ', $indent);
+        $padNext = str_repeat(' ', $indent + 4);
+        $items = [];
+        foreach ($value as $k => $v) {
+            $exported = short_var_export($v, $indent + 4);
+            if ($isAssoc) {
+                $key = is_int($k) ? $k : '\'' . str_replace("'", "\\'", $k) . '\'';
+                $items[] = $padNext . $key . ' => ' . $exported;
+            } else {
+                $items[] = $padNext . $exported;
+            }
+        }
+        return "[\n" . implode(",\n", $items) . "\n" . $pad . "]";
+    }
+    if (is_null($value)) {
+        return 'null';
+    }
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
+    }
+    if (is_string($value)) {
+        return "'" . str_replace("'", "\\'", $value) . "'";
+    }
+    if (is_object($value)) {
+        return 'object(' . get_class($value) . ')';
+    }
+    if (is_array($value) === false && (is_int($value) || is_float($value))) {
+        return (string) $value;
+    }
+    return var_export($value, true);
 }
 
 function getVisibility(ReflectionMethod|ReflectionProperty $r): string

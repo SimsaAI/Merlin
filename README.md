@@ -52,7 +52,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
   - Rich color output and styled help pages
   - Option parsing and argument separation
   - Built-in help and task listing
-- **Sync Task** - built-in sync task for generating/applying model and schema changes
+- **ModelSync Task (`model-sync`)** - Built-in CLI task for synchronizing PHP models with the database schema, generating migration/migration-like changes and optionally applying them.
 
 ### Additional Features
 
@@ -278,31 +278,6 @@ $report = User::query()
     ->select();
 ```
 
-#### Using the Query Builder Directly on Tables
-
-For raw queries without models, you can use the Query builder directly.
-This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with `Query::new()` and specify the table manually.
-
-```php
-use Merlin\Db\Query;
-
-
-Query::useModels(false);
-
-$results = Query::new()
-    ->table('orders o')
-    ->join('users u', 'o.user_id = u.id')
-    ->where('o.status', 'completed')
-    ->where('o.total >', 100)
-    ->groupBy('u.id')
-    ->having('COUNT(*) >', 5)
-    ->select([
-        'u.username',
-        'COUNT(*) as order_count',
-        'SUM(o.total) as total_spent'
-    ]);
-```
-
 #### Using ModelMapping for Dynamic Model References
 
 `ModelMapping` allows you to refer to models in queries without creating actual PHP model classes. This is useful when you want the convenience of model names in your queries but don't need the full Active Record functionality.
@@ -343,6 +318,34 @@ ModelMapping::usePluralTableNames(true);
 $mapping = ModelMapping::fromArray([
     'User' => true,    // uses auto-pluralized table name
 ]);
+
+Query::setModelMapping($mapping);
+Query::useModels(true);
+```
+
+#### Using the Query Builder Directly on Tables
+
+For raw queries without models, you can use the Query builder directly.
+This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with `Query::new()` and specify the table manually.
+
+```php
+use Merlin\Db\Query;
+
+
+Query::useModels(false);
+
+$results = Query::new()
+    ->table('orders o')
+    ->join('users u', 'o.user_id = u.id')
+    ->where('o.status', 'completed')
+    ->where('o.total >', 100)
+    ->groupBy('u.id')
+    ->having('COUNT(*) >', 5)
+    ->select([
+        'u.username',
+        'COUNT(*) as order_count',
+        'SUM(o.total) as total_spent'
+    ]);
 ```
 
 ### CLI Tasks
@@ -358,7 +361,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Merlin\Cli\Console;
 
 $console = new Console();
-$console->addNamespace('App\\Tasks');   // discover App\Tasks\*Task.php
+// App\Tasks is included automatically; add other namespaces if needed:
+// $console->addNamespace('App\\Admin\\Tasks');
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
@@ -399,6 +403,32 @@ php console.php database migrate latest --direction=down
 php console.php help               # overview with all tasks and actions
 php console.php help database      # detail page for one task
 ```
+
+**Using Built-in Tasks**
+
+Merlin includes built-in tasks for common development operations. The `model-sync` task synchronizes your PHP models with the database schema and supports these subcommands and options:
+
+```bash
+# Auto-discover App\Models via PSR-4 and preview differences (no args needed)
+php console.php model-sync all
+
+# Or target an explicit directory
+php console.php model-sync all src/Models
+
+# Apply detected changes (use --apply to write files)
+php console.php model-sync all src/Models --apply [--database=<role>] [--generate-accessors] [--create-missing]
+
+# Run sync for a single model file
+php console.php model-sync model src/Models/User.php [--apply] [--database=<role>]
+
+# Scaffold a new model – auto-discovers App\Models directory
+php console.php model-sync make Order
+
+# Or scaffold into an explicit directory
+php console.php model-sync make Order src/Models [--namespace=App\\Models] [--apply]
+```
+
+When no directory is provided, `model-sync all` and `model-sync make` automatically resolve the target by looking for `App\Models` in the PSR-4 entries of `composer.json`, then falling back to common paths (`app/Models`, `src/Models`).
 
 ## Project Structure
 
@@ -505,16 +535,6 @@ Merlin uses PHPUnit for testing:
 
 # Run with coverage (requires Xdebug)
 ./vendor/bin/phpunit --coverage-html coverage/
-```
-
-### Code Quality
-
-```bash
-# Install dev dependencies
-composer install --dev
-
-# Run tests
-composer test
 ```
 
 ## Contributing

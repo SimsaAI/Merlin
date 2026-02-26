@@ -149,11 +149,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Merlin\Cli\Console;
 
 $console = new Console();
-$console->addNamespace('App\\Tasks'); // discover App\Tasks\*Task.php
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
-`Console` auto-discovers every class whose name ends in `Task` under the registered namespace and registers it under a lowercase task name (`HelloTask` → `hello`). The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is always included automatically.
+`Console` auto-discovers every class whose name ends in `Task` under the registered namespace and registers it under a lowercase task name (`HelloTask` → `hello`). The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) and `App\Tasks` are included automatically.
 
 Run:
 

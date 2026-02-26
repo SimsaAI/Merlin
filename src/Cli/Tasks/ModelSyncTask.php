@@ -13,7 +13,7 @@ use Merlin\Sync\SyncRunner;
  * and for scaffolding new model files from database tables.
  *
  * Usage:
- *   model-sync all   <models-dir> [--apply] [--database=<role>]
+ *   model-sync all   [<models-dir>] [--apply] [--database=<role>]
  *                                 [--generate-accessors] [--no-deprecate]
  *                                 [--field-visibility=<public|protected|private>]
  *                                 [--create-missing] [--namespace=<ns>]
@@ -21,29 +21,32 @@ use Merlin\Sync\SyncRunner;
  *                                 [--generate-accessors] 
  *                                 [--field-visibility=<public|protected|private>]
  *                                 [--no-deprecate]
- *   model-sync make  <ClassName>  <directory> [--apply] 
+ *   model-sync make  <ClassName>  [<directory>] [--apply] 
  *                                 [--database=<role>] [--namespace=<ns>] 
  *                                 [--generate-accessors] [--no-deprecate]
  *                                 [--field-visibility=<public|protected|private>]
  *
- * By default the task runs in **dry-run** mode and only reports changes.
+ * By default the task only reports changes.
  * Pass --apply to write the updated model files to disk.
  * 
  * Options:
- *   --database=<role>           Database role to use for schema introspection 
- *                               (default: "read")
- *   --generate-accessors        Also generate getter/setter methods for each 
- *                               property
- *   --field-visibility=<vis>    Visibility for generated properties (default: 
- *                               "public")
- *   --no-deprecate              Don't add @deprecated tags to removed 
- *                               properties
+ *   --apply                     Apply changes to files instead of just 
+ *                               reporting them
  *   --create-missing            Create new model files for tables that don't 
  *                               have a corresponding model yet
+ *   --database=<role>           Database role to use for schema introspection 
+ *                               (default: "read")
+ *   --field-visibility=<vis>    Visibility for generated properties (default: 
+ *                               "public")
+ *   --generate-accessors        Also generate getter/setter methods for each 
+ *                               property
  *   --namespace=<ns>            Namespace to use when creating new model files 
  *                               (required if --create-missing is used)
+ *   --no-deprecate              Don't add @deprecated tags to removed 
+ *                               properties
  *
  * Examples:
+ *   php console.php model-sync all                                          # auto-discover App\Models
  *   php console.php model-sync all  src/Models                              # dry-run
  *   php console.php model-sync all  src/Models --apply                      # apply
  *   php console.php model-sync all  src/Models --apply --generate-accessors # with accessors
@@ -51,6 +54,7 @@ use Merlin\Sync\SyncRunner;
  *   php console.php model-sync all  src/Models --apply --no-deprecate
  *   php console.php model-sync all  src/Models --apply --create-missing --namespace=App\\Models
  *   php console.php model-sync model src/Models/User.php --apply
+ *   php console.php model-sync make  User                                    # auto-discover App\Models dir
  *   php console.php model-sync make  User src/Models --namespace=App\\Models --apply
  */
 class ModelSyncTask extends Task
@@ -63,13 +67,17 @@ class ModelSyncTask extends Task
      * Scan a directory recursively, find all PHP files that extend Model,
      * and sync each one against the database.
      *
-     * @param string $dir Directory to scan (required)
+     * @param string $dir Directory to scan (optional – defaults to App\\Models via PSR-4)
      */
     public function allAction(string $dir = ''): void
     {
         if ($dir === '') {
-            $this->error("Usage: sync all <models-directory> [--apply] [--database=<role>] [--generate-accessors] [--field-visibility=<vis>] [--no-deprecate] [--create-missing] [--namespace=<ns>]");
-            return;
+            $dir = $this->resolveModelsDir();
+            if ($dir === null) {
+                $this->error("No models directory found. Pass a directory or configure App\\Models in composer.json PSR-4.");
+                return;
+            }
+            $this->muted("Auto-discovered models directory: {$dir}");
         }
 
         if (!is_dir($dir)) {
@@ -183,13 +191,22 @@ class ModelSyncTask extends Task
      * Scaffold a new model class from a database table and immediately sync its properties.
      *
      * @param string $className Short class name without namespace (e.g. User)
-     * @param string $dir       Target directory for the new file
+     * @param string $dir       Target directory for the new file (optional – defaults to App\\Models via PSR-4)
      */
     public function makeAction(string $className = '', string $dir = ''): void
     {
-        if ($className === '' || $dir === '') {
-            $this->error("Usage: sync make <ClassName> <directory> [--namespace=<ns>] [--apply] [--database=<role>]");
+        if ($className === '') {
+            $this->error("Usage: sync make <ClassName> [<directory>] [--namespace=<ns>] [--apply] [--database=<role>]");
             return;
+        }
+
+        if ($dir === '') {
+            $dir = $this->resolveModelsDir();
+            if ($dir === null) {
+                $this->error("No models directory found. Pass a directory or configure App\\Models in composer.json PSR-4.");
+                return;
+            }
+            $this->muted("Auto-discovered models directory: {$dir}");
         }
 
         if (!is_dir($dir)) {
@@ -244,20 +261,7 @@ class ModelSyncTask extends Task
     /** @return string[] Absolute paths to PHP files inside $dir */
     private function findModelFiles(string $dir): array
     {
-        $iter = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
-        );
-
-        $files = [];
-        /** @var \SplFileInfo $file */
-        foreach ($iter as $file) {
-            if ($file->getExtension() === 'php') {
-                $files[] = $file->getRealPath();
-            }
-        }
-
-        sort($files);
-        return $files;
+        return $this->console->scanDirectory($dir);
     }
 
     private function buildOptions(): SyncOptions
@@ -272,13 +276,29 @@ class ModelSyncTask extends Task
     /** Detect the PHP namespace from any .php file directly inside $dir. */
     private function detectNamespace(string $dir): string
     {
-        foreach (glob(rtrim($dir, '/\\') . DIRECTORY_SEPARATOR . '*.php') ?: [] as $file) {
-            $code = file_get_contents($file);
-            if (preg_match('/^namespace\s+([\w\\\\]+)\s*;/m', $code, $m)) {
-                return $m[1];
+        return $this->console->detectNamespace($dir);
+    }
+
+    /**
+     * Resolve the default models directory.
+     *
+     * Tries to find App\Models via the PSR-4 map; falls back to checking for
+     * an app/Models or src/Models directory relative to the working directory.
+     */
+    private function resolveModelsDir(): ?string
+    {
+        $path = $this->console->resolvePsr4Path('App\\Models');
+        if ($path !== null) {
+            return $path;
+        }
+        $cwd = getcwd();
+        foreach (['app/Models', 'Models', 'src/Models', 'App/Models'] as $rel) {
+            $abs = $cwd . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $rel);
+            if (is_dir($abs)) {
+                return realpath($abs);
             }
         }
-        return '';
+        return null;
     }
 
     /** Convert a snake_case table name to a PascalCase class name (no singularisation). */

@@ -447,8 +447,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use Merlin\Cli\Console;
 
 $console = new Console();
-// Default namespace is already 'App\Tasks'; override only if needed:
-// $console->setNamespace('App\\Tasks');
+// App\Tasks is included automatically; add other namespaces as needed:
+// $console->addNamespace('App\\Admin\\Tasks');
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
 
