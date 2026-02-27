@@ -79,12 +79,12 @@ $mgr->set('write', new Database('mysql:host=primary;dbname=app', 'rw', 'secret')
 $mgr->set('read',  fn() => new Database('mysql:host=replica;dbname=app', 'ro', 'secret'));
 
 // Override the default role
-$mgr->setDefaultRole('write');
+$mgr->setDefault('write');
 
 // Retrieve
 $mgr->get('read');          // specific role (throws if missing)
 $mgr->getOrDefault('read'); // specific role or fallback to default
-$mgr->default();            // default role
+$mgr->getDefault();         // default role
 $mgr->has('analytics');     // check existence
 ```
 
@@ -451,6 +451,12 @@ $console = new Console();
 // $console->addNamespace('App\\Admin\\Tasks');
 $console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
 ```
+
+---
+
+## Generated Files
+
+The files under `docs/api/` are **auto-generated** from source PHPDoc. Do not edit them manually and do not update them in response to code changes.
 
 ---
 

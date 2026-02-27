@@ -94,11 +94,12 @@ class Database
 	/**
 	 * Add an event listener for database events
 	 * @param callable $listener A callable that receives the event name and relevant data
-	 * @return void
+	 * @return static
 	 */
-	public function addListener(callable $listener): void
+	public function addListener(callable $listener): static
 	{
 		$this->listeners[] = $listener;
+		return $this;
 	}
 
 	protected function fire(string $event, ...$args): void

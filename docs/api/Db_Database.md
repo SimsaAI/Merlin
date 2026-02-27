@@ -51,7 +51,7 @@ Establish a new PDO connection using the current configuration
 
 ### addListener() · [source](../../src/Db/Database.php#L99)
 
-`public function addListener(callable $listener): void`
+`public function addListener(callable $listener): static`
 
 Add an event listener for database events
 
@@ -63,12 +63,12 @@ Add an event listener for database events
 
 **➡️ Return value**
 
-- Type: void
+- Type: static
 
 
 ---
 
-### setAutoReconnect() · [source](../../src/Db/Database.php#L122)
+### setAutoReconnect() · [source](../../src/Db/Database.php#L123)
 
 `public function setAutoReconnect(bool $enabled = true, int $maxAttempts = 0, float $retryDelay = 1, float $backoffMultiplier = 2, float $maxRetryDelay = 30, bool $jitter = true, callable|null $onReconnect = null): static`
 
@@ -93,7 +93,7 @@ Configure automatic reconnection behavior with detailed options
 
 ---
 
-### getAutoReconnect() · [source](../../src/Db/Database.php#L147)
+### getAutoReconnect() · [source](../../src/Db/Database.php#L148)
 
 `public function getAutoReconnect(): array|bool`
 
@@ -106,7 +106,7 @@ Get auto-reconnect configuration
 
 ---
 
-### query() · [source](../../src/Db/Database.php#L159)
+### query() · [source](../../src/Db/Database.php#L160)
 
 `public function query(string $query, array|null $params = null): PDOStatement|bool`
 
@@ -130,7 +130,7 @@ Execute a SQL query with optional parameters and return the resulting statement 
 
 ---
 
-### prepare() · [source](../../src/Db/Database.php#L194)
+### prepare() · [source](../../src/Db/Database.php#L195)
 
 `public function prepare(string $query): PDOStatement|bool`
 
@@ -153,7 +153,7 @@ Prepare a SQL statement and return the resulting PDOStatement object.
 
 ---
 
-### execute() · [source](../../src/Db/Database.php#L223)
+### execute() · [source](../../src/Db/Database.php#L224)
 
 `public function execute(array $params = []): PDOStatement|bool`
 
@@ -178,7 +178,7 @@ Execute the most recently prepared statement with the given bound parameters.
 
 ---
 
-### selectRow() · [source](../../src/Db/Database.php#L388)
+### selectRow() · [source](../../src/Db/Database.php#L389)
 
 `public function selectRow(string $query, array|null $params = null, int $fetchMode = 0): array|bool`
 
@@ -199,7 +199,7 @@ Fetch a single row from the database as object, associative array, or numeric ar
 
 ---
 
-### selectAll() · [source](../../src/Db/Database.php#L403)
+### selectAll() · [source](../../src/Db/Database.php#L404)
 
 `public function selectAll(string $query, array|null $params = null, int $fetchMode = 0): array`
 
@@ -220,7 +220,7 @@ Fetch all rows from the database as an array of objects, associative arrays, or 
 
 ---
 
-### rowCount() · [source](../../src/Db/Database.php#L415)
+### rowCount() · [source](../../src/Db/Database.php#L416)
 
 `public function rowCount(): int`
 
@@ -234,7 +234,7 @@ Return the number of rows affected by the last executed statement.
 
 ---
 
-### lastInsertId() · [source](../../src/Db/Database.php#L427)
+### lastInsertId() · [source](../../src/Db/Database.php#L428)
 
 `public function lastInsertId(string|null $table = null, string|null $field = null): string|bool`
 
@@ -257,7 +257,7 @@ For PostgreSQL, pass the table and primary key field to use currval(pg_get_seria
 
 ---
 
-### begin() · [source](../../src/Db/Database.php#L461)
+### begin() · [source](../../src/Db/Database.php#L462)
 
 `public function begin(bool $nesting = true): int|bool`
 
@@ -281,7 +281,7 @@ Begin a new transaction, or create a savepoint if nested transactions are enable
 
 ---
 
-### commit() · [source](../../src/Db/Database.php#L504)
+### commit() · [source](../../src/Db/Database.php#L505)
 
 `public function commit(bool $nesting = true): int|bool`
 
@@ -305,7 +305,7 @@ Commit the current transaction or release the current savepoint (for nested tran
 
 ---
 
-### rollback() · [source](../../src/Db/Database.php#L550)
+### rollback() · [source](../../src/Db/Database.php#L551)
 
 `public function rollback(bool $nesting = true): int|bool`
 
@@ -328,7 +328,7 @@ Rollback the current transaction or to a savepoint if nesting is enabled and sup
 
 ---
 
-### quote() · [source](../../src/Db/Database.php#L595)
+### quote() · [source](../../src/Db/Database.php#L596)
 
 `public function quote(string|null $str): string|bool`
 
@@ -347,7 +347,7 @@ Quote a string for use in a query.
 
 ---
 
-### quoteIdentifier() · [source](../../src/Db/Database.php#L610)
+### quoteIdentifier() · [source](../../src/Db/Database.php#L611)
 
 `public function quoteIdentifier(string|null ...$args): string`
 
@@ -369,7 +369,7 @@ Parts are joined with a dot separator. NULL parts are skipped. "*" is passed thr
 
 ---
 
-### getInternalConnection() · [source](../../src/Db/Database.php#L639)
+### getInternalConnection() · [source](../../src/Db/Database.php#L640)
 
 `public function getInternalConnection(): PDO|null`
 
@@ -383,7 +383,7 @@ Return the underlying PDO connection instance.
 
 ---
 
-### builder() · [source](../../src/Db/Database.php#L648)
+### builder() · [source](../../src/Db/Database.php#L649)
 
 `public function builder(): Merlin\Db\Query`
 
@@ -396,7 +396,7 @@ Create a new Query builder instance associated with this database connection.
 
 ---
 
-### getDriver() · [source](../../src/Db/Database.php#L657)
+### getDriver() · [source](../../src/Db/Database.php#L658)
 
 `public function getDriver(): string`
 

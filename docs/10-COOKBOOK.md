@@ -102,7 +102,7 @@ Wrap related database operations in a transaction to ensure data consistency. If
 ```php
 use Merlin\AppContext;
 
-$db = AppContext::instance()->dbManager()->default();
+$db = AppContext::instance()->dbManager()->getDefault();
 
 $db->begin();
 try {

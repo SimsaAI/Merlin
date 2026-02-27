@@ -9,16 +9,44 @@ Integrate your own logger or observability solution via `Database::addListener()
 
 Database event listeners let you monitor queries, connection issues, and transactions. This is perfect for debugging, performance monitoring, or audit trails.
 
-`Merlin\Db\Database` supports event listeners:
+### Global listeners via DatabaseManager
+
+The easiest way to attach listeners when using `DatabaseManager` is via `addGlobalListener()`, which applies to every connection managed by the instance – including those registered as lazy factories:
 
 ```php
-use Merlin\Db\Database;
+$ctx->dbManager()
+    ->addGlobalListener(function (string $event, ...$args) {
+        error_log('[db] ' . $event . ' ' . json_encode($args));
+    })
+    ->set('default', new Database($dsn, $user, $pass));
+```
 
-$db = new Database($dsn, $user, $pass);
+`addGlobalListener()` returns `$this`, so it chains fluently with `set()`, `setDefault()`, etc.
 
-$db->addListener(function (string $event, ...$args) {
-    error_log('[db] ' . $event . ' ' . json_encode($args));
-});
+### Per-role listeners
+
+Use `addListener(string $role, callable)` to target a specific connection:
+
+```php
+$ctx->dbManager()
+    ->set('write', new Database($writeDsn, $user, $pass))
+    ->set('read',  fn() => new Database($readDsn, $user, $pass))
+    ->addListener('write', function (string $event, ...$args) {
+        error_log('[write] ' . $event);
+    });
+```
+
+Listeners registered before a lazy factory resolves are applied automatically on first access.
+
+### Direct listener on a Database instance
+
+`addListener()` is fluent and can be chained:
+
+```php
+$db = (new Database($dsn, $user, $pass))
+    ->addListener(function (string $event, ...$args) {
+        error_log('[db] ' . $event . ' ' . json_encode($args));
+    });
 ```
 
 Common events include:
@@ -73,13 +101,13 @@ Register this middleware first in your middleware stack to ensure all exceptions
 
 ## Integrating Your Own Logger
 
-You can forward database events to any logger implementation:
+Forward database events to any logger by attaching a global listener:
 
 ```php
-$db->addListener(function (string $event, ...$args) use ($logger) {
+$ctx->dbManager()->addGlobalListener(function (string $event, ...$args) use ($logger) {
     $logger->info('db_event', [
         'event' => $event,
-        'args' => $args,
+        'args'  => $args,
     ]);
 });
 ```
