@@ -56,8 +56,8 @@ class AppContext
      */
     public static function instance(): static
     {
-        // Falls der Router/Bootstrap noch nichts gesetzt hat:
-        return self::$instance ??= new static();
+        // Using null coalescing assignment operator to ensure only one instance is created (thread-safe in PHP 8.0+)
+        return static::$instance ??= new static();
     }
 
     /**
@@ -67,7 +67,7 @@ class AppContext
      */
     public static function setInstance(AppContext $instance): void
     {
-        self::$instance = $instance;
+        static::$instance = $instance;
     }
 
     // --- Lazy Services ---
