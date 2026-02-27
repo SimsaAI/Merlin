@@ -46,28 +46,24 @@ class AppContext
 
     // --- Singleton ---
 
-    /** @var AppContext|null The singleton instance of AppContext. */
-    protected static ?AppContext $instance = null;
+    /** @var AppContext|null Shared singleton instance */
+    private static ?AppContext $instance = null;
 
     /**
-     * Get the singleton instance of AppContext. If it doesn't exist, it will be created.
-     *
-     * @return static The singleton instance of AppContext.
+     * Get/create shared singleton instance
      */
     public static function instance(): static
     {
-        // Using null coalescing assignment operator to ensure only one instance is created (thread-safe in PHP 8.0+)
-        return static::$instance ??= new static();
+        // Thread-safe PHP 8.0+
+        return self::$instance ??= new static();
     }
 
     /**
-     * Set the singleton instance of AppContext. This can be used to inject a custom context, for example in tests.
-     *
-     * @param AppContext $instance The AppContext instance to set as the singleton.
+     * Set shared instance (affects ALL subclasses)
      */
     public static function setInstance(AppContext $instance): void
     {
-        static::$instance = $instance;
+        self::$instance = $instance;
     }
 
     // --- Lazy Services ---
