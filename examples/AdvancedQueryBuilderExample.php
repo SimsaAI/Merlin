@@ -215,7 +215,7 @@ $userStats = User::query('u')
         'SUM(p.view_count) as total_views',
         'AVG(p.like_count) as avg_likes'
     ])
-    ->leftJoin(Post::class, 'p.user_id = u.id', 'p')
+    ->leftJoin(Post::class, 'p', 'p.user_id = u.id')
     ->where('p.status = :status', ['status' => 'published'])
     ->where('u.status = :user_status', ['user_status' => 'active'])
     ->groupBy('u.id')
