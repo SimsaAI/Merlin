@@ -252,7 +252,7 @@ $results = Order::query('o')
 
 #### Subqueries as Sources
 
-A `Query` instance can be passed directly to `->from()` or to any join method (`->join()`, `->leftJoin()`, `->innerJoin()`, `->rightJoin()`, `->crossJoin()`). The subquery is wrapped in parentheses automatically and its bind parameters are propagated to the outer query — no manual merging required.
+A `Query` instance can be passed directly to `->from()` or to any join method. The subquery is wrapped in parentheses automatically and its bind parameters are propagated to the outer query — no manual merging required.
 
 ```php
 use Merlin\Db\Query;
@@ -561,6 +561,7 @@ Check out the `examples/` directory for complete working examples:
 - **[ReadWriteConnectionExample.php](examples/ReadWriteConnectionExample.php)** - Setting up separate read and write database connections for master/replica configurations and improved scalability.
 - **[SaveCreateUpdateExample.php](examples/SaveCreateUpdateExample.php)** - Complete CRUD operations including `create()`, `update()`, `save()`, `delete()`, and tracking changes with `hasChanged()`.
 - **[SqlNodeExample.php](examples/SqlNodeExample.php)** - Advanced SQL expressions using the `Sql` class for raw SQL, functions, subqueries, and complex conditions within the query builder.
+- **[SyncExample/](examples/SyncExample/)** - A CLI application example demonstrating task auto-discovery, custom namespaces, and the built-in `model-sync` task features.
 
 ## Philosophy
 

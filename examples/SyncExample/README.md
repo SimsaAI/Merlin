@@ -11,7 +11,7 @@ You set up a database, run the sync task, and the framework automatically popula
 SyncExample/
 ├── console.php          CLI entry point
 ├── bootstrap.php        Database connection setup
-├── Models/
+├── app/Models/
 │   ├── User.php         Empty model shell → sync populates properties
 │   ├── Post.php
 │   └── Comment.php

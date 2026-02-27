@@ -1,6 +1,6 @@
 <?php
 
-namespace SyncExample\Models;
+namespace App\Models;
 
 use Merlin\Mvc\Model;
 

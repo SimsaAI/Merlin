@@ -108,6 +108,77 @@ class DatabaseTask extends Task
 
 ---
 
+## Default Action Behavior
+
+When a task is invoked without an explicit action name, or when the provided action doesn't match any method, `Console` may fall back to a **default action** (by default `runAction`).
+
+### Fallback Rules
+
+The default action is invoked when:
+
+1. **No action is specified** – e.g., `php console.php database` calls `DatabaseTask::runAction()` if it exists.
+2. **The task has exactly one public `*Action` method** – for single-action tasks, the "action" argument is treated as a positional parameter and passed to the default action.
+
+For **multi-action tasks** (tasks with more than one action method), an unrecognized action name shows an error and the task help page instead of silently falling back. This prevents typos from being silently ignored.
+
+### Example: Single-Action Task
+
+```php
+class EchoTask extends Task
+{
+    public function runAction(string $message = 'Hello!'): void
+    {
+        echo $message . PHP_EOL;
+    }
+}
+```
+
+```bash
+php console.php echo                # calls runAction() with default
+php console.php echo "Hi there"     # calls runAction("Hi there")
+php console.php echo run "Hi"       # calls runAction("Hi") explicitly
+```
+
+In this case, `"Hi there"` is treated as the first positional parameter to `runAction()`, not as an action name.
+
+### Example: Multi-Action Task
+
+```php
+class DatabaseTask extends Task
+{
+    public function migrateAction(): void { /* … */ }
+    public function seedAction(): void { /* … */ }
+}
+```
+
+```bash
+php console.php database            # error: no default action defined
+php console.php database migrate    # calls migrateAction()
+php console.php database typo       # error + shows task help (does NOT fall back)
+```
+
+### Overriding the Default Action
+
+You can change the default action method name globally:
+
+```php
+$console->setDefaultAction('handleAction');  // default was 'runAction'
+```
+
+Or define a custom default action in your task (though you must still configure `Console` to recognize it).
+
+### Help Display
+
+The default action is marked with a `[default]` label in the help output:
+
+```
+Actions:
+  run              [default]
+  migrate          Run database migrations.
+```
+
+---
+
 ## Reading Options
 
 Options (`--flag`, `--key=value`, `--no-flag`) are parsed from the command line **before** calling the action method and are available as an associative array.
@@ -248,8 +319,8 @@ $console->hasColors();          // bool
 // Color a string directly (useful for custom Console subclasses)
 echo $console->style('Hello!', 'bold', 'bgreen', '#5aff5a');
 
-// Default action (called when no action arg is provided; default: "indexAction")
-$console->setDefaultAction('indexAction');
+// Default action (called when no action arg is provided; default: "runAction")
+$console->setDefaultAction('runAction');
 $console->getDefaultAction();
 
 // Parameter type coercion ("5" → 5, "true" → true, "null" → null)

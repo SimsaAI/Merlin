@@ -172,7 +172,7 @@ A minimal `composer.json` for your app might look like:
 ```json
 {
   "require": {
-    "simsaai/merlin": "^3.0"
+    "simsaai/merlin": "latest"
   },
   "autoload": {
     "psr-4": {

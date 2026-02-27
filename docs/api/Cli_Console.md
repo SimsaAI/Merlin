@@ -24,9 +24,11 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Cli/Console.php#L67)
+### __construct() · [source](../../src/Cli/Console.php#L75)
 
 `public function __construct(string|null $scriptName = null): mixed`
+
+Console constructor.
 
 **🧭 Parameters**
 
@@ -41,13 +43,51 @@
 
 ---
 
-### addNamespace() · [source](../../src/Cli/Console.php#L77)
+### setCachePath() · [source](../../src/Cli/Console.php#L86)
+
+`public function setCachePath(string|null $path): void`
+
+Override the directory used to store the task discovery cache.
+
+Defaults to sys_get_temp_dir(). Set to null to disable caching entirely.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$path` | string\|null | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### clearCache() · [source](../../src/Cli/Console.php#L96)
+
+`public function clearCache(): void`
+
+Delete the task discovery cache file for this project, if it exists.
+
+Use this after adding new Task classes when you do not want to wait for
+automatic invalidation.
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### addNamespace() · [source](../../src/Cli/Console.php#L151)
 
 `public function addNamespace(string $ns): void`
 
 Register a namespace to search for tasks. Namespaces are resolved to directories via PSR-4 rules.
 
-By default, "Merlin\\Cli\\Tasks" and "App\\Tasks" are registered.
+By default, "App\\Tasks" is registered. The framework's own built-in tasks are pre-registered
+directly without any filesystem scan.
 
 **🧭 Parameters**
 
@@ -62,7 +102,7 @@ By default, "Merlin\\Cli\\Tasks" and "App\\Tasks" are registered.
 
 ---
 
-### addTaskPath() · [source](../../src/Cli/Console.php#L89)
+### addTaskPath() · [source](../../src/Cli/Console.php#L163)
 
 `public function addTaskPath(string $path, bool $registerAutoload = false): void`
 
@@ -84,7 +124,7 @@ You can set $registerAutoload to true to automatically register a simple PSR-4 a
 
 ---
 
-### getDefaultAction() · [source](../../src/Cli/Console.php#L105)
+### getDefaultAction() · [source](../../src/Cli/Console.php#L179)
 
 `public function getDefaultAction(): string`
 
@@ -93,12 +133,12 @@ Get the default action method name used when no action is specified on the comma
 **➡️ Return value**
 
 - Type: string
-- Description: Default action method name (without namespace), e.g. "indexAction".
+- Description: Default action method name (without namespace), e.g. "runAction".
 
 
 ---
 
-### setDefaultAction() · [source](../../src/Cli/Console.php#L116)
+### setDefaultAction() · [source](../../src/Cli/Console.php#L190)
 
 `public function setDefaultAction(string $defaultAction): void`
 
@@ -108,7 +148,7 @@ Set the default action method name used when no action is specified on the comma
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$defaultAction` | string | - | Action method name, e.g. "indexAction". |
+| `$defaultAction` | string | - | Action method name, e.g. "runAction". |
 
 **➡️ Return value**
 
@@ -121,7 +161,7 @@ Set the default action method name used when no action is specified on the comma
 
 ---
 
-### enableColors() · [source](../../src/Cli/Console.php#L140)
+### enableColors() · [source](../../src/Cli/Console.php#L214)
 
 `public function enableColors(bool $colors): void`
 
@@ -140,7 +180,7 @@ Enable or disable ANSI color output explicitly.
 
 ---
 
-### hasColors() · [source](../../src/Cli/Console.php#L146)
+### hasColors() · [source](../../src/Cli/Console.php#L220)
 
 `public function hasColors(): bool`
 
@@ -153,7 +193,7 @@ Check whether ANSI color output is enabled.
 
 ---
 
-### color() · [source](../../src/Cli/Console.php#L160)
+### color() · [source](../../src/Cli/Console.php#L234)
 
 `public function color(string|int $r, int|null $g = null, int|null $b = null, mixed $background = false): string`
 
@@ -176,7 +216,7 @@ Generate an ANSI escape code for a custom RGB color.
 
 ---
 
-### style() · [source](../../src/Cli/Console.php#L213)
+### style() · [source](../../src/Cli/Console.php#L287)
 
 `public function style(string $text, string ...$styles): string`
 
@@ -201,7 +241,7 @@ When color support is disabled, the text is returned unchanged.
 
 ---
 
-### write() · [source](../../src/Cli/Console.php#L226)
+### write() · [source](../../src/Cli/Console.php#L300)
 
 `public function write(string $text = ''): void`
 
@@ -220,7 +260,7 @@ Write text to stdout.
 
 ---
 
-### writeln() · [source](../../src/Cli/Console.php#L232)
+### writeln() · [source](../../src/Cli/Console.php#L306)
 
 `public function writeln(string $text = ''): void`
 
@@ -239,7 +279,7 @@ Write a line to stdout (newline appended).
 
 ---
 
-### stderr() · [source](../../src/Cli/Console.php#L238)
+### stderr() · [source](../../src/Cli/Console.php#L312)
 
 `public function stderr(string $text): void`
 
@@ -258,7 +298,7 @@ Write text to stderr.
 
 ---
 
-### stderrln() · [source](../../src/Cli/Console.php#L244)
+### stderrln() · [source](../../src/Cli/Console.php#L318)
 
 `public function stderrln(string $text): void`
 
@@ -277,7 +317,7 @@ Write a line to stderr (newline appended).
 
 ---
 
-### line() · [source](../../src/Cli/Console.php#L250)
+### line() · [source](../../src/Cli/Console.php#L324)
 
 `public function line(string $text): void`
 
@@ -296,7 +336,7 @@ Plain informational line.
 
 ---
 
-### info() · [source](../../src/Cli/Console.php#L258)
+### info() · [source](../../src/Cli/Console.php#L332)
 
 `public function info(string $text): void`
 
@@ -315,7 +355,7 @@ Write an informational message (cyan). Newline is appended automatically.
 
 ---
 
-### success() · [source](../../src/Cli/Console.php#L266)
+### success() · [source](../../src/Cli/Console.php#L340)
 
 `public function success(string $text): void`
 
@@ -334,7 +374,7 @@ Write a success message (green). Newline is appended automatically.
 
 ---
 
-### warn() · [source](../../src/Cli/Console.php#L274)
+### warn() · [source](../../src/Cli/Console.php#L348)
 
 `public function warn(string $text): void`
 
@@ -353,7 +393,7 @@ Write a warning message (yellow). Newline is appended automatically.
 
 ---
 
-### error() · [source](../../src/Cli/Console.php#L282)
+### error() · [source](../../src/Cli/Console.php#L356)
 
 `public function error(string $text): void`
 
@@ -372,7 +412,7 @@ Write an error message (white on red) to STDERR. Newline is appended automatical
 
 ---
 
-### muted() · [source](../../src/Cli/Console.php#L290)
+### muted() · [source](../../src/Cli/Console.php#L364)
 
 `public function muted(string $text): void`
 
@@ -391,7 +431,7 @@ Write a muted / dimmed message. Newline is appended automatically.
 
 ---
 
-### shouldCoerceParams() · [source](../../src/Cli/Console.php#L308)
+### shouldCoerceParams() · [source](../../src/Cli/Console.php#L382)
 
 `public function shouldCoerceParams(): bool`
 
@@ -409,7 +449,7 @@ to the action method.
 
 ---
 
-### setCoerceParams() · [source](../../src/Cli/Console.php#L318)
+### setCoerceParams() · [source](../../src/Cli/Console.php#L392)
 
 `public function setCoerceParams(bool $coerceParams): void`
 
@@ -428,7 +468,7 @@ Enable or disable automatic parameter type coercion.
 
 ---
 
-### process() · [source](../../src/Cli/Console.php#L330)
+### process() · [source](../../src/Cli/Console.php#L404)
 
 `public function process(string|null $task = null, string|null $action = null, array $params = []): void`
 
@@ -449,7 +489,7 @@ Process the given task, action, and parameters.
 
 ---
 
-### autodiscover() · [source](../../src/Cli/Console.php#L426)
+### autodiscover() · [source](../../src/Cli/Console.php#L519)
 
 `public function autodiscover(): void`
 
@@ -462,7 +502,7 @@ Autodiscover tasks in all registered namespaces and paths
 
 ---
 
-### readComposerPsr4() · [source](../../src/Cli/Console.php#L463)
+### readComposerPsr4() · [source](../../src/Cli/Console.php#L596)
 
 `public function readComposerPsr4(): array`
 
@@ -478,7 +518,7 @@ Result is cached for the lifetime of this Console instance.
 
 ---
 
-### findComposerRoot() · [source](../../src/Cli/Console.php#L486)
+### findComposerRoot() · [source](../../src/Cli/Console.php#L628)
 
 `public function findComposerRoot(): string|null`
 
@@ -493,7 +533,7 @@ Falls back to the current working directory.
 
 ---
 
-### resolvePsr4Path() · [source](../../src/Cli/Console.php#L517)
+### resolvePsr4Path() · [source](../../src/Cli/Console.php#L658)
 
 `public function resolvePsr4Path(string $namespace): string|null`
 
@@ -516,7 +556,7 @@ Example: "App\\Models" => "/project/src/Models"
 
 ---
 
-### scanDirectory() · [source](../../src/Cli/Console.php#L550)
+### scanDirectory() · [source](../../src/Cli/Console.php#L691)
 
 `public function scanDirectory(string $dir, string $suffix = '.php'): array`
 
@@ -537,7 +577,7 @@ name ends with $suffix (default ".php").
 
 ---
 
-### extractClassFromFile() · [source](../../src/Cli/Console.php#L573)
+### extractClassFromFile() · [source](../../src/Cli/Console.php#L714)
 
 `public function extractClassFromFile(string $file): string|null`
 
@@ -557,7 +597,7 @@ parsing its namespace declaration and the file's base name.
 
 ---
 
-### detectNamespace() · [source](../../src/Cli/Console.php#L590)
+### detectNamespace() · [source](../../src/Cli/Console.php#L731)
 
 `public function detectNamespace(string $dir): string`
 
@@ -578,7 +618,7 @@ Returns an empty string if none is found.
 
 ---
 
-### helpOverview() · [source](../../src/Cli/Console.php#L652)
+### helpOverview() · [source](../../src/Cli/Console.php#L789)
 
 `public function helpOverview(): void`
 
@@ -591,7 +631,7 @@ Built-in help task
 
 ---
 
-### helpTask() · [source](../../src/Cli/Console.php#L718)
+### helpTask() · [source](../../src/Cli/Console.php#L863)
 
 `public function helpTask(string $task): void`
 
@@ -610,7 +650,7 @@ Built-in help task for a specific task
 
 ---
 
-### coerceParam() · [source](../../src/Cli/Console.php#L1066)
+### coerceParam() · [source](../../src/Cli/Console.php#L1218)
 
 `public function coerceParam(string $param): string|int|float|bool|null`
 
@@ -632,7 +672,7 @@ Otherwise return the original string. Empty string is returned as-is.
 
 ---
 
-### terminalWidth() · [source](../../src/Cli/Console.php#L1152)
+### terminalWidth() · [source](../../src/Cli/Console.php#L1304)
 
 `public function terminalWidth(): int`
 
@@ -645,7 +685,7 @@ Return detected terminal width (columns). Falls back to 80.
 
 ---
 
-### wrapText() · [source](../../src/Cli/Console.php#L1416)
+### wrapText() · [source](../../src/Cli/Console.php#L1568)
 
 `public function wrapText(string $text, int $width): array`
 

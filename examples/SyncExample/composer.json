@@ -1,0 +1,10 @@
+{
+  "require": {
+    "simsaai/merlin": "latest"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}

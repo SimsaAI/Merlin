@@ -6,13 +6,19 @@ use ReflectionClass;
 
 class Console
 {
-    protected array $namespaces = ['Merlin\\Cli\\Tasks', 'App\\Tasks'];
+    protected array $namespaces = ['App\\Tasks'];
     protected array $taskPaths = [];
-    protected array $tasks = []; // taskName => class
+    protected array $tasks = [
+        'model-sync' => \Merlin\Cli\Tasks\ModelSyncTask::class,
+    ]; // taskName => class
+    /** @var array<string,string> class => absolute file path, populated during cold discovery */
+    protected array $taskClassFiles = [];
+    protected ?string $cachePath = null;
+    protected bool $cacheEnabled = false;
     protected string $scriptName;
     protected bool $coerceParams = false;
     protected bool $useColors;
-    protected string $defaultAction = "indexAction";
+    protected string $defaultAction = "runAction";
 
     protected const ANSI = [
         'reset' => "\033[0m",
@@ -62,17 +68,85 @@ class Console
     protected $commentStyles = ['gray', '#bdbdbd'];
 
     /**
+     * Console constructor.
+     * 
      * @param string|null $scriptName Optional custom script name for help output. Defaults to the basename of argv[0].
      */
     public function __construct(string $scriptName = null)
     {
         $this->scriptName = $scriptName ?? basename($_SERVER['argv'][0] ?? 'console.php');
         $this->useColors = $this->detectColorSupport();
+        $this->cachePath = sys_get_temp_dir();
+    }
+
+    /**
+     * Override the directory used to store the task discovery cache.
+     * Defaults to sys_get_temp_dir(). Set to null to disable caching entirely.
+     */
+    public function setCachePath(?string $path): void
+    {
+        $this->cachePath = $path !== null ? rtrim($path, DIRECTORY_SEPARATOR) : null;
+    }
+
+    /**
+     * Delete the task discovery cache file for this project, if it exists.
+     * Use this after adding new Task classes when you do not want to wait for
+     * automatic invalidation.
+     */
+    public function clearCache(): void
+    {
+        $file = $this->cacheFilePath();
+        if ($file !== null && file_exists($file)) {
+            @unlink($file);
+        }
+    }
+
+    /**
+     * Return the absolute path to the cache file for this project, or null when
+     * caching is disabled ($cachePath === null).
+     */
+    protected function cacheFilePath(): ?string
+    {
+        if ($this->cachePath === null || !$this->cacheEnabled) {
+            return null;
+        }
+        $root = $this->findComposerRoot();
+        $key = md5($root ?? $this->getMainScriptDirectory());
+        return $this->cachePath . DIRECTORY_SEPARATOR . 'merlin_tasks_' . $key . '.php';
+    }
+
+    /**
+     * Return true when the on-disk cache file is still valid.
+     * Validity is checked by comparing the cache file's mtime against
+     * composer.json and composer.lock (if present). Adding a new Task file
+     * requires a manual --clear-cache run or a composer.json touch.
+     */
+    protected function isCacheValid(string $cacheFile): bool
+    {
+        if (!file_exists($cacheFile)) {
+            return false;
+        }
+        $cacheMtime = @filemtime($cacheFile);
+        if ($cacheMtime === false) {
+            return false;
+        }
+        $root = $this->findComposerRoot();
+        if ($root !== null) {
+            if ((@filemtime($root . '/composer.json') ?: 0) > $cacheMtime) {
+                return false;
+            }
+            $lock = $root . '/composer.lock';
+            if (file_exists($lock) && (@filemtime($lock) ?: 0) > $cacheMtime) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
      * Register a namespace to search for tasks. Namespaces are resolved to directories via PSR-4 rules.
-     * By default, "Merlin\\Cli\\Tasks" and "App\\Tasks" are registered.
+     * By default, "App\\Tasks" is registered. The framework's own built-in tasks are pre-registered
+     * directly without any filesystem scan.
      */
     public function addNamespace(string $ns): void
     {
@@ -100,7 +174,7 @@ class Console
     /**
      * Get the default action method name used when no action is specified on the command line.
      *
-     * @return string Default action method name (without namespace), e.g. "indexAction".
+     * @return string Default action method name (without namespace), e.g. "runAction".
      */
     public function getDefaultAction(): string
     {
@@ -110,7 +184,7 @@ class Console
     /**
      * Set the default action method name used when no action is specified on the command line.
      *
-     * @param string $defaultAction Action method name, e.g. "indexAction".
+     * @param string $defaultAction Action method name, e.g. "runAction".
      * @throws \InvalidArgumentException If the given name is empty.
      */
     public function setDefaultAction(string $defaultAction): void
@@ -329,6 +403,13 @@ class Console
      */
     public function process(?string $task = null, ?string $action = null, array $params = []): void
     {
+        // Handle built-in meta-commands before any discovery.
+        if ($task === '--clear-task-cache') {
+            $this->clearCache();
+            $this->writeln('Task discovery cache cleared.');
+            return;
+        }
+
         $this->autodiscover();
         $this->registerBuiltInHelp();
 
@@ -378,20 +459,32 @@ class Console
         // determine method name
         $method = $this->actionToMethod($actionName);
 
-        if (!method_exists($task, $method)) {
-            // try default action fallback
-            if (
-                method_exists(
-                    $task,
-                    $this->defaultAction
-                )
-            ) {
+        if (!$method || !\method_exists($task, $method)) {
+            // Only fall back to the default action automatically when no 
+            // action was specified, or when this is a single-action task
+            // (so the "action" arg is actually the first positional param). 
+            // For multi-action tasks with an unrecognised action name, show
+            // task help instead to prevent silently swallowing typos.
+            $hasDefault = \method_exists($task, $this->defaultAction);
+            $ref = new ReflectionClass($class);
+            $publicActionCount = \count(array_filter(
+                $ref->getMethods(\ReflectionMethod::IS_PUBLIC),
+                fn($m) => str_ends_with($m->getName(), 'Action')
+            ));
+            $isSingleActionTask = $publicActionCount <= 1;
+
+            if ($hasDefault && ($actionName === null || $actionName === '' || $isSingleActionTask)) {
                 $method = $this->defaultAction;
+                if ($actionName !== null && $actionName !== '') {
+                    // treat the provided action as the first positional p
+                    // arameter
+                    array_unshift($params, $actionName);
+                }
             } else {
                 if (!empty($actionName)) {
                     $this->stderrln("Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'. Showing task help.");
                 } else {
-                    $this->stderrln("No action specified for task '{$taskName}', and no default action found. Showing task help.");
+                    $this->stderrln("No action specified for task '{$taskName}' and no default action found. Showing task help.");
                 }
                 $this->helpTask($taskKey);
                 return;
@@ -405,10 +498,10 @@ class Console
         $task->$method(...$params);
     }
 
-    protected function actionToMethod(?string $action): string
+    protected function actionToMethod(?string $action): ?string
     {
         if (!$action) {
-            return $this->defaultAction;
+            return null;
         }
 
         // convert dashed or colon or snake to camelCase then append Action
@@ -425,6 +518,34 @@ class Console
     /** Autodiscover tasks in all registered namespaces and paths */
     public function autodiscover(): void
     {
+        // Warm path: load from cache and skip all filesystem traversal.
+        $cacheFile = $this->cacheFilePath();
+        if ($cacheFile !== null && $this->isCacheValid($cacheFile)) {
+            $cached = @include $cacheFile;
+            if (is_array($cached)) {
+                // Register a classmap autoloader so task classes discovered on
+                // the cold path can still be loaded without a full directory scan.
+                $classFiles = $cached['_files'] ?? [];
+                if (!empty($classFiles)) {
+                    spl_autoload_register(static function (string $class) use ($classFiles): void {
+                        if (isset($classFiles[$class]) && !class_exists($class, false)) {
+                            require_once $classFiles[$class];
+                        }
+                    });
+                }
+                foreach ($cached as $name => $class) {
+                    if ($name === '_files') {
+                        continue;
+                    }
+                    if (!isset($this->tasks[$name])) {
+                        $this->tasks[$name] = $class;
+                    }
+                }
+                return;
+            }
+        }
+
+        // Cold path: full filesystem discovery.
         foreach ($this->namespaces as $ns) {
             $this->discoverNamespaceViaComposer($ns);
         }
@@ -433,6 +554,18 @@ class Console
 
         foreach ($this->taskPaths as $path) {
             $this->discoverPath($path);
+        }
+
+        // Persist the result so subsequent runs skip the traversal.
+        if ($cacheFile !== null) {
+            $toCache = $this->tasks;
+            unset($toCache['help']); // 'help' is always registered at runtime
+            $toCache['_files'] = $this->taskClassFiles; // classmap for warm-path autoloading
+            $export = '<?php return ' . var_export($toCache, true) . ';' . PHP_EOL;
+            $tmp = $cacheFile . '.tmp.' . getmypid();
+            if (@file_put_contents($tmp, $export) !== false) {
+                @rename($tmp, $cacheFile);
+            }
         }
     }
 
@@ -479,6 +612,15 @@ class Console
         return $cache = $result;
     }
 
+    protected function getMainScriptDirectory(): string
+    {
+        static $dir = null;
+        if ($dir === null) {
+            $dir = dirname(get_included_files()[0]);
+        }
+        return $dir;
+    }
+
     /**
      * Walk up the directory tree from this file until composer.json is found.
      * Falls back to the current working directory.
@@ -489,7 +631,10 @@ class Console
         if ($cache !== false) {
             return $cache;
         }
-        $dir = __DIR__;
+
+        // Walk up from the currently executing script, which is the most likely location for composer.json in a typical project.
+        $dir = $this->getMainScriptDirectory();
+
         while (true) {
             if (is_file($dir . '/composer.json')) {
                 return $cache = $dir;
@@ -500,11 +645,7 @@ class Console
             }
             $dir = $parent;
         }
-        // Fallback: check current working directory
-        $dir = getcwd();
-        if (is_file($dir . '/composer.json')) {
-            return $cache = $dir;
-        }
+
         return $cache = null;
     }
 
@@ -536,8 +677,8 @@ class Console
                 : $bestDir;
             return is_dir($path) ? $path : null;
         }
-        // Fallback: guess from cwd
-        $guess = getcwd() . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $nsClean);
+        // Fallback: guess a path relative to the current script directory
+        $guess = $this->getMainScriptDirectory() . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $nsClean);
         return is_dir($guess) ? $guess : null;
     }
 
@@ -614,7 +755,7 @@ class Console
      */
     protected function registerTaskFile(string $file): void
     {
-        $class = $this->resolveClassFromFile($file);
+        $class = $this->extractClassFromFile($file);
         if (!$class) {
             return;
         }
@@ -625,13 +766,9 @@ class Console
             $taskName = $this->taskNameFromClass($class);
             if (!isset($this->tasks[$taskName])) {
                 $this->tasks[$taskName] = $class;
+                $this->taskClassFiles[$class] = $file;
             }
         }
-    }
-
-    protected function resolveClassFromFile(string $file): ?string
-    {
-        return $this->extractClassFromFile($file);
     }
 
     protected function taskNameFromClass(string $class): string
@@ -685,11 +822,18 @@ class Console
             $actionLabelInner = 16; // the str_pad width used for actions
             $actionLeft = 4 + 2; // visual indent
             $actionAvail = max(10, $termWidth - $actionLeft - $actionLabelInner - 1);
+            $defaultActionLabel = method_exists($class, $this->defaultAction)
+                ? $this->methodToActionName($this->defaultAction)
+                : null;
             foreach ($this->extractActionDescriptions($class) as $action => $actionDesc) {
+                $defaultMarker = $action === $defaultActionLabel
+                    ? ' ' . $this->style('[default]', ...$this->muteStyles)
+                    : '';
                 if ($actionDesc === '') {
                     $this->writeln(
                         '    '
                         . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
+                        . $defaultMarker
                     );
                     continue;
                 }
@@ -700,6 +844,7 @@ class Console
                     '    '
                     . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     . ' ' . $this->style($first)
+                    . $defaultMarker
                 );
                 foreach ($actionLines as $ln) {
                     $this->writeln('    ' . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
@@ -749,8 +894,14 @@ class Console
             // description starts after: leading + task + ' ' + actionLabel + ' '
             $descStartCol = $leadingSpaces + $actionLabelInner + 1;
             $actionAvail = max(10, $termWidth - $descStartCol);
+            $defaultActionLabel = method_exists($class, $this->defaultAction)
+                ? $this->methodToActionName($this->defaultAction)
+                : null;
 
             foreach ($actions as $action => $actionDesc) {
+                $defaultMarker = $action === $defaultActionLabel
+                    ? ' ' . $this->style('[default]', ...$this->muteStyles)
+                    : '';
                 $lines = $this->wrapText($actionDesc, $actionAvail);
                 $first = array_shift($lines);
 
@@ -758,6 +909,7 @@ class Console
                     str_repeat(' ', $leadingSpaces)
                     . $this->style(str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     . ($first !== '' ? ' ' . $this->style($first) : '')
+                    . $defaultMarker
                 );
 
                 // continuation lines: indent to description column
