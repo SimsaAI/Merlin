@@ -89,3 +89,9 @@
 - [IndexSchema](Sync_Schema_IndexSchema.md) `Merlin\Sync\Schema\IndexSchema`
 - [SqliteSchemaProvider](Sync_Schema_SqliteSchemaProvider.md) `Merlin\Sync\Schema\SqliteSchemaProvider`
 
+### `Merlin\Validation`
+
+- [FieldValidator](Validation_FieldValidator.md) `Merlin\Validation\FieldValidator`
+- [ValidationException](Validation_ValidationException.md) `Merlin\Validation\ValidationException`
+- [Validator](Validation_Validator.md) `Merlin\Validation\Validator`
+

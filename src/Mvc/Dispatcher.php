@@ -496,11 +496,13 @@ class Dispatcher
             return $before;
         }
 
-        $result = $controller->$action(...$params);
-
-        $after = $controller->afterAction($action, $params);
-        if ($after instanceof Response) {
-            return $after;
+        try {
+            $result = $controller->$action(...$params);
+        } finally {
+            $after = $controller->afterAction($action, $params);
+            if ($after instanceof Response) {
+                $result = $after;
+            }
         }
 
         if ($result instanceof Response) {

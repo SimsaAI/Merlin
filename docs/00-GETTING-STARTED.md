@@ -43,8 +43,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Merlin\AppContext;
 use Merlin\Db\Database;
 use Merlin\Http\Response;
+use Merlin\Http\SessionMiddleware;
 use Merlin\Mvc\Dispatcher;
-use Merlin\Mvc\Router;
 
 // Initialize application context
 $ctx = AppContext::instance();
@@ -54,6 +54,7 @@ $ctx->dbManager()->set('default', new Database('mysql:host=localhost;dbname=myap
 
 // Configure view engine
 $ctx->view()->setPath(__DIR__ . '/../views');
+$ctx->view()->setLayout('layouts/main');   // default wrapping layout for all views
 
 // Set up routing
 $router = $ctx->router();
@@ -62,9 +63,10 @@ $router->add('GET', '/users/{id:int}', 'UserController::viewAction')->setName('u
 
 // Configure dispatcher with namespace and defaults (no constructor args – uses AppContext internally)
 $dispatcher = new Dispatcher();
-$dispatcher->setBaseNamespace('App\\Controllers');
+$dispatcher->setBaseNamespace('\\App\\Controllers');
 $dispatcher->setDefaultController('IndexController');
 $dispatcher->setDefaultAction('indexAction');
+$dispatcher->addMiddleware(new SessionMiddleware()); // starts PHP session; makes $ctx->session() available
 
 // Get the current request URI and method
 $path   = $ctx->request()->getPath();
@@ -104,6 +106,55 @@ class IndexController extends Controller
 }
 ```
 
+To render a view, return an array of variables — the framework passes them to the matching template automatically:
+
+```php
+public function indexAction(): array
+{
+    return ['title' => 'Welcome', 'version' => '1.0'];
+}
+```
+
+You can also render explicitly using the view engine:
+
+```php
+public function indexAction(): string
+{
+    return $this->view()->render('home/index', ['title' => 'Welcome']);
+}
+```
+
+## Minimal View
+
+Templates live under the view path configured in the bootstrap. By default, Merlin resolves them as `{controller}/{action}` relative to that path.
+
+Create [views/home/index.php](../views/home/index.php):
+
+```php
+<h1><?= htmlspecialchars($title) ?></h1>
+<p>Application is running.</p>
+```
+
+If you configured a layout (`$ctx->view()->setLayout('layouts/main')`), create the layout file and output the rendered view body via `$content`:
+
+Create [views/layouts/main.php](../views/layouts/main.php):
+
+```php
+<!DOCTYPE html>
+<html>
+<head><title><?= htmlspecialchars($title ?? 'App') ?></title></head>
+<body>
+<?= $content ?>
+</body>
+</html>
+```
+
+To render without the layout (e.g. for partials or JSON responses), use `renderPartial()`:
+
+```php
+return $this->view()->renderPartial('partials/flash', ['message' => 'Saved!']);
+```
+
 ## Minimal Model
 
 Models represent your database tables and provide an object-oriented way to interact with data. Define public properties that match your table columns.
@@ -137,6 +188,17 @@ $newUser = User::create([
 
 $exists = User::exists(['email' => 'alice@example.com']);
 ```
+
+## Middleware
+
+Middleware classes implement `Merlin\Mvc\MiddlewareInterface` and run before (and after) every controller action. Register global middleware on the dispatcher:
+
+```php
+$dispatcher->addMiddleware(new SessionMiddleware());  // built-in: starts PHP session
+$dispatcher->addMiddleware(new MyAuthMiddleware());   // custom
+```
+
+You can also restrict middleware to specific controllers or actions using the `$middleware` and `$actionMiddleware` properties on a controller class. See [Controllers & Views](03-CONTROLLERS-VIEWS.md) for details.
 
 ## CLI Bootstrap
 
@@ -231,6 +293,9 @@ The directive `try_files $uri $uri/ /index.php?$query_string;` ensures that all 
 
 - [Architecture](01-ARCHITECTURE.md)
 - [MVC Routing](02-MVC-ROUTING.md)
+- [Controllers & Views](03-CONTROLLERS-VIEWS.md)
 - [Models & ORM](04-MODELS-ORM.md)
 - [Database Queries](05-DATABASE-QUERIES.md)
-- [CLI Tasks](07-CLI-TASKS.md)
+- [Validation](07-VALIDATION.md)
+- [CLI Tasks](08-CLI-TASKS.md)
+- [Security (Crypt)](09-SECURITY.md)

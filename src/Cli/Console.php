@@ -495,7 +495,12 @@ class Console
         [$params, $options] = $this->splitArgs($params);
         $task->options = $options;
         $task->console = $this;
-        $task->$method(...$params);
+        $task->beforeAction($method, $params);
+        try {
+            $task->$method(...$params);
+        } finally {
+            $task->afterAction($method, $params);
+        }
     }
 
     protected function actionToMethod(?string $action): ?string

@@ -1,69 +1,138 @@
 # HTTP Request
 
-**Handle user input safely** - Learn how to access GET/POST data, handle file uploads, read headers, detect request methods, and work with JSON input. Includes security best practices and input validation techniques.
+`Merlin\Http\Request` provides normalized access to all incoming request data: query parameters, POST fields, uploaded files, headers, and more.
 
-`Merlin\Http\Request` provides normalized access to request data and uploads.
-
-## Basic Input Access
-
-The Request object provides a clean interface to access all incoming data. Methods support default values and work consistently across GET/POST.
+Obtain the request object from `AppContext` rather than instantiating it directly:
 
 ```php
-use Merlin\Http\Request;
+$request = \Merlin\AppContext::instance()->request();
+// or inside a controller:
+$request = $this->request();
+```
 
-$request = new Request();
+---
 
-$q = $request->get('q');
-$page = $request->getQuery('page', 1);
-$username = $request->getPost('username');
+## Reading Input
 
-$all = $request->get();
-$allGet = $request->getQuery();
+All input accessors accept an optional name and default value. Omit the name to get the full array.
+
+```php
+// $_REQUEST (GET + POST + COOKIE)
+$q       = $request->get('q');
+$all     = $request->get();
+
+// Query string ($_GET)
+$page    = $request->getQuery('page', 1);
+$allGet  = $request->getQuery();
+
+// POST body ($_POST)
+$email   = $request->getPost('email');
 $allPost = $request->getPost();
+
+// Raw $_SERVER value
+$ua = $request->getServer('HTTP_USER_AGENT', '');
 ```
 
-## Method and URL Data
+### Checking Parameter Existence
 
-Access request metadata like HTTP method, URI, and connection security. These helpers make it easy to implement method-based logic and security checks.
+Use the `has*` helpers instead of comparing the return value to `null`, since a field might legitimately hold `null` or `0`.
 
 ```php
-$method = $request->getMethod();
-$uri = $request->getUri();
-$path = $request->getPath();
-
-$isPost = $request->isPost();
-$isSecure = $request->isSecure();
-$isAjax = $request->isAjax();
+$request->has('token');        // isset in $_REQUEST
+$request->hasPost('_method');  // isset in $_POST
+$request->hasQuery('page');    // isset in $_GET
+$request->hasServer('HTTPS');  // isset in $_SERVER
 ```
 
-## Server and Client Data
+---
 
-Access server variables and client information in a normalized way. These helpers handle edge cases and proxy configurations automatically.
+## Method and URL
 
 ```php
-$host = $request->getHttpHost();
-$port = $request->getPort();
-$scheme = $request->getScheme();
-$userAgent = $request->getUserAgent();
-$clientIp = $request->getClientAddress(true);
+$method = $request->getMethod();   // 'GET', 'POST', 'PUT', …
+$uri    = $request->getUri();      // '/users/5?tab=profile'
+$path   = $request->getPath();     // '/users/5'
+
+$request->isPost();    // true when method is POST
+$request->isSecure();  // true when HTTPS
+$request->isAjax();    // true for fetch/axios/jQuery XHR (see note below)
+```
+
+> **Method override** – `getMethod()` recognises an `X-HTTP-Method-Override` header sent with a POST request and returns the overridden method (e.g. `'PUT'`), which allows method tunnelling through form submissions.
+
+> **AJAX detection** – `isAjax()` returns `true` when any of the following is present: `Content-Type: application/json`, `Accept: application/json`, or `X-Requested-With: XMLHttpRequest`.
+
+---
+
+## Server and Client Information
+
+```php
+$host       = $request->getHttpHost();          // 'example.com' or 'example.com:8080'
+$scheme     = $request->getScheme();            // 'http' or 'https'
+$port       = $request->getPort();              // 443
+$serverName = $request->getServerName();        // $_SERVER['SERVER_NAME']
+$serverAddr = $request->getServerAddr();        // server IP address
+$userAgent  = $request->getUserAgent();
+$clientIp   = $request->getClientAddress();     // REMOTE_ADDR
+$clientIp   = $request->getClientAddress(true); // trust X-Forwarded-For / HTTP_CLIENT_IP
 
 $contentType = $request->getContentType();
-$accept = $request->getAcceptableContent(true);
-$bestLanguage = $request->getBestLanguage();
 ```
+
+---
+
+## Content Negotiation
+
+Parse `Accept`, `Accept-Language`, and `Accept-Charset` headers into quality-sorted arrays.
+
+```php
+// Accept
+$types       = $request->getAcceptableContent();       // unsorted
+$types       = $request->getAcceptableContent(true);   // sorted by quality
+$bestType    = $request->getBestAccept();               // e.g. 'text/html'
+
+// Accept-Language
+$languages   = $request->getLanguages();
+$bestLang    = $request->getBestLanguage();             // e.g. 'en'
+
+// Accept-Charset
+$charsets    = $request->getClientCharsets();
+$bestCharset = $request->getBestCharset();              // e.g. 'utf-8'
+```
+
+Each entry in the returned arrays contains the value and its `quality` key (0–1).
+
+---
 
 ## JSON Body
 
-For API endpoints, easily parse JSON request bodies. This is especially useful for modern single-page applications and mobile clients.
+```php
+$raw  = $request->getRequestBody();      // raw php://input string (cached)
+$data = $request->getJsonBody();         // decoded as associative array (default)
+$obj  = $request->getJsonBody(false);    // decoded as stdClass objects
+```
+
+`getJsonBody()` throws `\RuntimeException` if the body is not valid JSON.
+
+---
+
+## HTTP Authentication
 
 ```php
-$body = $request->getRequestBody();
-$data = $request->getJsonBody(true); // assoc array
+// HTTP Basic Auth
+$auth = $request->getBasicAuth();
+// ['username' => '...', 'password' => '...'] or null
+
+// HTTP Digest Auth
+$digest = $request->getDigestAuth();
+// parsed digest array or null
 ```
+
+---
 
 ## File Uploads
 
-Handle file uploads securely with the UploadedFile wrapper. It provides validation, type checking, and safe file operations.
+`getFile()` returns a single `UploadedFile` (or `null`). `getFiles()` always returns an array, which is convenient for multi-file inputs.
 
 ```php
 $file = $request->getFile('avatar');
@@ -71,16 +140,25 @@ if ($file && $file->isValid()) {
     $file->moveTo(__DIR__ . '/uploads/' . $file->getClientFilename());
 }
 
-$attachments = $request->getFiles('attachments');
+// Multi-file input (<input type="file" name="docs[]" multiple>)
+foreach ($request->getFiles('docs') as $doc) {
+    if ($doc->isValid()) {
+        $doc->moveTo('/storage/' . $doc->getClientFilename());
+    }
+}
 ```
 
-Available `UploadedFile` methods:
+`UploadedFile` API:
 
-- `isValid(): bool` – true when upload succeeded with no error
-- `getClientFilename(): string` – original filename from the browser
-- `getClientMediaType(): string` – MIME type reported by the browser
-- `getSize(): int` – file size in bytes
-- `moveTo(string $targetPath): void` – move file to destination
+| Method                 | Returns  | Description                                                 |
+| ---------------------- | -------- | ----------------------------------------------------------- |
+| `isValid()`            | `bool`   | `true` when `UPLOAD_ERR_OK`                                 |
+| `getClientFilename()`  | `string` | Original filename from the browser (sanitise before use)    |
+| `getClientMediaType()` | `string` | MIME type reported by the client (not verified server-side) |
+| `getSize()`            | `int`    | File size in bytes                                          |
+| `moveTo(string $path)` | `void`   | Move to destination; throws `\RuntimeException` on failure  |
+
+---
 
 ## Controller Example
 
@@ -89,20 +167,33 @@ class UserController extends \Merlin\Mvc\Controller
 {
     public function createAction(): array
     {
-        $email = $this->request()->getPost('email');
+        $request = $this->request();
 
-        if (!$email) {
+        if (!$request->hasPost('email')) {
             return ['ok' => false, 'error' => 'email is required'];
         }
 
-        User::query()->insert(['email' => $email]);
+        $email = $request->getPost('email');
+        User::create(['email' => $email]);
 
+        return ['ok' => true];
+    }
+
+    public function apiAction(): array
+    {
+        $data = $this->request()->getJsonBody();
+        // process $data ...
         return ['ok' => true];
     }
 }
 ```
 
+---
+
 ## Related
 
 - [src/Http/Request.php](../src/Http/Request.php)
+- [src/Http/UploadedFile.php](../src/Http/UploadedFile.php)
 - [Controllers & Views](03-CONTROLLERS-VIEWS.md)
+- [Validation](07-VALIDATION.md)
+- [Security](09-SECURITY.md)

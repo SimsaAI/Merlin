@@ -108,4 +108,32 @@ abstract class Task
         return $this->options[$key] ?? $default;
     }
 
+
+    // -------------------------------------------------------------------------
+    //  Lifecycle hooks
+    // -------------------------------------------------------------------------
+
+    /**
+     * Called before the action method is executed.
+     * Override in a subclass to perform setup work (e.g. register event listeners based on options).
+     * The method has access to $this->options and $this->console at this point.
+     *
+     * @param string $action The resolved PHP method name that will be invoked (e.g. "runAction").
+     * @param array  $params Positional parameters that will be passed to the action.
+     */
+    public function beforeAction(string $action, array $params): void
+    {
+    }
+
+    /**
+     * Called after the action method has finished executing (including when an exception is thrown).
+     * Override in a subclass to perform teardown or post-processing work (e.g. flush collected SQL logs).
+     *
+     * @param string $action The resolved PHP method name that was invoked (e.g. "runAction").
+     * @param array  $params Positional parameters that were passed to the action.
+     */
+    public function afterAction(string $action, array $params): void
+    {
+    }
+
 }

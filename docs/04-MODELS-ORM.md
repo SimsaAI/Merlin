@@ -1,12 +1,14 @@
 # Models & ORM
 
-**Work with database records as objects** - Discover Merlin's Active Record implementation for elegant database interactions. Learn about model relationships, composite keys, mass assignment, validation, and advanced querying techniques.
+**Work with database records as objects** - Discover Merlin's Active Record implementation for elegant database interactions. Learn about model configuration, static query helpers, CRUD operations, state tracking, and read/write connections.
 
 Merlin models use an Active Record style API backed by `Merlin\Db\Query`.
 
+---
+
 ## Define a Model
 
-Models are simple PHP classes that extend the base Model class. Define public properties for your table columns - Merlin handles the rest.
+Extend `Merlin\Mvc\Model` and declare public properties for your table columns. No registration or mapping is needed — Merlin infers the table name from the class name automatically.
 
 ```php
 <?php
@@ -19,127 +21,231 @@ class User extends Model
     public int $id;
     public string $username;
     public string $email;
-
-    // Optional overrides:
-    // public function source(): string { return 'users'; }
-    // public function schema(): ?string { return 'public'; }
-    // public function idFields(): array { return ['id']; }
+    public string $status = 'active';
 }
 ```
 
-By default, Merlin converts model class names to table names using snake_case (e.g., `User` → `user`, `AdminUser` → `admin_user`). To enable automatic pluralization of table names (e.g., `User` → `users`, `AdminUser` → `admin_users`), use the `ModelMapping` utility:
+### Overrideable Methods
+
+| Method              | Default               | Purpose                      |
+| ------------------- | --------------------- | ---------------------------- |
+| `source(): string`  | snake_case class name | Table or view name           |
+| `schema(): ?string` | `null`                | Database schema (PostgreSQL) |
+| `idFields(): array` | `['id']`              | Primary key field(s)         |
+
+```php
+class OrderItem extends Model
+{
+    public function source(): string   { return 'order_items'; }
+    public function schema(): ?string  { return 'sales'; }
+    public function idFields(): array  { return ['order_id', 'product_id']; }
+}
+```
+
+### Table Name Conventions
+
+By default, class names are converted to snake_case (`AdminUser` → `admin_user`). Enable automatic pluralization globally:
 
 ```php
 use Merlin\Mvc\ModelMapping;
 
-// Enable pluralization globally
 ModelMapping::usePluralTableNames(true);
+// User → users, AdminUser → admin_users, Person → people
 ```
 
-When enabled, the last word segment of the table name is pluralized (with support for irregular plurals like `person` → `people`). You can still override the source table per-model using the `source()` method if needed.
+Irregular plurals (`person` → `people`) are handled. Override `source()` on any model to bypass the convention entirely.
 
-## Query Access
+> **Note:** Model has no `toArray()` method. Access properties directly or build an array manually: `['id' => $user->id, 'email' => $user->email]`.
 
-Every model provides direct access to the query builder, allowing you to construct complex queries while maintaining the model context.
+---
+
+## Query Builder
+
+`Model::query()` returns a `Query` builder pre-scoped to the model's table and read connection. Use it for anything beyond simple lookups.
 
 ```php
-$activeUsers = User::query()
-    ->where('status', 'active')
-    ->orderBy('created_at DESC')
+// Optional table alias
+$activeUsers = User::query('u')
+    ->where('u.status', 'active')
+    ->orderBy('u.created_at DESC')
     ->limit(20)
     ->select();
 ```
 
-## Load Helpers
+See [Database Queries](05-DATABASE-QUERIES.md) for the full query builder API.
 
-Merlin provides convenient static methods for common retrieval patterns. These methods return fully hydrated model instances with state tracking enabled, making it easy to work with your data.
+---
+
+## Static Load Helpers
+
+All static helpers return fully hydrated model instances with state tracking already established.
 
 ```php
-$user = User::find(123);
-$user = User::findOne(['email' => 'john@example.com']);
-$users = User::findAll(['status' => 'active']);
+$user  = User::find(123);                           // ?static by primary key
+$user  = User::findOrFail(123);                     // static or throws Exception
+$user  = User::findOne(['email' => $email]);        // ?static, first match
+$users = User::findAll(['status' => 'active']);     // ResultSet<static>
 
-$exists = User::exists(['email' => 'john@example.com']);
-$count = User::count(['status' => 'active']);
+$exists = User::exists(['email' => $email]);        // bool
+$count  = User::count(['status' => 'active']);      // int
 ```
 
-Composite key lookup:
+### Composite Keys
 
 ```php
+// Positional (order matches idFields())
 $item = UserProduct::find([10, 25]);
+
+// Named (safer, order-independent)
 $item = UserProduct::find(['user_id' => 10, 'product_id' => 25]);
 ```
 
-## Create / Update / Delete
+---
 
-Models support full CRUD operations with automatic state tracking. When you modify a loaded model, Merlin tracks which fields changed so updates only affect modified columns.
+## Creating Records
+
+### `create()` — insert and return
 
 ```php
-// Create via static helper
 $user = User::create([
     'username' => 'alice',
-    'email' => 'alice@example.com',
+    'email'    => 'alice@example.com',
 ]);
-
-// Update loaded model
-$user = User::find(123);
-$user->email = 'alice.new@example.com';
-$user->save();
-
-// Delete
-$user->delete();
+// $user->id is populated after insert (auto-increment or RETURNING)
 ```
 
-## State Tracking
+### `forceCreate()` — bypass ID guards
 
-Every model instance tracks its state, allowing you to detect changes, revert modifications, or perform optimistic updates. This is particularly useful for forms and multi-step operations.
+`forceCreate()` inserts all provided values as-is, including manually set ID fields. Useful for seeding or migrations.
 
 ```php
-$user = User::find(123);
-$user->email = 'changed@example.com';
-
-if ($user->hasChanged()) {
-    $user->update();
-}
-
-$user->loadState(); // revert to last saved/loaded state
+$user = User::forceCreate([
+    'id'       => 42,
+    'username' => 'seeded',
+    'email'    => 'seed@example.com',
+]);
 ```
 
-## Convenience Helpers
+### `firstOrCreate()` — find or insert
 
 ```php
 $user = User::firstOrCreate(
-    ['email' => 'john@example.com'],
-    ['username' => 'john']
-);
-
-$user = User::updateOrCreate(
-    ['email' => 'john@example.com'],
-    ['username' => 'johnny']
+    ['email' => 'john@example.com'],   // conditions to find by
+    ['username' => 'john']              // extra values if creating
 );
 ```
 
+### `updateOrCreate()` — find, update or insert
+
+```php
+$user = User::updateOrCreate(
+    ['email' => 'john@example.com'],   // conditions to find by
+    ['username' => 'johnny']            // values to set on update or merge on create
+);
+```
+
+---
+
+## Saving Changes
+
+### `save()` — smart INSERT or UPDATE
+
+`save()` inspects the model's state and decides automatically:
+
+- If **all ID fields are set** → `UPDATE` (only changed fields are sent)
+- If **any ID field is missing** → `INSERT` (or upsert when there is a conflict key)
+
+Returns `false` when there is nothing to save (no changes detected).
+
+```php
+$user = User::find(123);
+$user->email = 'new@example.com';
+$user->save(); // UPDATE users SET email = ? WHERE id = 123
+```
+
+```php
+$user = new User();
+$user->username = 'bob';
+$user->email = 'bob@example.com';
+$user->save(); // INSERT INTO users ...
+// $user->id is set after insert
+```
+
+### `insert()` — always INSERT
+
+Forces an `INSERT` regardless of whether ID fields are set. All non-internal properties are included.
+
+```php
+$user->insert();
+```
+
+### `update()` — always UPDATE
+
+Sends only the fields that changed since the last `saveState()`. Returns `false` if nothing changed.
+
+```php
+$user->email = 'updated@example.com';
+$user->update(); // UPDATE users SET email = ? WHERE id = ?
+```
+
+### `delete()`
+
+```php
+$user->delete(); // DELETE FROM users WHERE id = ?
+```
+
+---
+
+## State Tracking
+
+Every model returned by a static helper has its state snapshot automatically saved. This enables change detection and rollback.
+
+| Method         | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| `saveState()`  | Snapshot the current field values as the baseline         |
+| `loadState()`  | Restore all fields to the last snapshot                   |
+| `getState()`   | Return the snapshot object (`?static`), or `null` if none |
+| `hasChanged()` | `true` if any field differs from the snapshot             |
+
+```php
+$user = User::find(123);         // snapshot saved automatically
+$user->email = 'new@example.com';
+
+$user->hasChanged();             // true
+$user->getState()->email;        // original value
+
+$user->loadState();              // revert to snapshot
+$user->hasChanged();             // false
+
+$user->email = 'other@example.com';
+if ($user->hasChanged()) {
+    $user->update();             // UPDATE only the changed fields
+}
+```
+
+Properties whose names start with `__` are considered internal and are never included in state comparisons or write operations.
+
+---
+
 ## Read/Write Connections
 
-Database connections are managed by `DatabaseManager` using named **roles**. Register connections in your bootstrap:
+Connections are managed by `DatabaseManager` using named **roles**. Register them in your bootstrap:
 
 ```php
 use Merlin\AppContext;
 use Merlin\Db\Database;
 
 $mgr = AppContext::instance()->dbManager();
-// Direct instance
 $mgr->set('write', new Database('mysql:host=primary;dbname=myapp', 'rw', 'secret'));
-// Lazy factory example
 $mgr->set('read',  fn() => new Database('mysql:host=replica;dbname=myapp', 'ro', 'secret'));
 ```
 
-Models read from the `read` role and write to the `write` role by default, falling back to the registered default when a role is absent.
+By default all models read from the `read` role and write to the `write` role, falling back to the registered default when a role is absent.
 
-Per-model override using role names:
+### Per-model role overrides
 
 ```php
-// Both read and write to the same role
+// Both read and write to the same custom role
 User::setDefaultRole('analytics');
 
 // Fine-grained
@@ -147,10 +253,29 @@ User::setDefaultReadRole('replica');
 User::setDefaultWriteRole('primary');
 ```
 
-For a single-database setup, register one connection – models fall through to the default:
+### Global override (all models)
+
+Call `setDefaultRole()` on the base `Model` class to change the default for every model that has not set its own role:
+
+```php
+use Merlin\Mvc\Model;
+
+Model::setDefaultRole('default'); // reset everything to 'default'
+```
+
+### Single-database setup
+
+Register one connection under any name — all models fall through to it:
 
 ```php
 AppContext::instance()->dbManager()->set('default', new Database(...));
+```
+
+### Direct connection access
+
+```php
+$db = $user->readConnection();   // Database (read role)
+$db = $user->writeConnection();  // Database (write role)
 ```
 
 ## Using ModelMapping Without Model Classes

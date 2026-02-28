@@ -464,10 +464,11 @@ Comprehensive guides and references:
 - **[Models & ORM](docs/04-MODELS-ORM.md)** - Work with Active Record models
 - **[Database Queries](docs/05-DATABASE-QUERIES.md)** - Master the query builder
 - **[HTTP Request](docs/06-HTTP-REQUEST.md)** - Handle requests, uploads, and headers
-- **[CLI Tasks](docs/07-CLI-TASKS.md)** - Create command-line tools
-- **[Security](docs/08-SECURITY.md)** - Best practices and security features
-- **[Logging](docs/09-LOGGING.md)** - Application and database logging
-- **[Cookbook](docs/10-COOKBOOK.md)** - Practical recipes and examples
+- **[Validation](docs/07-VALIDATION.md)** - Validate and coerce request input
+- **[CLI Tasks](docs/08-CLI-TASKS.md)** - Create command-line tools
+- **[Security](docs/09-SECURITY.md)** - Best practices and security features
+- **[Logging](docs/10-LOGGING.md)** - Application and database logging
+- **[Cookbook](docs/11-COOKBOOK.md)** - Practical recipes and examples
 - **[API Reference](docs/api/index.md)** - Complete API documentation
 
 ## Key Concepts

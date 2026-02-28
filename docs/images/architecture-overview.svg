@@ -64,10 +64,7 @@
    x="0px"
    y="0px"
    style="font-family:'ArialMT', 'Arial', sans-serif;font-size:18.667px;fill:rgb(51,65,85);"
-   id="text3">Simple runtime centered around <tspan
-   x="269.783px 282.234px "
-   y="0px 0px "
-   id="tspan3">Ap</tspan>plication Context, MVC dispatch, DB abstractions, and CLI tasks</text>
+   id="text3">Lightweight runtime: AppContext · MVC dispatch · DB abstractions · Model sync · CLI</text>
             </g>
         </g>
     </g>
@@ -197,7 +194,7 @@
    serif:id="text10"
    x="0"
    y="0"
-   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">Singleton service hub used by web and CLI ﬂows</text>
+   style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0">Singleton service hub used by web and CLI flows</text>
             </g>
         </g>
     </g>
@@ -518,10 +515,7 @@
    x="-84.041"
    y="0"
    style="font-size:18.667px;font-family:ArialMT, Arial, sans-serif;fill:#e2e8f0"
-   id="text55">T<tspan
-   x="-74.708 -64.325996"
-   y="0 0"
-   id="tspan55">er</tspan>minal operations:</text>
+   id="text55">Query terminal calls:</text>
                     </g>
                     <g
    transform="translate(-78.8616,23.3334)"

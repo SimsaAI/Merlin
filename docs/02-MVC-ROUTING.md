@@ -53,12 +53,23 @@ $router->add('GET', '/blog/{slug}', 'BlogController::showAction');
 
 Add type constraints to validate parameters automatically. This helps prevent invalid data from reaching your controllers and makes routes more self-documenting.
 
-Built-in types: `int`, `alpha`, `alnum`, `uuid`, `regex`, `*` (matches any remaining path segments, captured as an array).
+Built-in types:
+
+| Type    | Accepts                            |
+| ------- | ---------------------------------- |
+| `int`   | Digits only (`ctype_digit`)        |
+| `alpha` | Letters only (`ctype_alpha`)       |
+| `alnum` | Letters and digits (`ctype_alnum`) |
+| `uuid`  | 36-char UUID with hyphens          |
+| (none)  | Any single segment (no validation) |
 
 ```php
 $router->add('GET', '/users/{id:int}', 'UserController::viewAction');
 $router->add('GET', '/tags/{name:alpha}', 'TagController::showAction');
+$router->add('GET', '/items/{slug}', 'ItemController::showAction'); // any single segment
 ```
+
+> **Note:** `{slug}` (no type) matches **one** URL segment with any value. `{files:*}` (explicit `*` type) is a **wildcard** that captures all remaining segments as an array — see [Wildcard Parameters](#wildcard-parameters) below.
 
 #### Regex Type
 
@@ -73,6 +84,31 @@ $router->add('GET', '/api/{namespace:regex(v[1-2])}/users', 'ApiController::user
 ```
 
 The regex pattern is matched using PCRE's `preg_match()` function. Ensure your pattern is specific enough to avoid unintended matches, and remember that the pattern is matched against individual URL segments only, not across segment boundaries.
+
+### Optional Parameters
+
+Append `?` to a parameter name to make it optional. The segment is accepted when present and valid, but the route still matches when it is absent.
+
+```php
+// /users or /users/42 both match
+$router->add('GET', '/users/{id?:int}', 'UserController::listOrViewAction');
+
+// /archive or /archive/2026 or /archive/2026-01-15 all match
+$router->add('GET', '/archive/{date?:regex(\d{4}(-\d{2}-\d{2})?)}', 'ArchiveController::indexAction');
+```
+
+In your action, declare the parameter as nullable or give it a default value:
+
+```php
+public function listOrViewAction(?int $id = null): Response
+{
+    if ($id === null) {
+        // list all
+    } else {
+        // view single
+    }
+}
+```
 
 ### Routing Variables
 
@@ -136,6 +172,24 @@ $router->addType('slug', fn(string $v) => preg_match('/^[a-z0-9-]+$/', $v));
 $router->add('GET', '/posts/{slug:slug}', 'PostController::showAction');
 ```
 
+## Route Priority
+
+When multiple routes could match the same URL, the Router picks the most specific one automatically — no manual ordering is required. Specificity is scored per segment:
+
+| Segment kind                                | Score |
+| ------------------------------------------- | ----- |
+| Static literal                              | 3     |
+| Typed / regex parameter                     | 2     |
+| Untyped or wildcard (`{name}` / `{name:*}`) | 1     |
+
+The route with the highest total score wins.
+
+```php
+// /users/settings matches the static route, not the parameter route
+$router->add('GET', '/users/{id:int}', 'UserController::viewAction'); // score 5 (3+2)
+$router->add('GET', '/users/settings', 'UserController::settingsAction'); // score 6 (3+3) ← wins
+```
+
 ## Prefix, Namespace, Controller, and Middleware Groups
 
 Organize related routes with common prefixes, shared namespaces, a common controller, or middleware. Groups can be nested freely.
@@ -163,6 +217,11 @@ $router->controller('UserController', function (Router $r) {
 // Middleware group — name must match a group registered in Dispatcher
 $router->middleware('auth', function (Router $r) {
     $r->add('GET', '/dashboard', 'DashboardController::indexAction');
+});
+
+// Apply multiple middleware groups at once
+$router->middleware(['auth', 'admin'], function (Router $r) {
+    $r->add('DELETE', '/users/{id:int}', 'UserController::deleteAction');
 });
 ```
 

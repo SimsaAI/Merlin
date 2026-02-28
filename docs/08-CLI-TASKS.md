@@ -200,6 +200,65 @@ $dryRun = !$this->option('apply', false);
 
 ---
 
+## Lifecycle Hooks
+
+`Task` provides two optional lifecycle hooks that are called by `Console` around every action invocation. Override them in your task (or in a shared base task class) to implement cross-cutting behavior — such as registering event listeners before an action runs and flushing results afterwards — without touching the action methods themselves.
+
+```php
+public function beforeAction(string $action, array $params): void { }
+public function afterAction(string $action, array $params): void { }
+```
+
+- `$action` — the resolved PHP method name that will be (or was) invoked (e.g. `"runAction"`).
+- `$params` — the positional parameters that will be (or were) passed to the action.
+- Both hooks have full access to `$this->options` and `$this->console` when they fire.
+- `afterAction()` is always called inside a `finally` block, so it runs even when the action throws an exception.
+
+### Example: collect SQL queries globally
+
+```php
+<?php
+namespace App\Tasks;
+
+use Merlin\AppContext;
+use Merlin\Cli\Task;
+
+abstract class BaseTask extends Task
+{
+    private array $collectedSql = [];
+
+    public function beforeAction(string $action, array $params): void
+    {
+        if ($this->option('save-sql')) {
+            AppContext::instance()->dbManager()->addGlobalListener(
+                function (string $event, mixed ...$args): void {
+                    if ($event === 'db.afterQuery') {
+                        $this->collectedSql[] = $args[0]; // SQL string
+                    }
+                }
+            );
+        }
+    }
+
+    public function afterAction(string $action, array $params): void
+    {
+        $path = $this->option('save-sql');
+        if ($path && !empty($this->collectedSql)) {
+            file_put_contents($path, implode("\n", $this->collectedSql) . "\n");
+            $this->muted("SQL written to {$path}.");
+        }
+    }
+}
+```
+
+Any task that extends `BaseTask` automatically gains `--save-sql=<file>` support without any changes to its action methods:
+
+```bash
+php console.php import run data.csv --save-sql=import.sql
+```
+
+---
+
 ## Output Helpers
 
 All output methods are available inside a task via `$this->…`. They delegate to the `Console` instance, which handles ANSI color automatically (enabled when the terminal supports it, disabled when piped).

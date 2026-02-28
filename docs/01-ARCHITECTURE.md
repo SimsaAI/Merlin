@@ -37,24 +37,28 @@ Custom services can be registered with `$ctx->set($id, $service)` and retrieved 
 
 ### MVC Layer
 
-- `Router` matches URI + method to route patterns, extracting parameters
-- `Dispatcher` is instantiated without arguments; obtains `AppContext` internally. It resolves controllers via DI (`AppContext::get()`), executes the middleware pipeline, injects action parameters (route vars or DI), and stores route info via `AppContext::setRoute()`
-- `Controller` provides access to request/context plus lifecycle hooks
-- `ViewEngine` renders templates, layouts, and namespaced views
+- `Router` matches URI + method to route patterns, extracting typed parameters; supports named routes, groups (`prefix()`, `namespace()`, `controller()`, `middleware()`), and custom parameter validators
+- `Dispatcher` is instantiated without arguments; obtains `AppContext` internally. It resolves controllers via DI (`AppContext::get()`), runs the global and per-route middleware pipeline, injects action parameters (route vars or DI), and stores resolved route info via `AppContext::setRoute()`
+- `Controller` provides access to request/context plus `beforeAction`/`afterAction` lifecycle hooks and controller-level middleware declarations
+- `ViewEngine` renders templates, layouts, and namespaced views; supports global view variables and partial rendering
+- `ModelMapping` maps logical model names to PHP classes and table names – useful when decoupling route/query naming from class names
 - `MiddlewareInterface` defines the contract for all middleware; `SessionMiddleware` is the built-in implementation
 - `ResolvedRoute` (in `AppContext->route()`) contains resolved route information accessible anywhere
 
 ### Data Layer
 
-- `Model` provides Active Record style methods and state tracking
-- `Query` is the fluent SQL builder for select/write/count/exists
-- `Database` wraps PDO and transaction helpers
-- `ResultSet` provides iterable model/row access
+- `Model` provides Active Record style methods (`find`, `findAll`, `create`, `save`, `delete`, …) and state tracking (`saveState`/`hasChanged`)
+- `Query` is the fluent SQL builder for select, write, count, and exists operations; terminal calls (`insert`, `upsert`, `update`, `delete`) finalize the query
+- `Database` wraps PDO with transaction helpers and lazy connection creation
+- `ResultSet` provides iterable, countable access to model or raw-row results
+- `Paginator` wraps a `Query` builder to add page/offset/total metadata with minimal boilerplate
+- `Condition`, `Sql`, and `SqlCase` provide composable SQL fragments and safe escape hatches (`Sql::bind()` for PDO-bound values)
 
 ### CLI Layer
 
-- `Console` maps CLI args to `Task` classes and `*Action()` methods
-- `Task` is the base class for commands
+- `Console` maps CLI arguments to `Task` classes and `*Action()` methods; additional namespaces can be registered for discovery
+- `Task` is the base class for all commands
+- `ModelSyncTask` is the built-in task that drives model synchronisation (see Sync Layer below)
 
 ## Request Flow (Web)
 
@@ -121,6 +125,21 @@ For single-database apps, register one connection under any name – models fall
 ```php
 $ctx->dbManager()->set('default', new Database(...));
 ```
+
+## Sync Layer
+
+Merlin ships a code-generation and schema-synchronisation subsystem under `Merlin\Sync`. It introspects a live database and updates (or generates) Model PHP files to match the schema, without requiring a separate migration runner.
+
+Key components:
+
+- `SyncRunner` – orchestrates the sync: reads schema, diffs against the parsed model, applies or previews changes
+- `ModelParser` – parses an existing PHP model file into a `ParsedModel` with typed properties and accessors
+- `ModelDiff` – computes the diff between the live schema and the parsed model (add/remove/change columns and accessors)
+- `CodeGenerator` – writes the updated PHP source back to the model file
+- `SyncOptions` / `SyncResult` – configure dry-run/preview mode and carry the result back to the caller
+- `Schema\` – driver-specific providers (`MySqlSchemaProvider`, `PostgresSchemaProvider`, `SqliteSchemaProvider`) that return a normalised `TableSchema`
+
+The CLI entry point is the built-in `ModelSyncTask`; the same `SyncRunner` API can be called programmatically.
 
 ## Extensibility Points
 

@@ -223,6 +223,51 @@ Retrieve a parsed option value by key, with an optional default.
 - Description: The option value or the default if not set.
 
 
+---
+
+### beforeAction() · [source](../../src/Cli/Task.php#L124)
+
+`public function beforeAction(string $action, array $params): void`
+
+Called before the action method is executed.
+
+Override in a subclass to perform setup work (e.g. register event listeners based on options).
+The method has access to $this->options and $this->console at this point.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$action` | string | - | The resolved PHP method name that will be invoked (e.g. "runAction"). |
+| `$params` | array | - | Positional parameters that will be passed to the action. |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### afterAction() · [source](../../src/Cli/Task.php#L135)
+
+`public function afterAction(string $action, array $params): void`
+
+Called after the action method has finished executing (including when an exception is thrown).
+
+Override in a subclass to perform teardown or post-processing work (e.g. flush collected SQL logs).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$action` | string | - | The resolved PHP method name that was invoked (e.g. "runAction"). |
+| `$params` | array | - | Positional parameters that were passed to the action. |
+
+**➡️ Return value**
+
+- Type: void
+
+
 
 ---
 
