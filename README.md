@@ -30,7 +30,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 ### Database & ORM
 
 - **Query Builder** - Unified fluent interface for SELECT, INSERT, UPDATE, DELETE
-- **Active Record Models** - Expressive model API with relationships and validation
+- **Active Record Models** - Expressive model API with state tracking and typed property support
 - **Prepared Statements** - SQL injection protection by default
 - **Read/Write Splitting** - Built-in support for master/replica database setups
 - **Connection Pooling** - Automatic reconnection and connection management
@@ -56,9 +56,10 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 
 ### Additional Features
 
+- **Validation** - Fluent field rules with type coercion, nested list/object validation, and error collection
 - **Security** - CSRF tokens, password hashing, encryption (Sodium/OpenSSL)
 - **Logging** - Event-based logging hooks for database and application events
-- **Pagination** - Built-in query pagination support
+- **Pagination** - Built-in query pagination with automatic total-count queries
 - **Exception Handling** - Structured exception hierarchy
 - **AppContext** - Centralized service container for shared resources
 
@@ -218,6 +219,60 @@ User::query()
 User::query()->where('status', 'spam')->delete();
 ```
 
+### Validating Input
+
+Merlin includes a fluent validation component. Fields are required by default; call `->optional()` or `->default()` where needed.
+
+```php
+use Merlin\Validation\Validator;
+
+$v = new Validator($ctx->request()->post());
+
+$v->field('name')->required()->string()->min(2)->max(100);
+$v->field('email')->required()->email()->max(255);
+$v->field('age')->optional()->int()->min(18);
+$v->field('role')->default('viewer');   // optional with a default value
+
+if ($v->fails()) {
+    return Response::json(['errors' => $v->errors()], 422);
+}
+
+$data = $v->validated(); // only validated, coerced fields
+User::create($data);
+```
+
+Or throw on failure instead of branching:
+
+```php
+use Merlin\Validation\ValidationException;
+
+try {
+    $data = $v->validate(); // throws ValidationException on failure
+} catch (ValidationException $e) {
+    return Response::json(['errors' => $e->errors()], 422);
+}
+```
+
+### Paginating Results
+
+`Paginator` wraps any `Query`, handles `LIMIT`/`OFFSET`, and runs an automatic total-count query.
+
+```php
+use Merlin\Db\Paginator;
+
+$paginator = new Paginator(
+    User::query()->where('status', 'active')->orderBy('name'),
+    page: (int)($_GET['page'] ?? 1),
+    pageSize: 20
+);
+
+$users = $paginator->paginate();  // ResultSet for the current page
+
+$totalItems  = $paginator->getTotalItems();
+$totalPages  = $paginator->getTotalPages();
+$currentPage = $paginator->getCurrentPage();
+```
+
 ### Advanced Query Builder
 
 Build complex queries with joins, subqueries, and aggregations.
@@ -280,59 +335,14 @@ $report = User::query()
 
 #### Using ModelMapping for Dynamic Model References
 
-`ModelMapping` allows you to refer to models in queries without creating actual PHP model classes. This is useful when you want the convenience of model names in your queries but don't need the full Active Record functionality.
-
-Set up a `ModelMapping` to map model names to their source tables and optional schemas:
-
-```php
-use Merlin\Db\Query;
-use Merlin\Mvc\ModelMapping;
-
-// Create model mappings
-$mapping = ModelMapping::fromArray([
-    'User' => 'users',                    // simple: "Model" => "table"
-    'Order' => ['source' => 'orders', 'schema' => 'public'],  // with schema
-    'Product' => ['source' => 'products'],
-]);
-
-// Register the mapping globally
-Query::setModelMapping($mapping);
-Query::useModels(true);
-
-// Now you can reference models by name in queries
-$results = Query::new()
-    ->from('User', 'u')
-    ->join('Order', 'o', 'u.id = o.user_id')
-    ->where('o.status', 'completed')
-    ->columns(['u.username', 'o.id', 'o.total'])
-    ->select();
-```
-
-You can also enable automatic table name pluralization for models:
-
-```php
-ModelMapping::usePluralTableNames(true);
-
-// Now "User" automatically maps to "users", "Order" to "orders", etc.
-// (without needing explicit mappings for every model)
-$mapping = ModelMapping::fromArray([
-    'User' => true,    // uses auto-pluralized table name
-]);
-
-Query::setModelMapping($mapping);
-Query::useModels(true);
-```
+`ModelMapping` lets you reference model names in queries without full Active Record classes — useful for dynamic schemas or reporting queries. See [Database Queries](docs/05-DATABASE-QUERIES.md) for the complete API.
 
 #### Using the Query Builder Directly on Tables
 
-For raw queries without models, you can use the Query builder directly.
-This is useful for complex queries that don't fit the Active Record pattern or when you want more control over the SQL being generated. The API is the same as the model query builder, but you start with `Query::new()` and specify the table manually.
+For queries that don't belong to any model, start with `Query::new()` and specify the table manually:
 
 ```php
 use Merlin\Db\Query;
-
-
-Query::useModels(false);
 
 $results = Query::new()
     ->table('orders o')
@@ -406,29 +416,20 @@ php console.php help database      # detail page for one task
 
 **Using Built-in Tasks**
 
-Merlin includes a built-in tasks for common development operations. The `model-sync` task synchronizes your PHP models with the database schema and supports these actions and options:
+Merlin includes a built-in `model-sync` task that synchronizes PHP models with the database schema:
 
 ```bash
-# Auto-discover App\Models via PSR-4 and preview differences (no args needed)
+# Preview differences between your models and the database
 php console.php model-sync all
 
-# Or target an explicit directory
-php console.php model-sync all src/Models
+# Apply changes (writes to files)
+php console.php model-sync all src/Models --apply --generate-accessors
 
-# Apply detected changes (use --apply to write files)
-php console.php model-sync all src/Models --apply [--database=<role>] [--generate-accessors] [--create-missing]
-
-# Run sync for a single model file
-php console.php model-sync model src/Models/User.php [--apply] [--database=<role>]
-
-# Scaffold a new model – auto-discovers App\Models directory
+# Scaffold a new model class
 php console.php model-sync make Order
-
-# Or scaffold into an explicit directory
-php console.php model-sync make Order src/Models [--namespace=App\\Models] [--apply]
 ```
 
-When no directory is provided, `model-sync all` and `model-sync make` automatically resolve the target by looking for `App\Models` in the PSR-4 entries of `composer.json`, then falling back to common paths (`app/Models`, `src/Models`).
+`model-sync all` and `model-sync make` auto-resolve the target directory from PSR-4 entries in `composer.json`. See [CLI Tasks](docs/08-CLI-TASKS.md) for all options.
 
 ## Project Structure
 

@@ -217,8 +217,6 @@ class FieldValidator
      */
     public function validate(mixed $value, string $path, array &$errors): mixed
     {
-        $errorsBefore = count($errors);
-
         // 1. Type coercion
         if ($this->typeRule !== null) {
             [$value, $ok] = $this->applyType($value, $path, $errors);
