@@ -21,8 +21,6 @@ class Console
     protected string $defaultAction = "runAction";
     /** @var string|null Raw help text (same format as docblock Options/Notes sections) shown globally in all help output. */
     protected ?string $globalHelp = null;
-    /** @var string Label shown as section header for global help (e.g. "Global Options:"). */
-    protected string $globalHelpLabel = 'Global Options:';
 
     protected const ANSI = [
         'reset' => "\033[0m",
@@ -107,12 +105,10 @@ class Console
      * on that task class.
      *
      * @param string|null $help  The help text, or null to clear.
-     * @param string      $label Section header label (default "Global Options:").
      */
-    public function setGlobalHelp(?string $help, string $label = 'Global Options:'): void
+    public function setGlobalHelp(?string $help): void
     {
         $this->globalHelp = $help;
-        $this->globalHelpLabel = $label;
     }
 
     /**
@@ -915,10 +911,7 @@ class Console
 
         if ($this->globalHelp !== null) {
             $this->writeln();
-            if ($this->globalHelpLabel) {
-                $this->writeln($this->style($this->globalHelpLabel, ...$this->sectionStyles));
-            }
-            $this->renderOptionsBlock($this->globalHelp, $this->terminalWidth());
+            $this->renderGlobalHelp($this->terminalWidth());
         }
 
         $this->writeln();
@@ -1025,11 +1018,7 @@ class Console
                 }
             }
             if ($showGlobal) {
-                if ($this->globalHelpLabel) {
-                    $this->writeln($this->style($this->globalHelpLabel, ...$this->sectionStyles));
-                }
-                $this->renderOptionsBlock($this->globalHelp, $termWidth);
-                $this->writeln();
+                $this->renderGlobalHelp($termWidth);
             }
         }
     }
@@ -1453,6 +1442,92 @@ class Console
      *  - All other non-blank lines are treated as prose and rendered inline.
      *  - Argument columns across all entries are aligned to the longest left side.
      */
+
+    /**
+     * Parse and render the global help text, which may contain multiple named sections.
+     *
+     * Section headers are lines matching "Word(s):" (e.g. "Options:", "Notes:", "Examples:").
+     * Any text before the first header is rendered as plain prose.
+     *
+     * Section rendering by label (case-insensitive):
+     *  - "Options"  → renderOptionsBlock()  – aligned flag + description columns, syntax-highlighted tokens
+     *  - "Examples" → highlightCommandLine() – one highlighted command per line
+     *  - "Usage"    → highlightCommandLine() – treated like examples (no task-name context)
+     *  - Anything else (Notes, Warning, Info …) → word-wrapped plain text in muted color
+     */
+    protected function renderGlobalHelp(int $termWidth): void
+    {
+        if ($this->globalHelp === null) {
+            return;
+        }
+
+        // ── Split into sections ──────────────────────────────────────────────
+        // A header is a line whose trimmed form looks like "Word(s):" with nothing after the colon.
+        $headerPattern = '/^([A-Za-z][A-Za-z\s]*):\s*$/';
+
+        $sections = [];          // [['label' => string|null, 'lines' => string[]]]
+        $current = ['label' => null, 'lines' => []];
+
+        foreach (explode("\n", str_replace("\r", '', $this->globalHelp)) as $line) {
+            if (preg_match($headerPattern, rtrim($line), $m)) {
+                if ($current['label'] !== null || !empty($current['lines'])) {
+                    $sections[] = $current;
+                }
+                $current = ['label' => trim($m[1]), 'lines' => []];
+            } else {
+                $current['lines'][] = $line;
+            }
+        }
+        if ($current['label'] !== null || !empty($current['lines'])) {
+            $sections[] = $current;
+        }
+
+        // ── Render each section ──────────────────────────────────────────────
+        foreach ($sections as $section) {
+            $label = $section['label'];
+            $body = implode("\n", $section['lines']);
+            $bodyTrimmed = trim($body);
+
+            if ($label !== null) {
+                $this->writeln($this->style($label . ':', ...$this->sectionStyles));
+            }
+
+            if ($bodyTrimmed === '') {
+                if ($label !== null) {
+                    $this->writeln();
+                }
+                continue;
+            }
+
+            $labelLower = strtolower($label ?? '');
+
+            if ($labelLower === 'options' || str_ends_with($labelLower, ' options')) {
+                // Options block: flag + description columns, syntax-highlighted
+                $this->renderOptionsBlock($body, $termWidth);
+                $this->writeln();
+            } elseif ($labelLower === 'examples' || $labelLower === 'usage') {
+                // Command lines with syntax highlighting
+                foreach (explode("\n", $body) as $l) {
+                    $this->writeln($this->highlightCommandLine($l));
+                }
+                $this->writeln();
+            } else {
+                // Prose / notes: word-wrap in muted color, 2-space indent
+                foreach (explode("\n", $body) as $l) {
+                    $trimmed = trim($l);
+                    if ($trimmed === '') {
+                        $this->writeln();
+                        continue;
+                    }
+                    foreach ($this->wrapText($trimmed, max(10, $termWidth - 2)) as $wrapped) {
+                        $this->writeln('  ' . $this->style($wrapped, ...$this->commentStyles));
+                    }
+                }
+                $this->writeln();
+            }
+        }
+    }
+
     protected function renderUsageBlock(string $usageText, string $taskKey, int $termWidth): void
     {
         $taskPattern = '/^' . preg_quote($taskKey, '/') . '\b/i';
