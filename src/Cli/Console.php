@@ -528,10 +528,11 @@ class Console
                 }
             } else {
                 if (!empty($actionName)) {
-                    $this->stderrln("Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'. Showing task help.");
+                    $message = "Action '" . ($actionName ?? '') . "' not found on task '{$taskName}'. Showing task help.";
                 } else {
-                    $this->stderrln("No action specified for task '{$taskName}' and no default action found. Showing task help.");
+                    $message = "No action specified for task '{$taskName}' and no default action found. Showing task help.";
                 }
+                $this->stderrln($this->style($message, ...static::STYLE_MUTED));
                 $this->helpTask($taskKey);
                 return;
             }

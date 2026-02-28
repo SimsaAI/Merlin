@@ -531,7 +531,7 @@ Process the given task, action, and parameters.
 
 ---
 
-### autodiscover() · [source](../../src/Cli/Console.php#L570)
+### autodiscover() · [source](../../src/Cli/Console.php#L571)
 
 `public function autodiscover(): void`
 
@@ -544,7 +544,7 @@ Autodiscover tasks in all registered namespaces and paths
 
 ---
 
-### readComposerPsr4() · [source](../../src/Cli/Console.php#L647)
+### readComposerPsr4() · [source](../../src/Cli/Console.php#L648)
 
 `public function readComposerPsr4(): array`
 
@@ -560,7 +560,7 @@ Result is cached for the lifetime of this Console instance.
 
 ---
 
-### findComposerRoot() · [source](../../src/Cli/Console.php#L679)
+### findComposerRoot() · [source](../../src/Cli/Console.php#L680)
 
 `public function findComposerRoot(): string|null`
 
@@ -575,7 +575,7 @@ Falls back to the current working directory.
 
 ---
 
-### resolvePsr4Path() · [source](../../src/Cli/Console.php#L709)
+### resolvePsr4Path() · [source](../../src/Cli/Console.php#L710)
 
 `public function resolvePsr4Path(string $namespace): string|null`
 
@@ -598,7 +598,7 @@ Example: "App\\Models" => "/project/src/Models"
 
 ---
 
-### scanDirectory() · [source](../../src/Cli/Console.php#L742)
+### scanDirectory() · [source](../../src/Cli/Console.php#L743)
 
 `public function scanDirectory(string $dir, string $suffix = '.php'): array`
 
@@ -619,7 +619,7 @@ name ends with $suffix (default ".php").
 
 ---
 
-### extractClassFromFile() · [source](../../src/Cli/Console.php#L765)
+### extractClassFromFile() · [source](../../src/Cli/Console.php#L766)
 
 `public function extractClassFromFile(string $file): string|null`
 
@@ -639,7 +639,7 @@ parsing its namespace declaration and the file's base name.
 
 ---
 
-### detectNamespace() · [source](../../src/Cli/Console.php#L782)
+### detectNamespace() · [source](../../src/Cli/Console.php#L783)
 
 `public function detectNamespace(string $dir): string`
 
@@ -660,7 +660,7 @@ Returns an empty string if none is found.
 
 ---
 
-### helpOverview() · [source](../../src/Cli/Console.php#L840)
+### helpOverview() · [source](../../src/Cli/Console.php#L841)
 
 `public function helpOverview(): void`
 
@@ -673,7 +673,7 @@ Built-in help task
 
 ---
 
-### helpTask() · [source](../../src/Cli/Console.php#L926)
+### helpTask() · [source](../../src/Cli/Console.php#L927)
 
 `public function helpTask(string $task): void`
 
@@ -692,7 +692,7 @@ Built-in help task for a specific task
 
 ---
 
-### coerceParam() · [source](../../src/Cli/Console.php#L1302)
+### coerceParam() · [source](../../src/Cli/Console.php#L1303)
 
 `public function coerceParam(string $param): string|int|float|bool|null`
 
@@ -714,7 +714,7 @@ Otherwise return the original string. Empty string is returned as-is.
 
 ---
 
-### terminalWidth() · [source](../../src/Cli/Console.php#L1388)
+### terminalWidth() · [source](../../src/Cli/Console.php#L1389)
 
 `public function terminalWidth(): int`
 
@@ -727,7 +727,7 @@ Return detected terminal width (columns). Falls back to 80.
 
 ---
 
-### wrapText() · [source](../../src/Cli/Console.php#L1738)
+### wrapText() · [source](../../src/Cli/Console.php#L1739)
 
 `public function wrapText(string $text, int $width): array`
 
