@@ -20,13 +20,10 @@ abstract class Task
     public array $options = [];
 
     /**
-     * Get the current AppContext instance. Useful for accessing services.
-     * @return AppContext
+     * Set to false in a subclass to suppress the global help section (registered via
+     * {@see Console::setGlobalHelp()}) when `php console help <this-task>` is run.
      */
-    public function context(): AppContext
-    {
-        return AppContext::instance();
-    }
+    protected bool $showGlobalHelp = true;
 
     // -------------------------------------------------------------------------
     //  Output helpers – delegate to the Console for consistent color support
@@ -104,7 +101,7 @@ abstract class Task
     }
 
     // -------------------------------------------------------------------------
-    //  Option parsing helper
+    //  Option and context helpers
     // -------------------------------------------------------------------------
 
     /** 
@@ -118,6 +115,14 @@ abstract class Task
         return $this->options[$key] ?? $default;
     }
 
+    /**
+     * Get the current AppContext instance. Useful for accessing services.
+     * @return AppContext
+     */
+    public function context(): AppContext
+    {
+        return AppContext::instance();
+    }
 
     // -------------------------------------------------------------------------
     //  Lifecycle hooks

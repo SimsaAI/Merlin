@@ -19,6 +19,10 @@ class Console
     protected bool $coerceParams = false;
     protected bool $useColors;
     protected string $defaultAction = "runAction";
+    /** @var string|null Raw help text (same format as docblock Options/Notes sections) shown globally in all help output. */
+    protected ?string $globalHelp = null;
+    /** @var string Label shown as section header for global help (e.g. "Global Options:"). */
+    protected string $globalHelpLabel = 'Global Options:';
 
     protected const ANSI = [
         'reset' => "\033[0m",
@@ -87,6 +91,36 @@ class Console
         $this->scriptName = $scriptName ?? basename($_SERVER['argv'][0] ?? 'console.php');
         $this->useColors = $this->detectColorSupport();
         $this->cachePath = sys_get_temp_dir();
+    }
+
+    /**
+     * Set global help text that is appended to every help output (both the task overview and
+     * per-task detail). Use the same plain-text format as docblock Options sections:
+     *
+     *   --flag              One-line description
+     *   --key=<value>       Description aligned automatically
+     *
+     * Pass null to clear previously set help. The section header can be customised via
+     * the second argument (default: "Global Options:").
+     *
+     * To suppress global help for a specific task, set `protected bool $showGlobalHelp = false`
+     * on that task class.
+     *
+     * @param string|null $help  The help text, or null to clear.
+     * @param string      $label Section header label (default "Global Options:").
+     */
+    public function setGlobalHelp(?string $help, string $label = 'Global Options:'): void
+    {
+        $this->globalHelp = $help;
+        $this->globalHelpLabel = $label;
+    }
+
+    /**
+     * Return the currently registered global help text, or null if none is set.
+     */
+    public function getGlobalHelp(): ?string
+    {
+        return $this->globalHelp;
     }
 
     /**
@@ -878,6 +912,15 @@ class Console
         }
         $this->writeln();
         $this->writeln($this->style('Run "' . $this->scriptName . ' help <task>" for details.'));
+
+        if ($this->globalHelp !== null) {
+            $this->writeln();
+            if ($this->globalHelpLabel) {
+                $this->writeln($this->style($this->globalHelpLabel, ...$this->sectionStyles));
+            }
+            $this->renderOptionsBlock($this->globalHelp, $this->terminalWidth());
+        }
+
         $this->writeln();
     }
 
@@ -967,6 +1010,27 @@ class Console
                 $this->writeln($this->highlightCommandLine($l, $taskKey));
             }
             $this->writeln();
+        }
+
+        // Global help: shown unless the task class opts out via $showGlobalHelp = false.
+        if ($this->globalHelp !== null) {
+            $showGlobal = true;
+            if ($class && class_exists($class)) {
+                $taskRef = new ReflectionClass($class);
+                if ($taskRef->hasProperty('showGlobalHelp')) {
+                    $prop = $taskRef->getProperty('showGlobalHelp');
+                    $prop->setAccessible(true);
+                    // Read default value from class definition (not from an instance)
+                    $showGlobal = (bool) ($prop->hasDefaultValue() ? $prop->getDefaultValue() : true);
+                }
+            }
+            if ($showGlobal) {
+                if ($this->globalHelpLabel) {
+                    $this->writeln($this->style($this->globalHelpLabel, ...$this->sectionStyles));
+                }
+                $this->renderOptionsBlock($this->globalHelp, $termWidth);
+                $this->writeln();
+            }
         }
     }
 
