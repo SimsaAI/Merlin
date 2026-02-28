@@ -34,6 +34,44 @@ class FieldValidator
     /** @var array<string, callable>|null */
     private ?array $modelFields = null;
 
+    // ---- Error templates ----------------------------------------------------
+
+    private const TEMPLATES = [
+        'required' => 'required',
+        'type.int' => 'must be an integer',
+        'type.float' => 'must be a number',
+        'type.bool' => 'must be a boolean (true/false, yes/no, on/off, 1/0)',
+        'min.string' => 'must have at least {min} characters',
+        'min.number' => 'must be at least {min}',
+        'min.array' => 'must have at least {min} items',
+        'max.string' => 'must have at most {max} characters',
+        'max.number' => 'must be at most {max}',
+        'max.array' => 'must have at most {max} items',
+        'email' => 'must be a valid email address',
+        'url' => 'must be a valid URL',
+        'ip' => 'must be a valid IP address',
+        'domain' => 'must be a valid domain name',
+        'pattern' => 'has an invalid format',
+        'in' => 'must be one of: {allowed}',
+        'not_array' => 'must be an array',
+        'not_object' => 'must be an object',
+    ];
+
+    /**
+     * Build a structured error entry for the internal errors array.
+     *
+     * @param  array<string, mixed>  $params
+     * @return array{code: string, params: array<string, mixed>, template: string}
+     */
+    private function buildError(string $code, array $params = []): array
+    {
+        return [
+            'code' => $code,
+            'params' => $params,
+            'template' => self::TEMPLATES[$code] ?? $code,
+        ];
+    }
+
     // ---- Presence -----------------------------------------------------------
 
     public function required(): static
@@ -178,6 +216,34 @@ class FieldValidator
         return $this;
     }
 
+    /** Value must be a valid domain name (e.g. example.com), without scheme or path. */
+    public function domain(): static
+    {
+        $this->formatRules[] = ['domain'];
+        return $this;
+    }
+
+    /**
+     * Custom validation callback. Return:
+     *   - null                  → valid, no error
+     *   - string                → error with code 'custom' and the string as the message
+     *   - array                 → structured error; supports the same keys as built-in errors:
+     *       'code'     (required) – error code passed to the translator
+     *       'params'   (optional) – raw parameter values for placeholder replacement, default []
+     *       'template' (optional) – English fallback template with {placeholder} markers;
+     *                               if omitted, looked up from the built-in TEMPLATES table
+     *                               or falls back to the code string itself
+     *
+     * Multiple custom() calls are supported and stack; the first failure short-circuits.
+     *
+     * @param callable(mixed): (null|string|array{code: string, params?: array<string, mixed>, template?: string}) $fn
+     */
+    public function custom(callable $fn): static
+    {
+        $this->formatRules[] = ['custom', $fn];
+        return $this;
+    }
+
     // ---- Structure rules ----------------------------------------------------
 
     /**
@@ -212,7 +278,7 @@ class FieldValidator
      *
      * @param mixed  $value  The raw input value.
      * @param string $path   Dot-path used as the error key.
-     * @param array<string, string> $errors  Accumulated errors (mutated in place).
+     * @param array<string, array{code: string, params: array<string, mixed>, template: string}> $errors  Accumulated errors (mutated in place).
      * @return mixed The coerced / validated value.
      */
     public function validate(mixed $value, string $path, array &$errors): mixed
@@ -262,7 +328,7 @@ class FieldValidator
                     return [$value, true];
                 }
                 if (filter_var($value, FILTER_VALIDATE_INT) === false) {
-                    $errors[$path] = 'must be an integer';
+                    $errors[$path] = $this->buildError('type.int');
                     return [$value, false];
                 }
                 return [(int) $value, true];
@@ -272,7 +338,7 @@ class FieldValidator
                     return [(float) $value, true];
                 }
                 if (!is_numeric($value)) {
-                    $errors[$path] = 'must be a number';
+                    $errors[$path] = $this->buildError('type.float');
                     return [$value, false];
                 }
                 return [(float) $value, true];
@@ -283,7 +349,7 @@ class FieldValidator
                 }
                 $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
                 if ($result === null) {
-                    $errors[$path] = 'must be a boolean (true/false, yes/no, on/off, 1/0)';
+                    $errors[$path] = $this->buildError('type.bool');
                     return [$value, false];
                 }
                 return [$result, true];
@@ -312,18 +378,16 @@ class FieldValidator
         }
 
         if ($this->min !== null && $n < $this->min) {
-            $min = (int) $this->min === $this->min ? (int) $this->min : $this->min;
-            $errors[$path] = $noun
-                ? "must have at least {$min} {$noun}"
-                : "must be at least {$min}";
+            $min = (int) $this->min == $this->min ? (int) $this->min : $this->min;
+            $code = $noun === 'characters' ? 'min.string' : ($noun === 'items' ? 'min.array' : 'min.number');
+            $errors[$path] = $this->buildError($code, ['min' => $min]);
             return false;
         }
 
         if ($this->max !== null && $n > $this->max) {
-            $max = (int) $this->max === $this->max ? (int) $this->max : $this->max;
-            $errors[$path] = $noun
-                ? "must have at most {$max} {$noun}"
-                : "must be at most {$max}";
+            $max = (int) $this->max == $this->max ? (int) $this->max : $this->max;
+            $code = $noun === 'characters' ? 'max.string' : ($noun === 'items' ? 'max.array' : 'max.number');
+            $errors[$path] = $this->buildError($code, ['max' => $max]);
             return false;
         }
 
@@ -338,35 +402,58 @@ class FieldValidator
         switch ($rule[0]) {
             case 'email':
                 if (filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
-                    $errors[$path] = 'must be a valid email address';
+                    $errors[$path] = $this->buildError('email');
                     return false;
                 }
                 break;
 
             case 'url':
                 if (filter_var($value, FILTER_VALIDATE_URL) === false) {
-                    $errors[$path] = 'must be a valid URL';
+                    $errors[$path] = $this->buildError('url');
                     return false;
                 }
                 break;
 
             case 'ip':
                 if (filter_var($value, FILTER_VALIDATE_IP) === false) {
-                    $errors[$path] = 'must be a valid IP address';
+                    $errors[$path] = $this->buildError('ip');
                     return false;
                 }
                 break;
 
             case 'pattern':
                 if (!preg_match($rule[1], (string) $value)) {
-                    $errors[$path] = 'has an invalid format';
+                    $errors[$path] = $this->buildError('pattern');
                     return false;
                 }
                 break;
 
             case 'in':
                 if (!in_array($value, $rule[1], true)) {
-                    $errors[$path] = 'must be one of: ' . implode(', ', array_map('strval', $rule[1]));
+                    $errors[$path] = $this->buildError('in', ['allowed' => $rule[1]]);
+                    return false;
+                }
+                break;
+
+            case 'domain':
+                if (filter_var($value, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) === false) {
+                    $errors[$path] = $this->buildError('domain');
+                    return false;
+                }
+                break;
+
+            case 'custom':
+                $result = ($rule[1])($value);
+                if ($result !== null) {
+                    if (is_array($result)) {
+                        $errors[$path] = [
+                            'code' => $result['code'],
+                            'params' => $result['params'] ?? [],
+                            'template' => $result['template'] ?? (self::TEMPLATES[$result['code']] ?? $result['code']),
+                        ];
+                    } else {
+                        $errors[$path] = ['code' => 'custom', 'params' => [], 'template' => $result];
+                    }
                     return false;
                 }
                 break;
@@ -378,7 +465,7 @@ class FieldValidator
     private function applyList(mixed $value, string $path, array &$errors): mixed
     {
         if (!is_array($value)) {
-            $errors[$path] = 'must be an array';
+            $errors[$path] = $this->buildError('not_array');
             return $value;
         }
 
@@ -398,7 +485,7 @@ class FieldValidator
     private function applyModel(mixed $value, string $path, array &$errors): mixed
     {
         if (!is_array($value)) {
-            $errors[$path] = 'must be an object';
+            $errors[$path] = $this->buildError('not_object');
             return $value;
         }
 
@@ -410,7 +497,7 @@ class FieldValidator
 
             if (!array_key_exists($key, $value)) {
                 if ($fv->isRequired()) {
-                    $errors[$subPath] = 'required';
+                    $errors[$subPath] = $this->buildError('required');
                 } elseif ($fv->hasDefault()) {
                     $result[$key] = $fv->getDefault();
                 }

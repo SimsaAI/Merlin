@@ -1,4 +1,4 @@
-# SyncExample – Model Synchronisation Demo
+# ModelSyncExample – Model Synchronisation Demo
 
 This example demonstrates the **DB → PHP** model synchronisation feature of the Merlin framework.  
 You set up a database, run the sync task, and the framework automatically populates your model classes with typed PHP properties derived from the live database schema.
@@ -8,7 +8,7 @@ You set up a database, run the sync task, and the framework automatically popula
 ## Directory Structure
 
 ```
-SyncExample/
+ModelSyncExample/
 ├── console.php          CLI entry point
 ├── bootstrap.php        Database connection setup
 ├── app/Models/
@@ -28,7 +28,7 @@ SyncExample/
 ### 1. Create the database
 
 ```bash
-cd examples/SyncExample
+cd examples/ModelSyncExample
 
 # Create the SQLite database from the SQL file
 sqlite3 sync_example.sqlite < sql/sqlite.sql
@@ -42,7 +42,7 @@ No changes needed for the quick start.
 ### 3. Preview changes (dry-run)
 
 ```bash
-php console.php sync all Models
+php console.php model-sync all Models
 ```
 
 Expected output:
@@ -50,7 +50,7 @@ Expected output:
 ```
 Dry-run: scanning 3 file(s) in Models …
 
-[DRY-RUN] SyncExample\Models\User (users): +6 added
+[DRY-RUN] ModelSyncExample\Models\User (users): +6 added
     • add    $id: int — Primary key
     • add    $email: string
     • add    $name: ?string
@@ -58,10 +58,10 @@ Dry-run: scanning 3 file(s) in Models …
     • add    $created_at: string
     • add    $updated_at: ?string
 
-[DRY-RUN] SyncExample\Models\Post (posts): +6 added
+[DRY-RUN] ModelSyncExample\Models\Post (posts): +6 added
     ...
 
-[DRY-RUN] SyncExample\Models\Comment (comments): +5 added
+[DRY-RUN] ModelSyncExample\Models\Comment (comments): +5 added
     ...
 
 Done. 3 model(s) with changes, 0 error(s).
@@ -72,7 +72,7 @@ Done. 3 model(s) with changes, 0 error(s).
 ### 4. Apply changes
 
 ```bash
-php console.php sync all Models --apply
+php console.php model-sync all --apply
 ```
 
 The model files in `Models/` are now updated with the correct typed properties.  
@@ -93,9 +93,22 @@ class User extends Model
 
 ### 5. Sync a single model
 
+You can identify a model by file path, short class name, or fully-qualified class name:
+
 ```bash
-php console.php sync model Models/User.php --apply
+# By file path (original behaviour)
+php console.php model-sync model app/Models/User.php --apply
+
+# By short class name – discovered automatically via PSR-4
+php console.php model-sync model User --apply
+
+# By fully-qualified class name
+php console.php model-sync model App\Models\User --apply
 ```
+
+When a class name is given instead of a file path, the task resolves it to the
+correct file using the PSR-4 map in `composer.json`. Add `--directory=<dir>` if
+you have multiple classes with the same short name in different namespaces.
 
 ---
 
@@ -123,7 +136,7 @@ $ctx->dbManager()->set('default', new Database(
 ### 3. Run sync
 
 ```bash
-php console.php sync all Models --apply
+php console.php model-sync all --apply
 ```
 
 > **MySQL advantage:** Column and table comments from the SQL file are synced into  
@@ -155,7 +168,7 @@ $ctx->dbManager()->set('default', new Database(
 ### 3. Run sync
 
 ```bash
-php console.php sync all Models --apply
+php console.php model-sync all --apply
 ```
 
 ---
@@ -179,17 +192,21 @@ COMMENT ON COLUMN users.avatar_url IS 'Profile picture URL';
 Re-run:
 
 ```bash
-php console.php sync model Models/User.php --apply
+# By file path
+php console.php model-sync model app/Models/User.php --apply
+
+# Or by class name
+php console.php model-sync model User --apply
 ```
 
 `$avatar_url` (and the column comment as a docblock for MySQL/PG) is appended to `User.php`.
 
 ### Remove a column (simulate column removal)
 
-Drop a column from the database, then re-run sync:
+Re-run sync:
 
 ```bash
-php console.php sync all Models --apply
+php console.php model-sync all app/Models --apply
 ```
 
 Any PHP property that no longer has a matching column is marked `@deprecated` in its docblock rather than deleted — keeping your code safe.
@@ -199,16 +216,24 @@ Any PHP property that no longer has a matching column is marked `@deprecated` in
 ## CLI Reference
 
 ```
-php console.php sync all   <directory> [--apply] [--database=<role>]
+php console.php model-sync all   <directory>       [--apply] [--database=<role>]
                             [--generate-accessors] [--field-visibility=<vis>]
                             [--no-deprecate] [--create-missing] [--namespace=<ns>]
-php console.php sync model <file>       [--apply] [--database=<role>]
+php console.php model-sync model <file-or-class>   [--apply] [--database=<role>]
                             [--generate-accessors] [--field-visibility=<vis>]
-                            [--no-deprecate]
-php console.php sync make  <ClassName>  <directory> [--namespace=<ns>] [--apply]
+                            [--no-deprecate] [--directory=<dir>]
+php console.php model-sync make  <ClassName> [<dir>] [--namespace=<ns>] [--apply]
                             [--database=<role>] [--generate-accessors]
                             [--field-visibility=<vis>] [--no-deprecate]
 ```
+
+The `<file-or-class>` argument for `model-sync model` accepts:
+
+| Form                 | Example                            |
+| -------------------- | ---------------------------------- |
+| File path            | `app/Models/User.php`              |
+| Short class name     | `User` (auto-discovered via PSR-4) |
+| Fully-qualified name | `App\Models\User`                  |
 
 | Flag                       | Description                                                                              |
 | -------------------------- | ---------------------------------------------------------------------------------------- |
@@ -219,6 +244,7 @@ php console.php sync make  <ClassName>  <directory> [--namespace=<ns>] [--apply]
 | `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`                       |
 | `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed                    |
 | `--create-missing`         | (`sync all` only) Scaffold model files for tables that have no matching model yet        |
+| `--directory=<dir>`        | (`model-sync model` only) Directory hint when resolving a short class name               |
 | `--namespace=<ns>`         | PHP namespace to use when scaffolding new model files (required with `--create-missing`) |
 
 ---

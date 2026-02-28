@@ -89,20 +89,52 @@ $v->field('tags')->list(fn($f) => $f->string())->min(1)->max(10);
 
 Format rules validate the _content_ of the value without changing its type.
 
-| Rule                       | Validates                              |
-| -------------------------- | -------------------------------------- |
-| `->email()`                | RFC 5321 e-mail address                |
-| `->url()`                  | URL (`FILTER_VALIDATE_URL`)            |
-| `->ip()`                   | IPv4 or IPv6 address                   |
-| `->pattern(string $regex)` | Value matches the regular expression   |
-| `->in(array $allowed)`     | Strict (`===`) membership in the array |
+| Rule                       | Validates                                        |
+| -------------------------- | ------------------------------------------------ |
+| `->email()`                | RFC 5321 e-mail address                          |
+| `->url()`                  | URL (`FILTER_VALIDATE_URL`)                      |
+| `->ip()`                   | IPv4 or IPv6 address                             |
+| `->domain()`               | Bare hostname (`example.com`), no scheme or path |
+| `->pattern(string $regex)` | Value matches the regular expression             |
+| `->in(array $allowed)`     | Strict (`===`) membership in the array           |
+| `->custom(callable $fn)`   | User-defined callback                            |
 
 ```php
 $v->field('email')->email();
 $v->field('website')->optional()->url();
 $v->field('client_ip')->ip();
+$v->field('host')->domain();               // 'example.com' ✓  'https://example.com' ✗
 $v->field('zip')->pattern('/^\d{5}$/');
 $v->field('role')->in(['admin', 'editor', 'viewer']);
+```
+
+### Custom format callback
+
+`custom()` accepts a callable that receives the current value and returns:
+
+- `null` — valid, no error
+- `string` — fail with that string as the error message
+- `array` — structured error, giving the translator the same information as built-in rules:
+  - `code` _(required)_ — error code passed to the translator
+  - `params` _(optional)_ — raw values for `{placeholder}` substitution, default `[]`
+  - `template` _(optional)_ — English fallback with `{placeholder}` markers; if omitted, looked up from the built-in code table or falls back to the code string itself
+
+Multiple `custom()` calls stack; the first failure short-circuits.
+
+```php
+// Simple string — no translation support needed
+$v->field('username')
+    ->string()
+    ->custom(fn($v) => ctype_alnum($v) ? null : 'must contain only letters and digits');
+
+// Structured — translator receives code + params like a built-in rule
+$v->field('amount')
+    ->int()
+    ->custom(fn($v) => $v % 5 === 0 ? null : [
+        'code'     => 'not_multiple',
+        'params'   => ['factor' => 5],
+        'template' => 'must be a multiple of {factor}',
+    ]);
 ```
 
 ## Structure Rules
@@ -136,7 +168,7 @@ $v->field('address')->required()->model([
 
 ## Running Validation
 
-| Method        | Return type             | Behaviour                                                       |
+| Method        | Return type             | Behavior                                                        |
 | ------------- | ----------------------- | --------------------------------------------------------------- |
 | `fails()`     | `bool`                  | Runs rules, returns `true` if any field failed                  |
 | `errors()`    | `array<string, string>` | Returns all error messages, keyed by dot-path field name        |
@@ -164,6 +196,75 @@ A typical JSON error response:
     "ids[1]": "must be an integer"
   }
 }
+```
+
+## Translation
+
+By default `errors()` returns English messages. Use `setTranslator()` to provide translated messages or custom formatting.
+
+### Translator callback
+
+```php
+$v->setTranslator(function (string $field, string $code, array $params, string $template): string {
+    // $field    – dot-path of the field, e.g. 'email' or 'address.zip'
+    // $code     – error code, e.g. 'required', 'min.string', 'email'
+    // $params   – raw parameter values (native PHP types)
+    // $template – English template with {placeholder} markers, e.g. 'must be at least {min}'
+
+    // Return a translated template and the framework fills {placeholders},
+    // or return a fully pre-rendered string (placeholders are a no-op then).
+    return $template; // fallback: keep English
+});
+```
+
+### Error codes and their `$params`
+
+| Code                                      | `$params` keys (types)                                           |
+| ----------------------------------------- | ---------------------------------------------------------------- |
+| `required`                                | _(empty)_                                                        |
+| `type.int`, `type.float`, `type.bool`     | _(empty)_                                                        |
+| `min.string`, `min.number`, `min.array`   | `min: int\|float`                                                |
+| `max.string`, `max.number`, `max.array`   | `max: int\|float`                                                |
+| `email`, `url`, `ip`, `domain`, `pattern` | _(empty)_                                                        |
+| `in`                                      | `allowed: array<mixed>`                                          |
+| `not_array`, `not_object`                 | _(empty)_                                                        |
+| `custom`                                  | _(empty when string returned; user-defined when array returned)_ |
+
+The sub-code suffix (`.string`, `.number`, `.array`) tells the translator which context `min`/`max` relates to, so you can use different phrasing per context without inspecting `$params`.
+
+### Examples
+
+```php
+// Translated template — framework fills {min}
+$v->setTranslator(fn($field, $code, $params, $template) => match($code) {
+    'min.string' => 'mindestens {min} Zeichen erforderlich',
+    'required'   => 'Pflichtfeld',
+    default      => $template,
+});
+
+// Field-aware message
+$v->setTranslator(function ($field, $code, $params, $template) {
+    if ($field === 'email' && $code === 'required') {
+        return 'E-Mail is required — please enter a valid address';
+    }
+    return $template;
+});
+
+// Locale-aware number formatting (e.g. Persian numerals)
+$v->setTranslator(function ($field, $code, $params, $template) use ($locale) {
+    $translated = $myTranslations[$locale][$code] ?? $template;
+    // replace {min}/{max} ourselves with locale-formatted numbers
+    if (isset($params['min'])) {
+        $translated = str_replace('{min}', formatNumber($params['min'], $locale), $translated);
+    }
+    return $translated;
+});
+```
+
+`setTranslator()` returns `static` for chaining:
+
+```php
+$v = (new Validator($data))->setTranslator($myTranslator);
 ```
 
 ## Controller Integration

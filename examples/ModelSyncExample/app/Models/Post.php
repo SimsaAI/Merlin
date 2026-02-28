@@ -5,8 +5,9 @@ namespace App\Models;
 use Merlin\Mvc\Model;
 
 /**
- * Sync: php console.php sync model Models/Post.php --apply
- * With accessors: php console.php sync model Models/Post.php --apply --generate-accessors --field-visibility=protected
+ * Sync by file path:   php console.php model-sync model app/Models/Post.php --apply
+ * Sync by class name:  php console.php model-sync model Post --apply
+ * With accessors:      php console.php model-sync model Post --apply --generate-accessors --field-visibility=protected
  */
 class Post extends Model
 {

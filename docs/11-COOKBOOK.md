@@ -478,7 +478,7 @@ class AvatarController extends Controller
 
 ## 18) Custom Middleware
 
-Implement `MiddlewareInterface` to add cross-cutting behaviour — rate limiting, API key auth, CORS headers, etc. Return `null` to pass through; return a `Response` to short-circuit.
+Implement `MiddlewareInterface` to add cross-cutting behavior — rate limiting, API key auth, CORS headers, etc. Return `null` to pass through; return a `Response` to short-circuit.
 
 ```php
 <?php

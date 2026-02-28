@@ -2,7 +2,7 @@
 
 **Full name:** [Merlin\Sync\SyncOptions](../../src/Sync/SyncOptions.php)
 
-Configuration options that control the behaviour of the model-sync process.
+Configuration options that control the behavior of the model-sync process.
 
 ## 🔐 Public Properties
 

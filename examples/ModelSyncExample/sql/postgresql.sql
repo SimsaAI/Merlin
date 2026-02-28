@@ -1,4 +1,4 @@
--- PostgreSQL schema for the SyncExample project
+-- PostgreSQL schema for the ModelSyncExample project
 -- Run: psql -U <user> -d <database> -f sql/postgresql.sql
 
 CREATE TABLE IF NOT EXISTS users (

@@ -2,7 +2,7 @@
 namespace Merlin\Sync;
 
 /**
- * Configuration options that control the behaviour of the model-sync process.
+ * Configuration options that control the behavior of the model-sync process.
  */
 class SyncOptions
 {

@@ -324,4 +324,27 @@ class DispatcherTest extends TestCase
         $this->assertSame([42, null, 'x', 'y'], $stored->params);
         $this->assertSame(['x', 'y'], $stored->vars['params']);
     }
+
+    /** @dataProvider reservedActionProvider */
+    public function testReservedActionsCannotBeDispatched(string $reservedAction): void
+    {
+        $context = new AppContext();
+        AppContext::setInstance($context);
+        $disp = new Dispatcher();
+
+        $this->expectException(\Merlin\Mvc\Exceptions\ActionNotFoundException::class);
+
+        $disp->dispatch($this->routeWithOverride(
+            DTResponseController::class,
+            $reservedAction
+        ));
+    }
+
+    public static function reservedActionProvider(): array
+    {
+        return [
+            'beforeAction' => ['beforeAction'],
+            'afterAction'  => ['afterAction'],
+        ];
+    }
 }

@@ -12,6 +12,15 @@ use Merlin\Mvc\Exceptions\ControllerNotFoundException;
 
 class Dispatcher
 {
+    /**
+     * Method names that end with 'Action' but are lifecycle hooks, not
+     * dispatchable actions. Attempting to dispatch one via a dynamic route
+     * will result in an {@see ActionNotFoundException}.
+     */
+    protected const RESERVED_ACTIONS = [
+        'beforeAction' => true,
+        'afterAction' => true
+    ];
 
     protected AppContext $context;
 
@@ -177,6 +186,12 @@ class Dispatcher
             $actionName = $this->camelize((string) $vars['action'], false) . 'Action';
         } else {
             $actionName = $this->defaultAction;
+        }
+
+        if (isset(static::RESERVED_ACTIONS[$actionName])) {
+            throw new ActionNotFoundException(
+                "Action '{$actionName}' is a lifecycle hook and cannot be dispatched directly."
+            );
         }
 
         $controllerClass = $namespace !== ''

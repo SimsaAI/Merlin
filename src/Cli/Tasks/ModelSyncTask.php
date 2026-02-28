@@ -17,32 +17,39 @@ use Merlin\Sync\SyncRunner;
  *                                 [--generate-accessors] [--no-deprecate]
  *                                 [--field-visibility=<public|protected|private>]
  *                                 [--create-missing] [--namespace=<ns>]
- *   model-sync model <file> [--apply] [--database=<role>]
- *                                 [--generate-accessors] 
+ *   model-sync model <file-or-class> [--apply] [--database=<role>]
+ *                                 [--generate-accessors]
  *                                 [--field-visibility=<public|protected|private>]
- *                                 [--no-deprecate]
- *   model-sync make  <ClassName>  [<directory>] [--apply] 
- *                                 [--database=<role>] [--namespace=<ns>] 
+ *                                 [--no-deprecate] [--directory=<dir>]
+ *   model-sync make  <ClassName>  [<directory>] [--apply]
+ *                                 [--database=<role>] [--namespace=<ns>]
  *                                 [--generate-accessors] [--no-deprecate]
  *                                 [--field-visibility=<public|protected|private>]
  *
+ * The <file-or-class> argument for `model-sync model` accepts:
+ *   - A file path:               src/Models/User.php
+ *   - A short class name:        User          (discovered via PSR-4 / --directory)
+ *   - A fully-qualified name:    App\Models\User
+ *
  * By default the task only reports changes.
  * Pass --apply to write the updated model files to disk.
- * 
+ *
  * Options:
- *   --apply                     Apply changes to files instead of just 
+ *   --apply                     Apply changes to files instead of just
  *                               reporting them
- *   --create-missing            Create new model files for tables that don't 
+ *   --create-missing            Create new model files for tables that don't
  *                               have a corresponding model yet
- *   --database=<role>           Database role to use for schema introspection 
+ *   --database=<role>           Database role to use for schema introspection
  *                               (default: "read")
- *   --field-visibility=<vis>    Visibility for generated properties (default: 
+ *   --directory=<dir>           Hint directory for class-name resolution in
+ *                               `model-sync model` (optional)
+ *   --field-visibility=<vis>    Visibility for generated properties (default:
  *                               "public")
- *   --generate-accessors        Also generate getter/setter methods for each 
+ *   --generate-accessors        Also generate getter/setter methods for each
  *                               property
- *   --namespace=<ns>            Namespace to use when creating new model files 
+ *   --namespace=<ns>            Namespace to use when creating new model files
  *                               (required if --create-missing is used)
- *   --no-deprecate              Don't add @deprecated tags to removed 
+ *   --no-deprecate              Don't add @deprecated tags to removed
  *                               properties
  *
  * Examples:
@@ -53,8 +60,11 @@ use Merlin\Sync\SyncRunner;
  *   php console.php model-sync all  src/Models --apply --field-visibility=protected
  *   php console.php model-sync all  src/Models --apply --no-deprecate
  *   php console.php model-sync all  src/Models --apply --create-missing --namespace=App\\Models
- *   php console.php model-sync model src/Models/User.php --apply
- *   php console.php model-sync make  User                                    # auto-discover App\Models dir
+ *   php console.php model-sync model src/Models/User.php --apply            # file path
+ *   php console.php model-sync model User --apply                           # short class name (PSR-4)
+ *   php console.php model-sync model App\\Models\\User --apply              # fully-qualified name
+ *   php console.php model-sync model User --directory=src/Models --apply    # with directory hint
+ *   php console.php model-sync make  User                                   # auto-discover App\Models dir
  *   php console.php model-sync make  User src/Models --namespace=App\\Models --apply
  */
 class ModelSyncTask extends Task
@@ -153,21 +163,36 @@ class ModelSyncTask extends Task
     }
 
     /**
-     * Sync a single model file against the database.
+     * Sync a single model against the database.
      *
-     * @param string $file Path to the PHP model file (required)
+     * The argument may be a file path, a short class name, or a fully-qualified
+     * class name. Short and qualified class names are resolved to file paths
+     * via the PSR-4 autoloading map. Use --directory=<dir> to narrow the search
+     * when two classes share the same short name.
+     *
+     * @param string $file File path, short class name, or fully-qualified class name (required)
      */
     public function modelAction(string $file = ''): void
     {
         if ($file === '') {
-            $this->error("Usage: sync model <file> [--apply] [--database=<role>] [--generate-accessors] [--field-visibility=<vis>] [--no-deprecate]");
+            $this->error("Usage: model-sync model <file-or-class> [--apply] [--database=<role>] [--generate-accessors] [--field-visibility=<vis>] [--no-deprecate] [--directory=<dir>]");
             return;
         }
 
+        // Try to resolve as a literal file path first (preserves existing behaviour).
         $realPath = realpath($file);
+
         if ($realPath === false || !is_file($realPath)) {
-            $this->error("File not found: {$file}");
-            return;
+            // Fall back to class-name resolution (short name or FQN).
+            $dir = isset($this->options['directory']) ? $this->options['directory'] : null;
+            $realPath = $this->findModelFileByClassName($file, $dir);
+
+            if ($realPath === null) {
+                $this->error("Cannot resolve '{$file}' to a model file. Pass a valid file path, a short class name (e.g. User), or a fully-qualified name (e.g. App\\Models\\User). Use --directory=<dir> to narrow the search.");
+                return;
+            }
+
+            $this->muted("Resolved '{$file}' → {$realPath}");
         }
 
         $dryRun = !isset($this->options['apply']);
@@ -196,7 +221,7 @@ class ModelSyncTask extends Task
     public function makeAction(string $className = '', string $dir = ''): void
     {
         if ($className === '') {
-            $this->error("Usage: sync make <ClassName> [<directory>] [--namespace=<ns>] [--apply] [--database=<role>]");
+            $this->error("Usage: model-sync make <ClassName> [<directory>] [--namespace=<ns>] [--apply] [--database=<role>]");
             return;
         }
 
@@ -362,6 +387,74 @@ class ModelSyncTask extends Task
             "class comment",
             default => get_class($op),
         };
+    }
+
+    /**
+     * Attempt to resolve a PHP class name (short or fully-qualified) to an
+     * absolute file path using the PSR-4 autoloading map.
+     *
+     * Short name (e.g. "User"):
+     *   1. Check $baseDir/ClassName.php if $baseDir is provided.
+     *   2. Scan each PSR-4 root directory recursively for ClassName.php files
+     *      whose declared class name matches (to avoid false positives).
+     *
+     * Fully-qualified name (e.g. "App\Models\User"):
+     *   Derive the path from the PSR-4 prefix map (namespace → directory,
+     *   then append remaining segments + ".php").
+     *
+     * Returns null if the file cannot be found.
+     */
+    protected function findModelFileByClassName(string $className, ?string $baseDir = null): ?string
+    {
+        $isQualified = str_contains($className, '\\');
+
+        if ($isQualified) {
+            $map = $this->console->readComposerPsr4();
+            $nsClean = ltrim($className, '\\');
+            $bestPrefix = null;
+            $bestDir = null;
+            foreach ($map as $prefix => $dir) {
+                $prefixClean = rtrim($prefix, '\\');
+                if ($nsClean === $prefixClean || str_starts_with($nsClean, $prefixClean . '\\')) {
+                    if ($bestPrefix === null || strlen($prefixClean) > strlen($bestPrefix)) {
+                        $bestPrefix = $prefixClean;
+                        $bestDir = $dir;
+                    }
+                }
+            }
+            if ($bestPrefix !== null) {
+                $suffix = ltrim(substr($nsClean, strlen($bestPrefix)), '\\');
+                $relative = str_replace('\\', DIRECTORY_SEPARATOR, $suffix) . '.php';
+                $path = $bestDir . DIRECTORY_SEPARATOR . $relative;
+                $real = realpath($path);
+                return ($real !== false && is_file($real)) ? $real : null;
+            }
+            return null;
+        }
+
+        // Short name: check the explicit base directory first.
+        if ($baseDir !== null) {
+            $candidate = rtrim($baseDir, '/\\') . DIRECTORY_SEPARATOR . $className . '.php';
+            $real = realpath($candidate);
+            if ($real !== false && is_file($real)) {
+                return $real;
+            }
+        }
+
+        // Scan PSR-4 roots recursively for a file named ClassName.php whose
+        // declared class name actually matches (avoids same-named file false-positives).
+        foreach ($this->console->readComposerPsr4() as $dir) {
+            foreach ($this->console->scanDirectory($dir) as $file) {
+                if (basename($file, '.php') === $className) {
+                    $fqn = $this->console->extractClassFromFile($file);
+                    if ($fqn !== null && substr($fqn, strrpos($fqn, '\\') + 1) === $className) {
+                        return $file;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 }

@@ -1,13 +1,13 @@
 <?php
 /**
- * Bootstrap configuration for the SyncExample project.
+ * Bootstrap configuration for the ModelSyncExample project.
  *
  * Edit the database settings below to match your environment,
  * then run the console:
  *
- *   php console.php sync all Models --dry-run
- *   php console.php sync all Models --apply
- *   php console.php sync model Models/User.php --apply
+ *   php console.php model-sync all app/Models --apply
+ *   php console.php model-sync model app/Models/User.php --apply
+ *   php console.php model-sync model User --apply
  *
  * To set up the database, run one of the SQL files in the sql/ directory:
  *

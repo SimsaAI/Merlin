@@ -28,7 +28,7 @@ Or in a single call (throws ValidationException on failure):
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Validation/Validator.php#L46)
+### __construct() · [source](../../src/Validation/Validator.php#L49)
 
 `public function __construct(array $data): mixed`
 
@@ -45,7 +45,46 @@ Or in a single call (throws ValidationException on failure):
 
 ---
 
-### field() · [source](../../src/Validation/Validator.php#L56)
+### setTranslator() · [source](../../src/Validation/Validator.php#L78)
+
+`public function setTranslator(callable $fn): static`
+
+Set a translator callback invoked for each error when rendering messages.
+
+The callback receives:
+  - $field:          the dot-path field name (e.g. "address.zip", "tags[0]")
+  - $code:           the error code (see table below)
+  - $params:         raw parameters with native PHP types
+  - $template:       the English template string with {placeholder} markers intact
+
+The callback may return either a translated template (placeholders will be
+replaced by the framework) or a fully pre-rendered string (str_replace is
+a no-op when no markers remain). Return $template as-is to fall back to
+the English default.
+
+Error codes and their $params keys / types:
+  required, type.int, type.float, type.bool,
+  email, url, ip, domain, pattern,
+  not_array, not_object              => params is []
+  min.string, min.number, min.array  => ['min' => int|float]
+  max.string, max.number, max.array  => ['max' => int|float]
+  in                                 => ['allowed' => array<mixed>]
+  custom                             => [] (template is the callback's own message)
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$fn` | callable | - |  |
+
+**➡️ Return value**
+
+- Type: static
+
+
+---
+
+### field() · [source](../../src/Validation/Validator.php#L90)
 
 `public function field(string $name): Merlin\Validation\FieldValidator`
 
@@ -67,7 +106,7 @@ to make the field optional.
 
 ---
 
-### fails() · [source](../../src/Validation/Validator.php#L67)
+### fails() · [source](../../src/Validation/Validator.php#L101)
 
 `public function fails(): bool`
 
@@ -80,7 +119,7 @@ Run all rules. Returns true when at least one rule failed.
 
 ---
 
-### errors() · [source](../../src/Validation/Validator.php#L79)
+### errors() · [source](../../src/Validation/Validator.php#L113)
 
 `public function errors(): array`
 
@@ -95,7 +134,7 @@ Empty when validation has not been run yet or all rules passed.
 
 ---
 
-### validated() · [source](../../src/Validation/Validator.php#L91)
+### validated() · [source](../../src/Validation/Validator.php#L144)
 
 `public function validated(): array`
 
@@ -109,7 +148,7 @@ their declared types. Fields that failed are excluded.
 
 ---
 
-### validate() · [source](../../src/Validation/Validator.php#L103)
+### validate() · [source](../../src/Validation/Validator.php#L156)
 
 `public function validate(): array`
 

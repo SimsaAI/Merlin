@@ -4,7 +4,6 @@ namespace Merlin\Tests\Validation;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use Merlin\Validation\FieldValidator;
 use Merlin\Validation\ValidationException;
 use Merlin\Validation\Validator;
 use PHPUnit\Framework\TestCase;
@@ -505,5 +504,181 @@ class ValidatorTest extends TestCase
         $this->assertArrayHasKey('name', $errors);
         $this->assertArrayHasKey('email', $errors);
         $this->assertArrayHasKey('age', $errors);
+    }
+
+    // ---- Domain format rule -------------------------------------------------
+
+    public function testDomainAcceptsValid(): void
+    {
+        $v = new Validator(['host' => 'example.com']);
+        $v->field('host')->domain();
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testDomainAcceptsSubdomain(): void
+    {
+        $v = new Validator(['host' => 'sub.example.co.uk']);
+        $v->field('host')->domain();
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testDomainRejectsSpaces(): void
+    {
+        $v = new Validator(['host' => 'not a domain']);
+        $v->field('host')->domain();
+
+        $this->assertTrue($v->fails());
+        $this->assertArrayHasKey('host', $v->errors());
+    }
+
+    public function testDomainRejectsScheme(): void
+    {
+        $v = new Validator(['host' => 'https://example.com']);
+        $v->field('host')->domain();
+
+        $this->assertTrue($v->fails());
+    }
+
+    // ---- Custom format rule -------------------------------------------------
+
+    public function testCustomPassesOnNull(): void
+    {
+        $v = new Validator(['code' => 'ABC']);
+        $v->field('code')->custom(fn($val) => null);
+
+        $this->assertFalse($v->fails());
+    }
+
+    public function testCustomFailsWithReturnedMessage(): void
+    {
+        $v = new Validator(['code' => 'ABC']);
+        $v->field('code')->custom(fn($val) => 'must start with Z');
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('must start with Z', $v->errors()['code']);
+    }
+
+    public function testCustomChainedShortCircuits(): void
+    {
+        $called = 0;
+        $v = new Validator(['val' => 'x']);
+        $v->field('val')
+            ->custom(function ($val) use (&$called) {
+                $called++;
+                return 'first error';
+            })
+            ->custom(function ($val) use (&$called) {
+                $called++;
+                return null;
+            });
+
+        $this->assertTrue($v->fails());
+        $this->assertSame(1, $called);
+    }
+
+    public function testCustomArrayReturnCode(): void
+    {
+        $v = new Validator(['val' => 'x']);
+        $v->field('val')->custom(fn($v) => ['code' => 'my_custom_code']);
+
+        $this->assertTrue($v->fails());
+        // Without translator, code is used as template fallback
+        $this->assertSame('my_custom_code', $v->errors()['val']);
+    }
+
+    public function testCustomArrayReturnWithTemplate(): void
+    {
+        $v = new Validator(['val' => 'x']);
+        $v->field('val')->custom(fn($v) => [
+            'code' => 'too_short',
+            'params' => ['min' => 5],
+            'template' => 'must be at least {min} characters',
+        ]);
+
+        $this->assertTrue($v->fails());
+        $this->assertSame('must be at least 5 characters', $v->errors()['val']);
+    }
+
+    public function testCustomArrayReturnTranslatorReceivesCodeAndParams(): void
+    {
+        $received = [];
+        $v = new Validator(['val' => 'x']);
+        $v->field('val')->custom(fn($v) => [
+            'code' => 'below_minimum',
+            'params' => ['min' => 10],
+        ]);
+        $v->setTranslator(function ($field, $code, $params, $template) use (&$received) {
+            $received = compact('field', 'code', 'params', 'template');
+            return $template;
+        });
+
+        $v->errors();
+
+        $this->assertSame('val', $received['field']);
+        $this->assertSame('below_minimum', $received['code']);
+        $this->assertSame(10, $received['params']['min']);
+    }
+
+    // ---- Translator ---------------------------------------------------------
+
+    public function testTranslatorReceivesCodeParamsAndTemplate(): void
+    {
+        $received = [];
+        $v = new Validator(['age' => 15]);
+        $v->field('age')->int()->min(18);
+        $v->setTranslator(function (string $field, string $code, array $params, string $template) use (&$received) {
+            $received = compact('field', 'code', 'params', 'template');
+            return $template;
+        });
+
+        $v->errors();
+
+        $this->assertSame('age', $received['field']);
+        $this->assertSame('min.number', $received['code']);
+        $this->assertSame(18, $received['params']['min']);
+        $this->assertSame('must be at least {min}', $received['template']);
+    }
+
+    public function testTranslatorReturnIsUsedAsMessage(): void
+    {
+        $v = new Validator(['email' => 'bad']);
+        $v->field('email')->email();
+        $v->setTranslator(fn($field, $code, $params, $template) => 'ungültige E-Mail-Adresse');
+
+        $this->assertSame('ungültige E-Mail-Adresse', $v->errors()['email']);
+    }
+
+    public function testTranslatorReturnedTemplateGetsPlaceholderReplaced(): void
+    {
+        $v = new Validator(['name' => 'Al']);
+        $v->field('name')->string()->min(3);
+        $v->setTranslator(fn($code, $params, $template) => 'mindestens {min} Zeichen erforderlich');
+
+        $this->assertSame('mindestens 3 Zeichen erforderlich', $v->errors()['name']);
+    }
+
+    public function testNoTranslatorRendersEnglish(): void
+    {
+        $v = new Validator(['name' => 'Al']);
+        $v->field('name')->string()->min(3);
+
+        $this->assertSame('must have at least 3 characters', $v->errors()['name']);
+    }
+
+    public function testTranslatorReceivesRawAllowedArray(): void
+    {
+        $receivedAllowed = null;
+        $v = new Validator(['role' => 'superuser']);
+        $v->field('role')->in(['admin', 'editor']);
+        $v->setTranslator(function ($field, $code, $params, $template) use (&$receivedAllowed) {
+            $receivedAllowed = $params['allowed'] ?? null;
+            return $template;
+        });
+
+        $v->errors();
+
+        $this->assertSame(['admin', 'editor'], $receivedAllowed);
     }
 }

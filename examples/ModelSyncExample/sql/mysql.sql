@@ -1,4 +1,4 @@
--- MySQL schema for the SyncExample project
+-- MySQL schema for the ModelSyncExample project
 -- Run: mysql -u <user> -p <database> < sql/mysql.sql
 
 CREATE TABLE IF NOT EXISTS `users` (

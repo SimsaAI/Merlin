@@ -1,4 +1,4 @@
--- SQLite schema for the SyncExample project
+-- SQLite schema for the ModelSyncExample project
 -- Run: sqlite3 sync_example.sqlite < sql/sqlite.sql
 -- Note: SQLite does not support table or column comments.
 

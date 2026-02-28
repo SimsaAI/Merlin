@@ -32,7 +32,7 @@ class Validator
     /** @var array<string, FieldValidator> */
     private array $fields = [];
 
-    /** @var array<string, string> */
+    /** @var array<string, array{code: string, params: array<string, mixed>, template: string}> */
     private array $errors = [];
 
     /** @var array<string, mixed> */
@@ -40,11 +40,45 @@ class Validator
 
     private bool $ran = false;
 
+    /** @var callable|null */
+    private $translator = null;
+
     /**
      * @param array<string, mixed> $data Raw input array (e.g. from Request::post()).
      */
     public function __construct(private array $data)
     {
+    }
+
+    /**
+     * Set a translator callback invoked for each error when rendering messages.
+     *
+     * The callback receives:
+     *   - $field:          the dot-path field name (e.g. "address.zip", "tags[0]")
+     *   - $code:           the error code (see table below)
+     *   - $params:         raw parameters with native PHP types
+     *   - $template:       the English template string with {placeholder} markers intact
+     *
+     * The callback may return either a translated template (placeholders will be
+     * replaced by the framework) or a fully pre-rendered string (str_replace is
+     * a no-op when no markers remain). Return $template as-is to fall back to
+     * the English default.
+     *
+     * Error codes and their $params keys / types:
+     *   required, type.int, type.float, type.bool,
+     *   email, url, ip, domain, pattern,
+     *   not_array, not_object              => params is []
+     *   min.string, min.number, min.array  => ['min' => int|float]
+     *   max.string, max.number, max.array  => ['max' => int|float]
+     *   in                                 => ['allowed' => array<mixed>]
+     *   custom                             => [] (template is the callback's own message)
+     *
+     * @param callable(string $field, string $code, array<string,mixed> $params, string $template): string $fn
+     */
+    public function setTranslator(callable $fn): static
+    {
+        $this->translator = $fn;
+        return $this;
     }
 
     /**
@@ -79,7 +113,26 @@ class Validator
     public function errors(): array
     {
         $this->run();
-        return $this->errors;
+
+        $out = [];
+        foreach ($this->errors as $path => $error) {
+            // Let the translator rewrite the template (or return a pre-rendered string).
+            $template = $this->translator !== null
+                ? ($this->translator)($path, $error['code'], $error['params'], $error['template'])
+                : $error['template'];
+
+            // Replace any {placeholder} markers left in the template.
+            foreach ($error['params'] as $k => $v) {
+                $placeholder = '{' . $k . '}';
+                $replacement = \is_array($v)
+                    ? \implode(', ', $v)
+                    : (string) $v;
+                $template = \str_replace($placeholder, $replacement, $template);
+            }
+            $out[$path] = $template;
+        }
+
+        return $out;
     }
 
     /**
@@ -103,7 +156,7 @@ class Validator
     public function validate(): array
     {
         if ($this->fails()) {
-            throw new ValidationException($this->errors);
+            throw new ValidationException($this->errors());
         }
         return $this->validatedData;
     }
@@ -125,7 +178,7 @@ class Validator
 
             if (!$exists) {
                 if ($fv->isRequired()) {
-                    $this->errors[$name] = 'required';
+                    $this->errors[$name] = ['code' => 'required', 'params' => [], 'template' => 'required'];
                 } elseif ($fv->hasDefault()) {
                     $this->validatedData[$name] = $fv->getDefault();
                 }

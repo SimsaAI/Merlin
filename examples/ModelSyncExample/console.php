@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * SyncExample CLI entry point.
+ * ModelSyncExample CLI entry point.
  *
  * Usage:
  *   php console.php <task> <action> [args...]
@@ -13,10 +13,10 @@
  *   php console.php model-sync all  Models --apply --field-visibility=protected     # protected fields
  *   php console.php model-sync all  Models --apply --no-deprecate                   # skip @deprecated tags
  *   php console.php model-sync all  Models --apply --create-missing \
- *       --namespace=SyncExample\\Models                                        # scaffold new models
+ *       --namespace=ModelSyncExample\\Models                                        # scaffold new models
  *   php console.php model-sync model Models/User.php --apply
  *   php console.php model-sync model Models/User.php --apply --generate-accessors
- *   php console.php model-sync make Order Models --namespace=SyncExample\\Models --apply
+ *   php console.php model-sync make Order Models --namespace=ModelSyncExample\\Models --apply
  */
 
 chdir(__DIR__);

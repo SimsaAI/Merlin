@@ -334,8 +334,8 @@ The detail page parses these doc-comment sections:
 
 ```
 Usage:    – syntax-highlighted with task/action/placeholders/options
-Options:  – shown in gray
-Examples: – syntax-highlighted like Usage
+Options:  – syntax-highlighted list of supported options
+Examples: – syntax-highlighted examples for common use cases
 ```
 
 ### Example doc-comment
@@ -486,10 +486,18 @@ Merlin ships with a ready-made `ModelSyncTask` that keeps your PHP model files i
 ### Commands
 
 ```bash
-php console.php model-sync all   [<directory>] [options]              # scan a directory of model files (auto-discovers App\Models if omitted)
-php console.php model-sync model <file>        [options]              # sync a single model file
+php console.php model-sync all   [<directory>]     [options]  # scan a directory of model files (auto-discovers App\Models if omitted)
+php console.php model-sync model <file-or-class>  [options]  # sync a single model (file path, short name, or FQN)
 php console.php model-sync make  <ClassName>  [<directory>] [options]  # scaffold a new model file (auto-discovers App\Models if omitted)
 ```
+
+The `<file-or-class>` argument for `model-sync model` accepts three forms:
+
+| Form                 | Example                            |
+| -------------------- | ---------------------------------- |
+| File path            | `src/Models/User.php`              |
+| Short class name     | `User` (auto-discovered via PSR-4) |
+| Fully-qualified name | `App\Models\User`                  |
 
 When no `<directory>` is given, `model-sync all` and `model-sync make` automatically resolve the target directory in this order:
 
@@ -507,6 +515,7 @@ When no `<directory>` is given, `model-sync all` and `model-sync make` automatic
 | `--field-visibility=<vis>` | Property visibility: `public` (default), `protected`, or `private`                  |
 | `--no-deprecate`           | Skip `@deprecated` tags on properties whose columns have been removed               |
 | `--create-missing`         | (`model-sync all` only) Scaffold model files for tables that have no matching model |
+| `--directory=<dir>`        | (`model-sync model` only) Directory hint for class-name resolution                  |
 | `--namespace=<ns>`         | PHP namespace for scaffolded model files (required with `--create-missing`)         |
 
 ### Examples
@@ -527,8 +536,17 @@ php console.php model-sync all src/Models --apply --generate-accessors --field-v
 # Scaffold models for any DB tables not yet represented, then sync them
 php console.php model-sync all src/Models --apply --create-missing --namespace=App\\Models
 
-# Sync a single file
+# Sync a single file (file path)
 php console.php model-sync model src/Models/User.php --apply
+
+# Sync by short class name – auto-discovered via PSR-4
+php console.php model-sync model User --apply
+
+# Sync by fully-qualified class name
+php console.php model-sync model App\Models\User --apply
+
+# Sync by class name with an explicit directory hint
+php console.php model-sync model User --directory=src/Models --apply
 
 # Scaffold a new model – auto-discover App\Models directory
 php console.php model-sync make Order

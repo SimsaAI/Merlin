@@ -15,7 +15,7 @@ Example:
 
 ## 🚀 Public methods
 
-### required() · [source](../../src/Validation/FieldValidator.php#L39)
+### required() · [source](../../src/Validation/FieldValidator.php#L77)
 
 `public function required(): static`
 
@@ -26,7 +26,7 @@ Example:
 
 ---
 
-### optional() · [source](../../src/Validation/FieldValidator.php#L45)
+### optional() · [source](../../src/Validation/FieldValidator.php#L83)
 
 `public function optional(): static`
 
@@ -37,7 +37,7 @@ Example:
 
 ---
 
-### isRequired() · [source](../../src/Validation/FieldValidator.php#L51)
+### isRequired() · [source](../../src/Validation/FieldValidator.php#L89)
 
 `public function isRequired(): bool`
 
@@ -48,7 +48,7 @@ Example:
 
 ---
 
-### default() · [source](../../src/Validation/FieldValidator.php#L61)
+### default() · [source](../../src/Validation/FieldValidator.php#L99)
 
 `public function default(mixed $value): static`
 
@@ -70,7 +70,7 @@ The default is included in validated() as-is (no rules are applied to it).
 
 ---
 
-### hasDefault() · [source](../../src/Validation/FieldValidator.php#L69)
+### hasDefault() · [source](../../src/Validation/FieldValidator.php#L107)
 
 `public function hasDefault(): bool`
 
@@ -81,7 +81,7 @@ The default is included in validated() as-is (no rules are applied to it).
 
 ---
 
-### getDefault() · [source](../../src/Validation/FieldValidator.php#L74)
+### getDefault() · [source](../../src/Validation/FieldValidator.php#L112)
 
 `public function getDefault(): mixed`
 
@@ -92,7 +92,7 @@ The default is included in validated() as-is (no rules are applied to it).
 
 ---
 
-### int() · [source](../../src/Validation/FieldValidator.php#L84)
+### int() · [source](../../src/Validation/FieldValidator.php#L122)
 
 `public function int(): static`
 
@@ -105,7 +105,7 @@ Coerce to integer. Accepts int values and numeric strings (including negatives).
 
 ---
 
-### float() · [source](../../src/Validation/FieldValidator.php#L93)
+### float() · [source](../../src/Validation/FieldValidator.php#L131)
 
 `public function float(): static`
 
@@ -118,7 +118,7 @@ Coerce to float. Accepts any numeric value.
 
 ---
 
-### bool() · [source](../../src/Validation/FieldValidator.php#L102)
+### bool() · [source](../../src/Validation/FieldValidator.php#L140)
 
 `public function bool(): static`
 
@@ -131,7 +131,7 @@ Coerce to bool. Accepts true/false, 1/0, "true"/"false", "yes"/"no", "on"/"off".
 
 ---
 
-### string() · [source](../../src/Validation/FieldValidator.php#L111)
+### string() · [source](../../src/Validation/FieldValidator.php#L149)
 
 `public function string(): static`
 
@@ -144,7 +144,7 @@ Explicitly cast to string. Useful for ensuring min/max applies to character leng
 
 ---
 
-### min() · [source](../../src/Validation/FieldValidator.php#L125)
+### min() · [source](../../src/Validation/FieldValidator.php#L163)
 
 `public function min(int|float $n): static`
 
@@ -166,7 +166,7 @@ Minimum value / length / count depending on type:
 
 ---
 
-### max() · [source](../../src/Validation/FieldValidator.php#L134)
+### max() · [source](../../src/Validation/FieldValidator.php#L172)
 
 `public function max(int|float $n): static`
 
@@ -185,7 +185,7 @@ Maximum value / length / count (same semantics as min).
 
 ---
 
-### email() · [source](../../src/Validation/FieldValidator.php#L143)
+### email() · [source](../../src/Validation/FieldValidator.php#L181)
 
 `public function email(): static`
 
@@ -198,7 +198,7 @@ Value must be a valid e-mail address (RFC 5321).
 
 ---
 
-### url() · [source](../../src/Validation/FieldValidator.php#L150)
+### url() · [source](../../src/Validation/FieldValidator.php#L188)
 
 `public function url(): static`
 
@@ -211,7 +211,7 @@ Value must be a valid URL (FILTER_VALIDATE_URL).
 
 ---
 
-### ip() · [source](../../src/Validation/FieldValidator.php#L157)
+### ip() · [source](../../src/Validation/FieldValidator.php#L195)
 
 `public function ip(): static`
 
@@ -224,7 +224,7 @@ Value must be a valid IPv4 or IPv6 address.
 
 ---
 
-### pattern() · [source](../../src/Validation/FieldValidator.php#L164)
+### pattern() · [source](../../src/Validation/FieldValidator.php#L202)
 
 `public function pattern(string $regex): static`
 
@@ -243,7 +243,7 @@ Value must match the given regular expression.
 
 ---
 
-### in() · [source](../../src/Validation/FieldValidator.php#L175)
+### in() · [source](../../src/Validation/FieldValidator.php#L213)
 
 `public function in(array $allowed): static`
 
@@ -262,7 +262,49 @@ Value must be strictly equal (===) to one of the allowed values.
 
 ---
 
-### list() · [source](../../src/Validation/FieldValidator.php#L188)
+### domain() · [source](../../src/Validation/FieldValidator.php#L220)
+
+`public function domain(): static`
+
+Value must be a valid domain name (e.g. example.com), without scheme or path.
+
+**➡️ Return value**
+
+- Type: static
+
+
+---
+
+### custom() · [source](../../src/Validation/FieldValidator.php#L241)
+
+`public function custom(callable $fn): static`
+
+Custom validation callback. Return:
+  - null                  → valid, no error
+  - string                → error with code 'custom' and the string as the message
+  - array                 → structured error; supports the same keys as built-in errors:
+      'code'     (required) – error code passed to the translator
+      'params'   (optional) – raw parameter values for placeholder replacement, default []
+      'template' (optional) – English fallback template with {placeholder} markers;
+                              if omitted, looked up from the built-in TEMPLATES table
+                              or falls back to the code string itself
+
+Multiple custom() calls are supported and stack; the first failure short-circuits.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$fn` | callable | - |  |
+
+**➡️ Return value**
+
+- Type: static
+
+
+---
+
+### list() · [source](../../src/Validation/FieldValidator.php#L254)
 
 `public function list(callable $configure): static`
 
@@ -281,7 +323,7 @@ Value must be an array; each element is validated by the configured sub-validato
 
 ---
 
-### model() · [source](../../src/Validation/FieldValidator.php#L202)
+### model() · [source](../../src/Validation/FieldValidator.php#L268)
 
 `public function model(array $fields): static`
 
@@ -302,7 +344,7 @@ Each entry maps a key name to a callable that configures a FieldValidator.
 
 ---
 
-### validate() · [source](../../src/Validation/FieldValidator.php#L218)
+### validate() · [source](../../src/Validation/FieldValidator.php#L284)
 
 `public function validate(mixed $value, string $path, array &$errors): mixed`
 

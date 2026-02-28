@@ -4,7 +4,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Dispatcher.php#L21)
+### __construct() · [source](../../src/Mvc/Dispatcher.php#L30)
 
 `public function __construct(): mixed`
 
@@ -17,7 +17,7 @@ Create a new Dispatcher and bind it to the current [`AppContext`](AppContext.md)
 
 ---
 
-### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L37)
+### addMiddleware() · [source](../../src/Mvc/Dispatcher.php#L46)
 
 `public function addMiddleware(Merlin\Mvc\MiddlewareInterface $mw): void`
 
@@ -39,7 +39,7 @@ controller, or action middleware.
 
 ---
 
-### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L54)
+### defineMiddlewareGroup() · [source](../../src/Mvc/Dispatcher.php#L63)
 
 `public function defineMiddlewareGroup(string $name, array $middleware): void`
 
@@ -63,7 +63,7 @@ applied in the order they are listed on the route.
 
 ---
 
-### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L68)
+### getBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L77)
 
 `public function getBaseNamespace(): string`
 
@@ -77,7 +77,7 @@ Get the base namespace for controllers.
 
 ---
 
-### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L79)
+### setBaseNamespace() · [source](../../src/Mvc/Dispatcher.php#L88)
 
 `public function setBaseNamespace(string $baseNamespace): static`
 
@@ -96,7 +96,7 @@ Set the base namespace for controllers. This namespace will be prefixed to all c
 
 ---
 
-### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L90)
+### getDefaultController() · [source](../../src/Mvc/Dispatcher.php#L99)
 
 `public function getDefaultController(): string`
 
@@ -110,7 +110,7 @@ Get the default controller name used when a route doesn't provide one.
 
 ---
 
-### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L101)
+### setDefaultController() · [source](../../src/Mvc/Dispatcher.php#L110)
 
 `public function setDefaultController(string $defaultController): static`
 
@@ -133,7 +133,7 @@ Set the default controller name.
 
 ---
 
-### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L115)
+### getDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L124)
 
 `public function getDefaultAction(): string`
 
@@ -147,7 +147,7 @@ Get the default action name used when a route doesn't provide one.
 
 ---
 
-### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L126)
+### setDefaultAction() · [source](../../src/Mvc/Dispatcher.php#L135)
 
 `public function setDefaultAction(string $defaultAction): static`
 
@@ -170,7 +170,7 @@ Set the default action name.
 
 ---
 
-### dispatch() · [source](../../src/Mvc/Dispatcher.php#L143)
+### dispatch() · [source](../../src/Mvc/Dispatcher.php#L152)
 
 `public function dispatch(array $routeInfo): Merlin\Http\Response`
 

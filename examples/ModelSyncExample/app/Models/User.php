@@ -5,8 +5,9 @@ namespace App\Models;
 use Merlin\Mvc\Model;
 
 /**
- * Sync: php console.php sync model Models/User.php --apply
- * With accessors: php console.php sync model Models/User.php --apply --generate-accessors --field-visibility=protected
+ * Sync by file path:   php console.php model-sync model app/Models/User.php --apply
+ * Sync by class name:  php console.php model-sync model User --apply
+ * With accessors:      php console.php model-sync model User --apply --generate-accessors --field-visibility=protected
  */
 class User extends Model
 {

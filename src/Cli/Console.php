@@ -58,6 +58,16 @@ class Console
     public const STYLE_SUCCESS = ['bgreen'];
     public const STYLE_MUTED = ['gray'];
 
+    /**
+     * Method names that end with 'Action' but are lifecycle hooks, not
+     * dispatchable actions. They are excluded from help listings and from
+     * the single-action task detection heuristic.
+     */
+    protected const RESERVED_ACTIONS = [
+        'beforeAction' => true,
+        'afterAction' => true
+    ];
+
     protected $sectionStyles = ['bmagenta', '#e998ee'];
     protected $taskStyles = ['bold', 'bgreen', '#21e194'];
     protected $actionStyles = ['bcyan', 'bold', '#2cc4eb'];
@@ -467,17 +477,23 @@ class Console
             // task help instead to prevent silently swallowing typos.
             $hasDefault = \method_exists($task, $this->defaultAction);
             $ref = new ReflectionClass($class);
-            $publicActionCount = \count(array_filter(
-                $ref->getMethods(\ReflectionMethod::IS_PUBLIC),
-                fn($m) => str_ends_with($m->getName(), 'Action')
-            ));
+            $publicActionCount = 0;
+            foreach ($ref->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
+                $name = $m->getName();
+                if (!str_ends_with($name, 'Action')) {
+                    continue;
+                }
+                if (isset(static::RESERVED_ACTIONS[$name])) {
+                    continue;
+                }
+                $publicActionCount++;
+            }
             $isSingleActionTask = $publicActionCount <= 1;
 
             if ($hasDefault && ($actionName === null || $actionName === '' || $isSingleActionTask)) {
                 $method = $this->defaultAction;
                 if ($actionName !== null && $actionName !== '') {
-                    // treat the provided action as the first positional p
-                    // arameter
+                    // treat the provided action as the first positional parameter
                     array_unshift($params, $actionName);
                 }
             } else {
@@ -1113,10 +1129,14 @@ class Console
         $ref = new ReflectionClass($class);
         $actions = [];
         foreach ($ref->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if (!preg_match('/^([a-zA-Z0-9_]+)Action$/', $m->getName(), $mm)) {
+            $name = $m->getName();
+            if (!str_ends_with($name, 'Action')) {
                 continue;
             }
-            $actionName = $this->methodToActionName($m->getName());
+            if (isset(static::RESERVED_ACTIONS[$name])) {
+                continue;
+            }
+            $actionName = $this->methodToActionName($name);
             $doc = $m->getDocComment() ?: '';
             $actions[$actionName] = $this->extractDocHeader($doc);
         }
