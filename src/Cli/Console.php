@@ -818,6 +818,10 @@ class Console
             if ($name === 'help') {
                 continue;
             }
+            $actionDescriptions = $this->extractActionDescriptions($class);
+            if (empty($actionDescriptions)) {
+                continue; // skip tasks with no public actions
+            }
             $this->writeln();
             $desc = $this->extractShortDescription($class);
 
@@ -846,7 +850,7 @@ class Console
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
                 : null;
-            foreach ($this->extractActionDescriptions($class) as $action => $actionDesc) {
+            foreach ($actionDescriptions as $action => $actionDesc) {
                 $defaultMarker = $action === $defaultActionLabel
                     ? ' ' . $this->style('[default]', ...$this->muteStyles)
                     : '';
