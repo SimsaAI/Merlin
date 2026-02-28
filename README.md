@@ -266,7 +266,7 @@ $paginator = new Paginator(
     pageSize: 20
 );
 
-$users = $paginator->paginate();  // ResultSet for the current page
+$users = $paginator->execute();  // array of items for the current page
 
 $totalItems  = $paginator->getTotalItems();
 $totalPages  = $paginator->getTotalPages();
@@ -342,8 +342,6 @@ $report = User::query()
 For queries that don't belong to any model, start with `Query::new()` and specify the table manually:
 
 ```php
-use Merlin\Db\Query;
-
 $results = Query::new()
     ->table('orders o')
     ->join('users u', 'o.user_id = u.id')
