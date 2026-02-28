@@ -909,10 +909,12 @@ class Console
         $this->writeln();
         $this->writeln($this->style('Run "' . $this->scriptName . ' help <task>" for details.'));
 
+        /*
         if ($this->globalHelp !== null) {
             $this->writeln();
             $this->renderGlobalHelp($this->terminalWidth());
         }
+        */
 
         $this->writeln();
     }
