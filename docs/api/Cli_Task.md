@@ -14,7 +14,20 @@ are automatically discoverable by [`Console`](Cli_Console.md).
 
 ## 🚀 Public methods
 
-### write() · [source](../../src/Cli/Task.php#L26)
+### context() · [source](../../src/Cli/Task.php#L26)
+
+`public function context(): Merlin\AppContext`
+
+Get the current AppContext instance. Useful for accessing services.
+
+**➡️ Return value**
+
+- Type: [AppContext](AppContext.md)
+
+
+---
+
+### write() · [source](../../src/Cli/Task.php#L36)
 
 `public function write(string $text = ''): void`
 
@@ -33,7 +46,7 @@ Write text without a newline.
 
 ---
 
-### writeln() · [source](../../src/Cli/Task.php#L32)
+### writeln() · [source](../../src/Cli/Task.php#L42)
 
 `public function writeln(string $text = ''): void`
 
@@ -52,7 +65,7 @@ Write a line of text with a newline.
 
 ---
 
-### stderr() · [source](../../src/Cli/Task.php#L38)
+### stderr() · [source](../../src/Cli/Task.php#L48)
 
 `public function stderr(string $text = ''): void`
 
@@ -71,7 +84,7 @@ Write to STDERR without a newline.
 
 ---
 
-### stderrln() · [source](../../src/Cli/Task.php#L44)
+### stderrln() · [source](../../src/Cli/Task.php#L54)
 
 `public function stderrln(string $text = ''): void`
 
@@ -90,7 +103,7 @@ Write to STDERR with a newline.
 
 ---
 
-### line() · [source](../../src/Cli/Task.php#L50)
+### line() · [source](../../src/Cli/Task.php#L60)
 
 `public function line(string $text): void`
 
@@ -109,7 +122,7 @@ Plain message with no styling. Newline is appended.
 
 ---
 
-### info() · [source](../../src/Cli/Task.php#L56)
+### info() · [source](../../src/Cli/Task.php#L66)
 
 `public function info(string $text): void`
 
@@ -128,7 +141,7 @@ Informational message (cyan). Newline is appended.
 
 ---
 
-### success() · [source](../../src/Cli/Task.php#L62)
+### success() · [source](../../src/Cli/Task.php#L72)
 
 `public function success(string $text): void`
 
@@ -147,7 +160,7 @@ Success message (green). Newline is appended.
 
 ---
 
-### warn() · [source](../../src/Cli/Task.php#L68)
+### warn() · [source](../../src/Cli/Task.php#L78)
 
 `public function warn(string $text): void`
 
@@ -166,7 +179,7 @@ Warning message (yellow). Newline is appended.
 
 ---
 
-### error() · [source](../../src/Cli/Task.php#L74)
+### error() · [source](../../src/Cli/Task.php#L84)
 
 `public function error(string $text): void`
 
@@ -185,7 +198,7 @@ Error message (white on red) to STDERR. Newline is appended.
 
 ---
 
-### muted() · [source](../../src/Cli/Task.php#L80)
+### muted() · [source](../../src/Cli/Task.php#L90)
 
 `public function muted(string $text): void`
 
@@ -204,7 +217,7 @@ Muted / dimmed text (gray). Newline is appended.
 
 ---
 
-### option() · [source](../../src/Cli/Task.php#L106)
+### option() · [source](../../src/Cli/Task.php#L116)
 
 `public function option(string $key, mixed $default = null): mixed`
 
@@ -225,7 +238,7 @@ Retrieve a parsed option value by key, with an optional default.
 
 ---
 
-### beforeAction() · [source](../../src/Cli/Task.php#L124)
+### beforeAction() · [source](../../src/Cli/Task.php#L134)
 
 `public function beforeAction(string $action, array $params): void`
 
@@ -248,7 +261,7 @@ The method has access to $this->options and $this->console at this point.
 
 ---
 
-### afterAction() · [source](../../src/Cli/Task.php#L135)
+### afterAction() · [source](../../src/Cli/Task.php#L145)
 
 `public function afterAction(string $action, array $params): void`
 

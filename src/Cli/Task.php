@@ -2,6 +2,8 @@
 
 namespace Merlin\Cli;
 
+use Merlin\AppContext;
+
 
 /**
  * Base class for all CLI task classes.
@@ -17,6 +19,14 @@ abstract class Task
     /** @var array<string, mixed> Parsed options from the command line. */
     public array $options = [];
 
+    /**
+     * Get the current AppContext instance. Useful for accessing services.
+     * @return AppContext
+     */
+    public function context(): AppContext
+    {
+        return AppContext::instance();
+    }
 
     // -------------------------------------------------------------------------
     //  Output helpers – delegate to the Console for consistent color support
