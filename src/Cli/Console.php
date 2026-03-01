@@ -880,12 +880,7 @@ class Console
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
                 : null;
-            $firstAction = true;
             foreach ($actionDescriptions as $action => $actionDesc) {
-                if ($firstAction) {
-                    $firstAction = false;
-                    $this->writeln();
-                }
                 $defaultMarker = $action === $defaultActionLabel
                     ? ' ' . $this->style('[default]', ...$this->muteStyles)
                     : '';
