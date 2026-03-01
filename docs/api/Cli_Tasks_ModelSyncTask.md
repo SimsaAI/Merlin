@@ -20,8 +20,11 @@ Usage:
                                 [--field-visibility=<public|protected|private>]
 
 The <file-or-class> argument for `model-sync model` accepts:
+
   - A file path:               src/Models/User.php
+
   - A short class name:        User          (discovered via PSR-4 / --directory)
+
   - A fully-qualified name:    App\Models\User
 
 By default the task only reports changes.
@@ -67,7 +70,7 @@ Examples:
 
 ## 🚀 Public methods
 
-### allAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L82)
+### allAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L85)
 
 `public function allAction(string $dir = ''): void`
 
@@ -87,7 +90,7 @@ and sync each one against the database.
 
 ---
 
-### modelAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L175)
+### modelAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L178)
 
 `public function modelAction(string $file = ''): void`
 
@@ -111,7 +114,7 @@ when two classes share the same short name.
 
 ---
 
-### makeAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L221)
+### makeAction() · [source](../../src/Cli/Tasks/ModelSyncTask.php#L224)
 
 `public function makeAction(string $className = '', string $dir = ''): void`
 

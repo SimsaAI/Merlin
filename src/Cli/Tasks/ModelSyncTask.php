@@ -27,8 +27,11 @@ use Merlin\Sync\SyncRunner;
  *                                 [--field-visibility=<public|protected|private>]
  *
  * The <file-or-class> argument for `model-sync model` accepts:
+ * 
  *   - A file path:               src/Models/User.php
+ * 
  *   - A short class name:        User          (discovered via PSR-4 / --directory)
+ * 
  *   - A fully-qualified name:    App\Models\User
  *
  * By default the task only reports changes.

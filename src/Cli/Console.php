@@ -13,8 +13,6 @@ class Console
     ]; // taskName => class
     /** @var array<string,string> class => absolute file path, populated during cold discovery */
     protected array $taskClassFiles = [];
-    protected ?string $cachePath = null;
-    protected bool $cacheEnabled = false;
     protected string $scriptName;
     protected bool $coerceParams = false;
     protected bool $useColors;
@@ -88,7 +86,6 @@ class Console
     {
         $this->scriptName = $scriptName ?? basename($_SERVER['argv'][0] ?? 'console.php');
         $this->useColors = $this->detectColorSupport();
-        $this->cachePath = sys_get_temp_dir();
     }
 
     /**
@@ -116,70 +113,6 @@ class Console
     public function getGlobalTaskHelp(): ?string
     {
         return $this->globalHelp;
-    }
-
-    /**
-     * Override the directory used to store the task discovery cache.
-     * Defaults to sys_get_temp_dir(). Set to null to disable caching entirely.
-     */
-    public function setCachePath(?string $path): void
-    {
-        $this->cachePath = $path !== null ? rtrim($path, DIRECTORY_SEPARATOR) : null;
-    }
-
-    /**
-     * Delete the task discovery cache file for this project, if it exists.
-     * Use this after adding new Task classes when you do not want to wait for
-     * automatic invalidation.
-     */
-    public function clearCache(): void
-    {
-        $file = $this->cacheFilePath();
-        if ($file !== null && file_exists($file)) {
-            @unlink($file);
-        }
-    }
-
-    /**
-     * Return the absolute path to the cache file for this project, or null when
-     * caching is disabled ($cachePath === null).
-     */
-    protected function cacheFilePath(): ?string
-    {
-        if ($this->cachePath === null || !$this->cacheEnabled) {
-            return null;
-        }
-        $root = $this->findComposerRoot();
-        $key = md5($root ?? $this->getMainScriptDirectory());
-        return $this->cachePath . DIRECTORY_SEPARATOR . 'merlin_tasks_' . $key . '.php';
-    }
-
-    /**
-     * Return true when the on-disk cache file is still valid.
-     * Validity is checked by comparing the cache file's mtime against
-     * composer.json and composer.lock (if present). Adding a new Task file
-     * requires a manual --clear-cache run or a composer.json touch.
-     */
-    protected function isCacheValid(string $cacheFile): bool
-    {
-        if (!file_exists($cacheFile)) {
-            return false;
-        }
-        $cacheMtime = @filemtime($cacheFile);
-        if ($cacheMtime === false) {
-            return false;
-        }
-        $root = $this->findComposerRoot();
-        if ($root !== null) {
-            if ((@filemtime($root . '/composer.json') ?: 0) > $cacheMtime) {
-                return false;
-            }
-            $lock = $root . '/composer.lock';
-            if (file_exists($lock) && (@filemtime($lock) ?: 0) > $cacheMtime) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -232,6 +165,13 @@ class Console
             throw new \InvalidArgumentException("Default action cannot be empty");
         }
         $this->defaultAction = $defaultAction;
+    }
+
+
+    /** Remove all registered tasks. Useful if you don't want to expose system tasks. */
+    public function clearTasks(): void
+    {
+        $this->tasks = [];
     }
 
     // -------------------------------------------------------------------------
@@ -442,15 +382,7 @@ class Console
      */
     public function process(?string $task = null, ?string $action = null, array $params = []): void
     {
-        // Handle built-in meta-commands before any discovery.
-        if ($task === '--clear-task-cache') {
-            $this->clearCache();
-            $this->writeln('Task discovery cache cleared.');
-            return;
-        }
-
         $this->autodiscover();
-        $this->registerBuiltInHelp();
 
         // If no task provided, show overview
         if (!$task) {
@@ -569,34 +501,6 @@ class Console
     /** Autodiscover tasks in all registered namespaces and paths */
     public function autodiscover(): void
     {
-        // Warm path: load from cache and skip all filesystem traversal.
-        $cacheFile = $this->cacheFilePath();
-        if ($cacheFile !== null && $this->isCacheValid($cacheFile)) {
-            $cached = @include $cacheFile;
-            if (is_array($cached)) {
-                // Register a classmap autoloader so task classes discovered on
-                // the cold path can still be loaded without a full directory scan.
-                $classFiles = $cached['_files'] ?? [];
-                if (!empty($classFiles)) {
-                    spl_autoload_register(static function (string $class) use ($classFiles): void {
-                        if (isset($classFiles[$class]) && !class_exists($class, false)) {
-                            require_once $classFiles[$class];
-                        }
-                    });
-                }
-                foreach ($cached as $name => $class) {
-                    if ($name === '_files') {
-                        continue;
-                    }
-                    if (!isset($this->tasks[$name])) {
-                        $this->tasks[$name] = $class;
-                    }
-                }
-                return;
-            }
-        }
-
-        // Cold path: full filesystem discovery.
         foreach ($this->namespaces as $ns) {
             $this->discoverNamespaceViaComposer($ns);
         }
@@ -605,18 +509,6 @@ class Console
 
         foreach ($this->taskPaths as $path) {
             $this->discoverPath($path);
-        }
-
-        // Persist the result so subsequent runs skip the traversal.
-        if ($cacheFile !== null) {
-            $toCache = $this->tasks;
-            unset($toCache['help']); // 'help' is always registered at runtime
-            $toCache['_files'] = $this->taskClassFiles; // classmap for warm-path autoloading
-            $export = '<?php return ' . var_export($toCache, true) . ';' . PHP_EOL;
-            $tmp = $cacheFile . '.tmp.' . getmypid();
-            if (@file_put_contents($tmp, $export) !== false) {
-                @rename($tmp, $cacheFile);
-            }
         }
     }
 
@@ -829,11 +721,6 @@ class Console
         $parts = preg_split('/(?=[A-Z])/', $short, -1, PREG_SPLIT_NO_EMPTY);
         $parts = array_map(fn($p) => strtolower($p), $parts);
         return implode('-', $parts) ?: strtolower($short);
-    }
-
-    protected function registerBuiltInHelp(): void
-    {
-        $this->tasks['help'] = self::class;
     }
 
     /** Built-in help task */
