@@ -92,29 +92,28 @@ class Console
     }
 
     /**
-     * Set global help text that is appended to every help output (both the task overview and
-     * per-task detail). Use the same plain-text format as docblock Options sections:
+     * Set global help text that is appended to every help per-task detail 
+     * output. Use the same plain-text format as docblock Options sections:
      *
      *   --flag              One-line description
      *   --key=<value>       Description aligned automatically
      *
-     * Pass null to clear previously set help. The section header can be customised via
-     * the second argument (default: "Global Options:").
+     * Pass null to clear previously set help.
      *
-     * To suppress global help for a specific task, set `protected bool $showGlobalHelp = false`
-     * on that task class.
+     * To suppress this section for a specific task, set
+     * `protected bool $showGlobalHelp = false` on that task class.
      *
-     * @param string|null $help  The help text, or null to clear.
+     * @param string|null $help The help text, or null to clear.
      */
-    public function setGlobalHelp(?string $help): void
+    public function setGlobalTaskHelp(?string $help): void
     {
         $this->globalHelp = $help;
     }
 
     /**
-     * Return the currently registered global help text, or null if none is set.
+     * Return the currently registered global task help text, or null if none is set.
      */
-    public function getGlobalHelp(): ?string
+    public function getGlobalTaskHelp(): ?string
     {
         return $this->globalHelp;
     }
@@ -1439,14 +1438,6 @@ class Console
 
 
     /**
-     * Parse and render a Usage block:
-     *  - Lines starting with 'php' or the task name open a new usage entry.
-     *  - Lines starting with '[', '<', or '-' are continuations of the current entry.
-     *  - All other non-blank lines are treated as prose and rendered inline.
-     *  - Argument columns across all entries are aligned to the longest left side.
-     */
-
-    /**
      * Parse and render the global help text, which may contain multiple named sections.
      *
      * Section headers are lines matching "Word(s):" (e.g. "Options:", "Notes:", "Examples:").
@@ -1531,6 +1522,13 @@ class Console
         }
     }
 
+    /**
+     * Parse and render a Usage block:
+     *  - Lines starting with 'php' or the task name open a new usage entry.
+     *  - Lines starting with '[', '<', or '-' are continuations of the current entry.
+     *  - All other non-blank lines are treated as prose and rendered inline.
+     *  - Argument columns across all entries are aligned to the longest left side.
+     */
     protected function renderUsageBlock(string $usageText, string $taskKey, int $termWidth): void
     {
         $taskPattern = '/^' . preg_quote($taskKey, '/') . '\b/i';

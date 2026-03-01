@@ -21,7 +21,7 @@ abstract class Task
 
     /**
      * Set to false in a subclass to suppress the global help section (registered via
-     * {@see Console::setGlobalHelp()}) when `php console help <this-task>` is run.
+     * {@see Console::setGlobalTaskHelp()}) when `php console help <this-task>` is run.
      */
     protected bool $showGlobalHelp = true;
 
