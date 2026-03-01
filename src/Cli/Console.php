@@ -880,7 +880,12 @@ class Console
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
                 : null;
+            $firstAction = true;
             foreach ($actionDescriptions as $action => $actionDesc) {
+                if ($firstAction) {
+                    $firstAction = false;
+                    $this->writeln();
+                }
                 $defaultMarker = $action === $defaultActionLabel
                     ? ' ' . $this->style('[default]', ...$this->muteStyles)
                     : '';
@@ -1020,7 +1025,7 @@ class Console
                 }
             }
             if ($showGlobal) {
-                $this->renderGlobalHelp($termWidth);
+                $this->renderGlobalHelp();
             }
         }
     }
@@ -1449,11 +1454,13 @@ class Console
      *  - "Usage"    → highlightCommandLine() – treated like examples (no task-name context)
      *  - Anything else (Notes, Warning, Info …) → word-wrapped plain text in muted color
      */
-    protected function renderGlobalHelp(int $termWidth): void
+    protected function renderGlobalHelp(): void
     {
         if ($this->globalHelp === null) {
             return;
         }
+
+        $termWidth = $this->terminalWidth();
 
         // ── Split into sections ──────────────────────────────────────────────
         // A header is a line whose trimmed form looks like "Word(s):" with nothing after the colon.
