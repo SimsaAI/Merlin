@@ -740,7 +740,7 @@ class Console
             $desc = $this->extractShortDescription($class);
 
             // Task label column
-            $labelWidth = 20;
+            $labelWidth = 22;
             $leftPad = 2; // leading spaces printed before label
             $avail = max(10, $termWidth - $leftPad - $labelWidth - 1);
             $descLines = $this->wrapText($desc, $avail);
