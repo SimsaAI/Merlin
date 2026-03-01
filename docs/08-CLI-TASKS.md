@@ -45,7 +45,18 @@ $console->addNamespace('App\\Extra\\Tasks');
 $console->addTaskPath('/path/to/extra/tasks', registerAutoload: true);
 ```
 
-The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is **always** included. Discovery resolves paths from `composer.json` PSR-4 entries.
+The built-in `Merlin\Cli\Tasks` namespace (containing `ModelSyncTask`) is included by default. Discovery resolves paths from `composer.json` PSR-4 entries.
+
+If you want to remove these built-in/system tasks, you can clear the tasks before processing. Call `clearTasks()` on the `Console` instance to unregister all built-in/system tasks:
+
+```php
+// Clear built-in/system tasks
+$console->clearTasks();
+
+// Then register your namespaces and process as usual
+// $console->addNamespace('App\\Cli\\Tasks');
+$console->process($argv[1] ?? null, $argv[2] ?? null, array_slice($argv, 3));
+```
 
 ### Naming Rules
 

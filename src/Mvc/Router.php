@@ -705,7 +705,9 @@ class Router
                 if ($controllerPart === false) {
                     $override['controller'] = $handler;
                 } else {
-                    $override['controller'] = $controllerPart;
+                    if ($controllerPart !== '') {
+                        $override['controller'] = $controllerPart;
+                    }
                     $override['action'] = substr((string) strstr($handler, '::'), 2);
                 }
             }
