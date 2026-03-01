@@ -758,8 +758,8 @@ class Console
             }
 
             // Actions: action column is printed with 4 leading spaces + 2 spaces before the name
-            $actionLabelInner = 20; // the str_pad width used for actions
-            $actionLeft = 4 + 2; // visual indent
+            $actionLabelInner = 22; // the str_pad width used for actions
+            $actionLeft = 2 + 2; // visual indent
             $actionAvail = max(10, $termWidth - $actionLeft - $actionLabelInner - 1);
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
@@ -780,13 +780,13 @@ class Console
                 $actionLines = $this->wrapText($actionDesc, $actionAvail);
                 $first = array_shift($actionLines);
                 $this->writeln(
-                    '    '
+                    '  '
                     . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
                     . ' ' . $this->style($first)
                     . $defaultMarker
                 );
                 foreach ($actionLines as $ln) {
-                    $this->writeln('    ' . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
+                    $this->writeln('  ' . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
                 }
             }
         }
