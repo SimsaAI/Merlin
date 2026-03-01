@@ -732,9 +732,6 @@ class Console
         $this->writeln($this->style('Available tasks and actions:', 'bold', 'white'));
         $termWidth = $this->terminalWidth();
         foreach ($this->tasks as $name => $class) {
-            if ($name === 'help') {
-                continue;
-            }
             $actionDescriptions = $this->extractActionDescriptions($class);
             if (empty($actionDescriptions)) {
                 continue; // skip tasks with no public actions
@@ -761,7 +758,7 @@ class Console
             }
 
             // Actions: action column is printed with 4 leading spaces + 2 spaces before the name
-            $actionLabelInner = 16; // the str_pad width used for actions
+            $actionLabelInner = 20; // the str_pad width used for actions
             $actionLeft = 4 + 2; // visual indent
             $actionAvail = max(10, $termWidth - $actionLeft - $actionLabelInner - 1);
             $defaultActionLabel = method_exists($class, $this->defaultAction)
