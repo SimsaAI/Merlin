@@ -758,20 +758,24 @@ class Console
             }
 
             // Actions: action column is printed with 4 leading spaces + 2 spaces before the name
-            $actionLabelInner = 22; // the str_pad width used for actions
-            $actionLeft = 2 + 2; // visual indent
-            $actionAvail = max(10, $termWidth - $actionLeft - $actionLabelInner - 1);
+            $actionLabelInner = 22; // base str_pad width used for actions
+            $actionLeft = 2 + 2; // visual indent (leading spaces + inner padding)
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
                 : null;
             foreach ($actionDescriptions as $action => $actionDesc) {
+                // If an action name is longer than the base label width, account
+                // for its actual length when calculating description wrap width
+                $labelWidth = max($actionLabelInner, strlen($action));
+                $actionAvail = max(10, $termWidth - $actionLeft - $labelWidth - 1);
+
                 $defaultMarker = $action === $defaultActionLabel
                     ? ' ' . $this->style('[default]', ...$this->muteStyles)
                     : '';
                 if ($actionDesc === '') {
                     $this->writeln(
                         '    '
-                        . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
+                        . $this->style('  ' . str_pad($action, $labelWidth), ...$this->actionStyles)
                         . $defaultMarker
                     );
                     continue;
@@ -781,12 +785,12 @@ class Console
                 $first = array_shift($actionLines);
                 $this->writeln(
                     '  '
-                    . $this->style('  ' . str_pad($action, $actionLabelInner), ...$this->actionStyles)
+                    . $this->style('  ' . str_pad($action, $labelWidth), ...$this->actionStyles)
                     . ' ' . $this->style($first)
                     . $defaultMarker
                 );
                 foreach ($actionLines as $ln) {
-                    $this->writeln('  ' . str_repeat(' ', $actionLabelInner + 2) . ' ' . $this->style($ln));
+                    $this->writeln('  ' . str_repeat(' ', $labelWidth + 2) . ' ' . $this->style($ln));
                 }
             }
         }

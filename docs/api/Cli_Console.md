@@ -648,7 +648,7 @@ Built-in help task
 
 ---
 
-### helpTask() · [source](../../src/Cli/Console.php#L810)
+### helpTask() · [source](../../src/Cli/Console.php#L814)
 
 `public function helpTask(string $task): void`
 
@@ -667,7 +667,7 @@ Built-in help task for a specific task
 
 ---
 
-### coerceParam() · [source](../../src/Cli/Console.php#L1186)
+### coerceParam() · [source](../../src/Cli/Console.php#L1190)
 
 `public function coerceParam(string $param): string|int|float|bool|null`
 
@@ -689,7 +689,7 @@ Otherwise return the original string. Empty string is returned as-is.
 
 ---
 
-### terminalWidth() · [source](../../src/Cli/Console.php#L1272)
+### terminalWidth() · [source](../../src/Cli/Console.php#L1276)
 
 `public function terminalWidth(): int`
 
@@ -702,7 +702,7 @@ Return detected terminal width (columns). Falls back to 80.
 
 ---
 
-### wrapText() · [source](../../src/Cli/Console.php#L1623)
+### wrapText() · [source](../../src/Cli/Console.php#L1627)
 
 `public function wrapText(string $text, int $width): array`
 
