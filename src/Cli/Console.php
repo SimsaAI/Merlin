@@ -767,7 +767,8 @@ class Console
                 // If an action name is longer than the base label width, account
                 // for its actual length when calculating description wrap width
                 $labelWidth = max($actionLabelInner, strlen($action));
-                $actionAvail = max(10, $termWidth - $actionLeft - $labelWidth - 1);
+                // Reserve two spaces between action label and description
+                $actionAvail = max(10, $termWidth - $actionLeft - $labelWidth - 2);
 
                 $defaultMarker = $action === $defaultActionLabel
                     ? ' ' . $this->style('[default]', ...$this->muteStyles)
@@ -786,11 +787,11 @@ class Console
                 $this->writeln(
                     '  '
                     . $this->style('  ' . str_pad($action, $labelWidth), ...$this->actionStyles)
-                    . ' ' . $this->style($first)
+                    . '  ' . $this->style($first)
                     . $defaultMarker
                 );
                 foreach ($actionLines as $ln) {
-                    $this->writeln('  ' . str_repeat(' ', $labelWidth + 2) . ' ' . $this->style($ln));
+                    $this->writeln('  ' . str_repeat(' ', $labelWidth + 2) . '  ' . $this->style($ln));
                 }
             }
         }
@@ -842,8 +843,9 @@ class Console
 
             $actionLabelInner = 16;
             $leadingSpaces = 2; // two leading spaces before task
-            // description starts after: leading + task + ' ' + actionLabel + ' '
-            $descStartCol = $leadingSpaces + $actionLabelInner + 1;
+            // description starts after: leading + task + ' ' + actionLabel + '  '
+            // reserve two spaces between action and description
+            $descStartCol = $leadingSpaces + $actionLabelInner + 2;
             $actionAvail = max(10, $termWidth - $descStartCol);
             $defaultActionLabel = method_exists($class, $this->defaultAction)
                 ? $this->methodToActionName($this->defaultAction)
@@ -859,7 +861,7 @@ class Console
                 $this->writeln(
                     str_repeat(' ', $leadingSpaces)
                     . $this->style(str_pad($action, $actionLabelInner), ...$this->actionStyles)
-                    . ($first !== '' ? ' ' . $this->style($first) : '')
+                    . ($first !== '' ? '  ' . $this->style($first) : '')
                     . $defaultMarker
                 );
 
