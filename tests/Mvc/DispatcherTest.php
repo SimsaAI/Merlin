@@ -191,7 +191,7 @@ class DispatcherTest extends TestCase
         $res = $disp->dispatch($this->routeWithOverride(DTStringController::class, 'act'));
         $this->assertInstanceOf(Response::class, $res);
         $this->assertEquals('hello', $this->responseBody($res));
-        $this->assertEquals('text/plain; charset=utf-8', $this->responseHeaders($res)['Content-Type']);
+        $this->assertEquals('text/html; charset=utf-8', $this->responseHeaders($res)['Content-Type']);
 
         // array -> json
         $res = $disp->dispatch($this->routeWithOverride(DTArrayController::class, 'act'));
@@ -344,7 +344,7 @@ class DispatcherTest extends TestCase
     {
         return [
             'beforeAction' => ['beforeAction'],
-            'afterAction'  => ['afterAction'],
+            'afterAction' => ['afterAction'],
         ];
     }
 }

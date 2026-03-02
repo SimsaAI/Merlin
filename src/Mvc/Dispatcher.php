@@ -529,7 +529,7 @@ class Dispatcher
         elseif ($result instanceof \JsonSerializable)
             return Response::json($result->jsonSerialize());
         elseif (\is_string($result))
-            return Response::text($result);
+            return Response::html($result);
         elseif (\is_int($result))
             return Response::status($result);
         elseif ($result === null)

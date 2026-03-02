@@ -76,7 +76,7 @@ The `Dispatcher` automatically converts controller return values into HTTP respo
 | ---------------------------- | ---------------------------------------- |
 | `Merlin\Http\Response`       | sent as-is                               |
 | `array` / `JsonSerializable` | `200 application/json`                   |
-| `string`                     | `200 text/plain`                         |
+| `string`                     | `200 text/html`                          |
 | `int`                        | status-only response (e.g. `return 403`) |
 | `null`                       | `204 No Content`                         |
 

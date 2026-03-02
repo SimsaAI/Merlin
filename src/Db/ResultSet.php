@@ -4,6 +4,7 @@ namespace Merlin\Db;
 
 use Merlin\Mvc\Model;
 use PDO;
+use PDOStatement;
 
 /**
  * @template TModel of Model
@@ -11,7 +12,7 @@ use PDO;
 class ResultSet implements \Iterator, \Countable
 {
 	protected Database $db;
-	protected \PDOStatement $statement;
+	protected PDOStatement $statement;
 	protected ?string $sqlStatement;
 	protected ?array $boundParams;
 	/** @var class-string<TModel> */
@@ -28,14 +29,14 @@ class ResultSet implements \Iterator, \Countable
 	 * Create a new ResultSet wrapping a PDO statement result.
 	 *
 	 * @param Database        $connection   Database connection used to execute the query.
-	 * @param \PDOStatement   $statement    The executed PDO statement.
+	 * @param PDOStatement    $statement    The executed PDO statement.
 	 * @param string|null     $sqlStatement The original SQL string (used by reexecute()).
 	 * @param array|null      $boundParams  Bound parameters (used by reexecute()).
 	 * @param Model|null      $model        Optional model instance used for hydration (sets the fetch class).
 	 */
 	public function __construct(
 		Database $connection,
-		\PDOStatement $statement,
+		PDOStatement $statement,
 		?string $sqlStatement = null,
 		?array $boundParams = null,
 		?Model $model = null
@@ -52,6 +53,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch next row as object or array depending on fetch mode.
+	 * @return object|array|false The next row as an object or array depending on the fetch mode, or false if there are no more rows.
 	 */
 	public function fetch(): object|array|false
 	{
@@ -61,7 +63,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch next row as associative array.
-	 * @return array|false
+	 * @return array|false The next row as an associative array, or false if there are no more rows.
 	 */
 	public function fetchArray(): array|false
 	{
@@ -71,7 +73,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch next row as object.
-	 * @return object|false
+	 * @return object|false The next row as an object, or false if there are no more rows.
 	 */
 	public function fetchObject(): object|false
 	{
@@ -81,7 +83,8 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch next row as a single column value.
-	 * @param int $column
+	 * @param int $column Zero-based column index to fetch, or 0 for the first column.
+	 * @return mixed The value of the specified column in the next row, or false if there are no more rows.
 	 */
 	public function fetchColumn(int $column = 0): mixed
 	{
@@ -91,10 +94,10 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch all values from a single column.
-	 * @param int $column
-	 * @return array
+	 * @param int $column Zero-based column index to fetch, or 0 for the first column.
+	 * @return array The values of the specified column in all remaining rows.
 	 */
-	public function fetchAllColumns(int $column = 0): array
+	public function fetchAllColumn(int $column = 0): array
 	{
 		$result = $this->statement->fetchAll(PDO::FETCH_COLUMN, $column);
 		$this->position += \count($result);
@@ -103,12 +106,12 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Fetch all rows as objects or arrays depending on fetch mode.
-	 * @param int $fetchMode Override fetch mode for this call (optional)
-	 * @param int $columnIndex Column index for PDO::FETCH_COLUMN mode (optional)
+	 * @param int $fetchMode PDO::FETCH_* constant or 0 for default fetch mode
+	 * @return array An array of all remaining rows, each as an object or array depending on the fetch mode.
 	 */
-	public function fetchAll(int $fetchMode = 0, int $columnIndex = 0): array
+	public function fetchAll(int $fetchMode = 0): array
 	{
-		$result = $this->statement->fetchAll($fetchMode ?: $this->fetchMode, $columnIndex);
+		$result = $this->statement->fetchAll($fetchMode ?: $this->fetchMode);
 		$this->position += \count($result);
 		return $result;
 	}
@@ -124,7 +127,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Return all rows as associative arrays.
-	 * @return array
+	 * @return array<int, array<string, mixed>> An array of all remaining rows, each as an associative array.
 	 */
 	public function allArrays(): array
 	{
@@ -135,7 +138,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Return all rows as objects.
-	 * @return array
+	 * @return array<int, object> An array of all remaining rows, each as an object.
 	 */
 	public function allObjects(): array
 	{
@@ -146,7 +149,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Get the next model from the result set, or false if there are no more models. This method will attempt to hydrate a model if a model class was provided when the ResultSet was created. If no model class was provided, it will return false.
-	 * @return TModel|null
+	 * @return TModel|null The next model instance, or null if there are no more models.
 	 */
 	public function nextModel(): ?Model
 	{
@@ -183,7 +186,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Get first model or object from result set.
-	 * @return TModel|null
+	 * @return TModel|null The first model instance, or null if there are no models or if the first row cannot be hydrated as a model.
 	 */
 	public function firstModel(): ?Model
 	{
@@ -205,7 +208,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Get all remaining models or objects from result set.
-	 * @return array<int, TModel>
+	 * @return array<int, TModel> An array of all remaining model instances, or an empty array if there are no more models.
 	 */
 	/**
 	 * Get all remaining rows hydrated as model instances.
@@ -213,7 +216,7 @@ class ResultSet implements \Iterator, \Countable
 	 * Calls {@see nextModel()} repeatedly until the result set is exhausted.
 	 * Returns an empty array when no model class was provided at construction.
 	 *
-	 * @return array<int, TModel>
+	 * @return array<int, TModel> An array of all remaining model instances, or an empty array if there are no more models.
 	 */
 	public function allModels(): array
 	{
@@ -231,7 +234,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Return the SQL statement that was executed to produce this result set, if available.
-	 * @return string|null
+	 * @return string|null The SQL statement string, or null if not available.
 	 */
 	public function getSql(): ?string
 	{
@@ -240,7 +243,7 @@ class ResultSet implements \Iterator, \Countable
 
 	/**
 	 * Return the variables that were bound to the SQL statement, if available.
-	 * @return array|null
+	 * @return array|null The variables that were bound to the SQL statement, or null if not available.
 	 */
 	public function getBindings(): ?array
 	{
