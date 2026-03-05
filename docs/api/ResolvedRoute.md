@@ -17,7 +17,7 @@ used by the dispatcher to invoke the matched controller and action.
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/AppContext.php#L335)
+### __construct() · [source](../../src/AppContext.php#L334)
 
 `public function __construct(string|null $namespace, string $controller, string $action, array $params, array $vars, array $groups, array $override): mixed`
 

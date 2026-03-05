@@ -25,7 +25,7 @@ A lightweight, fast PHP framework for building modern MVC web applications and C
 - **Router** - Fast pattern matching with named routes, parameter validation, and middleware support
 - **Controllers** - Clean action-based controllers with dependency injection
 - **Dispatcher** - Flexible request dispatching with middleware pipeline
-- **ViewEngine** - Clarity template engine with auto-escaping, template inheritance, and a filter pipeline (native PHP templates also supported)
+- **ViewEngine** - Clarity template engine with auto-escaping, template inheritance, and a filter pipeline (A native PHP engine is also available for maximum performance)
 
 ### Database & ORM
 

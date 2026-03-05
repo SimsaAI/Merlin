@@ -1,14 +1,13 @@
 <?php
 namespace Merlin;
 
-use Merlin\Mvc\Engines\ClarityEngine;
-use Merlin\Mvc\Router;
 use RuntimeException;
 use Merlin\Db\DatabaseManager;
 use Merlin\Http\Cookies;
 use Merlin\Http\Request as HttpRequest;
 use Merlin\Http\Session;
-use Merlin\Mvc\Engines\NativeEngine;
+use Merlin\Mvc\Engines\ClarityEngine;
+use Merlin\Mvc\Router;
 use Merlin\Mvc\ViewEngine;
 
 class AppContext
