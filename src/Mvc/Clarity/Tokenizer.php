@@ -131,20 +131,17 @@ class Tokenizer
 
         $phpExpr = $this->convertVarsAndOps($expr);
 
-        // Determine whether auto-escape should be applied.
-        // If the last filter is 'raw' we strip it and skip escaping.
         $applyEscape = $autoEscape;
-        if ($applyEscape && !empty($filters)) {
-            $lastFilter = $filters[count($filters) - 1];
-            if ($this->filterName($lastFilter) === 'raw') {
-                array_pop($filters);
-                $applyEscape = false;
-            }
-        }
 
         // Wrap in filter calls (innermost first → outermost last)
+        $isRaw = false;
         foreach ($filters as $filterSegment) {
-            $phpExpr = $this->buildFilterCall($filterSegment, $phpExpr);
+            $phpExpr = $this->buildFilterCall($filterSegment, $phpExpr, $isRaw);
+        }
+
+        if ($isRaw) {
+            // If a 'raw' filter is found anywhere in the chain, disable auto-escape for the whole expression.
+            $applyEscape = false;
         }
 
         if ($applyEscape) {
@@ -647,13 +644,18 @@ class Tokenizer
      * @param string $phpValue      Already-converted PHP expression for the input value.
      * @return string PHP call expression.
      */
-    public function buildFilterCall(string $filterSegment, string $phpValue): string
+    public function buildFilterCall(string $filterSegment, string $phpValue, bool &$isRaw = false): string
     {
         if (\preg_match(self::RE_FILTER, $filterSegment, $m)) {
             $name = $m[1];
             $args = $m[2] ?? '';
         } else {
             throw new ClarityException("Invalid filter segment: '{$filterSegment}'");
+        }
+
+        if ($name === 'raw') {
+            $isRaw = true;
+            return $phpValue;
         }
 
         $safeName = "'" . \addslashes($name) . "'";

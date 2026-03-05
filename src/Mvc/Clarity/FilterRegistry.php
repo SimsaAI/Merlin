@@ -10,8 +10,6 @@ namespace Merlin\Mvc\Clarity;
  *
  * Built-in filters
  * ----------------
- * - escape / e   : htmlspecialchars (UTF-8, ENT_QUOTES)
- * - raw          : identity – disables auto-escaping
  * - trim         : trims whitespace
  * - upper        : strtoupper
  * - lower        : strtolower
@@ -66,15 +64,6 @@ class FilterRegistry
 
     private function registerBuiltins(): void
     {
-        $this->filters['escape'] = static fn(mixed $v): string =>
-            htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
-
-        // Alias
-        $this->filters['e'] = $this->filters['escape'];
-
-        // raw: identity — suppresses auto-escaping
-        $this->filters['raw'] = static fn(mixed $v): mixed => $v;
-
         $this->filters['trim'] = static fn(mixed $v): string => trim((string) $v);
 
         $this->filters['upper'] = static fn(mixed $v): string => strtoupper((string) $v);

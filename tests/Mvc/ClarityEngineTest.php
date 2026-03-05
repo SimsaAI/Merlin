@@ -122,6 +122,21 @@ class ClarityEngineTest extends TestCase
         $this->assertSame('<b>bold</b>', $result);
     }
 
+    public function testRawMidPipelineThrowsAtCompileTime(): void
+    {
+        $this->expectException(ClarityException::class);
+        $this->expectExceptionMessageMatches("/'raw' must be the last filter/");
+        self::tpl('raw_mid', '{{ html |> raw |> upper }}');
+        self::render('raw_mid', ['html' => 'hello']);
+    }
+
+    public function testEscapeFilterIsNotRegistered(): void
+    {
+        $this->expectException(ClarityException::class);
+        self::tpl('escape_filter', '{{ html |> escape }}');
+        self::render('escape_filter', ['html' => '<b>bold</b>']);
+    }
+
     public function testDotAccessOnArray(): void
     {
         self::tpl('dot', '{{ user.name }}');

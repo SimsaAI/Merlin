@@ -46,7 +46,7 @@ $ctx->view()->setViewPath(__DIR__ . '/../views');
 
 ```
 {{ expression }}          Output a value (auto-escaped)
-{{ expression |> raw }}   Output raw HTML (no escaping)
+{{ expression |> raw }}   Output raw HTML (no escaping; `raw` is a special marker that disables auto-escaping)
 {% directive %}           Control flow, assignment, includes, inheritance
 ```
 
@@ -66,6 +66,8 @@ Enclose any Clarity expression in double curly braces to print it:
 {# trusted HTML stored in a variable #}
 <div>{{ body |> raw }}</div>
 ```
+
+`raw` is a special compile-time marker handled by the Clarity engine. It acts as an identity within the filter pipeline and, when present anywhere in the chain, disables the automatic `htmlspecialchars()` wrap for the whole expression.
 
 ---
 
@@ -124,17 +126,15 @@ Filters with arguments use parentheses after the filter name:
 
 ### Built-in Filters
 
-| Filter         | Signature                   | Description                                     |
-| -------------- | --------------------------- | ----------------------------------------------- |
-| `escape` / `e` | `(value)`                   | `htmlspecialchars(UTF-8, ENT_QUOTES)`           |
-| `raw`          | `(value)`                   | Pass through unchanged; disables auto-escaping  |
-| `trim`         | `(value)`                   | Remove leading/trailing whitespace              |
-| `upper`        | `(value)`                   | `strtoupper`                                    |
-| `lower`        | `(value)`                   | `strtolower`                                    |
-| `length`       | `(value)`                   | `strlen` for strings, `count` for arrays        |
-| `number`       | `(value, decimals = 2)`     | `number_format`                                 |
-| `date`         | `(value, format = 'Y-m-d')` | Formats a Unix timestamp or `DateTimeInterface` |
-| `json`         | `(value)`                   | `json_encode`                                   |
+| Filter   | Signature                   | Description                                     |
+| -------- | --------------------------- | ----------------------------------------------- |
+| `trim`   | `(value)`                   | Remove leading/trailing whitespace              |
+| `upper`  | `(value)`                   | `strtoupper`                                    |
+| `lower`  | `(value)`                   | `strtolower`                                    |
+| `length` | `(value)`                   | `strlen` for strings, `count` for arrays        |
+| `number` | `(value, decimals = 2)`     | `number_format`                                 |
+| `date`   | `(value, format = 'Y-m-d')` | Formats a Unix timestamp or `DateTimeInterface` |
+| `json`   | `(value)`                   | `json_encode`                                   |
 
 ### Custom Filters
 

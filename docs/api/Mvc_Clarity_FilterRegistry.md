@@ -10,8 +10,6 @@ value as its first argument and any extra pipeline arguments after it.
 
 Built-in filters
 ----------------
-- escape / e   : htmlspecialchars (UTF-8, ENT_QUOTES)
-- raw          : identity – disables auto-escaping
 - trim         : trims whitespace
 - upper        : strtoupper
 - lower        : strtolower
@@ -23,7 +21,7 @@ Built-in filters
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L29)
+### __construct() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L27)
 
 `public function __construct(): mixed`
 
@@ -34,7 +32,7 @@ Built-in filters
 
 ---
 
-### add() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L41)
+### add() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L39)
 
 `public function add(string $name, callable $fn): static`
 
@@ -54,7 +52,7 @@ Register a user-defined filter.
 
 ---
 
-### has() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L50)
+### has() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L48)
 
 `public function has(string $name): bool`
 
@@ -73,7 +71,7 @@ Check whether a named filter is registered.
 
 ---
 
-### all() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L60)
+### all() · [source](../../src/Mvc/Clarity/FilterRegistry.php#L58)
 
 `public function all(): array`
 

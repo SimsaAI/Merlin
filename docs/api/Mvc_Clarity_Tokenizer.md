@@ -85,7 +85,7 @@ expression and each subsequent segment is a filter call.
 
 ---
 
-### processCondition() · [source](../../src/Mvc/Clarity/Tokenizer.php#L164)
+### processCondition() · [source](../../src/Mvc/Clarity/Tokenizer.php#L161)
 
 `public function processCondition(string $expression): string`
 
@@ -106,7 +106,7 @@ structure conditions (if, for, set) where auto-escape is meaningless.
 
 ---
 
-### processLvalue() · [source](../../src/Mvc/Clarity/Tokenizer.php#L183)
+### processLvalue() · [source](../../src/Mvc/Clarity/Tokenizer.php#L180)
 
 `public function processLvalue(string $var): string`
 
@@ -128,7 +128,7 @@ Used for the left-hand side of {% set var = ... %}.
 
 ---
 
-### convertVarsAndOps() · [source](../../src/Mvc/Clarity/Tokenizer.php#L270)
+### convertVarsAndOps() · [source](../../src/Mvc/Clarity/Tokenizer.php#L267)
 
 `public function convertVarsAndOps(string $expr): string`
 
@@ -154,7 +154,7 @@ identifiers/var-chains, operators, punctuation) and process each atom.
 
 ---
 
-### varChainToPhp() · [source](../../src/Mvc/Clarity/Tokenizer.php#L616)
+### varChainToPhp() · [source](../../src/Mvc/Clarity/Tokenizer.php#L613)
 
 `public function varChainToPhp(string $chain): string`
 
@@ -180,9 +180,9 @@ a.b[c.d].e    → $vars['a']['b'][$vars['c']['d']]['e']
 
 ---
 
-### buildFilterCall() · [source](../../src/Mvc/Clarity/Tokenizer.php#L650)
+### buildFilterCall() · [source](../../src/Mvc/Clarity/Tokenizer.php#L647)
 
-`public function buildFilterCall(string $filterSegment, string $phpValue): string`
+`public function buildFilterCall(string $filterSegment, string $phpValue, bool &$isRaw = false): string`
 
 Build a PHP filter call:  $__f['name']($value, arg1, arg2)
 
@@ -192,6 +192,7 @@ Build a PHP filter call:  $__f['name']($value, arg1, arg2)
 |---|---|---|---|
 | `$filterSegment` | string | - | Clarity filter segment e.g. 'number(2)' or 'upper' |
 | `$phpValue` | string | - | Already-converted PHP expression for the input value. |
+| `$isRaw` | bool | `false` |  |
 
 **➡️ Return value**
 
@@ -201,7 +202,7 @@ Build a PHP filter call:  $__f['name']($value, arg1, arg2)
 
 ---
 
-### filterName() · [source](../../src/Mvc/Clarity/Tokenizer.php#L680)
+### filterName() · [source](../../src/Mvc/Clarity/Tokenizer.php#L682)
 
 `public function filterName(string $filterSegment): string`
 
