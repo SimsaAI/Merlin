@@ -5,8 +5,14 @@
 Declares a property as a persistent column.
 
 Everything is optional: an unattributed declared property is still a
-column with inferred defaults (name = property name, type 'string').
-The attribute exists to override those defaults.
+column with inferred defaults (name = property name, type from the PHP
+type, falling back to 'string'). The attribute exists to override
+those defaults.
+
+`type` is inferred from the property's PHP type when omitted (int →
+'int', float → 'float', bool → 'bool', array → 'json', DateTime* →
+'datetime', anything else → 'string'); pass `type:` explicitly to
+override (e.g. 'pgarray' for a native pg array column).
 
 `pk` explicitly marks (or excludes) a primary key: true marks the
 column as part of the PK (composite keys = multiple marked columns);
@@ -15,7 +21,7 @@ An idFields() override on the model still wins over these marks.
 
 ## 🌍 Public Properties
 
-- `public` string `$type` · [source](../../src/Orm/Attribute/Column.php)
+- `public` string|null `$type` · [source](../../src/Orm/Attribute/Column.php)
 - `public` string|null `$name` · [source](../../src/Orm/Attribute/Column.php)
 - `public` bool `$nullable` · [source](../../src/Orm/Attribute/Column.php)
 - `public` bool `$transient` · [source](../../src/Orm/Attribute/Column.php)
@@ -23,15 +29,15 @@ An idFields() override on the model still wins over these marks.
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Orm/Attribute/Column.php#L20)
+### __construct() · [source](../../src/Orm/Attribute/Column.php#L26)
 
-`public function __construct(string $type = 'string', string|null $name = null, bool $nullable = false, bool $transient = false, bool|null $pk = null): mixed`
+`public function __construct(string|null $type = null, string|null $name = null, bool $nullable = false, bool $transient = false, bool|null $pk = null): mixed`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$type` | string | `'string'` |  |
+| `$type` | string\|null | `null` |  |
 | `$name` | string\|null | `null` |  |
 | `$nullable` | bool | `false` |  |
 | `$transient` | bool | `false` |  |

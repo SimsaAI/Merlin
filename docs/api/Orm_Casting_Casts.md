@@ -1,8 +1,8 @@
 # 🧩 Class: Casts
 
-**Full name:** [Azera\Orm\Casting\Casts](../../src/Orm/Cast/Casts.php)
+**Full name:** [Azera\Orm\Casting\Casts](../../src/Orm/Casting/Casts.php)
 
-Registry mapping metadata column types to [`Cast`](Orm_Cast_Cast.md) transformations.
+Registry mapping metadata column types to [`Cast`](Orm_Casting_Cast.md) transformations.
 
 The cast key is the COLUMN type declared (or inferred) in metadata —
 `#[Column(type: 'json')]` or the property-type inference (array ->
@@ -10,7 +10,7 @@ The cast key is the COLUMN type declared (or inferred) in metadata —
 an `array` property on PostgreSQL backed by a native array column must
 be declared explicitly as `#[Column(type: 'pgarray')]`.
 
-Registered built-ins (registered in [`Casts::boot()`](Orm_Cast_Casts.md#boot)):
+Registered built-ins (registered in [`Casts::boot()`](Orm_Casting_Casts.md#boot)):
 
   'int'      decode coerces strings -> int (both property AND snapshot)
   'float'    decode coerces strings -> float (both directions as int)
@@ -35,7 +35,7 @@ Semantics:
 
 ## 🚀 Public methods
 
-### register() · [source](../../src/Orm/Cast/Casts.php#L48)
+### register() · [source](../../src/Orm/Casting/Casts.php#L48)
 
 `public static function register(string $type, Azera\Orm\Casting\Cast $cast): void`
 
@@ -46,7 +46,7 @@ Register (or replace) a cast for a column type.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `$type` | string | - |  |
-| `$cast` | [Cast](Orm_Cast_Cast.md) | - |  |
+| `$cast` | [Cast](Orm_Casting_Cast.md) | - |  |
 
 **➡️ Return value**
 
@@ -55,7 +55,7 @@ Register (or replace) a cast for a column type.
 
 ---
 
-### for() · [source](../../src/Orm/Cast/Casts.php#L59)
+### for() · [source](../../src/Orm/Casting/Casts.php#L59)
 
 `public static function for(string $type): Azera\Orm\Casting\Cast|null`
 
@@ -70,12 +70,12 @@ transformation (values pass through raw in both directions).
 
 **➡️ Return value**
 
-- Type: [Cast](Orm_Cast_Cast.md)|null
+- Type: [Cast](Orm_Casting_Cast.md)|null
 
 
 ---
 
-### types() · [source](../../src/Orm/Cast/Casts.php#L71)
+### types() · [source](../../src/Orm/Casting/Casts.php#L71)
 
 `public static function types(): array`
 
@@ -88,7 +88,7 @@ Registered type names (tests).
 
 ---
 
-### clear() · [source](../../src/Orm/Cast/Casts.php#L81)
+### clear() · [source](../../src/Orm/Casting/Casts.php#L81)
 
 `public static function clear(): void`
 

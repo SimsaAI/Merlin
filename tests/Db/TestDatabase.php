@@ -70,7 +70,7 @@ class TestDatabase extends \Azera\Db\Database
         }
 
         $this->queries[] = [
-            'sql' => $statement,
+            'sql'    => $statement,
             'params' => $args ?? []
         ];
 
@@ -109,7 +109,7 @@ class TestDatabase extends \Azera\Db\Database
 
         if ($sth instanceof TestPdoStatement) {
             $this->queries[] = [
-                'sql' => 'prepared statement',
+                'sql'    => 'prepared statement',
                 'params' => $params
             ];
             return $sth;
@@ -214,6 +214,9 @@ class TestDatabase extends \Azera\Db\Database
     public function rollback($nesting = true): bool
     {
         $this->queries[] = ['sql' => 'ROLLBACK', 'params' => []];
+        if ($this->transactionLevel > 0) {
+            $this->transactionLevel--;
+        }
         return true;
     }
     /**
@@ -226,9 +229,7 @@ class TestDatabase extends \Azera\Db\Database
         if ($handler === null) {
             $handler = new class extends \PDO
             {
-                public function __construct()
-                {
-                }
+                public function __construct() {}
                 #[\ReturnTypeWillChange]
                 public function getAttribute($attr)
                 {
@@ -263,7 +264,7 @@ class TestPdoStatement extends \PDOStatement
 
     public function setFetchMode($mode, ...$args): true
     {
-        $this->fetchMode = $mode;
+        $this->fetchMode  = $mode;
         $this->fetchClass = $mode === \PDO::FETCH_CLASS && isset($args[0]) ? (string) $args[0] : null;
         return true;
     }
@@ -280,7 +281,7 @@ class TestPdoStatement extends \PDOStatement
             return false;
         }
 
-        $row = $this->results[$this->position++];
+        $row  = $this->results[$this->position++];
         $mode = $mode === \PDO::FETCH_BOTH ? $this->fetchMode : $mode;
 
         switch ($mode) {
@@ -342,7 +343,7 @@ class TestPdoStatement extends \PDOStatement
 
     public function closeCursor(): bool
     {
-        $this->position = 0;
+        $this->position     = 0;
         $this->cursorClosed = true;
         return true;
     }

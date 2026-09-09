@@ -1,12 +1,12 @@
 # 🧩 Class: BoolCast
 
-**Full name:** [Azera\Orm\Casting\BoolCast](../../src/Orm/Cast/BoolCast.php)
+**Full name:** [Azera\Orm\Casting\BoolCast](../../src/Orm/Casting/BoolCast.php)
 
 Scalar bool cast — see IntCast for the shared rationale.
 
 ## 🚀 Public methods
 
-### encode() · [source](../../src/Orm/Cast/BoolCast.php#L18)
+### encode() · [source](../../src/Orm/Casting/BoolCast.php#L18)
 
 `public function encode(mixed $value): mixed`
 
@@ -23,7 +23,7 @@ Scalar bool cast — see IntCast for the shared rationale.
 
 ---
 
-### decode() · [source](../../src/Orm/Cast/BoolCast.php#L23)
+### decode() · [source](../../src/Orm/Casting/BoolCast.php#L23)
 
 `public function decode(mixed $value): mixed`
 

@@ -64,6 +64,35 @@ document throws during metadata compile (MongoStore owns its connections
 — multiple clients = multiple store types, selected via `store:`), while
 SQL stores honor it as per-class read/write routing.
 
+### Column Type Inference
+
+`#[Column]` is fully optional. When `type:` is omitted, the column type
+is inferred from the property's PHP type — even when the attribute is
+present for other reasons (renaming, `pk` marks):
+
+```php
+class AdminUser extends Model
+{
+    #[Column(pk: true)]
+    public int $tenant_id;   // type inferred → 'int'
+
+    #[Column(name: 'status_code', pk: false)]
+    public int $status;      // renamed + excluded from key, type still 'int'
+}
+```
+
+| PHP type                          | Inferred column type |
+| --------------------------------- | -------------------- |
+| `int`                             | `int`                |
+| `float`                           | `float`              |
+| `bool`                            | `bool`               |
+| `array`                           | `json`               |
+| `DateTime` / `DateTimeImmutable`  | `datetime`           |
+| anything else / untyped           | `string`             |
+
+Pass `type:` explicitly to override the inference (e.g. `'pgarray'` for a
+native pg array column, or a custom registered cast).
+
 ### Column Casts (value transformation)
 
 Values with a registered cast type are **encoded before every write** and
@@ -456,6 +485,54 @@ EntityManager).
 ```php
 $user->delete(); // DELETE FROM users WHERE id = ?
 ```
+
+### `flush()` — single-connection atomic flush
+
+`save()` persists through the EntityManager and flushes with the CURRENT
+flush cycle — every write lands in ONE transaction on ONE connection
+target: all scheduled classes must resolve to one store instance AND one
+connection target on it, otherwise the flush spans two connections and
+throws (a cross-connection transaction does not exist):
+
+```php
+$em->flush();  // or simply Model::save() — same write pipeline
+```
+
+The error names the two targets and the escape hatch — persist through
+separate EntityManagers, split the flush, or use `flushAll()` below.
+
+### `flushAll()` — multi-connection flush
+
+When a write set legitimately spans connections (SQL + mongo, or several
+`#[Connection(write: …)]` roles on one store), `flushAll()` executes the
+whole scheduled set across EVERY target:
+
+```php
+$em->flushAll();   // Model: AppContext::instance()->entityManager()->flushAll()
+```
+
+| Piece           | `flush()`                                  | `flushAll()`                                                |
+| --------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| Transactions    | ONE tx, ONE connection target              | one tx per store/connection target, begun lazily            |
+| Execution order | single topological pass                    | single topological pass ACROSS all targets (FK backfill crosses groups) |
+| Commits         | at the end of the pass                     | deferred until every node executed                          |
+| Failure         | full rollback                              | all txs begun SO FAR roll back; already-committed groups stay (best-effort all-or-nothing) |
+| Multi-target    | throws                                     | works                                                       |
+
+Cross-connection atomicity does not exist anywhere (two-phase commit is
+not modeled) — `flushAll()` trades strict atomicity for reachability,
+matching `flush()`'s failure shape as closely as physically possible.
+Prefer `flush()` when the whole write set shares one connection target.
+
+Two store/connection facts worth knowing:
+
+- **Role aliases collapse.** Two `#[Connection(write: …)]` roles that
+  resolve to the SAME `Database` share ONE transaction (one `BEGIN`) —
+  same connection, same tx, atomically coupled by the database itself.
+- **A tx pins only its own target.** Reads on the transaction's
+  connection see its uncommitted writes; reads resolving to OTHER
+  connections run autocommit (a tx no longer hijacks unrelated
+  roles' traffic).
 
 ---
 

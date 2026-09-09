@@ -189,15 +189,16 @@ final class MongoStore implements Store
     /**
      * No-ops: multi-document ACID needs replica-set sessions (deferred).
      * Kept structural so the EM pipeline never branches on store type.
-     * $meta ignored — an owning store has exactly one write target.
+     * $meta ignored — an owning store has exactly ONE fixed write target,
+     * so there is nothing to address per class.
      */
     public function begin(?array $meta = null): void {}
 
-    public function commit(): void {}
+    public function commit(?array $meta = null): void {}
 
-    public function rollback(): void {}
+    public function rollback(?array $meta = null): void {}
 
-    public function inTransaction(): bool
+    public function inTransaction(?array $meta = null): bool
     {
         return false;
     }

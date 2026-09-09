@@ -1,6 +1,6 @@
 # 🔌 Interface: Cast
 
-**Full name:** [Azera\Orm\Casting\Cast](../../src/Orm/Cast/Cast.php)
+**Full name:** [Azera\Orm\Casting\Cast](../../src/Orm/Casting/Cast.php)
 
 A value transformation between the PHP entity representation and the
 raw store representation.
@@ -22,7 +22,7 @@ all classes and rows of the registered type.
 
 ## 🚀 Public methods
 
-### encode() · [source](../../src/Orm/Cast/Cast.php#L29)
+### encode() · [source](../../src/Orm/Casting/Cast.php#L29)
 
 `public function encode(mixed $value): mixed`
 
@@ -41,7 +41,7 @@ PHP entity value -> raw store value.
 
 ---
 
-### decode() · [source](../../src/Orm/Cast/Cast.php#L34)
+### decode() · [source](../../src/Orm/Casting/Cast.php#L34)
 
 `public function decode(mixed $value): mixed`
 

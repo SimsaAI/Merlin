@@ -1,6 +1,6 @@
 # 🧩 Class: PgArrayCast
 
-**Full name:** [Azera\Orm\Casting\PgArrayCast](../../src/Orm/Cast/PgArrayCast.php)
+**Full name:** [Azera\Orm\Casting\PgArrayCast](../../src/Orm/Casting/PgArrayCast.php)
 
 'pgarray' cast: PHP 1-D scalar array <-> PostgreSQL native array
 literal (the string form PDO returns for array columns: `{1,2,3}`,
@@ -26,7 +26,7 @@ against a text[] column just works.
 
 ## 🚀 Public methods
 
-### encode() · [source](../../src/Orm/Cast/PgArrayCast.php#L33)
+### encode() · [source](../../src/Orm/Casting/PgArrayCast.php#L33)
 
 `public function encode(mixed $value): mixed`
 
@@ -43,7 +43,7 @@ against a text[] column just works.
 
 ---
 
-### decode() · [source](../../src/Orm/Cast/PgArrayCast.php#L52)
+### decode() · [source](../../src/Orm/Casting/PgArrayCast.php#L52)
 
 `public function decode(mixed $value): mixed`
 

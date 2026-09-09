@@ -202,15 +202,17 @@ Count matching rows.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/Store.php#L102)
+### begin() · [source](../../src/Orm/Storage/Store.php#L103)
 
 `public function begin(array|null $meta = null): void`
 
-Open a transaction. $meta (the scheduled class's metadata) lets the
-store pin to the class's write target when it supports per-class
-routing — flush() pins the tx to the FIRST scheduled class's
-writeRole instead of the constructor default (which made per-class
-routing dead code on the EM path). Null = constructor default.
+Open a transaction for $meta's write target. $meta (the scheduled
+class's metadata) lets a store with per-class routing open the tx on
+the class's OWN connection; a store MAY hold SEVERAL txs at once —
+one per distinct connection target (PdoStore's tx map) — and a
+begin() for an ALREADY-OPEN target must join it (no nesting).
+
+Null = the store's default target.
 
 **🧭 Parameters**
 
@@ -225,9 +227,20 @@ routing dead code on the EM path). Null = constructor default.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/Store.php#L103)
+### commit() · [source](../../src/Orm/Storage/Store.php#L111)
 
-`public function commit(): void`
+`public function commit(array|null $meta = null): void`
+
+Commit the tx on $meta's write target — a tx THIS store began
+(caller-opened txs are joined by routing and must never be
+committed/rolled back by a store). Null meta commits EVERY tx the
+store began (the legacy bare-call semantic, generalized to the map).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -236,9 +249,17 @@ routing dead code on the EM path). Null = constructor default.
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/Store.php#L104)
+### rollback() · [source](../../src/Orm/Storage/Store.php#L116)
 
-`public function rollback(): void`
+`public function rollback(array|null $meta = null): void`
+
+Rollback — same target addressing as [`Store::commit()`](Orm_Storage_Store.md#commit).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -247,11 +268,19 @@ routing dead code on the EM path). Null = constructor default.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/Store.php#L109)
+### inTransaction() · [source](../../src/Orm/Storage/Store.php#L123)
 
-`public function inTransaction(): bool`
+`public function inTransaction(array|null $meta = null): bool`
 
-Whether a transaction (or savepoint level) is active.
+Whether a transaction (or savepoint level) is active on $meta's
+write target — store-begun OR caller-opened (the EM joins either
+instead of double-beginning). Null meta: any of the store's targets.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -260,7 +289,7 @@ Whether a transaction (or savepoint level) is active.
 
 ---
 
-### enrichMetadata() · [source](../../src/Orm/Storage/Store.php#L119)
+### enrichMetadata() · [source](../../src/Orm/Storage/Store.php#L133)
 
 `public function enrichMetadata(array $meta, ReflectionClass $class): array`
 

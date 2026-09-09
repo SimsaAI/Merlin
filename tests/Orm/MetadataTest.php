@@ -7,6 +7,7 @@ require_once __DIR__ . '/Fixtures/Article.php';
 require_once __DIR__ . '/Fixtures/Relations.php';
 require_once __DIR__ . '/Fixtures/ArticleDocument.php';
 require_once __DIR__ . '/Fixtures/InventoryItem.php';
+require_once __DIR__ . '/Fixtures/TypedColumns.php';
 
 use Azera\Cache\ArrayCache;
 use Azera\AppContext;
@@ -18,6 +19,7 @@ use Azera\Tests\Orm\Fixtures\ArticleDocument;
 use Azera\Tests\Orm\Fixtures\ArticleWithRelations;
 use Azera\Tests\Orm\Fixtures\Comment;
 use Azera\Tests\Orm\Fixtures\InventoryItem;
+use Azera\Tests\Orm\Fixtures\TypedColumns;
 use PHPUnit\Framework\TestCase;
 
 class MetadataTest extends TestCase
@@ -72,6 +74,27 @@ class MetadataTest extends TestCase
 
         $this->assertSame('status_code', $meta['columns']['status']['name']);
         $this->assertSame('int', $meta['columns']['status']['type']);
+        $this->assertFalse($meta['columns']['status']['pk']);
+    }
+
+    public function testColumnTypeInferredFromPhpTypeWhenOmitted(): void
+    {
+        $meta = Metadata::for(TypedColumns::class);
+
+        // #[Column] present but no `type:` → PHP type wins.
+        $this->assertSame('int', $meta['columns']['id']['type']);
+        $this->assertSame('int', $meta['columns']['status']['type']);
+        $this->assertSame('float', $meta['columns']['score']['type']);
+        $this->assertSame('bool', $meta['columns']['active']['type']);
+        $this->assertSame('json', $meta['columns']['tags']['type']);
+        $this->assertSame('datetime', $meta['columns']['created_at']['type']);
+        $this->assertSame('string', $meta['columns']['title']['type']);
+
+        // Untyped property still falls back to 'string'.
+        $this->assertSame('string', $meta['columns']['untyped']['type']);
+
+        // name/pk overrides still honored alongside inferred type.
+        $this->assertSame('status_code', $meta['columns']['status']['name']);
         $this->assertFalse($meta['columns']['status']['pk']);
     }
 

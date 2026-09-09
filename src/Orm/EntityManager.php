@@ -7,7 +7,6 @@ use Azera\Lifecycle\RequestScoped;
 use Azera\Orm\Casting\Casts;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
-use Azera\Orm\Storage\PdoStore;
 use Azera\Orm\Storage\Store;
 use Azera\Orm\Storage\Stores;
 
@@ -251,7 +250,7 @@ final class EntityManager implements RequestScoped
     }
 
     /**
-     * Execute all scheduled writes in one transaction
+     * Execute all scheduled writes in ONE transaction
      * (diff -> order -> execute -> backfill).
      *
      * Transaction control follows the SCHEDULED WORK's (store, txTarget)
@@ -259,9 +258,9 @@ final class EntityManager implements RequestScoped
      * AND one connection target on it — otherwise the flush spans two
      * connections and cannot be atomic, which throws (stores may relax
      * this with per-instance semantics via txTarget(); e.g. a mongo
-     * store's no-op txs group under its single instance token). flush()
-     * pins the tx to the FIRST scheduled class's write target via
-     * begin($meta) — per-class #[Connection] routing survives pinning.
+     * store's no-op txs group under its single instance token). Use
+     * {@see EntityManager::flushAll()} for write sets that legitimately
+     * span connections (per-target txs, best-effort all-or-nothing).
      */
     public function flush(): void
     {
@@ -272,34 +271,26 @@ final class EntityManager implements RequestScoped
 
         // Resolve every scheduled class's store UP FRONT — a missing or
         // misconfigured store must fail the flush before ANY write runs,
-        // not mid-flush after earlier nodes already executed. Grouping by
-        // (store instance, txTarget): more than one group = the write set
-        // spans two connections — no cross-connection tx exists, fail
-        // loudly instead of pretending atomicity.
-        $txStore   = null;
-        $txTarget  = null;
-        $firstMeta = null;
-        foreach ($scheduled as $node) {
-            $meta   = Metadata::for($node->class);
-            $store  = $this->storeFor($node->class);
-            $target = $store->txTarget($meta);
+        // not mid-flush after earlier nodes already executed.
+        $groups = $this->partitionScheduled($scheduled);
 
-            if ($txStore === null) {
-                $txStore   = $store;
-                $txTarget  = $target;
-                $firstMeta = $meta;
-            } elseif ($txStore !== $store || $txTarget !== $target) {
-                throw new \RuntimeException(
-                    'flush() spans multiple connections (store type change or '
-                        . "different write targets: '{$txTarget}' vs '{$target}') — not atomic, "
-                        . 'split it into separate flushes or persist through separate EntityManagers.'
-                );
-            }
+        if (\count($groups) > 1) {
+            $targetList = implode(', ', array_column($groups, 'target'));
+            throw new \RuntimeException(
+                'flush() spans multiple connections (store type change or '
+                    . "different write targets: {$targetList}) — not atomic, "
+                    . 'split it into separate flushes, use flushAll() for per-target transactions, '
+                    . 'or persist through separate EntityManagers.'
+            );
         }
 
+        $group = $groups[0];
+        $store = $group['store'];
+        $meta  = $group['firstMeta'];
+
         $startedTx = false;
-        if (!$txStore->inTransaction()) {
-            $txStore->begin($firstMeta);
+        if (!$store->inTransaction($meta)) {
+            $store->begin($meta);
             $startedTx = true;
         }
 
@@ -309,14 +300,94 @@ final class EntityManager implements RequestScoped
             }
 
             if ($startedTx) {
-                $txStore->commit();
+                $store->commit($meta);
             }
         } catch (\Throwable $e) {
             if ($startedTx) {
-                $txStore->rollback();
+                $store->rollback($meta);
             }
             throw $e;
         }
+    }
+
+    /**
+     * Execute all scheduled writes across EVERY connection they touch.
+     * The escape hatch for write sets that legitimately span multiple
+     * stores/connections (e.g. SQL + mongo, or several #[Connection]
+     * write roles): ONE global topological pass executes every node (an
+     * owner in one group can feed its PK into a dependent in another),
+     * and each store/connection target commits its own tx — begun lazily
+     * when its first node executes.
+     *
+     * Failure semantics are best-effort all-or-nothing, mirroring
+     * flush()'s shape: if any write (or a commit) throws mid-pass, every
+     * tx begun SO FAR is rolled back; groups whose commit already ran
+     * stay committed. Cross-connection atomicity does not exist — use
+     * flush() when the whole write set shares one connection target.
+     */
+    public function flushAll(): void
+    {
+        $scheduled = $this->heap->scheduled();
+        if ($scheduled === []) {
+            return; // fast path: nothing to do
+        }
+
+        // Same fail-fast as flush(): resolve every scheduled class's store
+        // before ANY write runs.
+        $this->partitionScheduled($scheduled);
+
+        $begun = [];
+        try {
+            foreach ($this->order($scheduled) as $node) {
+                $meta  = Metadata::for($node->class);
+                $store = $this->storeFor($node->class);
+
+                if (!$store->inTransaction($meta)) {
+                    $store->begin($meta);
+                    $begun[] = [$store, $meta];
+                }
+
+                $this->execute($node);
+            }
+
+            foreach ($begun as [$store, $meta]) {
+                $store->commit($meta);
+            }
+        } catch (\Throwable $e) {
+            foreach ($begun as [$store, $meta]) {
+                $store->rollback($meta);
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Group scheduled nodes by (store instance, txTarget): the tx-partition
+     * of the write set, shared by flush() (atomic single group) and
+     * flushAll() (independent per-group txs). Each entry carries the store,
+     * its target token, and the FIRST node's meta — the tx control calls
+     * are addressed through it.
+     *
+     * @return list<array{store: Store, target: string, firstMeta: array<string, mixed>}>
+     */
+    private function partitionScheduled(array $scheduled): array
+    {
+        $groups     = [];
+        $groupIndex = [];
+
+        foreach ($scheduled as $node) {
+            $meta   = Metadata::for($node->class);
+            $store  = $this->storeFor($node->class);
+            $target = $store->txTarget($meta);
+            $key    = spl_object_id($store) . '|' . $target;
+
+            if (!isset($groupIndex[$key])) {
+                $groupIndex[$key] = \count($groups);
+                $groups[] = ['store' => $store, 'target' => $target, 'firstMeta' => $meta];
+            }
+        }
+
+        return $groups;
     }
 
     /* ------------------------------------------------------------ lifecycle */

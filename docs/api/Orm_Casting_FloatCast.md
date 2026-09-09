@@ -1,12 +1,12 @@
 # 🧩 Class: FloatCast
 
-**Full name:** [Azera\Orm\Casting\FloatCast](../../src/Orm/Cast/FloatCast.php)
+**Full name:** [Azera\Orm\Casting\FloatCast](../../src/Orm/Casting/FloatCast.php)
 
 Scalar float cast — see IntCast for the shared rationale.
 
 ## 🚀 Public methods
 
-### encode() · [source](../../src/Orm/Cast/FloatCast.php#L14)
+### encode() · [source](../../src/Orm/Casting/FloatCast.php#L14)
 
 `public function encode(mixed $value): mixed`
 
@@ -23,7 +23,7 @@ Scalar float cast — see IntCast for the shared rationale.
 
 ---
 
-### decode() · [source](../../src/Orm/Cast/FloatCast.php#L19)
+### decode() · [source](../../src/Orm/Casting/FloatCast.php#L19)
 
 `public function decode(mixed $value): mixed`
 

@@ -104,6 +104,124 @@ class PdoStoreTest extends TestCase
         $this->assertSame(7, $this->store->count(Article::class));
     }
 
+    /* ============================================== tx map (per-target txs)
+     *
+     * One PdoStore instance holds one tx PER DISTINCT write connection:
+     * begin($meta) opens (or joins) the tx on $meta's write role; two
+     * roles aliasing the SAME Database share one tx (no savepoint);
+     * commit/rollback($meta) address exactly that target's store-begun tx
+     * and never touch caller-opened ones. */
+
+    public function testTwoWriteTargetsHoldIndependentTransactions(): void
+    {
+        $primary = new TestDatabase('pgsql');
+        $replica = new TestDatabase('pgsql');
+        $dbm     = AppContext::instance()->dbManager();
+        $dbm->set('primary', $primary);
+        $dbm->set('secondary', $replica);
+
+        $metaPrimary = ['writeRole' => 'primary', 'readRole' => 'primary'];
+        $metaSecond  = ['writeRole' => 'secondary', 'readRole' => 'secondary'];
+
+        $this->store->begin($metaPrimary);
+        $this->store->begin($metaSecond);
+
+        // Independent: BEGIN on both connections, each in its own tx.
+        $this->assertTrue($primary->inTransaction());
+        $this->assertTrue($replica->inTransaction());
+        $this->assertTrue($this->store->inTransaction($metaPrimary));
+        $this->assertTrue($this->store->inTransaction($metaSecond));
+        $this->assertTrue($this->store->inTransaction());
+
+        // Writes route to each target's OWN connection.
+        $this->store->insertOne(Article::class, ['id' => 1, 'title' => 'A', 'created_at' => null, 'status_code' => null]);
+        $this->store->insertOne(Article::class, ['id' => 2, 'title' => 'B', 'created_at' => null, 'status_code' => null]);
+        $this->assertCount(1, $primary->queries);
+        $this->assertCount(1, $replica->queries);
+
+        // Committing ONE target leaves the other open.
+        $this->store->commit($metaPrimary);
+        $this->assertFalse($primary->inTransaction());
+        $this->assertTrue($replica->inTransaction());
+    }
+
+    public function testSameConnectionTargetsShareOneTransaction(): void
+    {
+        // Two write roles aliasing the SAME Database: begin() joins — one
+        // BEGIN, one tx, and a single commit finalizes both.
+        $dbm = AppContext::instance()->dbManager();
+        $dbm->set('a', $this->db);
+        $dbm->set('b', $this->db);
+
+        $this->store->begin(['writeRole' => 'a']);
+        $this->store->begin(['writeRole' => 'b']);
+
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'BEGIN')));
+        $this->assertTrue($this->store->inTransaction(['writeRole' => 'b']));
+
+        $this->store->commit(['writeRole' => 'b']);
+        $this->assertFalse($this->db->inTransaction());
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'COMMIT')));
+    }
+
+    public function testCallerOpenedTxIsJoinedButNeverCommittedOrRolledBack(): void
+    {
+        // A caller began a tx directly on the write connection.
+        $this->db->begin();
+
+        $this->assertTrue($this->store->inTransaction(['writeRole' => 'write']));
+
+        // begin() must NOT open a savepoint/second BEGIN over it…
+        $this->store->begin(['writeRole' => 'write']);
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'BEGIN')));
+
+        // …and the store must not commit/rollback the caller's tx.
+        $this->store->commit(['writeRole' => 'write']);
+        $this->store->rollback(['writeRole' => 'write']);
+        $this->assertTrue($this->db->inTransaction());
+
+        $this->db->commit(); // caller unwinds its own tx
+    }
+
+    public function testBareCommitFinalizesAllStoreBegunTransactions(): void
+    {
+        $primary = new TestDatabase('pgsql');
+        $dbm     = AppContext::instance()->dbManager();
+        $dbm->set('primary', $primary);
+
+        $this->store->begin(['writeRole' => 'write']);
+        $this->store->begin(['writeRole' => 'primary']);
+
+        $this->store->commit();
+
+        $this->assertFalse($this->db->inTransaction());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame(1, count(array_filter($primary->queries, fn($q) => $q['sql'] === 'COMMIT')));
+    }
+
+    public function testReadRoutesToItsOwnRolesNotAnotherTargetsTx(): void
+    {
+        $read = new TestDatabase('pgsql');
+        $tx   = new TestDatabase('pgsql');
+        $dbm  = AppContext::instance()->dbManager();
+        $dbm->set('replica', $read);
+        $dbm->set('primary', $tx);
+
+        // A tx is open on 'primary' (another target's tx).
+        $this->store->begin(['writeRole' => 'primary']);
+
+        $read->setMockResults([[['id' => 1, 'title' => 'A']]]);
+
+        // A read resolving to 'replica' (no tx there) runs autocommit on
+        // the replica — it is NOT hijacked into the open tx's connection.
+        // InventoryItem carries #[Connection(read: 'replica', write: 'primary')].
+        $rows = $this->store->findBy(InventoryItem::class, ['tenant_id' => 1]);
+
+        $this->assertSame([['id' => 1, 'title' => 'A']], $rows);
+        $this->assertCount(1, $read->queries);
+        $this->assertCount(1, $tx->queries); // only the BEGIN
+    }
+
     private function dataQueries(): array
     {
         return array_values(array_filter($this->db->queries, fn($q) => !in_array($q['sql'], ['BEGIN', 'COMMIT', 'ROLLBACK'], true)));

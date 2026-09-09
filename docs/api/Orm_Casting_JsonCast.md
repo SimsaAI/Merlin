@@ -1,6 +1,6 @@
 # 🧩 Class: JsonCast
 
-**Full name:** [Azera\Orm\Casting\JsonCast](../../src/Orm/Cast/JsonCast.php)
+**Full name:** [Azera\Orm\Casting\JsonCast](../../src/Orm/Casting/JsonCast.php)
 
 'json' cast: PHP arrays/objects <-> JSON text in a TEXT/JSON column.
 
@@ -29,7 +29,7 @@ as a change (PHP `===` on list-likes is order-sensitive): accepted.
 
 ## 🚀 Public methods
 
-### encode() · [source](../../src/Orm/Cast/JsonCast.php#L33)
+### encode() · [source](../../src/Orm/Casting/JsonCast.php#L33)
 
 `public function encode(mixed $value): mixed`
 
@@ -46,7 +46,7 @@ as a change (PHP `===` on list-likes is order-sensitive): accepted.
 
 ---
 
-### decode() · [source](../../src/Orm/Cast/JsonCast.php#L51)
+### decode() · [source](../../src/Orm/Casting/JsonCast.php#L51)
 
 `public function decode(mixed $value): mixed`
 

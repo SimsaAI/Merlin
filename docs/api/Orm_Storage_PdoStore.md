@@ -18,14 +18,18 @@ no-RETURNING driver -> lastInsertId.
 Connection-role resolution is PER CLASS: metadata readRole/writeRole
 (compiled from #[Connection(read|write|role)]) override the constructor
 defaults, so one shared store instance can route individual classes to
-dedicated connections. Once begin() opens a transaction, ALL statements
-pin to that transaction connection until commit/rollback — a tx must not
-split across connections, and reads must see its uncommitted writes
-(per-class routing applies to autocommit statements only).
+dedicated connections. Transactions are PER CONNECTION TARGET: begin($meta)
+opens a tx on $meta's resolved write connection and records it in the tx
+map — operations resolving to the SAME Database join it (reads inside the
+tx see its uncommitted writes), operations resolving to OTHER connections
+route to their own class's roles. One store instance therefore holds one
+tx PER DISTINCT write target (flushAll() commits them independently);
+legacy Model/QB writes on an already-begun target join via the shared
+Database instance.
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Orm/Storage/PdoStore.php#L37)
+### __construct() · [source](../../src/Orm/Storage/PdoStore.php#L48)
 
 `public function __construct(Azera\Db\DatabaseManager|null $dbm = null, string $readRole = 'read', string $writeRole = 'write'): mixed`
 
@@ -44,7 +48,7 @@ split across connections, and reads must see its uncommitted writes
 
 ---
 
-### wantsNativeValues() · [source](../../src/Orm/Storage/PdoStore.php#L52)
+### wantsNativeValues() · [source](../../src/Orm/Storage/PdoStore.php#L63)
 
 `public function wantsNativeValues(): bool`
 
@@ -59,7 +63,7 @@ extractData() consults this via the Store seam).
 
 ---
 
-### txTarget() · [source](../../src/Orm/Storage/PdoStore.php#L62)
+### txTarget() · [source](../../src/Orm/Storage/PdoStore.php#L73)
 
 `public function txTarget(array $meta): string`
 
@@ -80,7 +84,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L89)
+### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L103)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -98,7 +102,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L135)
+### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L149)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -117,7 +121,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L146)
+### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L160)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -135,7 +139,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L180)
+### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L194)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -153,7 +157,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L188)
+### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L202)
 
 `public function findBy(string $class, array $where): array`
 
@@ -171,7 +175,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L197)
+### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L211)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -189,7 +193,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### count() · [source](../../src/Orm/Storage/PdoStore.php#L203)
+### count() · [source](../../src/Orm/Storage/PdoStore.php#L217)
 
 `public function count(string $class, array $where = []): int`
 
@@ -207,17 +211,17 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/PdoStore.php#L221)
+### begin() · [source](../../src/Orm/Storage/PdoStore.php#L235)
 
 `public function begin(array|null $meta = null): void`
 
-begin($meta) pins the scheduled class's WRITE target (metadata
-writeRole override wins over the constructor default — flush() passes
-the first scheduled class's meta so per-class routing survives tx
-pinning): every subsequent operation routes to it until
-commit/rollback, so a transaction can never split across connections
-and reads inside it see uncommitted writes. begin() without meta
-(direct callers, tests) pins the constructor default.
+begin($meta) opens a transaction on $meta's write connection (the
+metadata writeRole override wins over the constructor default;
+null meta = constructor default). Idempotent per connection: an
+ALREADY-HELD tx on the same Database joins (no savepoint — two
+write roles aliasing one connection share ONE tx, one BEGIN in the
+log). Caller-opened txs are never recorded here: they are joined
+implicitly by routing and never committed/rolled back by this store.
 
 **🧭 Parameters**
 
@@ -232,20 +236,15 @@ and reads inside it see uncommitted writes. begin() without meta
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/PdoStore.php#L227)
+### commit() · [source](../../src/Orm/Storage/PdoStore.php#L252)
 
-`public function commit(): void`
+`public function commit(array|null $meta = null): void`
 
-**➡️ Return value**
+**🧭 Parameters**
 
-- Type: void
-
-
----
-
-### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L233)
-
-`public function rollback(): void`
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -254,9 +253,37 @@ and reads inside it see uncommitted writes. begin() without meta
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L239)
+### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L260)
 
-`public function inTransaction(): bool`
+`public function rollback(array|null $meta = null): void`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L274)
+
+`public function inTransaction(array|null $meta = null): bool`
+
+$meta form: whether a tx is active on $meta's write connection —
+store-begun OR caller-opened (flush()/flushAll() join either, and
+must not double-begin over a caller tx). Bare form: any tx this
+store began, else the constructor-default write connection.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -265,7 +292,7 @@ and reads inside it see uncommitted writes. begin() without meta
 
 ---
 
-### enrichMetadata() · [source](../../src/Orm/Storage/PdoStore.php#L460)
+### enrichMetadata() · [source](../../src/Orm/Storage/PdoStore.php#L521)
 
 `public function enrichMetadata(array $meta, ReflectionClass $class): array`
 

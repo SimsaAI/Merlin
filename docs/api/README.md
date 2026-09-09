@@ -164,15 +164,15 @@
 - [HasMany](Orm_Attribute_HasMany.md) `Azera\Orm\Attribute\HasMany`
 - [HasOne](Orm_Attribute_HasOne.md) `Azera\Orm\Attribute\HasOne`
 
-### `Azera\Orm\Cast`
+### `Azera\Orm\Casting`
 
-- [BoolCast](Orm_Cast_BoolCast.md) `Azera\Orm\Casting\BoolCast`
-- [Cast](Orm_Cast_Cast.md) `Azera\Orm\Casting\Cast`
-- [Casts](Orm_Cast_Casts.md) `Azera\Orm\Casting\Casts`
-- [FloatCast](Orm_Cast_FloatCast.md) `Azera\Orm\Casting\FloatCast`
-- [IntCast](Orm_Cast_IntCast.md) `Azera\Orm\Casting\IntCast`
-- [JsonCast](Orm_Cast_JsonCast.md) `Azera\Orm\Casting\JsonCast`
-- [PgArrayCast](Orm_Cast_PgArrayCast.md) `Azera\Orm\Casting\PgArrayCast`
+- [BoolCast](Orm_Casting_BoolCast.md) `Azera\Orm\Casting\BoolCast`
+- [Cast](Orm_Casting_Cast.md) `Azera\Orm\Casting\Cast`
+- [Casts](Orm_Casting_Casts.md) `Azera\Orm\Casting\Casts`
+- [FloatCast](Orm_Casting_FloatCast.md) `Azera\Orm\Casting\FloatCast`
+- [IntCast](Orm_Casting_IntCast.md) `Azera\Orm\Casting\IntCast`
+- [JsonCast](Orm_Casting_JsonCast.md) `Azera\Orm\Casting\JsonCast`
+- [PgArrayCast](Orm_Casting_PgArrayCast.md) `Azera\Orm\Casting\PgArrayCast`
 
 ### `Azera\Orm`
 

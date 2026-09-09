@@ -181,14 +181,15 @@ deployments.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/MongoStore.php#L194)
+### begin() · [source](../../src/Orm/Storage/MongoStore.php#L195)
 
 `public function begin(array|null $meta = null): void`
 
 No-ops: multi-document ACID needs replica-set sessions (deferred).
 
 Kept structural so the EM pipeline never branches on store type.
-$meta ignored — an owning store has exactly one write target.
+$meta ignored — an owning store has exactly ONE fixed write target,
+so there is nothing to address per class.
 
 **🧭 Parameters**
 
@@ -203,20 +204,15 @@ $meta ignored — an owning store has exactly one write target.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/MongoStore.php#L196)
+### commit() · [source](../../src/Orm/Storage/MongoStore.php#L197)
 
-`public function commit(): void`
+`public function commit(array|null $meta = null): void`
 
-**➡️ Return value**
+**🧭 Parameters**
 
-- Type: void
-
-
----
-
-### rollback() · [source](../../src/Orm/Storage/MongoStore.php#L198)
-
-`public function rollback(): void`
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -225,9 +221,32 @@ $meta ignored — an owning store has exactly one write target.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/MongoStore.php#L200)
+### rollback() · [source](../../src/Orm/Storage/MongoStore.php#L199)
 
-`public function inTransaction(): bool`
+`public function rollback(array|null $meta = null): void`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### inTransaction() · [source](../../src/Orm/Storage/MongoStore.php#L201)
+
+`public function inTransaction(array|null $meta = null): bool`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -236,7 +255,7 @@ $meta ignored — an owning store has exactly one write target.
 
 ---
 
-### enrichMetadata() · [source](../../src/Orm/Storage/MongoStore.php#L222)
+### enrichMetadata() · [source](../../src/Orm/Storage/MongoStore.php#L223)
 
 `public function enrichMetadata(array $meta, ReflectionClass $class): array`
 
@@ -268,7 +287,7 @@ with the snake/plural convention as fallback — no per-backend key.
 
 ---
 
-### wantsNativeValues() · [source](../../src/Orm/Storage/MongoStore.php#L276)
+### wantsNativeValues() · [source](../../src/Orm/Storage/MongoStore.php#L277)
 
 `public function wantsNativeValues(): bool`
 
@@ -283,7 +302,7 @@ cast encoding (a 'json' cast is inert here by design).
 
 ---
 
-### txTarget() · [source](../../src/Orm/Storage/MongoStore.php#L285)
+### txTarget() · [source](../../src/Orm/Storage/MongoStore.php#L286)
 
 `public function txTarget(array $meta): string`
 

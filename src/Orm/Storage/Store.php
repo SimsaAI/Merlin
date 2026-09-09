@@ -93,20 +93,34 @@ interface Store
     /* --------------------------------------------------- transactions */
 
     /**
-     * Open a transaction. $meta (the scheduled class's metadata) lets the
-     * store pin to the class's write target when it supports per-class
-     * routing — flush() pins the tx to the FIRST scheduled class's
-     * writeRole instead of the constructor default (which made per-class
-     * routing dead code on the EM path). Null = constructor default.
+     * Open a transaction for $meta's write target. $meta (the scheduled
+     * class's metadata) lets a store with per-class routing open the tx on
+     * the class's OWN connection; a store MAY hold SEVERAL txs at once —
+     * one per distinct connection target (PdoStore's tx map) — and a
+     * begin() for an ALREADY-OPEN target must join it (no nesting).
+     * Null = the store's default target.
      */
     public function begin(?array $meta = null): void;
-    public function commit(): void;
-    public function rollback(): void;
 
     /**
-     * Whether a transaction (or savepoint level) is active.
+     * Commit the tx on $meta's write target — a tx THIS store began
+     * (caller-opened txs are joined by routing and must never be
+     * committed/rolled back by a store). Null meta commits EVERY tx the
+     * store began (the legacy bare-call semantic, generalized to the map).
      */
-    public function inTransaction(): bool;
+    public function commit(?array $meta = null): void;
+
+    /**
+     * Rollback — same target addressing as {@see Store::commit()}.
+     */
+    public function rollback(?array $meta = null): void;
+
+    /**
+     * Whether a transaction (or savepoint level) is active on $meta's
+     * write target — store-begun OR caller-opened (the EM joins either
+     * instead of double-beginning). Null meta: any of the store's targets.
+     */
+    public function inTransaction(?array $meta = null): bool;
 
     /**
      * Return $meta enriched (or throw for dishonorable attribute combos).

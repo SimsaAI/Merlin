@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../Db/TestDatabase.php';
 require_once __DIR__ . '/Fixtures/Article.php';
 require_once __DIR__ . '/Fixtures/Relations.php';
+require_once __DIR__ . '/Fixtures/AuditEntry.php';
 require_once __DIR__ . '/FakeMongoCollection.php';
 
 use Azera\AppContext;
@@ -21,6 +22,7 @@ use Azera\Orm\Storage\PdoStore;
 use Azera\Orm\Storage\Stores;
 use Azera\Tests\Db\TestDatabase;
 use Azera\Tests\Orm\Fixtures\Article;
+use Azera\Tests\Orm\Fixtures\AuditEntry;
 use Azera\Tests\Orm\Fixtures\Author;
 use Azera\Tests\Orm\Fixtures\Comment;
 use PHPUnit\Framework\TestCase;
@@ -984,5 +986,196 @@ class EntityManagerTest extends TestCase
         // A real data change still reports — field-keyed, PK excluded.
         $a->title = 'Mutated';
         $this->assertSame(['title' => 'Mutated'], $this->em->dirtyData($a));
+    }
+
+    /* ============================================ flushAll — multi-connection
+     *
+     * flushAll() executes the WHOLE scheduled write set across every
+     * store/connection it touches: one global topological pass, lazily
+     * begun per-target txs, commits deferred until every node executed
+     * (failure → all begun txs rolled back — best-effort all-or-nothing). */
+
+    /**
+     * Same store instance, two write targets (two Databases): flushAll()
+     * writes BOTH — the scenario flush() throws on.
+     */
+    public function testFlushAllSpansTwoWriteTargetsOnOneStore(): void
+    {
+        $primary = new TestDatabase('pgsql');
+        $this->ctx->dbManager()->set('primary', $primary);
+
+        $audit = new AuditEntry();
+        $audit->id    = 1;
+        $audit->title = 'audit';
+        $this->em->persist($audit);
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        $this->em->flushAll();
+
+        $q = $this->dataQueries();
+        $this->assertCount(1, $q);
+        $this->assertStringStartsWith('INSERT INTO "article"', $q[0]['sql']);
+
+        $pq = array_values(array_filter($primary->queries, fn($q) => !in_array($q['sql'], ['BEGIN', 'COMMIT', 'ROLLBACK'], true)));
+        $this->assertCount(1, $pq);
+        $this->assertStringStartsWith('INSERT INTO "audit_entry"', $pq[0]['sql']);
+
+        // Both txs committed (deferred commit, two BEGIN/COMMIT pairs).
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'BEGIN')));
+        $this->assertSame(1, count(array_filter($primary->queries, fn($q) => $q['sql'] === 'BEGIN')));
+        $this->assertFalse($this->db->inTransaction());
+        $this->assertFalse($primary->inTransaction());
+    }
+
+    /**
+     * Two write roles aliasing the SAME Database: one tx — exactly one
+     * BEGIN, both rows written, one COMMIT.
+     */
+    public function testFlushAllJoinsRoleAliasesIntoOneTransaction(): void
+    {
+        $this->ctx->dbManager()->set('primary', $this->db); // alias of 'write'
+
+        $audit = new AuditEntry();
+        $audit->id    = 1;
+        $audit->title = 'audit';
+        $this->em->persist($audit);
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        $this->em->flushAll();
+
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'BEGIN')));
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'COMMIT')));
+        $this->assertFalse($this->db->inTransaction());
+        $this->assertSame(2, count($this->dataQueries())); // two INSERTs
+    }
+
+    /**
+     * Mixed SQL + mongo write set: two store INSTANCES, each committing
+     * its own tx (mongo's is a no-op) — flush() throws here, flushAll()
+     * routes both.
+     */
+    public function testFlushAllSpansSqlAndMongoStores(): void
+    {
+        $fakes = new FakeMongoFactory();
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
+
+        $doc = new \Azera\Tests\Orm\Fixtures\ArticleDocument();
+        $doc->_id   = 'abc123';
+        $doc->title = 'Doc One';
+        $this->em->upsert($doc);
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        $this->em->flushAll();
+
+        $this->assertCount(1, $this->dataQueries()); // the SQL INSERT
+        $articles = $fakes->for('articles');
+        $this->assertCount(1, $articles->calls);
+        $this->assertSame('update', $articles->calls[0]['op']); // the upsert
+    }
+
+    /**
+     * Failure in a LATER group's execution rolls back the EARLIER begun
+     * tx (deferred commits — no partial commit of the first group).
+     */
+    public function testFlushAllRollsBackEarlierGroupsOnLaterFailure(): void
+    {
+        // 'primary' rejects the second write.
+        $primary = new class extends TestDatabase
+        {
+            public function query($statement, $params = null): \Azera\Tests\Db\TestPdoStatement
+            {
+                if (str_contains($statement, 'INSERT')) {
+                    throw new \RuntimeException('primary exploded');
+                }
+                return parent::query($statement, $params);
+            }
+        };
+        $this->ctx->dbManager()->set('primary', $primary);
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        $audit = new AuditEntry();
+        $audit->id    = 1;
+        $audit->title = 'audit';
+        $this->em->persist($audit);
+
+        try {
+            $this->em->flushAll();
+            $this->fail('Expected the primary connection failure to propagate');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('primary exploded', $e->getMessage());
+        }
+
+        // First group's (already-begun) tx rolled back, not committed.
+        $this->assertFalse($this->db->inTransaction());
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'ROLLBACK')));
+        $this->assertSame(0, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'COMMIT')));
+        // The later group's begun tx is rolled back too.
+        $this->assertSame(1, count(array_filter($primary->queries, fn($q) => $q['sql'] === 'ROLLBACK')));
+        $this->assertSame(0, count(array_filter($primary->queries, fn($q) => $q['sql'] === 'COMMIT')));
+    }
+
+    /**
+     * Caller-owned open tx on one target: flushAll() JOINS it (no second
+     * BEGIN) and does NOT commit it — the caller unwinds its own tx.
+     */
+    public function testFlushAllJoinsCallerTxWithoutCommittingIt(): void
+    {
+        $this->db->begin(); // caller's tx on the default write connection
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        $this->em->flushAll();
+
+        $this->assertSame(1, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'BEGIN')));
+        $this->assertSame(0, count(array_filter($this->db->queries, fn($q) => $q['sql'] === 'COMMIT')));
+        $this->assertTrue($this->db->inTransaction()); // still the caller's
+
+        $this->db->commit(); // caller unwinds
+    }
+
+    /**
+     * flush() keeps its single-group atomicity throw for multi-target
+     * write sets (the message now points at flushAll()).
+     */
+    public function testFlushStillThrowsOnMultiTargetWriteSet(): void
+    {
+        $this->ctx->dbManager()->set('primary', new TestDatabase('pgsql'));
+
+        $audit = new AuditEntry();
+        $audit->id    = 1;
+        $audit->title = 'audit';
+        $this->em->persist($audit);
+
+        $a = new Article();
+        $a->id    = 2;
+        $a->title = 'article';
+        $this->em->persist($a);
+
+        try {
+            $this->em->flush();
+            $this->fail('Expected flush() to reject a multi-connection write set');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('flush() spans multiple connections', $e->getMessage());
+            $this->assertStringContainsString('flushAll()', $e->getMessage());
+        }
     }
 }

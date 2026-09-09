@@ -24,15 +24,26 @@ use Azera\Orm\Metadata;
  * Connection-role resolution is PER CLASS: metadata readRole/writeRole
  * (compiled from #[Connection(read|write|role)]) override the constructor
  * defaults, so one shared store instance can route individual classes to
- * dedicated connections. Once begin() opens a transaction, ALL statements
- * pin to that transaction connection until commit/rollback — a tx must not
- * split across connections, and reads must see its uncommitted writes
- * (per-class routing applies to autocommit statements only).
+ * dedicated connections. Transactions are PER CONNECTION TARGET: begin($meta)
+ * opens a tx on $meta's resolved write connection and records it in the tx
+ * map — operations resolving to the SAME Database join it (reads inside the
+ * tx see its uncommitted writes), operations resolving to OTHER connections
+ * route to their own class's roles. One store instance therefore holds one
+ * tx PER DISTINCT write target (flushAll() commits them independently);
+ * legacy Model/QB writes on an already-begun target join via the shared
+ * Database instance.
  */
 final class PdoStore implements Store
 {
-    /** Connection pinned by begin() — non-null while a store tx is open. */
-    private ?Database $tx = null;
+    /**
+     * Transactions THIS store began, keyed by the resolved Database instance
+     * (spl_object_id). One store instance holds one tx PER DISTINCT
+     * connection target — two classes with different #[Connection(write:)]
+     * roles run independent txs side by side under flushAll(). Ownership, not
+     * presence: caller-opened txs on the same connections are JOINED by
+     * routing but never appear here, so commit()/rollback() never touch them.
+     */
+    private array $txs = [];
 
     public function __construct(
         private ?DatabaseManager $dbm = null,
@@ -68,22 +79,25 @@ final class PdoStore implements Store
 
     /**
      * Connection for a READ on $meta's class: metadata readRole
-     * (#[Connection]) overrides the constructor default; an open
-     * transaction pins to the tx connection.
+     * (#[Connection]) overrides the constructor default. Reads resolving
+     * to a connection with an open tx (this store's or a caller's) run on
+     * it and see its uncommitted writes; reads resolving to other
+     * connections run autocommit — a tx pins only its own target.
      */
     private function readDb(array $meta): Database
     {
-        return $this->tx ?? $this->dbm->getOrDefault($meta['readRole'] ?? $this->readRole);
+        return $this->dbm->getOrDefault($meta['readRole'] ?? $this->readRole);
     }
 
     /**
      * Connection for a WRITE on $meta's class: metadata writeRole
-     * (#[Connection]) overrides the constructor default; an open
-     * transaction pins to the tx connection.
+     * (#[Connection]) overrides the constructor default. A tx begun on
+     * this exact connection (store- or caller-begun) is shared — same
+     * Database object — so same-target legacy ops join the flush tx.
      */
     private function writeDb(array $meta): Database
     {
-        return $this->tx ?? $this->dbm->getOrDefault($meta['writeRole'] ?? $this->writeRole);
+        return $this->dbm->getOrDefault($meta['writeRole'] ?? $this->writeRole);
     }
 
     public function insertOne(string $class, array $data): array
@@ -210,38 +224,85 @@ final class PdoStore implements Store
     }
 
     /**
-     * begin($meta) pins the scheduled class's WRITE target (metadata
-     * writeRole override wins over the constructor default — flush() passes
-     * the first scheduled class's meta so per-class routing survives tx
-     * pinning): every subsequent operation routes to it until
-     * commit/rollback, so a transaction can never split across connections
-     * and reads inside it see uncommitted writes. begin() without meta
-     * (direct callers, tests) pins the constructor default.
+     * begin($meta) opens a transaction on $meta's write connection (the
+     * metadata writeRole override wins over the constructor default;
+     * null meta = constructor default). Idempotent per connection: an
+     * ALREADY-HELD tx on the same Database joins (no savepoint — two
+     * write roles aliasing one connection share ONE tx, one BEGIN in the
+     * log). Caller-opened txs are never recorded here: they are joined
+     * implicitly by routing and never committed/rolled back by this store.
      */
     public function begin(?array $meta = null): void
     {
-        $this->tx = $this->writeDb($meta ?? []);
-        $this->tx->begin();
+        $db  = $this->writeDb($meta ?? []);
+        $key = spl_object_id($db);
+
+        if (isset($this->txs[$key])) {
+            return; // this store already began a tx on that connection
+        }
+
+        if ($db->inTransaction()) {
+            return; // caller-opened tx: joined by routing, never owned
+        }
+
+        $db->begin();
+        $this->txs[$key] = $db;
     }
 
-    public function commit(): void
+    public function commit(?array $meta = null): void
     {
-        $this->tx?->commit();
-        $this->tx = null;
+        foreach ($this->ownedTxs($meta) as $db) {
+            $db->commit();
+            unset($this->txs[spl_object_id($db)]);
+        }
     }
 
-    public function rollback(): void
+    public function rollback(?array $meta = null): void
     {
-        $this->tx?->rollback();
-        $this->tx = null;
+        foreach ($this->ownedTxs($meta) as $db) {
+            $db->rollback();
+            unset($this->txs[spl_object_id($db)]);
+        }
     }
 
-    public function inTransaction(): bool
+    /**
+     * $meta form: whether a tx is active on $meta's write connection —
+     * store-begun OR caller-opened (flush()/flushAll() join either, and
+     * must not double-begin over a caller tx). Bare form: any tx this
+     * store began, else the constructor-default write connection.
+     */
+    public function inTransaction(?array $meta = null): bool
     {
-        // Pinned tx OR a transaction opened by a caller directly on the
-        // write-role connection (legacy Model/QB sharing) — flush() must
-        // join it either way, not open a savepoint on top.
-        return ($this->tx ?? $this->dbm->getOrDefault($this->writeRole))->inTransaction();
+        if ($meta !== null) {
+            return $this->writeDb($meta)->inTransaction();
+        }
+
+        foreach ($this->txs as $db) {
+            if ($db->inTransaction()) {
+                return true;
+            }
+        }
+
+        return $this->dbm->getOrDefault($this->writeRole)->inTransaction();
+    }
+
+    /**
+     * The map-held txs commit()/rollback() act on: with meta, exactly the
+     * one on $meta's write connection (absent = no-op — never a
+     * caller-opened tx); bare, EVERY tx this store began.
+     *
+     * @return list<Database>
+     */
+    private function ownedTxs(?array $meta): array
+    {
+        if ($meta === null) {
+            return array_values($this->txs);
+        }
+
+        $db  = $this->writeDb($meta);
+        $key = spl_object_id($db);
+
+        return isset($this->txs[$key]) ? [$db] : [];
     }
 
     /* -------------------------------------------------- helpers */
