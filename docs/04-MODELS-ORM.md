@@ -3,7 +3,12 @@
 **Work with database records as objects** - Discover Azera's Active Record implementation for elegant database interactions. Learn about model configuration, static query helpers, CRUD operations, relations with eager loading, state tracking, and read/write connections.
 
 Azera models use an Active Record style API backed by the
-`Azera\Orm\EntityManager` (identity map + write pipeline).
+`Azera\Orm\EntityManager` (identity map + write pipeline). `Model` and
+`Document` are thin facades over it — and because the `#[Entity]` /
+`#[Column]` attributes carry the configuration, the EntityManager alone
+is also a complete persistence API. See
+[Two Ways to the Same Pipeline](#two-ways-to-the-same-pipeline) below for
+the side-by-side comparison and the EM-direct usage.
 
 ---
 
@@ -190,11 +195,9 @@ every type whose registered cast your wire format makes redundant.
 
 ### Mongo Documents (MongoStore)
 
-`#[Entity(store: 'mongo')]` classes always route to MongoDB — never the
-SQL store. The stack is two layers, not two alternatives:
-**ext-mongodb** (PECL) is the driver (wire protocol, BSON) and
-**mongodb/mongodb** (composer) is the pure-PHP API on top of it; using
-documents means using both.
+`#[Entity(store: 'mongo')]` classes always route to MongoDB. The stack is two layers:
+- **ext-mongodb** (PECL) is the driver (wire protocol, BSON) and
+- **mongodb/mongodb** (composer) is the PHP API on top of it.
 
 ```php
 use Azera\Orm\Attribute\Column;
@@ -611,6 +614,120 @@ if ($user->hasChanged()) {
 The ORM tracks only the columns declared via metadata (public properties /
 `#[Column]` attributes); properties that are not part of the model's
 metadata are ignored by change detection and writes.
+
+---
+
+## Two Ways to the Same Pipeline
+
+Every facade call shown above — `find()`, `save()`, `upsert()`,
+`delete()` — delegates to ONE request-scoped `EntityManager`: identity
+map → diff → transaction → ID backfill. `Model` and `Document` are thin
+**facades** over it (Active Record sugar), and the `#[Entity]` /
+`#[Column]` attributes are the **metadata source** for every style.
+Because the attributes alone are enough, the base class is optional: a
+plain class plus the EM is a fully supported persistence path.
+
+```mermaid
+flowchart LR
+    M["Model facade<br/>(Active Record sugar)"] --> EM
+    D["Document facade<br/>(mongo sugar)"] --> EM
+    P["Plain class<br/>(attributes only)"] --> EM
+    EM["EntityManager<br/>identity map + write pipeline"] --> S["Stores<br/>PdoStore · MongoStore"]
+```
+
+```php
+use Azera\AppContext;
+use Azera\Orm\Attribute\Column;
+use Azera\Orm\Attribute\Entity;
+
+// No base class: the attributes carry ALL configuration,
+// the EntityManager carries ALL behavior.
+#[Entity(name: 'sessions')]
+class Session
+{
+    #[Column(pk: true)]
+    public int $id;
+    public string $token;
+    public ?string $user_agent;
+}
+
+$em = AppContext::instance()->entityManager();
+
+// LOAD — through the identity map (the heap hit returns the SAME instance)
+$session = $em->find(Session::class, ['id' => 7]);
+
+// MUTATE — tracked entity, diffed against the heap snapshot
+$em->isDirty($session);      // false
+$session->token = 'rotated';
+$em->isDirty($session);      // true
+$em->dirtyData($session);    // ['token' => 'rotated']
+
+// SAVE — persist() schedules, flush() writes ONLY the changed fields
+$em->persist($session)->flush();   // UPDATE sessions SET token = ? WHERE id = 7
+
+// INSERT — persist an untracked entity; the flush backfills the generated id
+$new = new Session();
+$new->token = 'fresh';
+$em->persist($new)->flush();       // $new->id is populated after flush
+
+// DELETE
+$em->remove($session)->flush();
+
+// Atomic create-or-update (same statement Model::upsert() emits; full PK required)
+$em->upsert($new)->flush();
+
+// Manually built entity with a full identity, loaded OUTSIDE the EM:
+// adopt() registers it as managed with an EMPTY baseline — the next
+// flush writes every set column (the same semantic $model->save() uses).
+$em->adopt($detached);
+$em->persist($detached)->flush();
+```
+
+The unit-of-work shape the facades do not expose directly: many changes,
+one flush, one transaction.
+
+```php
+$em->persist($a)->persist($b)->persist($c)->flush();
+```
+
+Flush semantics for these writes (single-connection atomicity and the
+`flushAll()` escape hatch) are documented under
+[Saving Changes](#saving-changes).
+
+### Which style to use
+
+| Task                        | With `Model` / `Document`            | Plain class + EM                                       |
+| --------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| Load by PK                  | `Session::find(7)`                   | `$em->find(Session::class, ['id' => 7])`               |
+| Load by conditions          | `Session::findOne([...])`            | `$em->findBy(Session::class, [...])[0]`                |
+| Insert / update             | `$session->save()`                   | `$em->persist($s)->flush()`                            |
+| Upsert                      | `Session::upsert([...])`             | `$em->upsert($s)->flush()`                             |
+| Delete                      | `$session->delete()`                 | `$em->remove($s)->flush()`                             |
+| Dirty check / revert        | `hasChanged()` / `loadState()`       | `$em->isDirty($s)` / `$em->revert($s)`                 |
+| Re-read in place            | `Session::find(7, fresh: true)`      | `$em->refresh($s)`                                     |
+| Query builder → entities    | `Session::query()->entities()`       | not available — read via `$em->find()` / `findBy()`    |
+
+Guidance:
+
+- **Facades** are the ergonomic default: static finders, `save()` /
+  `firstOrCreate()`, eager loading via `with()`, and query-builder
+  hydration (`entities()` requires a `Model` subclass).
+- **Plain class + EM** gives you lean domain objects with no inherited API
+  surface and full unit-of-work control (batch several `persist()` calls
+  into ONE atomic `flush()`). It also frees the class to extend something
+  else — inheritance is never consumed by persistence. Instances carry no
+  per-entity state in either style (identity + snapshots live in the
+  request-scoped heap), so the savings are in the class surface, not the
+  heap.
+- The same split applies to documents: `#[Entity(store: 'mongo')]` +
+  `$em->persist()/flush()` replaces the `Document` base class.
+- PK resolution differs slightly: explicit `#[Column(pk: true)]` marks work
+  on any class; on plain classes the `id` / `*_id` naming convention also
+  contributes the key, while `Model` classes default to `['id']`.
+
+> **Note:** facade-style and EM-direct use share ONE identity map — an
+> entity loaded via `Session::find()` and the same row loaded via
+> `$em->find()` are the SAME object in the same request.
 
 ---
 
