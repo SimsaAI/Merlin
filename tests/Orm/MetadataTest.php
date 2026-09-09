@@ -205,7 +205,7 @@ class MetadataTest extends TestCase
         // 'json' excluded (BSON owns array encoding), 'string' cast-free
         // anyway (no registered cast, flag true is inert), the PK forced
         // off by #[Column(cast: false)].
-        $this->assertSame(['json', 'pgarray', 'datetime'], $meta['castExclusions']);
+        $this->assertSame(['json', 'datetime'], $meta['castExclusions']);
         $this->assertFalse($meta['columns']['tags']['cast']);
         $this->assertTrue($meta['columns']['title']['cast']);
         $this->assertFalse($meta['columns']['_id']['cast']);
