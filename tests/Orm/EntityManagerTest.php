@@ -18,7 +18,7 @@ use Azera\Orm\Metadata;
 use Azera\Orm\Node;
 use Azera\Orm\Storage\MongoStore;
 use Azera\Orm\Storage\PdoStore;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Db\TestDatabase;
 use Azera\Tests\Orm\Fixtures\Article;
 use Azera\Tests\Orm\Fixtures\Author;
@@ -26,7 +26,7 @@ use Azera\Tests\Orm\Fixtures\Comment;
 use PHPUnit\Framework\TestCase;
 
 /** Document base-class fixture: exercises the Document facade (not Model). */
-#[\Azera\Orm\Attribute\Document(collection: 'docs')]
+#[\Azera\Orm\Attribute\Entity(store: 'mongo', name: 'docs')]
 class DocumentFixture extends \Azera\Orm\Document
 {
     public $_id;
@@ -55,10 +55,9 @@ class EntityManagerTest extends TestCase
         $dbm->set('write', $this->db);
         $this->ctx->set(DatabaseManager::class, $dbm);
 
-        $stores = new StoreManager();
-        $stores->set('sql', 'default', fn() => new PdoStore($dbm, 'read', 'write'));
-        $stores->setDefault('sql', 'default');
-        $this->ctx->set(StoreManager::class, $stores);
+        $stores = new Stores();
+        $stores->set('sql', new PdoStore($dbm, 'read', 'write'));
+        $this->ctx->set(Stores::class, $stores);
 
         $this->em = $this->ctx->entityManager();
     }
@@ -191,7 +190,7 @@ class EntityManagerTest extends TestCase
     public function testUpsertOnDocumentRoutesThroughMongoStore(): void
     {
         $fakes = new FakeMongoFactory();
-        $this->ctx->get(StoreManager::class)->set('mongo', 'default', new MongoStore(fn($name) => $fakes->for($name)));
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
 
         $doc = new \Azera\Tests\Orm\Fixtures\ArticleDocument();
         $doc->_id   = 'abc123';
@@ -216,6 +215,30 @@ class EntityManagerTest extends TestCase
         $node = $this->em->heap()->find($entity);
         $this->assertNotNull($node);
         return $node;
+    }
+
+    /**
+     * Fresh AppContext (no stores registered) + non-sql metadata → the
+     * actionable unregistered-type error. Also proves no static bleed:
+     * stores registered in earlier tests must NOT leak into a fresh
+     * context (the Stores holder is context-attached, not process-global).
+     */
+    public function testUnregisteredStoreTypeThrowsActionablyInFreshContext(): void
+    {
+        // Simulate a fresh worker process: brand-new context + L1 reset.
+        $ctx = new AppContext();
+        AppContext::setInstance($ctx);
+        Metadata::clear();
+
+        $em = $ctx->entityManager();
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage("No store registered for type 'mongo'");
+            $em->find(\Azera\Tests\Orm\Fixtures\ArticleDocument::class, ['_id' => 'x']);
+        } finally {
+            AppContext::setInstance($this->ctx); // restore for tearDown
+        }
     }
 
     /**
@@ -612,7 +635,7 @@ class EntityManagerTest extends TestCase
     public function testModelFacadeOverMongoMetadataInsertRoutesThroughEm(): void
     {
         $fakes = new FakeMongoFactory();
-        $this->ctx->get(StoreManager::class)->set('mongo', 'default', new MongoStore(fn($name) => $fakes->for($name)));
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
 
         $doc = new \Azera\Tests\Orm\Fixtures\ArticleDocument();
         $doc->_id   = null;
@@ -622,7 +645,7 @@ class EntityManagerTest extends TestCase
         $this->assertTrue($doc->save());
         $this->assertSame('1', $doc->_id); // driver-generated id backfilled
 
-        $articles = $fakes->for('articles'); // #[Document(collection)]
+        $articles = $fakes->for('articles'); // #[Entity(name)] → collection
         $this->assertCount(1, $articles->docs);
         $this->assertSame(['a', 'b'], $articles->docs[0]['tags']); // RAW array, not JSON
         $this->assertSame('Doc One', $articles->docs[0]['title']);
@@ -634,7 +657,7 @@ class EntityManagerTest extends TestCase
     public function testDocumentFacadeCleanSaveIsNoOp(): void
     {
         $fakes = new FakeMongoFactory();
-        $this->ctx->get(StoreManager::class)->set('mongo', 'default', new MongoStore(fn($name) => $fakes->for($name)));
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
         $fakes->for('articles')->docs[] = ['_id' => 'abc123', 'title' => 'Doc One', 'tags' => null];
 
         $doc = $this->em->find(\Azera\Tests\Orm\Fixtures\ArticleDocument::class, ['_id' => 'abc123']);
@@ -651,7 +674,7 @@ class EntityManagerTest extends TestCase
     public function testDocumentFacadeUpdateWritesOnlyChangedFields(): void
     {
         $fakes = new FakeMongoFactory();
-        $this->ctx->get(StoreManager::class)->set('mongo', 'default', new MongoStore(fn($name) => $fakes->for($name)));
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
         $fakes->for('articles')->docs[] = ['_id' => 'abc123', 'title' => 'Doc One', 'tags' => null];
 
         $doc = $this->em->find(\Azera\Tests\Orm\Fixtures\ArticleDocument::class, ['_id' => 'abc123']);
@@ -679,7 +702,7 @@ class EntityManagerTest extends TestCase
     public function testDocumentBaseFacadeDeleteRoutesThroughEm(): void
     {
         $fakes = new FakeMongoFactory();
-        $this->ctx->get(StoreManager::class)->set('mongo', 'default', new MongoStore(fn($name) => $fakes->for($name)));
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
         $fakes->for('docs')->docs[] = ['_id' => 'abc123', 'title' => 'Doc One', 'tags' => null];
 
         $doc = $this->em->find(DocumentFixture::class, ['_id' => 'abc123']);

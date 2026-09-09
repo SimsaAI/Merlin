@@ -847,7 +847,7 @@ class Query extends Condition
         }
         $result = $this->executeQuery($db, $query);
         if (!($result instanceof ResultSet)) {
-            throw new Exception('SELECT query did not return ResultSet');
+            throw new Exception('SELECT query did not return a ResultSet');
         }
 
         return $result;
@@ -857,7 +857,7 @@ class Query extends Condition
      * ORM eager-load read: HydrationMap plan + joined SQL + RowSplitter.
      * Raw rows only — no ResultSet in this path.
      */
-    protected function selectWithEagerLoad($db): object
+    protected function selectWithEagerLoad(?Database $db): object
     {
         $modelClass = $this->resolvedSource['modelClass'];
         $plan       = \Azera\Orm\HydrationMap::build($modelClass, $this->eagerLoad);
@@ -1001,8 +1001,8 @@ class Query extends Condition
     /**
      * Hydrate raw rows into heap-tracked entities (FastHydrator plan).
      *
-     * @param list\<array\<string,mixed\>> $rows
-     * @return list\<object>
+     * @param list<array<string,mixed>> $rows
+     * @return list<object>
      */
     protected function hydrateRows(array $rows, string $modelClass, bool $fresh = false): array
     {
@@ -1040,8 +1040,8 @@ class Query extends Condition
      * Field-name typo detection (model mode): in a model-backed query the
      * where()/orderBy() identifiers must be metadata fields (optionally
      * qualified with an alias). Unknown names throw instead of reaching
-     * SQL and failing with a driver error. Raw-table queries skip this —
-     * there is no metadata to check against.
+     * SQL and failing with a driver error. Raw-table queries skip this
+     * as there is no metadata to check against.
      */
     protected function validateField(string $field): string
     {
@@ -1056,10 +1056,7 @@ class Query extends Condition
         if (($pos = strpos($candidate, '.')) !== false) {
             $candidate = substr($candidate, $pos + 1);
         }
-        $candidate = trim((string) preg_replace('/\s+/', ' ', $candidate));
-        if (($pos = strpos($candidate, ' ')) !== false) {
-            $candidate = substr($candidate, 0, $pos);
-        }
+        $candidate = preg_split('/\s+/', $candidate)[0];
 
         if (!isset($fields[$candidate])) {
             throw new \InvalidArgumentException(

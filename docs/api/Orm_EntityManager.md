@@ -25,10 +25,11 @@ scheduling overhead, and no tx when one is already open (joins the
 caller's tx).
 
 Storage-agnostic: writes execute through the [`Store`](Orm_Storage_Store.md) seam resolved
-from class metadata (store: 'sql' | 'mongo'). The SQL shapes and the
-RETURNING matrix (pk_set / returning_id / returning_all / last_insert_id)
-live in each Store backend; flush consumes their normalized
-['row' => ?array, 'id' => ?scalar] results for identity backfill.
+from class metadata (#[Entity(store: …)] — an opaque registry key). The
+SQL shapes and the RETURNING matrix (pk_set / returning_id /
+returning_all / last_insert_id) live in each Store backend; flush
+consumes their normalized ['row' => ?array, 'id' => ?scalar] results
+for identity backfill.
 
 RequestScoped: `resetState()` wipes the heap and drops scheduled
 writes between requests in persistent workers (non-negotiable — same
@@ -36,7 +37,7 @@ contract as Heap).
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Orm/EntityManager.php#L49)
+### __construct() · [source](../../src/Orm/EntityManager.php#L50)
 
 `public function __construct(Azera\Orm\Heap $heap, object|null $db = null): mixed`
 
@@ -54,7 +55,7 @@ contract as Heap).
 
 ---
 
-### heap() · [source](../../src/Orm/EntityManager.php#L59)
+### heap() · [source](../../src/Orm/EntityManager.php#L60)
 
 `public function heap(): Azera\Orm\Heap`
 
@@ -67,12 +68,22 @@ The shared identity map.
 
 ---
 
-### find() · [source](../../src/Orm/EntityManager.php#L73)
+### find() · [source](../../src/Orm/EntityManager.php#L84)
 
-`public function find(string $class, array $id): object|null`
+`public function find(string $class, array $id, bool $fresh = false): object|null`
 
 Load one entity by PK values: heap probe first, Store read on miss,
 hydration onto the shared heap.
+
+$fresh=false (default): a heap hit returns the tracked instance
+WITHOUT touching the store — the identity-map behavior.
+
+$fresh=true: the row is RE-READ from the Store and applied onto the
+tracked instance in place (`refresh()`) — same object, current
+values. Use this for stale-read-sensitive work (polling tasks,
+cross-request workers between resetState() boundaries). Entities
+with scheduled (unflushed) writes must NOT be fresh-read — refresh()
+throws instead of silently discarding pending work.
 
 **🧭 Parameters**
 
@@ -80,6 +91,7 @@ hydration onto the shared heap.
 |---|---|---|---|
 | `$class` | string | - |  |
 | `$id` | array | - | PK field => value |
+| `$fresh` | bool | `false` |  |
 
 **➡️ Return value**
 
@@ -88,11 +100,15 @@ hydration onto the shared heap.
 
 ---
 
-### findBy() · [source](../../src/Orm/EntityManager.php#L99)
+### findBy() · [source](../../src/Orm/EntityManager.php#L124)
 
-`public function findBy(string $class, array $where): array`
+`public function findBy(string $class, array $where, bool $fresh = false): array`
 
 Load all entities matching field => value conditions.
+
+$fresh=true refreshes already-tracked entities in place from the
+fresh rows (same instances, current values); entities with pending
+scheduled writes keep their in-request state.
 
 **🧭 Parameters**
 
@@ -100,6 +116,7 @@ Load all entities matching field => value conditions.
 |---|---|---|---|
 | `$class` | string | - |  |
 | `$where` | array | - |  |
+| `$fresh` | bool | `false` |  |
 
 **➡️ Return value**
 
@@ -108,7 +125,39 @@ Load all entities matching field => value conditions.
 
 ---
 
-### persist() · [source](../../src/Orm/EntityManager.php#L113)
+### refresh() · [source](../../src/Orm/EntityManager.php#L147)
+
+`public function refresh(object $entity): object|null`
+
+Re-read an entity's row from the Store and refresh the tracked
+instance IN PLACE: current row values onto the entity, node snapshot
+synced as the new diff baseline. Identity is preserved — the caller
+keeps its reference, the data is current. The escape hatch that
+keeps the identity-map's correctness (one row = one object, no lost
+in-request writes) while serving freshness-sensitive reads
+(polling, long-lived workers between request boundaries).
+
+Returns the entity when refreshed. Returns NULL when the row is
+GONE in storage — the entity is detached (the identity map mirrors
+the store; a tracked ghost would keep coming back on heap-hit
+reads). Guards: untracked entities throw (nothing to refresh
+against — find()/track() first); entities with scheduled unflushed
+writes throw (a re-read would clobber queued work — flush() first).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$entity` | object | - |  |
+
+**➡️ Return value**
+
+- Type: object|null
+
+
+---
+
+### persist() · [source](../../src/Orm/EntityManager.php#L183)
 
 `public function persist(object $entity): static`
 
@@ -130,7 +179,7 @@ Explicit intent — flush() sees ONLY what was persisted here
 
 ---
 
-### upsert() · [source](../../src/Orm/EntityManager.php#L138)
+### upsert() · [source](../../src/Orm/EntityManager.php#L208)
 
 `public function upsert(object $entity): static`
 
@@ -157,7 +206,7 @@ conflict target. Anything less is an ordinary insert.
 
 ---
 
-### remove() · [source](../../src/Orm/EntityManager.php#L167)
+### remove() · [source](../../src/Orm/EntityManager.php#L237)
 
 `public function remove(object $entity): static`
 
@@ -177,17 +226,21 @@ pending inserts) are just dropped from identity tracking.
 
 ---
 
-### flush() · [source](../../src/Orm/EntityManager.php#L192)
+### flush() · [source](../../src/Orm/EntityManager.php#L266)
 
 `public function flush(): void`
 
 Execute all scheduled writes in one transaction
 (diff -> order -> execute -> backfill).
 
-Transaction control follows the SCHEDULED WORK's store types (not a
-classless resolution): SQL stores get begin/commit/rollback; mongo
-stores are structural no-ops (replica-set sessions deferred). A mixed
-SQL+mongo flush wraps only the SQL side — no cross-type tx exists.
+Transaction control follows the SCHEDULED WORK's (store, txTarget)
+grouping: all scheduled classes must resolve to ONE store instance
+AND one connection target on it — otherwise the flush spans two
+connections and cannot be atomic, which throws (stores may relax
+this with per-instance semantics via txTarget(); e.g. a mongo
+store's no-op txs group under its single instance token). flush()
+pins the tx to the FIRST scheduled class's write target via
+begin($meta) — per-class #[Connection] routing survives pinning.
 
 **➡️ Return value**
 
@@ -196,7 +249,7 @@ SQL+mongo flush wraps only the SQL side — no cross-type tx exists.
 
 ---
 
-### detach() · [source](../../src/Orm/EntityManager.php#L241)
+### detach() · [source](../../src/Orm/EntityManager.php#L327)
 
 `public function detach(object $entity): void`
 
@@ -215,7 +268,7 @@ Drop an entity from identity tracking (no storage effect).
 
 ---
 
-### adopt() · [source](../../src/Orm/EntityManager.php#L264)
+### adopt() · [source](../../src/Orm/EntityManager.php#L350)
 
 `public function adopt(object $entity): object`
 
@@ -247,7 +300,7 @@ the node when the entity already sits under another identity).
 
 ---
 
-### track() · [source](../../src/Orm/EntityManager.php#L291)
+### track() · [source](../../src/Orm/EntityManager.php#L377)
 
 `public function track(object $entity): object`
 
@@ -270,7 +323,7 @@ SQL only for fields changed after the track() call.
 
 ---
 
-### contains() · [source](../../src/Orm/EntityManager.php#L313)
+### contains() · [source](../../src/Orm/EntityManager.php#L399)
 
 `public function contains(object $entity): bool`
 
@@ -289,7 +342,7 @@ Whether the entity is tracked in the request heap.
 
 ---
 
-### isScheduled() · [source](../../src/Orm/EntityManager.php#L321)
+### isScheduled() · [source](../../src/Orm/EntityManager.php#L407)
 
 `public function isScheduled(object $entity): bool`
 
@@ -308,7 +361,7 @@ Whether the entity has scheduled work in the current flush cycle.
 
 ---
 
-### dirtyData() · [source](../../src/Orm/EntityManager.php#L341)
+### dirtyData() · [source](../../src/Orm/EntityManager.php#L431)
 
 `public function dirtyData(object $entity): array`
 
@@ -318,7 +371,11 @@ Stateful's clone snapshot is gone).
 Untracked entity: every metadata column with a set value counts as
 changed (the same "everything set is pending" semantic the old
 no-snapshot Stateful path had). Tracked entity: current values vs
-the node snapshot, field-name-keyed.
+the node snapshot, field-name-keyed — PK columns EXCLUDED there:
+identity, not data (the pipeline never puts a PK into an UPDATE
+SET, so isDirty()/hasChanged() must match what flush() would
+actually write; a mutated PK on a tracked entity is the identity
+guard's problem, not a data diff).
 
 **🧭 Parameters**
 
@@ -334,7 +391,7 @@ the node snapshot, field-name-keyed.
 
 ---
 
-### isDirty() · [source](../../src/Orm/EntityManager.php#L372)
+### isDirty() · [source](../../src/Orm/EntityManager.php#L479)
 
 `public function isDirty(object $entity): bool`
 
@@ -354,7 +411,7 @@ true — it has pending state that adopt+flush would write).
 
 ---
 
-### revert() · [source](../../src/Orm/EntityManager.php#L382)
+### revert() · [source](../../src/Orm/EntityManager.php#L489)
 
 `public function revert(object $entity): void`
 
@@ -375,7 +432,7 @@ entities — nothing to revert to.
 
 ---
 
-### clear() · [source](../../src/Orm/EntityManager.php#L410)
+### clear() · [source](../../src/Orm/EntityManager.php#L517)
 
 `public function clear(): void`
 
@@ -389,16 +446,44 @@ work is dropped, NOT flushed — explicit clear means "forget".
 
 ---
 
-### resetState() · [source](../../src/Orm/EntityManager.php#L419)
+### resetState() · [source](../../src/Orm/EntityManager.php#L529)
 
 `public function resetState(): void`
 
 Request-scoped hook: wipe the identity map + any scheduled writes
-between requests in persistent workers.
+between requests in persistent workers. Also drops the memoized
+fallback store — a worker re-pointing DatabaseManager roles (tenant
+swap) must not keep a stale-borrowed store; the next storeFor()
+rebuilds it from the then-current manager.
 
 **➡️ Return value**
 
 - Type: void
+
+
+---
+
+### setStore() · [source](../../src/Orm/EntityManager.php#L1011)
+
+`public function setStore(string $type, Azera\Orm\Storage\Store $store): static`
+
+Register a Store under a TYPE NAME — the single routing axis.
+
+Metadata `store` (#[Entity(store: ...)]) selects it per class.
+A connection-owning backend with multiple clients registers one
+type per client ('mongo-eu', 'mongo-us'): the type name IS the
+discriminator — there is no role level.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$type` | string | - |  |
+| `$store` | [Store](Orm_Storage_Store.md) | - |  |
+
+**➡️ Return value**
+
+- Type: static
 
 
 

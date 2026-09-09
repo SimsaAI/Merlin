@@ -15,17 +15,25 @@ Holds the RETURNING matrix: pk_set -> plain INSERT; all non-PK cols set +
 driver RETURNING -> RETURNING id; unset non-PK cols -> RETURNING *;
 no-RETURNING driver -> lastInsertId.
 
+Connection-role resolution is PER CLASS: metadata readRole/writeRole
+(compiled from #[Connection(read|write|role)]) override the constructor
+defaults, so one shared store instance can route individual classes to
+dedicated connections. Once begin() opens a transaction, ALL statements
+pin to that transaction connection until commit/rollback — a tx must not
+split across connections, and reads must see its uncommitted writes
+(per-class routing applies to autocommit statements only).
+
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Orm/Storage/PdoStore.php#L25)
+### __construct() · [source](../../src/Orm/Storage/PdoStore.php#L37)
 
-`public function __construct(Azera\Db\DatabaseManager $dbm, string $readRole = 'read', string $writeRole = 'write'): mixed`
+`public function __construct(Azera\Db\DatabaseManager|null $dbm = null, string $readRole = 'read', string $writeRole = 'write'): mixed`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$dbm` | [DatabaseManager](Db_DatabaseManager.md) | - |  |
+| `$dbm` | [DatabaseManager](Db_DatabaseManager.md)\|null | `null` |  |
 | `$readRole` | string | `'read'` |  |
 | `$writeRole` | string | `'write'` |  |
 
@@ -36,7 +44,43 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L31)
+### wantsNativeValues() · [source](../../src/Orm/Storage/PdoStore.php#L52)
+
+`public function wantsNativeValues(): bool`
+
+SQL shaping applies: DateTime objects are formatted and cast values
+are ENCODED before the row hits the connection (the EM's
+extractData() consults this via the Store seam).
+
+**➡️ Return value**
+
+- Type: bool
+
+
+---
+
+### txTarget() · [source](../../src/Orm/Storage/PdoStore.php#L62)
+
+`public function txTarget(array $meta): string`
+
+Connection identity for tx grouping in flush(): the class's write
+role (#[Connection] override wins over the constructor default) —
+two classes sharing a write role share one transaction target.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - |  |
+
+**➡️ Return value**
+
+- Type: string
+
+
+---
+
+### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L89)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -54,7 +98,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L66)
+### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L135)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -73,7 +117,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L77)
+### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L146)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -91,7 +135,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L111)
+### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L180)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -109,7 +153,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L119)
+### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L188)
 
 `public function findBy(string $class, array $where): array`
 
@@ -127,7 +171,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L128)
+### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L197)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -145,7 +189,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### count() · [source](../../src/Orm/Storage/PdoStore.php#L134)
+### count() · [source](../../src/Orm/Storage/PdoStore.php#L203)
 
 `public function count(string $class, array $where = []): int`
 
@@ -163,9 +207,23 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/PdoStore.php#L143)
+### begin() · [source](../../src/Orm/Storage/PdoStore.php#L221)
 
-`public function begin(): void`
+`public function begin(array|null $meta = null): void`
+
+begin($meta) pins the scheduled class's WRITE target (metadata
+writeRole override wins over the constructor default — flush() passes
+the first scheduled class's meta so per-class routing survives tx
+pinning): every subsequent operation routes to it until
+commit/rollback, so a transaction can never split across connections
+and reads inside it see uncommitted writes. begin() without meta
+(direct callers, tests) pins the constructor default.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -174,7 +232,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/PdoStore.php#L148)
+### commit() · [source](../../src/Orm/Storage/PdoStore.php#L227)
 
 `public function commit(): void`
 
@@ -185,7 +243,7 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L153)
+### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L233)
 
 `public function rollback(): void`
 
@@ -196,13 +254,31 @@ no-RETURNING driver -> lastInsertId.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L158)
+### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L239)
 
 `public function inTransaction(): bool`
 
 **➡️ Return value**
 
 - Type: bool
+
+
+---
+
+### enrichMetadata() · [source](../../src/Orm/Storage/PdoStore.php#L460)
+
+`public function enrichMetadata(array $meta, ReflectionClass $class): array`
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - |  |
+| `$class` | ReflectionClass | - |  |
+
+**➡️ Return value**
+
+- Type: array
 
 
 

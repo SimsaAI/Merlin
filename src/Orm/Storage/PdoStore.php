@@ -2,6 +2,7 @@
 
 namespace Azera\Orm\Storage;
 
+use Azera\AppContext;
 use Azera\Db\Database;
 use Azera\Db\DatabaseManager;
 use Azera\Orm\Metadata;
@@ -19,19 +20,76 @@ use Azera\Orm\Metadata;
  * Holds the RETURNING matrix: pk_set -> plain INSERT; all non-PK cols set +
  * driver RETURNING -> RETURNING id; unset non-PK cols -> RETURNING *;
  * no-RETURNING driver -> lastInsertId.
+ *
+ * Connection-role resolution is PER CLASS: metadata readRole/writeRole
+ * (compiled from #[Connection(read|write|role)]) override the constructor
+ * defaults, so one shared store instance can route individual classes to
+ * dedicated connections. Once begin() opens a transaction, ALL statements
+ * pin to that transaction connection until commit/rollback — a tx must not
+ * split across connections, and reads must see its uncommitted writes
+ * (per-class routing applies to autocommit statements only).
  */
 final class PdoStore implements Store
 {
+    /** Connection pinned by begin() — non-null while a store tx is open. */
+    private ?Database $tx = null;
+
     public function __construct(
-        private DatabaseManager $dbm,
+        private ?DatabaseManager $dbm = null,
         private string $readRole = 'read',
         private string $writeRole = 'write',
-    ) {}
+    ) {
+        $this->dbm ??= AppContext::instance()->dbManager();
+    }
+
+    /* ------------------------------------------------- capabilities */
+
+    /**
+     * SQL shaping applies: DateTime objects are formatted and cast values
+     * are ENCODED before the row hits the connection (the EM's
+     * extractData() consults this via the Store seam).
+     */
+    public function wantsNativeValues(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Connection identity for tx grouping in flush(): the class's write
+     * role (#[Connection] override wins over the constructor default) —
+     * two classes sharing a write role share one transaction target.
+     */
+    public function txTarget(array $meta): string
+    {
+        return 'sql:' . ($meta['writeRole'] ?? $this->writeRole);
+    }
+
+    /* ------------------------------------------------- connections */
+
+    /**
+     * Connection for a READ on $meta's class: metadata readRole
+     * (#[Connection]) overrides the constructor default; an open
+     * transaction pins to the tx connection.
+     */
+    private function readDb(array $meta): Database
+    {
+        return $this->tx ?? $this->dbm->getOrDefault($meta['readRole'] ?? $this->readRole);
+    }
+
+    /**
+     * Connection for a WRITE on $meta's class: metadata writeRole
+     * (#[Connection]) overrides the constructor default; an open
+     * transaction pins to the tx connection.
+     */
+    private function writeDb(array $meta): Database
+    {
+        return $this->tx ?? $this->dbm->getOrDefault($meta['writeRole'] ?? $this->writeRole);
+    }
 
     public function insertOne(string $class, array $data): array
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
 
         // Strategy selection lives here (per-situation, not always RETURNING *).
         $strategy = $this->strategy($meta, $data, $db->supportsReturning());
@@ -45,13 +103,21 @@ final class PdoStore implements Store
                 return ['row' => null, 'id' => null];
 
             case 'returning_id':
-                $pk      = $this->pkColumn($meta);
-                $row     = $db->selectRow($sql . ' RETURNING ' . $db->quoteIdentifier($pk['name']), $params, \PDO::FETCH_ASSOC);
+                $pk  = $this->pkColumn($meta);
+                $row = $db->selectRow(
+                    $sql . ' RETURNING ' . $db->quoteIdentifier($pk['name']),
+                    $params,
+                    \PDO::FETCH_ASSOC
+                );
                 $idValue = $row[$pk['name']] ?? null;
                 return ['row' => null, 'id' => $idValue];
 
             case 'returning_all':
-                $row = $db->selectRow($sql . ' RETURNING *', $params, \PDO::FETCH_ASSOC);
+                $row = $db->selectRow(
+                    $sql . ' RETURNING *',
+                    $params,
+                    \PDO::FETCH_ASSOC
+                );
                 return ['row' => $row, 'id' => null];
 
             case 'last_insert_id':
@@ -59,14 +125,17 @@ final class PdoStore implements Store
                 $db->query($sql, $params);
                 $pk = $this->pkColumn($meta);
                 $id = $db->lastInsertId();
-                return ['row' => null, 'id' => ($id !== false && $id !== '0' && $id !== '') ? $id : null];
+                return [
+                    'row' => null,
+                    'id'  => ($id !== false && $id !== '0' && $id !== '') ? $id : null
+                ];
         }
     }
 
     public function updateOne(string $class, array $data, array $id): array
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
 
         [$sql, $params] = $this->updateSql($meta, $data, $id);
         $db->query($sql, $params);
@@ -77,7 +146,7 @@ final class PdoStore implements Store
     public function upsertOne(string $class, array $data): array
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
 
         // The PK is the CONFLICT TARGET — always caller-set on an upsert,
         // so strategy()'s matrix can't be reused here (it short-circuits
@@ -111,7 +180,7 @@ final class PdoStore implements Store
     public function deleteOne(string $class, array $id): void
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
         [$sql, $params] = $this->deleteSql($meta, $id);
         $db->query($sql, $params);
     }
@@ -119,7 +188,7 @@ final class PdoStore implements Store
     public function findBy(string $class, array $where): array
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->readRole);
+        $db   = $this->readDb($meta);
         [$sql, $params] = $this->selectSql($meta, $where);
         $rows = $db->selectAll($sql, $params, \PDO::FETCH_ASSOC);
         return $rows;
@@ -134,30 +203,45 @@ final class PdoStore implements Store
     public function count(string $class, array $where = []): int
     {
         $meta = Metadata::for($class);
-        $db   = $this->dbm->getOrDefault($this->readRole);
+        $db   = $this->readDb($meta);
         [$sql, $params] = $this->countSql($meta, $where);
         $row = $db->selectRow($sql, $params, \PDO::FETCH_ASSOC);
         return (int) ($row['cnt'] ?? 0);
     }
 
-    public function begin(): void
+    /**
+     * begin($meta) pins the scheduled class's WRITE target (metadata
+     * writeRole override wins over the constructor default — flush() passes
+     * the first scheduled class's meta so per-class routing survives tx
+     * pinning): every subsequent operation routes to it until
+     * commit/rollback, so a transaction can never split across connections
+     * and reads inside it see uncommitted writes. begin() without meta
+     * (direct callers, tests) pins the constructor default.
+     */
+    public function begin(?array $meta = null): void
     {
-        $this->dbm->getOrDefault($this->writeRole)->begin();
+        $this->tx = $this->writeDb($meta ?? []);
+        $this->tx->begin();
     }
 
     public function commit(): void
     {
-        $this->dbm->getOrDefault($this->writeRole)->commit();
+        $this->tx?->commit();
+        $this->tx = null;
     }
 
     public function rollback(): void
     {
-        $this->dbm->getOrDefault($this->writeRole)->rollback();
+        $this->tx?->rollback();
+        $this->tx = null;
     }
 
     public function inTransaction(): bool
     {
-        return $this->dbm->getOrDefault($this->writeRole)->inTransaction();
+        // Pinned tx OR a transaction opened by a caller directly on the
+        // write-role connection (legacy Model/QB sharing) — flush() must
+        // join it either way, not open a savepoint on top.
+        return ($this->tx ?? $this->dbm->getOrDefault($this->writeRole))->inTransaction();
     }
 
     /* -------------------------------------------------- helpers */
@@ -216,7 +300,7 @@ final class PdoStore implements Store
 
     /**
      * Schema-qualified quoted table name from metadata
-     * (#[Table(schema)] / schema() override — null schema yields the
+     * (#[Entity(schema)] / schema() override — null schema yields the
      * bare table).
      */
     private function table(Database $db, array $meta): string
@@ -226,13 +310,13 @@ final class PdoStore implements Store
 
     private function insertSql(array $meta, array $set): array
     {
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
         $cols = array_map(fn($c) => $db->quoteIdentifier($c), array_keys($set));
         $bind = array_fill(0, \count($set), '?');
 
         return [
             'INSERT INTO ' . $this->table($db, $meta)
-            . ' (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $bind) . ')',
+                . ' (' . implode(', ', $cols) . ') VALUES (' . implode(', ', $bind) . ')',
             array_values($set),
         ];
     }
@@ -302,7 +386,7 @@ final class PdoStore implements Store
 
     private function updateSql(array $meta, array $data, array $id): array
     {
-        $db   = $this->dbm->getOrDefault($this->writeRole);
+        $db   = $this->writeDb($meta);
         $sets = [];
         $bind = [];
 
@@ -321,15 +405,15 @@ final class PdoStore implements Store
 
         return [
             'UPDATE ' . $this->table($db, $meta)
-            . ' SET ' . implode(', ', $sets)
-            . ' WHERE ' . implode(' AND ', $wheres ?: ['1=0']),
+                . ' SET ' . implode(', ', $sets)
+                . ' WHERE ' . implode(' AND ', $wheres ?: ['1=0']),
             $bind,
         ];
     }
 
     private function deleteSql(array $meta, array $id): array
     {
-        $db     = $this->dbm->getOrDefault($this->writeRole);
+        $db     = $this->writeDb($meta);
         $wheres = [];
         $bind   = [];
 
@@ -342,14 +426,14 @@ final class PdoStore implements Store
 
         return [
             'DELETE FROM ' . $this->table($db, $meta)
-            . ' WHERE ' . implode(' AND ', $wheres ?: ['1=0']),
+                . ' WHERE ' . implode(' AND ', $wheres ?: ['1=0']),
             $bind,
         ];
     }
 
     private function selectSql(array $meta, array $where): array
     {
-        $db     = $this->dbm->getOrDefault($this->readRole);
+        $db     = $this->readDb($meta);
         $wheres = [];
         $bind   = [];
 
@@ -371,5 +455,10 @@ final class PdoStore implements Store
         $sql = str_replace('SELECT *', 'SELECT COUNT(*) AS cnt', $sql);
 
         return [$sql, $bind];
+    }
+
+    public function enrichMetadata(array $meta, \ReflectionClass $class): array
+    {
+        return $meta;
     }
 }

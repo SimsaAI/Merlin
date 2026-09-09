@@ -4,7 +4,7 @@
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/AppContext.php#L34)
+### __construct() · [source](../../src/AppContext.php#L35)
 
 `public function __construct(): mixed`
 
@@ -15,7 +15,7 @@
 
 ---
 
-### instance() · [source](../../src/AppContext.php#L108)
+### instance() · [source](../../src/AppContext.php#L105)
 
 `public static function instance(): static`
 
@@ -28,7 +28,7 @@ Get/create shared singleton instance
 
 ---
 
-### setInstance() · [source](../../src/AppContext.php#L117)
+### setInstance() · [source](../../src/AppContext.php#L114)
 
 `public static function setInstance(self $instance): void`
 
@@ -47,7 +47,7 @@ Set the shared singleton instance (e.g. for testing or multi-context scenarios).
 
 ---
 
-### reset() · [source](../../src/AppContext.php#L130)
+### reset() · [source](../../src/AppContext.php#L127)
 
 `public static function reset(): void`
 
@@ -65,7 +65,7 @@ a previous test having called `setInstance()`. After this, the next
 
 ---
 
-### request() · [source](../../src/AppContext.php#L142)
+### request() · [source](../../src/AppContext.php#L139)
 
 `public function request(): Azera\Http\Request`
 
@@ -79,7 +79,7 @@ Get the HttpRequest instance. If it doesn't exist, it will be created.
 
 ---
 
-### view() · [source](../../src/AppContext.php#L152)
+### view() · [source](../../src/AppContext.php#L149)
 
 `public function view(): Azera\Core\ViewEngine`
 
@@ -93,7 +93,7 @@ Get the active view engine instance. Defaults to ClarityEngine.
 
 ---
 
-### setView() · [source](../../src/AppContext.php#L163)
+### setView() · [source](../../src/AppContext.php#L160)
 
 `public function setView(Azera\Core\ViewEngine $engine): static`
 
@@ -112,7 +112,7 @@ Replace the active view engine (e.g. swap in ClarityEngine at bootstrap).
 
 ---
 
-### cookies() · [source](../../src/AppContext.php#L176)
+### cookies() · [source](../../src/AppContext.php#L173)
 
 `public function cookies(): Azera\Http\Cookies`
 
@@ -126,7 +126,7 @@ Get the Cookies instance. If it doesn't exist, it will be created.
 
 ---
 
-### heap() · [source](../../src/AppContext.php#L192)
+### heap() · [source](../../src/AppContext.php#L189)
 
 `public function heap(): Azera\Orm\Heap`
 
@@ -147,7 +147,7 @@ across requests/tenants).
 
 ---
 
-### entityManager() · [source](../../src/AppContext.php#L205)
+### entityManager() · [source](../../src/AppContext.php#L202)
 
 `public function entityManager(): Azera\Orm\EntityManager`
 
@@ -165,7 +165,7 @@ persist() schedules, flush() executes in one transaction. Wiped by
 
 ---
 
-### dbManager() · [source](../../src/AppContext.php#L213)
+### dbManager() · [source](../../src/AppContext.php#L210)
 
 `public function dbManager(): Azera\Db\DatabaseManager`
 
@@ -178,7 +178,7 @@ Get the DatabaseManager instance. If it doesn't exist, it will be created.
 
 ---
 
-### router() · [source](../../src/AppContext.php#L223)
+### router() · [source](../../src/AppContext.php#L220)
 
 `public function router(): Azera\Core\Router`
 
@@ -192,7 +192,7 @@ Get the Router instance. If it doesn't exist, it will be created.
 
 ---
 
-### dispatcher() · [source](../../src/AppContext.php#L233)
+### dispatcher() · [source](../../src/AppContext.php#L230)
 
 `public function dispatcher(): Azera\Core\Dispatcher`
 
@@ -206,7 +206,7 @@ Get the Dispatcher instance. If it doesn't exist, it will be created.
 
 ---
 
-### logger() · [source](../../src/AppContext.php#L245)
+### logger() · [source](../../src/AppContext.php#L242)
 
 `public function logger(): Psr\Log\LoggerInterface`
 
@@ -221,7 +221,7 @@ null-checks. Register a real logger via `set(LoggerInterface::class, ...)`.
 
 ---
 
-### events() · [source](../../src/AppContext.php#L257)
+### events() · [source](../../src/AppContext.php#L254)
 
 `public function events(): Psr\EventDispatcher\EventDispatcherInterface`
 
@@ -236,7 +236,7 @@ a real dispatcher via `set(EventDispatcherInterface::class, ...)`.
 
 ---
 
-### cache() · [source](../../src/AppContext.php#L269)
+### cache() · [source](../../src/AppContext.php#L266)
 
 `public function cache(): Psr\SimpleCache\CacheInterface`
 
@@ -251,7 +251,7 @@ registered (always reports a miss). Register a real cache via
 
 ---
 
-### queue() · [source](../../src/AppContext.php#L285)
+### queue() · [source](../../src/AppContext.php#L282)
 
 `public function queue(): Azera\Queue\QueueInterface`
 
@@ -273,7 +273,7 @@ Register a queue via `set(QueueInterface::class, ...)`.
 
 ---
 
-### config() · [source](../../src/AppContext.php#L308)
+### config() · [source](../../src/AppContext.php#L305)
 
 `public function config(): Azera\Config\Config`
 
@@ -287,7 +287,7 @@ if none has been registered.
 
 ---
 
-### pipeline() · [source](../../src/AppContext.php#L331)
+### pipeline() · [source](../../src/AppContext.php#L328)
 
 `public function pipeline(array $interceptors = []): Azera\Aop\Pipeline`
 
@@ -318,7 +318,7 @@ $result = $ctx->pipeline()
 
 ---
 
-### registerInterceptor() · [source](../../src/AppContext.php#L347)
+### registerInterceptor() · [source](../../src/AppContext.php#L344)
 
 `public function registerInterceptor(string $adviceClass, Azera\Aop\InterceptorInterface $interceptor): void`
 
@@ -342,7 +342,7 @@ carrying the corresponding advice attribute.
 
 ---
 
-### setAopCacheDir() · [source](../../src/AppContext.php#L383)
+### setAopCacheDir() · [source](../../src/AppContext.php#L380)
 
 `public function setAopCacheDir(string|null $dir): void`
 
@@ -364,7 +364,7 @@ Pass null to use eval() (development, no cache files).
 
 ---
 
-### session() · [source](../../src/AppContext.php#L442)
+### session() · [source](../../src/AppContext.php#L439)
 
 `public function session(): Azera\Http\Session|null`
 
@@ -377,7 +377,7 @@ Get the Session instance.
 
 ---
 
-### setSession() · [source](../../src/AppContext.php#L452)
+### setSession() · [source](../../src/AppContext.php#L449)
 
 `public function setSession(Azera\Http\Session $session): void`
 
@@ -396,7 +396,7 @@ Set the Session instance.
 
 ---
 
-### route() · [source](../../src/AppContext.php#L462)
+### route() · [source](../../src/AppContext.php#L459)
 
 `public function route(): Azera\Core\ResolvedRoute|null`
 
@@ -409,7 +409,7 @@ Get the current resolved route information.
 
 ---
 
-### setRoute() · [source](../../src/AppContext.php#L472)
+### setRoute() · [source](../../src/AppContext.php#L469)
 
 `public function setRoute(Azera\Core\ResolvedRoute $route): void`
 
@@ -428,7 +428,7 @@ Set the current resolved route information.
 
 ---
 
-### clearRequestScope() · [source](../../src/AppContext.php#L497)
+### clearRequestScope() · [source](../../src/AppContext.php#L494)
 
 `public function clearRequestScope(): void`
 
@@ -458,7 +458,7 @@ Safe to call repeatedly; a no-op when no request has been processed yet.
 
 ---
 
-### set() · [source](../../src/AppContext.php#L540)
+### set() · [source](../../src/AppContext.php#L537)
 
 `public function set(string $id, callable|object|null $service = null): void`
 
@@ -481,7 +481,7 @@ first resolution and their returned object is cached for subsequent lookups.
 
 ---
 
-### has() · [source](../../src/AppContext.php#L559)
+### has() · [source](../../src/AppContext.php#L556)
 
 `public function has(string $id): bool`
 
@@ -501,7 +501,7 @@ Check if a service is registered in the context.
 
 ---
 
-### get() · [source](../../src/AppContext.php#L577)
+### get() · [source](../../src/AppContext.php#L574)
 
 `public function get(string $id): object`
 
@@ -530,7 +530,7 @@ auto-wire and instantiate it.
 
 ---
 
-### tryGet() · [source](../../src/AppContext.php#L608)
+### tryGet() · [source](../../src/AppContext.php#L604)
 
 `public function tryGet(string $id): object|null`
 
@@ -556,7 +556,7 @@ or if a registered factory currently resolves to null.
 
 ---
 
-### getOrNull() · [source](../../src/AppContext.php#L637)
+### getOrNull() · [source](../../src/AppContext.php#L633)
 
 `public function getOrNull(string $id): object|null`
 

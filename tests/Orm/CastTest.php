@@ -16,7 +16,7 @@ use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
 use Azera\Orm\Model;
 use Azera\Orm\Storage\PdoStore;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Db\TestDatabase;
 use PHPUnit\Framework\TestCase;
 
@@ -81,10 +81,9 @@ final class CastTest extends TestCase
         $dbm->set('write', $this->db);
         $this->ctx->set(DatabaseManager::class, $dbm);
 
-        $stores = new StoreManager();
-        $stores->set('sql', 'default', fn() => new PdoStore($dbm, 'read', 'write'));
-        $stores->setDefault('sql', 'default');
-        $this->ctx->set(StoreManager::class, $stores);
+        $stores = new Stores();
+        $stores->set('sql', new PdoStore($dbm, 'read', 'write'));
+        $this->ctx->set(Stores::class, $stores);
 
         $this->em = $this->ctx->entityManager();
     }

@@ -5,14 +5,14 @@ namespace Azera\Tests\Orm\Fixtures;
 use Azera\Orm\Model;
 use Azera\Orm\Attribute\Column;
 use Azera\Orm\Attribute\Connection;
-use Azera\Orm\Attribute\Table;
+use Azera\Orm\Attribute\Entity;
 
 /**
- * All-in-one SQL attribute fixture: #[Table] (name + schema),
+ * All-in-one SQL attribute fixture: #[Entity] (name + schema),
  * #[Connection] (split read/write roles), #[Column(pk: true)] composite
  * key, plus a renamed, non-PK *_id column excluded from the key.
  */
-#[Table(name: 'inventory_items', schema: 'warehouse')]
+#[Entity(name: 'inventory_items', schema: 'warehouse')]
 #[Connection(read: 'replica', write: 'primary')]
 class InventoryItem extends Model
 {

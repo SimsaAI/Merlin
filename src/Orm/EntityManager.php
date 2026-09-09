@@ -9,7 +9,7 @@ use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
 use Azera\Orm\Storage\PdoStore;
 use Azera\Orm\Storage\Store;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 
 /**
  * The entity manager: identity map + write pipeline, consolidated.
@@ -35,10 +35,11 @@ use Azera\Orm\Storage\StoreManager;
  * caller's tx).
  *
  * Storage-agnostic: writes execute through the {@see Store} seam resolved
- * from class metadata (store: 'sql' | 'mongo'). The SQL shapes and the
- * RETURNING matrix (pk_set / returning_id / returning_all / last_insert_id)
- * live in each Store backend; flush consumes their normalized
- * ['row' => ?array, 'id' => ?scalar] results for identity backfill.
+ * from class metadata (#[Entity(store: …)] — an opaque registry key). The
+ * SQL shapes and the RETURNING matrix (pk_set / returning_id /
+ * returning_all / last_insert_id) live in each Store backend; flush
+ * consumes their normalized ['row' => ?array, 'id' => ?scalar] results
+ * for identity backfill.
  *
  * RequestScoped: {@see resetState()} wipes the heap and drops scheduled
  * writes between requests in persistent workers (non-negotiable — same
@@ -50,12 +51,6 @@ final class EntityManager implements RequestScoped
         private Heap $heap,
         private ?object $db = null,
     ) {}
-
-    /**
-     * Memoized SQL fallback store (the StoreManager-less path) — built
-     * once per EntityManager, see storeFor()/buildFallbackStore().
-     */
-    private ?PdoStore $fallbackStore = null;
 
     /* ------------------------------------------------------------ accessors */
 
@@ -259,10 +254,14 @@ final class EntityManager implements RequestScoped
      * Execute all scheduled writes in one transaction
      * (diff -> order -> execute -> backfill).
      *
-     * Transaction control follows the SCHEDULED WORK's store types (not a
-     * classless resolution): SQL stores get begin/commit/rollback; mongo
-     * stores are structural no-ops (replica-set sessions deferred). A mixed
-     * SQL+mongo flush wraps only the SQL side — no cross-type tx exists.
+     * Transaction control follows the SCHEDULED WORK's (store, txTarget)
+     * grouping: all scheduled classes must resolve to ONE store instance
+     * AND one connection target on it — otherwise the flush spans two
+     * connections and cannot be atomic, which throws (stores may relax
+     * this with per-instance semantics via txTarget(); e.g. a mongo
+     * store's no-op txs group under its single instance token). flush()
+     * pins the tx to the FIRST scheduled class's write target via
+     * begin($meta) — per-class #[Connection] routing survives pinning.
      */
     public function flush(): void
     {
@@ -273,22 +272,34 @@ final class EntityManager implements RequestScoped
 
         // Resolve every scheduled class's store UP FRONT — a missing or
         // misconfigured store must fail the flush before ANY write runs,
-        // not mid-flush after earlier nodes already executed. The SQL
-        // store doubles as the tx target; mongo stores need none (the
-        // seam's begin/commit/rollback are structural no-ops there —
-        // multi-doc ACID is deferred until replica-set sessions), so a
-        // mixed SQL+mongo flush wraps only the SQL side.
-        $sqlStore = null;
+        // not mid-flush after earlier nodes already executed. Grouping by
+        // (store instance, txTarget): more than one group = the write set
+        // spans two connections — no cross-connection tx exists, fail
+        // loudly instead of pretending atomicity.
+        $txStore   = null;
+        $txTarget  = null;
+        $firstMeta = null;
         foreach ($scheduled as $node) {
-            $store = $this->storeFor($node->class);
-            if ((Metadata::for($node->class)['store'] ?? 'sql') === 'sql') {
-                $sqlStore ??= $store;
+            $meta   = Metadata::for($node->class);
+            $store  = $this->storeFor($node->class);
+            $target = $store->txTarget($meta);
+
+            if ($txStore === null) {
+                $txStore   = $store;
+                $txTarget  = $target;
+                $firstMeta = $meta;
+            } elseif ($txStore !== $store || $txTarget !== $target) {
+                throw new \RuntimeException(
+                    'flush() spans multiple connections (store type change or '
+                        . "different write targets: '{$txTarget}' vs '{$target}') — not atomic, "
+                        . 'split it into separate flushes or persist through separate EntityManagers.'
+                );
             }
         }
 
         $startedTx = false;
-        if ($sqlStore !== null && !$sqlStore->inTransaction()) {
-            $sqlStore->begin();
+        if (!$txStore->inTransaction()) {
+            $txStore->begin($firstMeta);
             $startedTx = true;
         }
 
@@ -298,11 +309,11 @@ final class EntityManager implements RequestScoped
             }
 
             if ($startedTx) {
-                $sqlStore->commit();
+                $txStore->commit();
             }
         } catch (\Throwable $e) {
             if ($startedTx) {
-                $sqlStore->rollback();
+                $txStore->rollback();
             }
             throw $e;
         }
@@ -518,7 +529,6 @@ final class EntityManager implements RequestScoped
     public function resetState(): void
     {
         $this->heap->resetState();
-        $this->fallbackStore = null;
     }
 
     /* ------------------------------------------------------- scheduling */
@@ -786,11 +796,11 @@ final class EntityManager implements RequestScoped
     /**
      * Entity -> raw store row keyed by COLUMN NAME (store representation).
      * Values with a registered cast are ENCODED here (json -> text, pg
-     * array -> literal; scalar casts are encode no-ops); DateTime objects
-     * formatted for SQL stores; null stays null; isset() (never a bare
-     * read) so uninitialized typed properties don't throw. Mongo stores
-     * bypass ALL value shaping — arrays/objects pass raw, the driver owns
-     * BSON encoding (a 'json' cast is inert there by design).
+     * array -> literal; scalar casts are encode no-ops); null stays null;
+     * isset() (never a bare read) so uninitialized typed properties don't
+     * throw. Stores declaring wantsNativeValues() (e.g. mongo) bypass ALL
+     * value shaping — arrays/objects pass raw, the driver owns the wire
+     * format (a 'json' cast is inert there by design).
      *
      * This is the single encode choke point: every write path (schedule,
      * diff, adopt, track, dirtyData) funnels through it, so node->data and
@@ -799,13 +809,15 @@ final class EntityManager implements RequestScoped
      */
     private function extractData(object $entity, array $meta): array
     {
+        $native = $this->storeFor($meta['class'])->wantsNativeValues();
+
         $data = [];
         foreach ($meta['columns'] as $field => $col) {
             $value = isset($entity->{$field}) ? $entity->{$field} : null;
 
-            if (($meta['store'] ?? 'sql') === 'mongo') {
-                // Raw pass-through: the mongodb driver maps PHP arrays and
-                // DateTimeInterface to BSON natively.
+            if ($native) {
+                // Raw pass-through: the store owns value mapping (mongo:
+                // the driver maps PHP arrays/DateTime to BSON natively).
             } elseif (\is_object($value) && $value instanceof \DateTimeInterface) {
                 $value = $value->format('Y-m-d H:i:s');
             } elseif (($cast = Casts::for($col['type'])) !== null) {
@@ -950,81 +962,58 @@ final class EntityManager implements RequestScoped
     /* ----------------------------------------------------- store seam */
 
     /**
-     * Resolve the Store for a class, keyed by metadata `store` type:
-     * StoreManager::tryGet(storeType, storeRole) — a NULL-returning lookup,
-     * so an unregistered role costs an array probe, not an exception. The
-     * type comes from metadata ('sql' | 'mongo') — the hard routing
-     * guarantee: #[Document] classes can not fall into the SQL PdoStore
-     * regardless of what roles are registered, because the two maps never
-     * mix and tryGet never crosses types.
+     * Resolve the Store for a class by metadata `store` type — a plain
+     * registry lookup in the context-attached Stores holder (setStore()).
+     * The type comes from metadata (#[Entity(store: 'name')]) — the hard
+     * routing guarantee: a class NEVER falls into another type's store
+     * regardless of what is registered, because lookup is keyed by the
+     * type alone.
      *
-     * Fallback (direct construction — tests, scripts, StoreManager-less
-     * contexts): ONE PdoStore per EntityManager, memoized. Safe to cache
-     * because PdoStore owns NO connections — it resolves the live Database
-     * from its DatabaseManager per operation. Without an injected Database
-     * it shares the context's DatabaseManager directly (getOrDefault on the
+     * Fallback (direct construction — tests, scripts, holder-less
+     * contexts): ONE PdoStore per EntityManager, memoized, for the
+     * default 'sql' type ONLY. Safe to cache because PdoStore owns NO
+     * connections — it resolves the live Database from its
+     * DatabaseManager per operation. Without an injected Database it
+     * shares the context's DatabaseManager directly (getOrDefault on the
      * read/write roles falls back to the manager's default role, so role
      * re-registrations — tenant swaps in workers — are picked up like
-     * Model::readConnection()). Mongo classes in a StoreManager-less
-     * context throw — a SQL fallback would silently write a table. The db
-     * param keeps positional compatibility with pre-seam callers.
+     * Model::readConnection()). Any OTHER unregistered type throws — a
+     * SQL fallback would silently write the wrong backend. The db param
+     * keeps positional compatibility with pre-seam callers.
      */
     private function storeFor(string $class): Store
     {
         $meta = $class !== '' ? Metadata::for($class) : null;
         $type = $meta['store'] ?? 'sql';
-        $role = $meta['storeRole'] ?? 'default';
 
-        $ctx = AppContext::instance();
-        if ($ctx->has(StoreManager::class)) {
-            $store = $ctx->get(StoreManager::class)->tryGetOrDefault($type, $role);
-            if ($store !== null) {
-                return $store;
-            }
+        $ctx   = AppContext::instance();
+        $store = $ctx->get(Stores::class)->tryGet($type);
+        if ($store !== null) {
+            return $store;
         }
 
-        // No store registered for this (type, role): mongo has no SQL
-        // fallback — a SQL store would silently write a table.
-        if ($type === 'mongo') {
-            throw new \RuntimeException(
-                "Mongo document {$class} needs a StoreManager with a mongo " .
-                    'store registered for role ' . "'{$role}'"
-            );
-        }
-
-        return $this->fallbackStore ??= $this->buildFallbackStore($ctx);
+        // No store registered for this type: the SQL fallback is the ONLY
+        // fallback (zero-config path); anything else must be registered.
+        throw new \RuntimeException(
+            "No store registered for type '{$type}' (class {$class}). " .
+                'Register it via EntityManager::setStore(\'' . $type . '\', $store) — ' .
+                'or annotate the class with #[Entity(store: …)] pointing at a registered type.'
+        );
     }
 
     /**
-     * Build the (single) SQL fallback store. The wrapped-connection case
-     * covers explicitly injected Databases; otherwise the context's
-     * DatabaseManager is shared, not copied.
+     * Register a Store under a TYPE NAME — the single routing axis.
+     * Metadata `store` (#[Entity(store: ...)]) selects it per class.
+     * A connection-owning backend with multiple clients registers one
+     * type per client ('mongo-eu', 'mongo-us'): the type name IS the
+     * discriminator — there is no role level.
      */
-    private function buildFallbackStore(AppContext $ctx): PdoStore
+    public function setStore(string $type, Store $store): static
     {
-        if ($this->db !== null) {
-            // Explicitly injected Database: map the default role onto it;
-            // getOrDefault('read'/'write') falls back to it.
-            $dbm = new \Azera\Db\DatabaseManager();
-            $dbm->set('default', $this->db);
+        $ctx = AppContext::instance();
+        $ctx->get(Stores::class)->set($type, $store);
 
-            return new PdoStore($dbm, 'read', 'write');
-        }
-
-        $dbm = $ctx->dbManager();
-        try {
-            // Fail fast with the actionable message BEFORE any flush write
-            // runs (flush() resolves stores up front for exactly this),
-            // not mid-flush on the first query.
-            $dbm->getOrDefault('default');
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException(
-                'EntityManager has no Database and no StoreManager registered',
-                0,
-                $e
-            );
-        }
-
-        return new PdoStore($dbm, 'read', 'write');
+        return $this;
     }
+
 }

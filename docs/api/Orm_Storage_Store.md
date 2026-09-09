@@ -7,12 +7,53 @@ Persistence-level seam between the ORM and any storage backend.
 Operations the EntityManager's write pipeline performs — NOT a query builder. SQL stores
 implement it over a [`Database`](Db_Database.md); Mongo over the
 mongodb library. The per-situation write strategies (RETURNING matrix)
-live in each backend. A model belongs to exactly one store, declared in
-metadata (store: 'sql' | 'mongo' + storeRole).
+live in each backend. A model belongs to exactly one store, routed by
+metadata `store` (#[Entity(store: 'name')]) — the registry key
+EntityManager::setStore() maps to an instance. Third-party backends:
+implement this interface, register under a name, annotate #[Entity].
 
 ## 🚀 Public methods
 
-### insertOne() · [source](../../src/Orm/Storage/Store.php#L23)
+### wantsNativeValues() · [source](../../src/Orm/Storage/Store.php#L24)
+
+`public function wantsNativeValues(): bool`
+
+Capability flag: TRUE when this store wants values passed through
+RAW (no DateTime formatting, no cast encoding) — the backend owns
+value mapping (mongo: the driver owns BSON encoding). FALSE for
+SQL-shaped stores (DateTime -> 'Y-m-d H:i:s', cast->encode()).
+
+**➡️ Return value**
+
+- Type: bool
+
+
+---
+
+### txTarget() · [source](../../src/Orm/Storage/Store.php#L32)
+
+`public function txTarget(array $meta): string`
+
+Connection identity for the class described by $meta: two classes
+sharing one txTarget share one transaction target in flush().
+
+Borrowing stores (SQL) derive it from the write role; owning stores
+return a constant token (their connection is fixed per instance).
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - |  |
+
+**➡️ Return value**
+
+- Type: string
+
+
+---
+
+### insertOne() · [source](../../src/Orm/Storage/Store.php#L40)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -34,7 +75,7 @@ Returns raw row(s) for backfill: ['row' => ?array, 'id' => int|string|null].
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/Store.php#L32)
+### updateOne() · [source](../../src/Orm/Storage/Store.php#L49)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -55,7 +96,7 @@ Update one entity by PK values.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/Store.php#L45)
+### upsertOne() · [source](../../src/Orm/Storage/Store.php#L62)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -81,7 +122,7 @@ Returns raw row(s) for backfill, same contract as insertOne
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/Store.php#L51)
+### deleteOne() · [source](../../src/Orm/Storage/Store.php#L68)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -101,7 +142,7 @@ Delete one entity by PK values.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/Store.php#L60)
+### findBy() · [source](../../src/Orm/Storage/Store.php#L77)
 
 `public function findBy(string $class, array $where): array`
 
@@ -121,7 +162,7 @@ Read raw rows. Returns plain assoc rows (no ResultSet).
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/Store.php#L68)
+### findByPk() · [source](../../src/Orm/Storage/Store.php#L85)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -141,7 +182,7 @@ Read one raw row by PK values (null when missing).
 
 ---
 
-### count() · [source](../../src/Orm/Storage/Store.php#L74)
+### count() · [source](../../src/Orm/Storage/Store.php#L91)
 
 `public function count(string $class, array $where = []): int`
 
@@ -161,9 +202,21 @@ Count matching rows.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/Store.php#L78)
+### begin() · [source](../../src/Orm/Storage/Store.php#L102)
 
-`public function begin(): void`
+`public function begin(array|null $meta = null): void`
+
+Open a transaction. $meta (the scheduled class's metadata) lets the
+store pin to the class's write target when it supports per-class
+routing — flush() pins the tx to the FIRST scheduled class's
+writeRole instead of the constructor default (which made per-class
+routing dead code on the EM path). Null = constructor default.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -172,7 +225,7 @@ Count matching rows.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/Store.php#L79)
+### commit() · [source](../../src/Orm/Storage/Store.php#L103)
 
 `public function commit(): void`
 
@@ -183,7 +236,7 @@ Count matching rows.
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/Store.php#L80)
+### rollback() · [source](../../src/Orm/Storage/Store.php#L104)
 
 `public function rollback(): void`
 
@@ -194,7 +247,7 @@ Count matching rows.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/Store.php#L85)
+### inTransaction() · [source](../../src/Orm/Storage/Store.php#L109)
 
 `public function inTransaction(): bool`
 
@@ -203,6 +256,28 @@ Whether a transaction (or savepoint level) is active.
 **➡️ Return value**
 
 - Type: bool
+
+
+---
+
+### enrichMetadata() · [source](../../src/Orm/Storage/Store.php#L119)
+
+`public function enrichMetadata(array $meta, ReflectionClass $class): array`
+
+Return $meta enriched (or throw for dishonorable attribute combos).
+
+MUST stay JSON-serializable — the result feeds the L2 metadata cache.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - | the freshly compiled generic metadata |
+| `$class` | ReflectionClass | - | reflection of the compiled class |
+
+**➡️ Return value**
+
+- Type: array
 
 
 

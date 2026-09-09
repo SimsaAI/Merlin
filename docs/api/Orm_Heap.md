@@ -16,7 +16,7 @@ oid index), no objects allocated for lookups.
 
 ## 🚀 Public methods
 
-### key() · [source](../../src/Orm/Heap.php#L62)
+### key() · [source](../../src/Orm/Heap.php#L77)
 
 `public static function key(string $class, array $id): string`
 
@@ -44,7 +44,7 @@ one interpolation. Composite keys keep the full canonicalization.
 
 ---
 
-### attach() · [source](../../src/Orm/Heap.php#L86)
+### attach() · [source](../../src/Orm/Heap.php#L101)
 
 `public function attach(object $entity, Azera\Orm\Node $node): void`
 
@@ -64,7 +64,7 @@ Register (or replace) the node for an entity.
 
 ---
 
-### find() · [source](../../src/Orm/Heap.php#L109)
+### find() · [source](../../src/Orm/Heap.php#L165)
 
 `public function find(object $entity): Azera\Orm\Node|null`
 
@@ -83,7 +83,7 @@ Find the node for an entity OBJECT (regardless of its identity).
 
 ---
 
-### findById() · [source](../../src/Orm/Heap.php#L120)
+### findById() · [source](../../src/Orm/Heap.php#L176)
 
 `public function findById(string $class, array $id): Azera\Orm\Node|null`
 
@@ -103,7 +103,7 @@ Find the node for a class + PK values — the identity-map hit path.
 
 ---
 
-### detach() · [source](../../src/Orm/Heap.php#L128)
+### detach() · [source](../../src/Orm/Heap.php#L184)
 
 `public function detach(object $entity): void`
 
@@ -122,7 +122,7 @@ Drop an entity from identity tracking (after delete or detach).
 
 ---
 
-### scheduled() · [source](../../src/Orm/Heap.php#L143)
+### scheduled() · [source](../../src/Orm/Heap.php#L211)
 
 `public function scheduled(): array`
 
@@ -135,7 +135,7 @@ All nodes currently scheduled for a flush, in insertion order.
 
 ---
 
-### entityFor() · [source](../../src/Orm/Heap.php#L160)
+### entityFor() · [source](../../src/Orm/Heap.php#L228)
 
 `public function entityFor(Azera\Orm\Node $node): object|null`
 
@@ -157,7 +157,7 @@ O(1) via the reverse node => oid index.
 
 ---
 
-### all() · [source](../../src/Orm/Heap.php#L172)
+### all() · [source](../../src/Orm/Heap.php#L240)
 
 `public function all(): array`
 
@@ -170,7 +170,7 @@ All nodes (any state), in insertion order.
 
 ---
 
-### count() · [source](../../src/Orm/Heap.php#L177)
+### count() · [source](../../src/Orm/Heap.php#L245)
 
 `public function count(): int`
 
@@ -181,7 +181,7 @@ All nodes (any state), in insertion order.
 
 ---
 
-### resetState() · [source](../../src/Orm/Heap.php#L187)
+### resetState() · [source](../../src/Orm/Heap.php#L255)
 
 `public function resetState(): void`
 

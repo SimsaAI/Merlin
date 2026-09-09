@@ -4,10 +4,10 @@ namespace Azera\Tests\Orm\Fixtures;
 
 use Azera\Orm\Model;
 use Azera\Orm\Attribute\Column;
-use Azera\Orm\Attribute\Document;
+use Azera\Orm\Attribute\Entity;
 
 /** Mongo document fixture. */
-#[Document(collection: 'articles')]
+#[Entity(store: 'mongo', name: 'articles')]
 class ArticleDocument extends Model
 {
     #[Column(type: 'int')]

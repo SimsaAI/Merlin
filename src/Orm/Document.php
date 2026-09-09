@@ -5,14 +5,13 @@ namespace Azera\Orm;
 use Azera\AppContext;
 
 /**
- * Base class for MongoDB-backed objects (pairs with #[Document]).
+ * Base class for MongoDB-backed objects (pairs with #[Entity(store: 'mongo')]).
  *
  * FACADE over the {@see EntityManager}: save()/delete() delegate to the
  * EM's write pipeline (persist + flush), so documents and SQL models go
  * through the SAME diff -> order -> transaction path and land in the SAME
- * request-scoped heap. The #[Document] attribute's storeRole selects the
- * StoreManager role (MongoStore once it lands; tenancy via per-tenant
- * roles).
+ * request-scoped heap. The #[Entity] attribute's `store` selects the
+ * registered store type (EntityManager::setStore()).
  *
  * The EM's heap-node diff is authoritative — hydrated documents are
  * heap-tracked, so persist() schedules an UPDATE only when fields actually
@@ -21,13 +20,14 @@ use Azera\AppContext;
 abstract class Document
 {
     /**
-     * Which StoreManager role resolves the backend for this document.
-     * Mirrors the #[Document(storeRole: ...)] attribute; the attribute is
-     * the authority when both are present (it compiles into metadata).
+     * Which store type handles this document (the registry key
+     * EntityManager::setStore() maps to an instance). Mirrors the
+     * #[Entity(store: ...)] attribute; the attribute is the authority
+     * (it compiles into metadata).
      */
-    public function storeRole(): string
+    public function store(): string
     {
-        return Metadata::for(static::class)['storeRole'] ?? 'default';
+        return Metadata::for(static::class)['store'] ?? 'sql';
     }
 
     /**

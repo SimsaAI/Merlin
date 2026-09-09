@@ -31,7 +31,7 @@ $c = Condition::create()
 
 ## 🚀 Public methods
 
-### new() · [source](../../src/Db/Condition.php#L82)
+### new() · [source](../../src/Db/Condition.php#L89)
 
 `public static function new(Azera\Db\Database|null $db = null): static`
 
@@ -50,7 +50,7 @@ Create a new Condition builder instance
 
 ---
 
-### __construct() · [source](../../src/Db/Condition.php#L91)
+### __construct() · [source](../../src/Db/Condition.php#L98)
 
 `public function __construct(Azera\Db\Database|null $db = null): mixed`
 
@@ -71,7 +71,7 @@ Create a new Condition builder instance
 
 ---
 
-### injectModelResolver() · [source](../../src/Db/Condition.php#L136)
+### injectModelResolver() · [source](../../src/Db/Condition.php#L143)
 
 `public function injectModelResolver(callable $resolver): void`
 
@@ -90,7 +90,7 @@ Inject model resolver from Query builder
 
 ---
 
-### where() · [source](../../src/Db/Condition.php#L187)
+### where() · [source](../../src/Db/Condition.php#L194)
 
 `public function where(Azera\Db\Condition|string $conditionOrField, mixed $valueOrOp = null, mixed $escapeOrValue = true): static`
 
@@ -121,7 +121,7 @@ to the semantically correct 1=0 / 1=1.
 
 ---
 
-### orWhere() · [source](../../src/Db/Condition.php#L199)
+### orWhere() · [source](../../src/Db/Condition.php#L206)
 
 `public function orWhere(Azera\Db\Condition|string $conditionOrField, mixed $valueOrOp = null, mixed $escapeOrValue = true): static`
 
@@ -142,7 +142,7 @@ Appends a condition to the current conditions using a OR operator
 
 ---
 
-### notWhere() · [source](../../src/Db/Condition.php#L211)
+### notWhere() · [source](../../src/Db/Condition.php#L218)
 
 `public function notWhere(Azera\Db\Condition|string $conditionOrField, mixed $valueOrOp = null, mixed $escapeOrValue = true): static`
 
@@ -163,7 +163,7 @@ Appends a negated condition to the current conditions using an AND operator
 
 ---
 
-### orNotWhere() · [source](../../src/Db/Condition.php#L223)
+### orNotWhere() · [source](../../src/Db/Condition.php#L230)
 
 `public function orNotWhere(Azera\Db\Condition|string $conditionOrField, mixed $valueOrOp = null, mixed $escapeOrValue = true): static`
 
@@ -184,7 +184,7 @@ Appends a negated condition to the current conditions using an OR operator
 
 ---
 
-### betweenWhere() · [source](../../src/Db/Condition.php#L397)
+### betweenWhere() · [source](../../src/Db/Condition.php#L404)
 
 `public function betweenWhere(string $condition, mixed $minimum, mixed $maximum): static`
 
@@ -205,7 +205,7 @@ Appends a BETWEEN condition to the current conditions using AND operator
 
 ---
 
-### notBetweenWhere() · [source](../../src/Db/Condition.php#L409)
+### notBetweenWhere() · [source](../../src/Db/Condition.php#L416)
 
 `public function notBetweenWhere(string $condition, mixed $minimum, mixed $maximum): static`
 
@@ -226,7 +226,7 @@ Appends a NOT BETWEEN condition to the current conditions using AND operator
 
 ---
 
-### orBetweenWhere() · [source](../../src/Db/Condition.php#L421)
+### orBetweenWhere() · [source](../../src/Db/Condition.php#L428)
 
 `public function orBetweenWhere(string $condition, mixed $minimum, mixed $maximum): static`
 
@@ -247,7 +247,7 @@ Appends a BETWEEN condition to the current conditions using OR operator
 
 ---
 
-### orNotBetweenWhere() · [source](../../src/Db/Condition.php#L433)
+### orNotBetweenWhere() · [source](../../src/Db/Condition.php#L440)
 
 `public function orNotBetweenWhere(string $condition, mixed $minimum, mixed $maximum): static`
 
@@ -268,7 +268,7 @@ Appends a NOT BETWEEN condition to the current conditions using OR operator
 
 ---
 
-### inWhere() · [source](../../src/Db/Condition.php#L468)
+### inWhere() · [source](../../src/Db/Condition.php#L475)
 
 `public function inWhere(string $condition, mixed $values): static`
 
@@ -288,7 +288,7 @@ Appends an IN condition to the current conditions using AND operator
 
 ---
 
-### notInWhere() · [source](../../src/Db/Condition.php#L479)
+### notInWhere() · [source](../../src/Db/Condition.php#L486)
 
 `public function notInWhere(string $condition, mixed $values): static`
 
@@ -308,7 +308,7 @@ Appends an NOT IN condition to the current conditions using AND operator
 
 ---
 
-### orInWhere() · [source](../../src/Db/Condition.php#L490)
+### orInWhere() · [source](../../src/Db/Condition.php#L497)
 
 `public function orInWhere(string $condition, mixed $values): static`
 
@@ -328,7 +328,7 @@ Appends an IN condition to the current conditions using OR operator
 
 ---
 
-### orNotInWhere() · [source](../../src/Db/Condition.php#L501)
+### orNotInWhere() · [source](../../src/Db/Condition.php#L508)
 
 `public function orNotInWhere(string $condition, mixed $values): static`
 
@@ -348,7 +348,7 @@ Appends an NOT IN condition to the current conditions using OR operator
 
 ---
 
-### having() · [source](../../src/Db/Condition.php#L541)
+### having() · [source](../../src/Db/Condition.php#L548)
 
 `public function having(Azera\Db\Sql|string $condition, mixed $values = null): static`
 
@@ -368,7 +368,7 @@ Appends an HAVING condition to the current conditions using AND operator
 
 ---
 
-### notHaving() · [source](../../src/Db/Condition.php#L552)
+### notHaving() · [source](../../src/Db/Condition.php#L559)
 
 `public function notHaving(Azera\Db\Sql|string $condition, mixed $values = null): static`
 
@@ -388,7 +388,7 @@ Appends an NOT HAVING condition to the current conditions using AND operator
 
 ---
 
-### orHaving() · [source](../../src/Db/Condition.php#L563)
+### orHaving() · [source](../../src/Db/Condition.php#L570)
 
 `public function orHaving(Azera\Db\Sql|string $condition, mixed $values = null): static`
 
@@ -408,7 +408,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 ---
 
-### orNotHaving() · [source](../../src/Db/Condition.php#L573)
+### orNotHaving() · [source](../../src/Db/Condition.php#L580)
 
 `public function orNotHaving(Azera\Db\Sql|string $condition, mixed $values = null): static`
 
@@ -426,7 +426,7 @@ Appends an HAVING condition to the current conditions using OR operator
 
 ---
 
-### likeWhere() · [source](../../src/Db/Condition.php#L611)
+### likeWhere() · [source](../../src/Db/Condition.php#L618)
 
 `public function likeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -447,7 +447,7 @@ Appends a LIKE condition to the current condition
 
 ---
 
-### andLikeWhere() · [source](../../src/Db/Condition.php#L624)
+### andLikeWhere() · [source](../../src/Db/Condition.php#L631)
 
 `public function andLikeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -468,7 +468,7 @@ Appends a LIKE condition to the current condition using an AND operator
 
 ---
 
-### orLikeWhere() · [source](../../src/Db/Condition.php#L637)
+### orLikeWhere() · [source](../../src/Db/Condition.php#L644)
 
 `public function orLikeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -489,7 +489,7 @@ Appends a LIKE condition to the current condition using an OR operator
 
 ---
 
-### notLikeWhere() · [source](../../src/Db/Condition.php#L650)
+### notLikeWhere() · [source](../../src/Db/Condition.php#L657)
 
 `public function notLikeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -510,7 +510,7 @@ Appends a NOT LIKE condition to the current condition
 
 ---
 
-### andNotLikeWhere() · [source](../../src/Db/Condition.php#L663)
+### andNotLikeWhere() · [source](../../src/Db/Condition.php#L670)
 
 `public function andNotLikeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -531,7 +531,7 @@ Appends a NOT LIKE condition to the current condition using an AND operator
 
 ---
 
-### orNotLikeWhere() · [source](../../src/Db/Condition.php#L676)
+### orNotLikeWhere() · [source](../../src/Db/Condition.php#L683)
 
 `public function orNotLikeWhere(string $identifier, mixed $value, bool $escape = true): static`
 
@@ -552,7 +552,7 @@ Appends a NOT LIKE condition to the current condition using an OR operator
 
 ---
 
-### group() · [source](../../src/Db/Condition.php#L725)
+### group() · [source](../../src/Db/Condition.php#L732)
 
 `public function group(callable $callback): static`
 
@@ -581,7 +581,7 @@ Example:
 
 ---
 
-### orGroup() · [source](../../src/Db/Condition.php#L737)
+### orGroup() · [source](../../src/Db/Condition.php#L744)
 
 `public function orGroup(callable $callback): static`
 
@@ -600,7 +600,7 @@ Build a grouped condition using a callback, joined with OR.
 
 ---
 
-### notGroup() · [source](../../src/Db/Condition.php#L749)
+### notGroup() · [source](../../src/Db/Condition.php#L756)
 
 `public function notGroup(callable $callback): static`
 
@@ -619,7 +619,7 @@ Build a negated grouped condition using a callback, joined with AND.
 
 ---
 
-### orNotGroup() · [source](../../src/Db/Condition.php#L761)
+### orNotGroup() · [source](../../src/Db/Condition.php#L768)
 
 `public function orNotGroup(callable $callback): static`
 
@@ -638,7 +638,7 @@ Build a negated grouped condition using a callback, joined with OR.
 
 ---
 
-### noop() · [source](../../src/Db/Condition.php#L795)
+### noop() · [source](../../src/Db/Condition.php#L802)
 
 `public function noop(): static`
 
@@ -651,7 +651,7 @@ No operator function. Useful to build flexible chains
 
 ---
 
-### bind() · [source](../../src/Db/Condition.php#L1180)
+### bind() · [source](../../src/Db/Condition.php#L1214)
 
 `public function bind(array $bindParams): static`
 
@@ -670,7 +670,7 @@ Replace placeholders in the condition with actual values
 
 ---
 
-### toSql() · [source](../../src/Db/Condition.php#L1193)
+### toSql() · [source](../../src/Db/Condition.php#L1227)
 
 `public function toSql(): string`
 
@@ -683,7 +683,7 @@ Get the condition
 
 ---
 
-### getBindings() · [source](../../src/Db/Condition.php#L1202)
+### getBindings() · [source](../../src/Db/Condition.php#L1236)
 
 `public function getBindings(): array`
 

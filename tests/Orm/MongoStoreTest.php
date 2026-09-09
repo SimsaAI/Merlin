@@ -59,15 +59,15 @@ final class MongoStoreTest extends TestCase
     public function testCollectionNameFromAttribute(): void
     {
         $this->store->insertOne(ArticleDocument::class, ['title' => 'X']);
-        // #[Document(collection: 'articles')] — NOT the snake/plural fallback
+        // #[Entity(name: 'articles')] — NOT the snake/plural fallback
         $this->assertTrue($this->fakes->collections['articles'] !== null);
     }
 
     public function testCollectionNameFallsBackToConvention(): void
     {
-        // DocumentFixture (no explicit collection) would resolve 'document_fixtures'
+        // Collection key = the generic `source` metadata (#[Entity(name)]).
         $meta = Metadata::for(ArticleDocument::class);
-        $this->assertSame('articles', $meta['collection']);
+        $this->assertSame('articles', $meta['source']);
     }
 
     public function testFindByPkAndFindByRouteThroughFind(): void

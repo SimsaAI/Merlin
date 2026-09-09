@@ -9,7 +9,7 @@ require_once __DIR__ . '/Fixtures/Article.php';
 use Azera\AppContext;
 use Azera\Orm\Metadata;
 use Azera\Orm\Storage\PdoStore;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Db\TestDatabase;
 use Azera\Tests\Orm\Fixtures\Article;
 use Azera\Tests\Orm\Fixtures\InventoryItem;
@@ -62,7 +62,7 @@ class PdoStoreTest extends TestCase
 
     public function testSchemaQualifiedTableInAllSql(): void
     {
-        // #[Table(schema: 'warehouse', name: 'inventory_items')] — every
+        // #[Entity(schema: 'warehouse', name: 'inventory_items')] — every
         // statement targets "warehouse"."inventory_items".
         $this->db->setMockResults([[['cnt' => 3]]]);
 

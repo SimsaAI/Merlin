@@ -8,11 +8,28 @@ namespace Azera\Orm\Storage;
  * Operations the EntityManager's write pipeline performs — NOT a query builder. SQL stores
  * implement it over a {@see \Azera\Db\Database}; Mongo over the
  * mongodb library. The per-situation write strategies (RETURNING matrix)
- * live in each backend. A model belongs to exactly one store, declared in
- * metadata (store: 'sql' | 'mongo' + storeRole).
+ * live in each backend. A model belongs to exactly one store, routed by
+ * metadata `store` (#[Entity(store: 'name')]) — the registry key
+ * EntityManager::setStore() maps to an instance. Third-party backends:
+ * implement this interface, register under a name, annotate #[Entity].
  */
 interface Store
 {
+    /**
+     * Capability flag: TRUE when this store wants values passed through
+     * RAW (no DateTime formatting, no cast encoding) — the backend owns
+     * value mapping (mongo: the driver owns BSON encoding). FALSE for
+     * SQL-shaped stores (DateTime -> 'Y-m-d H:i:s', cast->encode()).
+     */
+    public function wantsNativeValues(): bool;
+
+    /**
+     * Connection identity for the class described by $meta: two classes
+     * sharing one txTarget share one transaction target in flush().
+     * Borrowing stores (SQL) derive it from the write role; owning stores
+     * return a constant token (their connection is fixed per instance).
+     */
+    public function txTarget(array $meta): string;
     /**
      * Persist one entity: INSERT or UPDATE (upsert when flagged).
      * Returns raw row(s) for backfill: ['row' => ?array, 'id' => int|string|null].
@@ -75,7 +92,14 @@ interface Store
 
     /* --------------------------------------------------- transactions */
 
-    public function begin(): void;
+    /**
+     * Open a transaction. $meta (the scheduled class's metadata) lets the
+     * store pin to the class's write target when it supports per-class
+     * routing — flush() pins the tx to the FIRST scheduled class's
+     * writeRole instead of the constructor default (which made per-class
+     * routing dead code on the EM path). Null = constructor default.
+     */
+    public function begin(?array $meta = null): void;
     public function commit(): void;
     public function rollback(): void;
 
@@ -83,4 +107,14 @@ interface Store
      * Whether a transaction (or savepoint level) is active.
      */
     public function inTransaction(): bool;
+
+    /**
+     * Return $meta enriched (or throw for dishonorable attribute combos).
+     * MUST stay JSON-serializable — the result feeds the L2 metadata cache.
+     *
+     * @param array<string, mixed> $meta the freshly compiled generic metadata
+     * @param \ReflectionClass<object> $class reflection of the compiled class
+     * @return array<string, mixed>
+     */
+    public function enrichMetadata(array $meta, \ReflectionClass $class): array;
 }

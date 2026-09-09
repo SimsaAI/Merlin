@@ -22,7 +22,7 @@ use MongoDB\Collection as MongoCollection;
  * role-based read/write split in the DatabaseManager, so the store wraps one
  * {@see Client} and resolves the per-class collection from metadata
  * (`collection` ?? snake/plural convention). A class belongs to exactly one
- * collection, declared by #[Document(collection)].
+ * collection, declared by #[Entity(name)].
  *
  * Constructor accepts EITHER a Client (production) OR a collection resolver
  * `fn(string $name): MongoCollection` — the test seam: an in-memory fake
@@ -68,7 +68,7 @@ final class MongoStore implements Store
      */
     public function __construct(
         Client|callable $clientOrResolver,
-        private string $database = 'azera',
+        private string $database = 'test',
     ) {
         if (!$clientOrResolver instanceof Client && !\is_callable($clientOrResolver)) {
             $hint = \class_exists(\MongoDB\Client::class)
@@ -189,8 +189,9 @@ final class MongoStore implements Store
     /**
      * No-ops: multi-document ACID needs replica-set sessions (deferred).
      * Kept structural so the EM pipeline never branches on store type.
+     * $meta ignored — an owning store has exactly one write target.
      */
-    public function begin(): void {}
+    public function begin(?array $meta = null): void {}
 
     public function commit(): void {}
 
@@ -201,12 +202,46 @@ final class MongoStore implements Store
         return false;
     }
 
+    /* --------------------------------------------- metadata enrichment */
+
+    /**
+     * Contribute document-specific metadata during compile:
+     *
+     * - pkMode = 'convention': documents resolve their PK via the id/*_id
+     *   NAME convention (not the SQL Model chain) — this is what keeps
+     *   `_id` resolving as the PK. Model-ness alone cannot decide (mongo
+     *   documents may extend Model too); only the store knows.
+     * - #[Connection] rejected: this store OWNS its client (the inverse
+     *   of PdoStore's borrow model) — multiple mongo connections are
+     *   modeled as multiple registered store types ('mongo-eu', …),
+     *   selected by #[Entity(store: ...)].
+     *
+     * Collection resolution stays generic: metadata `source` (#[Entity(name)])
+     * with the snake/plural convention as fallback — no per-backend key.
+     */
+    public function enrichMetadata(array $meta, \ReflectionClass $class): array
+    {
+        $conn = $class->getAttributes(\Azera\Orm\Attribute\Connection::class, \ReflectionAttribute::IS_INSTANCEOF);
+        if ($conn !== []) {
+            throw new \LogicException(
+                "#[Connection] on {$class->name} is not valid with a MongoStore: it owns its " .
+                    'connections — register a per-client store type (e.g. setStore(\'mongo-eu\', …)) ' .
+                    'and select it via #[Entity(store: \'mongo-eu\')]'
+            );
+        }
+
+        $meta['pkMode'] = 'convention';
+
+        return $meta;
+    }
+
     /* -------------------------------------------------------- helpers */
 
     /**
      * Per-class collection, resolved once per class per store instance.
-     * Name: metadata `collection` (#[Document(collection)]) — falling back
-     * to the SQL-style snake/plural convention when the attribute omits it.
+     * Name: metadata `source` (#[Entity(name)]) — the SAME generic
+     * data-location key SQL uses — falling back to the SQL-style
+     * snake/plural convention when the attribute omits it.
      *
      * Deliberately NO return type: MongoDB\Collection is final (no
      * interface), so the resolver-seam fake (tests) duck-types on the same
@@ -220,7 +255,7 @@ final class MongoStore implements Store
             return $this->collections[$class];
         }
 
-        $name = $meta['collection'] ?? null;
+        $name = $meta['source'] ?? null;
         if ($name === null || $name === '') {
             $short = (new \ReflectionClass($class))->getShortName();
             $name  = ModelMapping::convertModelToSource($short);
@@ -231,6 +266,25 @@ final class MongoStore implements Store
             : $this->client->selectCollection($this->database, $name);
 
         return $this->collections[$class] = $collection;
+    }
+
+    /**
+     * Wants RAW values: the mongodb driver maps PHP arrays and
+     * DateTimeInterface to BSON natively — no DateTime formatting, no
+     * cast encoding (a 'json' cast is inert here by design).
+     */
+    public function wantsNativeValues(): bool
+    {
+        return true;
+    }
+
+    /**
+     * No transactions: one connection per store instance, so the identity
+     * token is constant. begin()/commit()/rollback() are no-ops anyway.
+     */
+    public function txTarget(array $meta): string
+    {
+        return 'mongo:' . $meta['store'];
     }
 
     /**

@@ -9,7 +9,10 @@ require_once __DIR__ . '/Fixtures/ArticleDocument.php';
 require_once __DIR__ . '/Fixtures/InventoryItem.php';
 
 use Azera\Cache\ArrayCache;
+use Azera\AppContext;
 use Azera\Orm\Metadata;
+use Azera\Orm\Storage\MongoStore;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Orm\Fixtures\Article;
 use Azera\Tests\Orm\Fixtures\ArticleDocument;
 use Azera\Tests\Orm\Fixtures\ArticleWithRelations;
@@ -22,6 +25,16 @@ class MetadataTest extends TestCase
     protected function setUp(): void
     {
         Metadata::clear();
+
+        // Enrichment source: a mongo store (resolver never reached —
+        // enrichment only reads/writes the metadata array). Needed so
+        // mongo-annotated fixtures compile their document pkMode.
+        AppContext::setInstance(new AppContext());
+        $stores = new Stores();
+        $stores->set('mongo', new MongoStore(
+            fn(string $name) => throw new \LogicException('no mongo I/O in MetadataTest')
+        ));
+        AppContext::instance()->set(Stores::class, $stores);
     }
 
     protected function tearDown(): void
@@ -30,6 +43,7 @@ class MetadataTest extends TestCase
         Metadata::useCache(null);
         Metadata::cacheSalt(null);
         Metadata::clear();
+        AppContext::reset();
     }
 
     public function testCompileInferredAndExplicitColumns(): void
@@ -89,12 +103,13 @@ class MetadataTest extends TestCase
         $this->assertSame('join', $rel['author']['strategy']);
     }
 
-    public function testDocumentStoreSwitchesStoreAndCollection(): void
+    public function testEntityAttributeSwitchesStoreAndNamesSource(): void
     {
         $meta = Metadata::for(ArticleDocument::class);
 
         $this->assertSame('mongo', $meta['store']);
-        $this->assertSame('articles', $meta['collection']);
+        // Collection key = the generic `source` (#[Entity(name: 'articles')]).
+        $this->assertSame('articles', $meta['source']);
         $this->assertNull($meta['schema']);
         $this->assertNull($meta['readRole']);
         $this->assertNull($meta['writeRole']);
@@ -149,15 +164,17 @@ class MetadataTest extends TestCase
         $meta = Metadata::for(ArticleDocument::class);
 
         $this->assertSame('mongo', $meta['store']);
-        // Plain/mongo classes keep the id/*_id name convention: $_id is
+        // Document pkMode ('convention', contributed by MongoStore
+        // enrichment) keeps the id/*_id name convention: $_id is
         // pk-marked by the *_id suffix (documents commonly rely on it).
+        $this->assertSame('convention', $meta['pkMode']);
         $this->assertSame(['_id'], $meta['pkFields']);
     }
 
-    public function testTableAndConnectionOnDocumentThrow(): void
+    public function testConnectionOnMongoDocumentThrowsViaStoreEnrichment(): void
     {
         $this->expectException(\LogicException::class);
-        Metadata::for(DocumentWithTableAttr::class);
+        Metadata::for(MongoDocumentWithConnection::class);
     }
 
     public function testDeclaredSourceOverrideWinsOverConvention(): void
@@ -191,10 +208,10 @@ class MetadataTest extends TestCase
 
     /* -------------------------------------------- L2 (opt-in PSR-16 backend) */
 
-    /** Mirrors Metadata::cacheKey(): 'azera_orm_meta_' . md5(v4\0salt\0class). */
+    /** Mirrors Metadata::cacheKey(): 'azera_orm_meta_' . md5(v5\0salt\0class). */
     private static function metaKey(string $class, string $salt = ''): string
     {
-        return 'azera_orm_meta_' . md5("v4\0{$salt}\0{$class}");
+        return 'azera_orm_meta_' . md5("v5\0{$salt}\0{$class}");
     }
 
     /** All azera_orm_meta_* keys currently present in an ArrayCache backend. */
@@ -234,7 +251,7 @@ class MetadataTest extends TestCase
         Metadata::useCache($backend);
         Metadata::for(Article::class); // compile + write to L2
 
-        $key = self::metaKey(Article::class);
+        $key    = self::metaKey(Article::class);
         $poison = $backend->get($key);
         $poison['source'] = 'poisoned_from_l2';
         $backend->set($key, $poison);
@@ -274,7 +291,7 @@ class MetadataTest extends TestCase
         Metadata::for(InventoryItem::class);
 
         $keySalted = self::metaKey(InventoryItem::class, 'deploy-42:build/abc?x=y');
-        $keys = $this->metaKeys($backend);
+        $keys      = $this->metaKeys($backend);
         $this->assertContains($keyNoSalt, $keys, 'salting does not delete earlier entries');
         $this->assertContains($keySalted, $keys);
         $this->assertSame(InventoryItem::class, $backend->get($keySalted)['class']);
@@ -302,10 +319,11 @@ class MetadataTest extends TestCase
     }
 }
 
-/** Fixture: SQL-only attributes on a mongo document → compile throws. */
-#[\Azera\Orm\Attribute\Document(collection: 'conflict')]
-#[\Azera\Orm\Attribute\Table(name: 'no_sql_here')]
-class DocumentWithTableAttr extends \Azera\Orm\Model
+/** Fixture: #[Connection] on a mongo document → the STORE rejects it
+ * (enrichment validation — MongoStore owns its connections). */
+#[\Azera\Orm\Attribute\Entity(store: 'mongo', name: 'conflict')]
+#[\Azera\Orm\Attribute\Connection(role: 'nope')]
+class MongoDocumentWithConnection extends \Azera\Orm\Model
 {
     public $id;
 }

@@ -5,11 +5,12 @@ namespace Azera\Orm;
 use Azera\Orm\Attribute\BelongsTo;
 use Azera\Orm\Attribute\Column;
 use Azera\Orm\Attribute\Connection;
-use Azera\Orm\Attribute\Document;
+use Azera\Orm\Attribute\Entity;
 use Azera\Orm\Attribute\HasMany;
 use Azera\Orm\Attribute\HasOne;
-use Azera\Orm\Attribute\Table;
 use Azera\Db\ModelMapping;
+use Azera\Orm\Storage\MetadataContributor;
+use Azera\Orm\Storage\Stores;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -21,28 +22,35 @@ use ReflectionProperty;
  * ```
  * [
  *   'class'      => class-string,
- *   'source'     => string,              // #[Table(name)] > source() override > convention
- *   'schema'     => ?string,             // #[Table(schema)] > schema() override > null
- *   'store'      => 'sql'|'mongo',
- *   'storeRole'  => string,              // StoreManager role ('default' for SQL, #[Document] for mongo)
+ *   'source'     => string,              // #[Entity(name)] > source() override > convention
+ *   'schema'     => ?string,             // #[Entity(schema)] > schema() override > null
+ *   'store'      => string,              // #[Entity(store)] — default 'sql' (the zero-config path)
+ *   'pkMode'     => string,              // 'model-chain' | 'convention' — resolved by the store (enrichment)
  *   'readRole'   => ?string,             // #[Connection(read|role)] — null = unset
  *   'writeRole'  => ?string,             // #[Connection(write|role)] — null = unset
- *   'collection' => ?string,             // mongo only
  *   'pkFields'   => list<string>,        // resolved PK fields, declaration order (['id'] fallback)
  *   'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool]],
  *   'relations'  => [name => ['type'=>.., 'target'=>.., 'foreignKey'=>.., 'ownerKey'=>.., 'strategy' => 'join'|'second_query']],
  * ]
  * ```
  *
- * PK resolution (SQL Models): a declared idFields() override is the
- * authority; without one, explicit #[Column(pk:)] marks define the key
- * (all-or-nothing — one explicit mark disables the implicit default),
- * falling back to ['id']. Plain classes and mongo documents keep the
- * id/*_id name convention, with #[Column(pk:)] marks layered on top.
+ * Store routing is GENERIC: metadata `store` is an opaque registry key —
+ * EntityManager::setStore('name', $store) maps it to an instance. Core
+ * never learns backend names; backend-specific metadata (e.g. pkMode) is
+ * contributed by the store itself during compile ({@see MetadataContributor}).
  *
- * Store applicability: #[Table] and #[Connection] are SQL-only — on a
- * #[Document] class they throw (mongo routes via storeRole instead).
- * #[Column] is store-agnostic.
+ * PK resolution (pkMode): 'model-chain' (SQL default) = a declared
+ * idFields() override is the authority; without one, explicit #[Column(pk:)]
+ * marks define the key (all-or-nothing — one explicit mark disables the
+ * implicit default), falling back to ['id']. 'convention' (documents) keeps
+ * the id/*_id name convention, with #[Column(pk:)] marks layered on top.
+ * Which mode applies is decided by the class's STORE (a mongo document may
+ * be a Model subclass — only the store knows its PK semantics).
+ *
+ * Attribute validation: #[Connection] is store-agnostic in CORE (any store
+ * may honor per-class connection roles); each STORE validates during
+ * enrichment which attributes it can honor (e.g. MongoStore rejects
+ * #[Connection] — it owns its clients).
  *
  * Caching (two tiers):
  * - L1: per-process static array (survives across RoadRunner requests).
@@ -66,7 +74,7 @@ use ReflectionProperty;
 final class Metadata
 {
     /** Bump when compiler output changes shape — invalidates L2 entries. */
-    private const VERSION = 'v4';
+    private const VERSION = 'v5';
 
     /** @var array<class-string, array> */
     private static array $l1 = [];
@@ -186,8 +194,8 @@ final class Metadata
     private static function cacheKey(string $class): string
     {
         return self::KEY_PREFIX . '_' . md5(
-            self::VERSION . "\0" . (self::$salt ?? '') . "\0" . $class
-        );
+                self::VERSION . "\0" . (self::$salt ?? '') . "\0" . $class
+            );
     }
 
     /** @return array|null null = miss (no backend, fetch failure, wrong class) */
@@ -249,7 +257,7 @@ final class Metadata
         if (isset(self::$compiling[$class])) {
             throw new \LogicException(
                 "Recursive metadata compile for {$class} — an override must not " .
-                'consult Metadata::for() on its own class; call parent:: instead'
+                    'consult Metadata::for() on its own class; call parent:: instead'
             );
         }
 
@@ -269,60 +277,57 @@ final class Metadata
 
         $meta = [
             'class' => $class,
-            // Declared source() override or the convention — #[Table(name)]
+            // Declared source() override or the convention — #[Entity(name)]
             // layers on top ONLY when the method is not overridden
             // (dynamic > static > convention).
             'source' => self::resolveSource($reflect),
-            // Same precedence for schema (declared override > #[Table] > null).
-            'schema'     => self::resolveSchema($reflect),
-            'store'      => 'sql',
-            'storeRole'  => 'default',
-            'readRole'   => null,
-            'writeRole'  => null,
-            'collection' => null,
-            'columns'    => [],
-            'relations'  => [],
+            // Same precedence for schema (declared override > #[Entity] > null).
+            'schema' => self::resolveSchema($reflect),
+            // Generic registry key — 'sql' is the zero-config default; the
+            // registered store for this type enriches pkMode below.
+            'store'     => 'sql',
+            'pkMode'    => null,
+            'readRole'  => null,
+            'writeRole' => null,
+            'columns'   => [],
+            'relations' => [],
         ];
 
-        $tableAttrs = $reflect->getAttributes(Table::class, \ReflectionAttribute::IS_INSTANCEOF);
-        $table      = $tableAttrs === [] ? null : $tableAttrs[0]->newInstance();
+        $entityAttrs = $reflect->getAttributes(Entity::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $entity      = $entityAttrs === [] ? null : $entityAttrs[0]->newInstance();
 
         $connAttrs = $reflect->getAttributes(Connection::class, \ReflectionAttribute::IS_INSTANCEOF);
         $conn      = $connAttrs === [] ? null : $connAttrs[0]->newInstance();
 
-        $docAttrs = $reflect->getAttributes(Document::class, \ReflectionAttribute::IS_INSTANCEOF);
-        if ($docAttrs !== []) {
-            // Mongo documents route storage via #[Document(storeRole)]. The
-            // SQL-only attributes on a document are a configuration error —
-            // fail loudly instead of silently ignoring them.
-            if ($table !== null || $conn !== null) {
-                throw new \LogicException(
-                    "#[Table] and #[Connection] can not be used with #[Document], found here: {$class}"
-                );
+        if ($entity !== null) {
+            // The store key is opaque routing config — the registry lookup
+            // (EM fallback / registered store) gives it meaning.
+            if ($entity->store !== null) {
+                $meta['store'] = $entity->store;
             }
-
-            $doc = $docAttrs[0]->newInstance();
-            $meta['store']      = 'mongo';
-            $meta['storeRole']  = $doc->storeRole;
-            $meta['collection'] = $doc->collection;
-        } else {
-            if ($table !== null) {
-                // The attribute fills only what the model does not already
-                // declare: a source()/schema() override wins (dynamic >
-                // static); the attribute beats the convention.
-                if ($table->name !== null && !self::overridesMethod($reflect, 'source', \Azera\Orm\Model::class)) {
-                    $meta['source'] = $table->name;
-                }
-                if ($table->schema !== null && !self::overridesMethod($reflect, 'schema', \Azera\Orm\Model::class)) {
-                    $meta['schema'] = $table->schema;
-                }
+            // The attribute fills only what the model does not already
+            // declare: a source()/schema() override wins (dynamic >
+            // static); the attribute beats the convention.
+            if ($entity->name !== null && !self::overridesMethod($reflect, 'source', \Azera\Orm\Model::class)) {
+                $meta['source'] = $entity->name;
             }
-            if ($conn !== null) {
-                // `role` sets both directions; explicit read/write win per side.
-                $meta['readRole']  = $conn->read ?? $conn->role;
-                $meta['writeRole'] = $conn->write ?? $conn->role;
+            if ($entity->schema !== null && !self::overridesMethod($reflect, 'schema', \Azera\Orm\Model::class)) {
+                $meta['schema'] = $entity->schema;
             }
         }
+        if ($conn !== null) {
+            // `role` sets both directions; explicit read/write win per side.
+            // Store-agnostic in core — each store validates during
+            // enrichment whether it can honor per-class connection roles.
+            $meta['readRole']  = $conn->read ?? $conn->role;
+            $meta['writeRole'] = $conn->write ?? $conn->role;
+        }
+
+        // Store-driven enrichment BEFORE PK resolution: the store's pkMode
+        // decides which PK chain runs. Unregistered store type = no
+        // enrichment (the documented ordering rule: register stores before
+        // first metadata use of the classes they serve).
+        $meta = self::enrichFromStore($meta, $reflect);
 
         // Explicit #[Column(pk)] marks (true OR false) — kept separately
         // from the resolved flag, which also carries the id/*_id name
@@ -365,7 +370,7 @@ final class Metadata
 
         $isModel = $reflect->isSubclassOf(\Azera\Orm\Model::class);
 
-        if ($meta['store'] === 'sql' && $isModel) {
+        if (($meta['pkMode'] ?? 'model-chain') === 'model-chain' && $isModel) {
             // 1) A DECLARED idFields() override is the PK authority: the
             //    name convention alone misses custom keys ('uid') and would
             //    wrongly mark FK-like columns (*_id that are not part of
@@ -424,8 +429,34 @@ final class Metadata
     }
 
     /**
+     * Store-driven enrichment at compile time: resolve the registered store
+     * for the class's `store` type via the context holder and let it
+     * contribute backend-specific metadata ({@see MetadataContributor}) —
+     * before PK resolution, because the store's pkMode decides which PK
+     * chain runs.
+     *
+     * Unregistered type = no enrichment (plain skip, no error): the
+     * documented ordering rule is that stores are registered before the
+     * first metadata use of the classes they serve. This is also what keeps
+     * metadata compilation store-optional (zero-config SQL path).
+     *
+     * @param array<string, mixed> $meta
+     * @return array<string, mixed>
+     */
+    private static function enrichFromStore(array $meta, ReflectionClass $reflect): array
+    {
+        $ctx = \Azera\AppContext::instance();
+
+        $store = $ctx->get(Stores::class)->tryGet($meta['store']);
+        if ($store === null) {
+            return $meta;
+        }
+        return $store->enrichMetadata($meta, $reflect);
+    }
+
+    /**
      * Resolve the effective source (table) name for a class — WITHOUT
-     * attribute application (doCompile layers #[Table(name)] on top).
+     * attribute application (doCompile layers #[Entity(name)] on top).
      *
      * A DECLARED source() override (method declared closer than Model)
      * is consulted at compile time — the Store seam must target the same
@@ -455,7 +486,7 @@ final class Metadata
 
     /**
      * Resolve the declared schema() override — WITHOUT attribute
-     * application (doCompile layers #[Table(schema)] on top). Null for
+     * application (doCompile layers #[Entity(schema)] on top). Null for
      * plain classes and non-overriding models.
      */
     private static function resolveSchema(\ReflectionClass $reflect): ?string

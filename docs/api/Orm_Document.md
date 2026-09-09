@@ -2,14 +2,13 @@
 
 **Full name:** [Azera\Orm\Document](../../src/Orm/Document.php)
 
-Base class for MongoDB-backed objects (pairs with #[Document]).
+Base class for MongoDB-backed objects (pairs with #[Entity(store: 'mongo')]).
 
 FACADE over the [`EntityManager`](Orm_EntityManager.md): save()/delete() delegate to the
 EM's write pipeline (persist + flush), so documents and SQL models go
 through the SAME diff -> order -> transaction path and land in the SAME
-request-scoped heap. The #[Document] attribute's storeRole selects the
-StoreManager role (MongoStore once it lands; tenancy via per-tenant
-roles).
+request-scoped heap. The #[Entity] attribute's `store` selects the
+registered store type (EntityManager::setStore()).
 
 The EM's heap-node diff is authoritative — hydrated documents are
 heap-tracked, so persist() schedules an UPDATE only when fields actually
@@ -17,14 +16,14 @@ changed.
 
 ## 🚀 Public methods
 
-### storeRole() · [source](../../src/Orm/Document.php#L28)
+### store() · [source](../../src/Orm/Document.php#L28)
 
-`public function storeRole(): string`
+`public function store(): string`
 
-Which StoreManager role resolves the backend for this document.
-
-Mirrors the #[Document(storeRole: ...)] attribute; the attribute is
-the authority when both are present (it compiles into metadata).
+Which store type handles this document (the registry key
+EntityManager::setStore() maps to an instance). Mirrors the
+#[Entity(store: ...)] attribute; the attribute is the authority
+(it compiles into metadata).
 
 **➡️ Return value**
 
@@ -99,6 +98,22 @@ snapshot (the loadState() replacement). No-op for untracked entities.
 **➡️ Return value**
 
 - Type: static
+
+
+---
+
+### refresh() · [source](../../src/Orm/Document.php#L117)
+
+`public function refresh(): static|null`
+
+Re-read this document's row from storage and refresh the instance
+IN PLACE (current values + synced snapshot). Returns $this, or NULL
+when the row is gone in storage (detached). Throws for untracked
+documents and documents with scheduled unflushed writes.
+
+**➡️ Return value**
+
+- Type: static|null
 
 
 

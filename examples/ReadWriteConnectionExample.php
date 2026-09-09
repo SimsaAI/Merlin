@@ -156,10 +156,11 @@ $primary->exec('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, userna
 $dbManager->set('write', new Database('sqlite:' . $primaryFile, '', ''));
 $dbManager->set('read', $dbManager->get('write'));
 
-// The EM's PdoStore borrows the read/write roles through the StoreManager:
-$stores = AppContext::instance()->tryGet(\Azera\Orm\Storage\StoreManager::class);
-$stores?->set('sql', 'default', fn() => new \Azera\Orm\Storage\PdoStore($dbManager, 'read', 'write'));
-$stores?->setDefault('sql', 'default');
+// The EM's PdoStore borrows the read/write roles; the 'sql' store type is
+// registered in the context-attached Stores holder (or use the PdoStore
+// fallback with no registration at all):
+$stores = AppContext::instance()->tryGet(\Azera\Orm\Storage\Stores::class);
+$stores?->set('sql', new \Azera\Orm\Storage\PdoStore($dbManager, 'read', 'write'));
 
 $u = new User();
 $u->username = 'bob';

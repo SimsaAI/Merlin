@@ -35,9 +35,9 @@ cached metadata:
 use Azera\Orm\Model;
 use Azera\Orm\Attribute\Column;
 use Azera\Orm\Attribute\Connection;
-use Azera\Orm\Attribute\Table;
+use Azera\Orm\Attribute\Entity;
 
-#[Table(name: 'admin_users', schema: 'sales')]
+#[Entity(name: 'admin_users', schema: 'sales')]
 #[Connection(read: 'replica', write: 'primary')]
 class AdminUser extends Model
 {
@@ -54,13 +54,16 @@ class AdminUser extends Model
 
 | Attribute                                                | Applies to           | Purpose                         |
 | -------------------------------------------------------- | -------------------- | ------------------------------- |
-| `#[Table(name:, schema:)]`                               | SQL models           | Table name and database schema  |
-| `#[Connection(role:)]` or `#[Connection(read:, write:)]` | SQL models           | Read/write connection roles     |
+| `#[Entity(name:, store:, schema:)]`                      | Any persistent class | Data location + store routing   |
+| `#[Connection(role:)]` or `#[Connection(read:, write:)]` | Borrowing stores (SQL) | Read/write connection roles   |
 | `#[Column(type:, name:, nullable:, transient:, pk:)]`    | Any persistent class | Column configuration            |
-| `#[Document(collection:, storeRole:)]`                   | Mongo documents      | Store + collection + store role |
 
-`#[Table]` / `#[Connection]` on a `#[Document]` class throw — mongo routes
-storage through `storeRole` instead.
+`#[Entity(store: …)]` routes the class to the registered store of that
+name (`$em->setStore('mongo', …)`) — `'sql'` is the zero-config default.
+Attribute validity is decided per STORE: e.g. `#[Connection]` on a mongo
+document throws during metadata compile (MongoStore owns its connections
+— multiple clients = multiple store types, selected via `store:`), while
+SQL stores honor it as per-class read/write routing.
 
 ### Column Casts (value transformation)
 
@@ -113,24 +116,21 @@ inert there). `datetime` decode (string → `DateTimeImmutable` on
 hydration) is deliberately **not** built-in: it would change the entity
 surface for every existing model; register a `Cast` yourself when wanted.
 
-`#[Table]` / `#[Connection]` on a `#[Document]` class throw — mongo routes
-storage through `storeRole` instead.
-
 ### Mongo Documents (MongoStore)
 
-`#[Document]` classes always route to MongoDB — never the SQL store. The
-stack is two layers, not two alternatives: **ext-mongodb** (PECL) is the
-driver (wire protocol, BSON) and **mongodb/mongodb** (composer) is the
-pure-PHP API on top of it; using documents means using both.
+`#[Entity(store: 'mongo')]` classes always route to MongoDB — never the
+SQL store. The stack is two layers, not two alternatives:
+**ext-mongodb** (PECL) is the driver (wire protocol, BSON) and
+**mongodb/mongodb** (composer) is the pure-PHP API on top of it; using
+documents means using both.
 
 ```php
 use Azera\Orm\Attribute\Column;
-use Azera\Orm\Attribute\Document;
+use Azera\Orm\Attribute\Entity;
 use Azera\Orm\Storage\MongoStore;
-use Azera\Orm\Storage\StoreManager;
 use MongoDB\Client;
 
-#[Document(collection: 'articles', storeRole: 'mongo')]
+#[Entity(store: 'mongo', name: 'articles')]
 class Article extends Document
 {
     public $_id;              // mongo's PK; ObjectId string after insert
@@ -139,11 +139,10 @@ class Article extends Document
     public $tags;             // arrays pass through raw — BSON owns encoding
 }
 
-// bootstrap: register the mongo store under its (type, role) tuple
+// bootstrap: register the mongo store under its type name
 $client = new Client('mongodb://localhost:27017');
-$stores = new StoreManager();
-$stores->set('mongo', 'mongo', new MongoStore($client, database: 'myapp'));
-$stores->setDefault('mongo', 'mongo');
+AppContext::instance()->entityManager()
+    ->setStore('mongo', new MongoStore($client, database: 'myapp'));
 
 $article = new Article();
 $article->title = 'Hello';
@@ -158,17 +157,19 @@ $found->delete();                 // deleteOne by _id
 
 | Piece           | Contract                                                                                |
 | --------------- | --------------------------------------------------------------------------------------- |
-| Collection name | `#[Document(collection:)]` — falls back to the snake/plural convention                  |
+| Collection name | `#[Entity(name:)]` (the generic `source`) — falls back to the snake/plural convention   |
 | Primary key     | `_id`; omitted at insert = driver-generated ObjectId, backfilled as string              |
 | `_id` filters   | the store casts 24-hex-char string `_id`s back to ObjectId automatically                |
 | Values          | arrays/dates pass through raw; the driver maps BSON                                     |
 | Transactions    | begin/commit/rollback are no-ops (multi-doc ACID needs replica-set sessions — deferred) |
 
-Store roles are split **per store type** (`set('mongo', $role, …)` /
-`get('mongo', $role)`), so a document can never resolve the SQL `PdoStore`
-and vice versa. Documents in a
-context without a registered mongo store throw loudly instead of silently
-writing a SQL table.
+Store routing is keyed **per type name** (one axis, no roles): a document
+resolves only the store registered under its `#[Entity(store:)]` name, so
+it can never fall into the SQL `PdoStore` and vice versa. Multiple mongo
+clients = multiple registered types (`setStore('mongo-eu', …)`,
+`setStore('mongo-us', …)`) selected per class. A class whose store type
+has no registration throws loudly instead of silently writing the wrong
+backend.
 
 **Primary keys:** a declared `idFields()` override is the authority. Without
 one, explicit `#[Column(pk: true)]` marks define the key (composite = several
@@ -183,8 +184,8 @@ the corresponding attribute:
 
 | Method              | Default                          | Purpose                      |
 | ------------------- | -------------------------------- | ---------------------------- |
-| `source(): string`  | `#[Table(name)]` / convention    | Table or view name           |
-| `schema(): ?string` | `#[Table(schema)]` / `null`      | Database schema (PostgreSQL) |
+| `source(): string`  | `#[Entity(name)]` / convention   | Table, view, or collection   |
+| `schema(): ?string` | `#[Entity(schema)]` / `null`     | Database schema (PostgreSQL) |
 | `idFields(): array` | `#[Column(pk)]` marks / `['id']` | Primary key field(s)         |
 
 ```php

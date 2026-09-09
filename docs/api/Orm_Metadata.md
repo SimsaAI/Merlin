@@ -8,28 +8,35 @@ Compiled shape (all values JSON-serializable — required for the L2 cache):
 ```
 [
   'class'      => class-string,
-  'source'     => string,              // #[Table(name)] > source() override > convention
-  'schema'     => ?string,             // #[Table(schema)] > schema() override > null
-  'store'      => 'sql'|'mongo',
-  'storeRole'  => string,              // StoreManager role ('default' for SQL, #[Document] for mongo)
+  'source'     => string,              // #[Entity(name)] > source() override > convention
+  'schema'     => ?string,             // #[Entity(schema)] > schema() override > null
+  'store'      => string,              // #[Entity(store)] — default 'sql' (the zero-config path)
+  'pkMode'     => string,              // 'model-chain' | 'convention' — resolved by the store (enrichment)
   'readRole'   => ?string,             // #[Connection(read|role)] — null = unset
   'writeRole'  => ?string,             // #[Connection(write|role)] — null = unset
-  'collection' => ?string,             // mongo only
   'pkFields'   => list<string>,        // resolved PK fields, declaration order (['id'] fallback)
   'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool]],
   'relations'  => [name => ['type'=>.., 'target'=>.., 'foreignKey'=>.., 'ownerKey'=>.., 'strategy' => 'join'|'second_query']],
 ]
 ```
 
-PK resolution (SQL Models): a declared idFields() override is the
-authority; without one, explicit #[Column(pk:)] marks define the key
-(all-or-nothing — one explicit mark disables the implicit default),
-falling back to ['id']. Plain classes and mongo documents keep the
-id/*_id name convention, with #[Column(pk:)] marks layered on top.
+Store routing is GENERIC: metadata `store` is an opaque registry key —
+EntityManager::setStore('name', $store) maps it to an instance. Core
+never learns backend names; backend-specific metadata (e.g. pkMode) is
+contributed by the store itself during compile (`MetadataContributor`).
 
-Store applicability: #[Table] and #[Connection] are SQL-only — on a
-#[Document] class they throw (mongo routes via storeRole instead).
-#[Column] is store-agnostic.
+PK resolution (pkMode): 'model-chain' (SQL default) = a declared
+idFields() override is the authority; without one, explicit #[Column(pk:)]
+marks define the key (all-or-nothing — one explicit mark disables the
+implicit default), falling back to ['id']. 'convention' (documents) keeps
+the id/*_id name convention, with #[Column(pk:)] marks layered on top.
+Which mode applies is decided by the class's STORE (a mongo document may
+be a Model subclass — only the store knows its PK semantics).
+
+Attribute validation: #[Connection] is store-agnostic in CORE (any store
+may honor per-class connection roles); each STORE validates during
+enrichment which attributes it can honor (e.g. MongoStore rejects
+#[Connection] — it owns its clients).
 
 Caching (two tiers):
 - L1: per-process static array (survives across RoadRunner requests).
@@ -52,7 +59,7 @@ dynamic — they sit ABOVE the #[Connection] attribute in precedence.
 
 ## 🚀 Public methods
 
-### useCache() · [source](../../src/Orm/Metadata.php#L105)
+### useCache() · [source](../../src/Orm/Metadata.php#L113)
 
 `public static function useCache(Psr\SimpleCache\CacheInterface|null $cache, int|null $ttl = null): void`
 
@@ -80,7 +87,7 @@ typically `cacheSalt()` with a deploy hash, or a TTL:
 
 ---
 
-### cacheSalt() · [source](../../src/Orm/Metadata.php#L117)
+### cacheSalt() · [source](../../src/Orm/Metadata.php#L125)
 
 `public static function cacheSalt(string|null $salt): void`
 
@@ -103,7 +110,7 @@ requested again (TTL or backend eviction reclaims their space).
 
 ---
 
-### for() · [source](../../src/Orm/Metadata.php#L127)
+### for() · [source](../../src/Orm/Metadata.php#L135)
 
 `public static function for(string $class): array`
 
@@ -122,7 +129,7 @@ Compile (or fetch from cache) metadata for a class.
 
 ---
 
-### clear() · [source](../../src/Orm/Metadata.php#L148)
+### clear() · [source](../../src/Orm/Metadata.php#L156)
 
 `public static function clear(): void`
 
@@ -140,7 +147,7 @@ application may be using for unrelated data.
 
 ---
 
-### isCompiling() · [source](../../src/Orm/Metadata.php#L170)
+### isCompiling() · [source](../../src/Orm/Metadata.php#L178)
 
 `public static function isCompiling(string $class): bool`
 

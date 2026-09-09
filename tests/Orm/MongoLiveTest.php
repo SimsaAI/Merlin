@@ -11,7 +11,7 @@ use Azera\AppContext;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
 use Azera\Orm\Storage\MongoStore;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Orm\Fixtures\ArticleDocument;
 use MongoDB\Client;
 use PHPUnit\Framework\TestCase;
@@ -39,9 +39,9 @@ final class MongoLiveTest extends TestCase
         $this->ctx = new AppContext();
         AppContext::setInstance($this->ctx);
 
-        $stores = new StoreManager();
-        $stores->set('mongo', 'default', new MongoStore($client, 'azera_live_test'));
-        $this->ctx->set(StoreManager::class, $stores);
+        $stores = new Stores();
+        $stores->set('mongo', new MongoStore($client, 'azera_live_test'));
+        $this->ctx->set(Stores::class, $stores);
         $this->ctx->entityManager(); // EM registered request-scoped
     }
 

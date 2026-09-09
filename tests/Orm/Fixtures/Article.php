@@ -5,7 +5,6 @@ namespace Azera\Tests\Orm\Fixtures;
 use Azera\Orm\Model;
 use Azera\Orm\Attribute\BelongsTo;
 use Azera\Orm\Attribute\Column;
-use Azera\Orm\Attribute\Document;
 use Azera\Orm\Attribute\HasMany;
 use Azera\Orm\Attribute\HasOne;
 

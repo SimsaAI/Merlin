@@ -46,9 +46,9 @@ Per-class singleton plan (mirrors Metadata::for semantics).
 
 ---
 
-### hydrate() · [source](../../src/Orm/FastHydrator.php#L95)
+### hydrate() · [source](../../src/Orm/FastHydrator.php#L100)
 
-`public function hydrate(Azera\Orm\Heap $heap, array $row): array`
+`public function hydrate(Azera\Orm\Heap $heap, array $row, bool $fresh = false): array`
 
 Compile a row -> [entity, id, snapshotData] triple.
 
@@ -57,6 +57,11 @@ same row read twice in one request MUST yield the same object (a
 per-query heap never faced this because it died with the query).
 A hit returns the existing instance untouched — the heap snapshot
 stays authoritative and in-request mutations are not clobbered.
+
+$fresh=true inverts the hit behavior for STALE-READ-SENSITIVE reads:
+the tracked instance is refreshed IN PLACE from the row (`apply()`)
+— same object, current values. Entities with scheduled (unflushed)
+writes keep their pending state; the DB never clobbers queued work.
 
 Cold path: build id + entity + snapshot in three tight list loops,
 attach once.
@@ -67,6 +72,7 @@ attach once.
 |---|---|---|---|
 | `$heap` | [Heap](Orm_Heap.md) | - |  |
 | `$row` | array | - | raw assoc row keyed by COLUMN name |
+| `$fresh` | bool | `false` |  |
 
 **➡️ Return value**
 
@@ -75,7 +81,40 @@ attach once.
 
 ---
 
-### attach() · [source](../../src/Orm/FastHydrator.php#L164)
+### apply() · [source](../../src/Orm/FastHydrator.php#L188)
+
+`public function apply(object $entity, Azera\Orm\Node $node, array $row): void`
+
+Refresh an EXISTING tracked entity in place from a fresh store row.
+
+Where the identity-map contract (one row = one object) meets the
+freshness requirement: instead of materializing a second instance,
+the row values are applied onto the live entity and the node
+snapshot is updated to match — the new diff baseline. Coded columns
+decode() onto the entity and encode(decode(raw)) into the snapshot,
+exactly like the cold hydration path.
+
+Only columns present in $row are touched; entity and snapshot keep
+their previous values for the rest (partial rows — explicit
+columns() — stay consistent). Node state is NOT touched: callers
+guarantee the entity is not scheduled.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$entity` | object | - |  |
+| `$node` | [Node](Orm_Node.md) | - |  |
+| `$row` | array | - |  |
+
+**➡️ Return value**
+
+- Type: void
+
+
+---
+
+### attach() · [source](../../src/Orm/FastHydrator.php#L219)
 
 `public function attach(Azera\Orm\Heap $heap, object $entity, array $id, array $data): Azera\Orm\Node`
 
@@ -97,7 +136,7 @@ Attach a hydrated entity to the heap as MANAGED.
 
 ---
 
-### clear() · [source](../../src/Orm/FastHydrator.php#L174)
+### clear() · [source](../../src/Orm/FastHydrator.php#L229)
 
 `public static function clear(): void`
 

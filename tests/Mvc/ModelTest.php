@@ -10,7 +10,7 @@ use Azera\Db\DatabaseManager;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
 use Azera\Orm\Storage\PdoStore;
-use Azera\Orm\Storage\StoreManager;
+use Azera\Orm\Storage\Stores;
 use Azera\Tests\Db\TestPgDatabase;
 use Azera\Tests\Db\TestMysqlDatabase;
 use Azera\Tests\Db\TestSqliteDatabase;
@@ -466,7 +466,7 @@ class ModelTest extends TestCase
     {
         Metadata::clear();
 
-        // #[Table(name: 'inventory_items', schema: 'warehouse')] +
+        // #[Entity(name: 'inventory_items', schema: 'warehouse')] +
         // #[Column(pk: true)] composite key — all three accessors resolve
         // from compiled metadata with no method overrides on the class.
         $m = new \Azera\Tests\Orm\Fixtures\InventoryItem();
@@ -483,8 +483,8 @@ class ModelTest extends TestCase
 
     /**
      * Wire the EM's Store seam to the given test DB (same pattern as the
-     * EntityManagerTest bootstrap): StoreManager 'default' role over a
-     * PdoStore borrowing the DatabaseManager's default/read/write roles.
+     * EntityManagerTest bootstrap): a PdoStore under the 'sql' type,
+     * borrowing the DatabaseManager's default/read/write roles.
      */
     private function wireStore(TestPgDatabase|TestMysqlDatabase|TestSqliteDatabase $db): void
     {
@@ -494,9 +494,8 @@ class ModelTest extends TestCase
         $dbm->set('write', $db);
         AppContext::instance()->set(DatabaseManager::class, $dbm);
 
-        $stores = new StoreManager();
-        $stores->set('sql', 'default', fn() => new PdoStore($dbm, 'read', 'write'));
-        $stores->setDefault('sql', 'default');
-        AppContext::instance()->set(StoreManager::class, $stores);
+        $stores = new Stores();
+        $stores->set('sql', new PdoStore($dbm, 'read', 'write'));
+        AppContext::instance()->set(Stores::class, $stores);
     }
 }

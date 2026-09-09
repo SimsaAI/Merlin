@@ -160,10 +160,9 @@
 - [BelongsTo](Orm_Attribute_BelongsTo.md) `Azera\Orm\Attribute\BelongsTo`
 - [Column](Orm_Attribute_Column.md) `Azera\Orm\Attribute\Column`
 - [Connection](Orm_Attribute_Connection.md) `Azera\Orm\Attribute\Connection`
-- [Document](Orm_Attribute_Document.md) `Azera\Orm\Attribute\Document`
+- [Entity](Orm_Attribute_Entity.md) `Azera\Orm\Attribute\Entity`
 - [HasMany](Orm_Attribute_HasMany.md) `Azera\Orm\Attribute\HasMany`
 - [HasOne](Orm_Attribute_HasOne.md) `Azera\Orm\Attribute\HasOne`
-- [Table](Orm_Attribute_Table.md) `Azera\Orm\Attribute\Table`
 
 ### `Azera\Orm\Cast`
 
@@ -193,7 +192,7 @@
 - [MongoStore](Orm_Storage_MongoStore.md) `Azera\Orm\Storage\MongoStore`
 - [PdoStore](Orm_Storage_PdoStore.md) `Azera\Orm\Storage\PdoStore`
 - [Store](Orm_Storage_Store.md) `Azera\Orm\Storage\Store`
-- [StoreManager](Orm_Storage_StoreManager.md) `Azera\Orm\Storage\StoreManager`
+- [Stores](Orm_Storage_Stores.md) `Azera\Orm\Storage\Stores`
 
 ### `Azera\Queue`
 

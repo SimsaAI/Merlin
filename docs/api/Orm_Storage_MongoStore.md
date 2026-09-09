@@ -14,7 +14,7 @@ OWNS its connection (the inverse of PdoStore's borrow model): mongo has no
 role-based read/write split in the DatabaseManager, so the store wraps one
 `Client` and resolves the per-class collection from metadata
 (`collection` ?? snake/plural convention). A class belongs to exactly one
-collection, declared by #[Document(collection)].
+collection, declared by #[Entity(name)].
 
 Constructor accepts EITHER a Client (production) OR a collection resolver
 `fn(string $name): MongoCollection` — the test seam: an in-memory fake
@@ -36,16 +36,16 @@ deployments.
 
 ## 🚀 Public methods
 
-### __construct() · [source](../../src/Orm/Storage/MongoStore.php#L59)
+### __construct() · [source](../../src/Orm/Storage/MongoStore.php#L69)
 
-`public function __construct(MongoDB\Client|callable $clientOrResolver, string $database = 'azera'): mixed`
+`public function __construct(MongoDB\Client|callable $clientOrResolver, string $database = 'test'): mixed`
 
 **🧭 Parameters**
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `$clientOrResolver` | MongoDB\Client\|callable | - |  |
-| `$database` | string | `'azera'` |  |
+| `$clientOrResolver` | MongoDB\Client\|callable | - | Optional-dependency boundary: mongodb/mongodb is a `suggest` (not<br>`require`). The `use MongoDB\...` imports here are lazy aliases —<br>loading this class never fatals — and the resolver seam (test<br>fakes) needs no package at all. The failure shape that can actually<br>occur without the package: a real Client instance CANNOT be passed<br>(its class doesn't exist, so it can't be constructed anywhere), so<br>a non-callable argument can only be a mistake — most likely a DSN<br>string in the Client-ctor shape. Convert the cryptic union<br>TypeError into the actionable install hint. |
+| `$database` | string | `'test'` |  |
 
 **➡️ Return value**
 
@@ -54,7 +54,7 @@ deployments.
 
 ---
 
-### insertOne() · [source](../../src/Orm/Storage/MongoStore.php#L72)
+### insertOne() · [source](../../src/Orm/Storage/MongoStore.php#L94)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -72,7 +72,7 @@ deployments.
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/MongoStore.php#L93)
+### updateOne() · [source](../../src/Orm/Storage/MongoStore.php#L115)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -91,7 +91,7 @@ deployments.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/MongoStore.php#L106)
+### upsertOne() · [source](../../src/Orm/Storage/MongoStore.php#L128)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -109,7 +109,7 @@ deployments.
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/MongoStore.php#L137)
+### deleteOne() · [source](../../src/Orm/Storage/MongoStore.php#L159)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -127,7 +127,7 @@ deployments.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/MongoStore.php#L143)
+### findBy() · [source](../../src/Orm/Storage/MongoStore.php#L165)
 
 `public function findBy(string $class, array $where): array`
 
@@ -145,7 +145,7 @@ deployments.
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/MongoStore.php#L151)
+### findByPk() · [source](../../src/Orm/Storage/MongoStore.php#L173)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -163,7 +163,7 @@ deployments.
 
 ---
 
-### count() · [source](../../src/Orm/Storage/MongoStore.php#L159)
+### count() · [source](../../src/Orm/Storage/MongoStore.php#L181)
 
 `public function count(string $class, array $where = []): int`
 
@@ -181,13 +181,20 @@ deployments.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/MongoStore.php#L171)
+### begin() · [source](../../src/Orm/Storage/MongoStore.php#L194)
 
-`public function begin(): void`
+`public function begin(array|null $meta = null): void`
 
 No-ops: multi-document ACID needs replica-set sessions (deferred).
 
 Kept structural so the EM pipeline never branches on store type.
+$meta ignored — an owning store has exactly one write target.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array\|null | `null` |  |
 
 **➡️ Return value**
 
@@ -196,7 +203,7 @@ Kept structural so the EM pipeline never branches on store type.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/MongoStore.php#L173)
+### commit() · [source](../../src/Orm/Storage/MongoStore.php#L196)
 
 `public function commit(): void`
 
@@ -207,7 +214,7 @@ Kept structural so the EM pipeline never branches on store type.
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/MongoStore.php#L175)
+### rollback() · [source](../../src/Orm/Storage/MongoStore.php#L198)
 
 `public function rollback(): void`
 
@@ -218,13 +225,80 @@ Kept structural so the EM pipeline never branches on store type.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/MongoStore.php#L177)
+### inTransaction() · [source](../../src/Orm/Storage/MongoStore.php#L200)
 
 `public function inTransaction(): bool`
 
 **➡️ Return value**
 
 - Type: bool
+
+
+---
+
+### enrichMetadata() · [source](../../src/Orm/Storage/MongoStore.php#L222)
+
+`public function enrichMetadata(array $meta, ReflectionClass $class): array`
+
+Contribute document-specific metadata during compile:
+
+- pkMode = 'convention': documents resolve their PK via the id/*_id
+  NAME convention (not the SQL Model chain) — this is what keeps
+  `_id` resolving as the PK. Model-ness alone cannot decide (mongo
+  documents may extend Model too); only the store knows.
+- #[Connection] rejected: this store OWNS its client (the inverse
+  of PdoStore's borrow model) — multiple mongo connections are
+  modeled as multiple registered store types ('mongo-eu', …),
+  selected by #[Entity(store: ...)].
+
+Collection resolution stays generic: metadata `source` (#[Entity(name)])
+with the snake/plural convention as fallback — no per-backend key.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - |  |
+| `$class` | ReflectionClass | - |  |
+
+**➡️ Return value**
+
+- Type: array
+
+
+---
+
+### wantsNativeValues() · [source](../../src/Orm/Storage/MongoStore.php#L276)
+
+`public function wantsNativeValues(): bool`
+
+Wants RAW values: the mongodb driver maps PHP arrays and
+DateTimeInterface to BSON natively — no DateTime formatting, no
+cast encoding (a 'json' cast is inert here by design).
+
+**➡️ Return value**
+
+- Type: bool
+
+
+---
+
+### txTarget() · [source](../../src/Orm/Storage/MongoStore.php#L285)
+
+`public function txTarget(array $meta): string`
+
+No transactions: one connection per store instance, so the identity
+token is constant. begin()/commit()/rollback() are no-ops anyway.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$meta` | array | - |  |
+
+**➡️ Return value**
+
+- Type: string
 
 
 

@@ -29,7 +29,7 @@ abstract class Model
     /**
      * Return the table or view name for this model.
      *
-     * Metadata-backed: #[Table(name: ...)] > a declared source()
+     * Metadata-backed: #[Entity(name: ...)] > a declared source()
      * override > the naming convention (short class name, snake_case,
      * optional pluralization — e.g. User → users, AdminUser →
      * admin_users, Person → people). Overriding the method still wins
@@ -52,7 +52,7 @@ abstract class Model
 
     /**
      * Return the database schema for this model, if applicable
-     * (e.g. PostgreSQL). Metadata-backed: #[Table(schema: ...)] > a
+     * (e.g. PostgreSQL). Metadata-backed: #[Entity(schema: ...)] > a
      * declared schema() override > null.
      */
     public function schema(): ?string
@@ -442,12 +442,12 @@ abstract class Model
     }
 
     /**
-         * Re-read this model's row from storage and refresh the instance IN
-         * PLACE: current values onto $this, heap snapshot synced as the new
-         * diff baseline. Returns $this, or NULL when the row is gone in
-         * storage (detached from the identity map). Throws for untracked
-    n     * models and models with scheduled unflushed writes.
-    */
+     * Re-read this model's row from storage and refresh the instance IN
+     * PLACE: current values onto $this, heap snapshot synced as the new
+     * diff baseline. Returns $this, or NULL when the row is gone in
+     * storage (detached from the identity map). Throws for untracked
+     * models and models with scheduled unflushed writes.
+     */
     public function refresh(): ?static
     {
         $found = AppContext::instance()->entityManager()->refresh($this);

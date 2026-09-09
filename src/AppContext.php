@@ -23,6 +23,7 @@ use Azera\Http\Request as HttpRequest;
 use Azera\Http\Session;
 use Azera\Lifecycle\RequestScoped;
 use Azera\Log\NullLogger;
+use Azera\Orm\Storage\Stores;
 use Azera\Queue\QueueInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -33,27 +34,23 @@ class AppContext
 {
     public function __construct()
     {
-        $this->registerDefaultServices();
-    }
-
-    protected function registerDefaultServices(): void
-    {
         $this->serviceDefinitions = [
-            Session::class         => fn() => $this->session(),
-            Cookies::class         => fn() => $this->cookies(),
-            HttpRequest::class     => fn() => $this->request(),
-            ViewEngine::class      => fn() => $this->view(),
-            DatabaseManager::class => fn() => $this->dbManager(),
-            Router::class          => fn() => $this->router(),
-            Dispatcher::class      => fn() => $this->dispatcher(),
-            TableResolver::class   => fn() => $this->get(ModelResolver::class),
-            Heap::class            => fn() => $this->heap(),
-            EntityManager::class   => fn() => $this->entityManager(),
             AppContext::class      => fn() => $this,
+            Cookies::class         => fn() => $this->cookies(),
+            DatabaseManager::class => fn() => $this->dbManager(),
+            Dispatcher::class      => fn() => $this->dispatcher(),
+            EntityManager::class   => fn() => $this->entityManager(),
+            Heap::class            => fn() => $this->heap(),
+            HttpRequest::class     => fn() => $this->request(),
+            Router::class          => fn() => $this->router(),
+            Session::class         => fn() => $this->session(),
+            Stores::class          => fn() => new Stores(),
+            TableResolver::class   => fn() => new ModelResolver(),
+            ViewEngine::class      => fn() => $this->view(),
         ];
     }
 
-    protected array $serviceDefinitions = [];
+    protected array $serviceDefinitions;
 
     protected array $serviceInstances = [];
 
@@ -292,8 +289,8 @@ class AppContext
         if ($q === null) {
             throw new \LogicException(
                 'No queue registered. Set one via '
-                . 'AppContext::set(QueueInterface::class, $queue). '
-                . 'For synchronous processing, use Azera\\Queue\\SyncQueue.'
+                    . 'AppContext::set(QueueInterface::class, $queue). '
+                    . 'For synchronous processing, use Azera\\Queue\\SyncQueue.'
             );
         }
         return $this->queue = $q;
@@ -361,7 +358,7 @@ class AppContext
             // Set to null via setAopCacheDir(null) to use eval (development).
             $this->proxyFactory->setCacheDir(
                 $this->aopCacheDir
-                ?? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'azera_aop'
+                    ?? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'azera_aop'
             );
             foreach ($this->interceptors as $adviceClass => $interceptor) {
                 $this->proxyFactory->register($adviceClass, $interceptor);
@@ -576,9 +573,8 @@ class AppContext
      */
     public function get(string $id): object
     {
-        $service = $this->resolveRegisteredService($id, allowNull: false);
-        if ($service !== null) {
-            return $service;
+        if (isset($this->serviceDefinitions[$id])) {
+            return $this->resolveRegisteredService($id, allowNull: false);
         }
 
         if (class_exists($id)) {
@@ -607,9 +603,9 @@ class AppContext
      */
     public function tryGet(string $id): ?object
     {
-        $service = $this->resolveRegisteredService($id, allowNull: true);
-        if ($service !== null || $this->has($id)) {
-            return $service;
+        // A registered factory that currently resolves to null must stay null.
+        if (isset($this->serviceDefinitions[$id])) {
+            return $this->resolveRegisteredService($id, allowNull: true);
         }
 
         if (class_exists($id)) {
@@ -700,42 +696,43 @@ class AppContext
         if ($service !== null && !$service instanceof $id) {
             return; // The service does not match the expected type, skip syncing
         }
+
         switch ($id) {
-            case HttpRequest::class:
-                $this->request = $service;
-                break;
-            case ViewEngine::class:
-                $this->view = $service;
-                break;
-            case Session::class:
-                $this->session = $service;
-                break;
-            case Cookies::class:
-                $this->cookies = $service;
-                break;
-            case Router::class:
-                $this->router = $service;
-                break;
-            case Dispatcher::class:
-                $this->dispatcher = $service;
-                break;
-            case DatabaseManager::class:
-                $this->dbManager = $service;
-                break;
-            case LoggerInterface::class:
-                $this->logger = $service;
-                break;
-            case EventDispatcherInterface::class:
-                $this->events = $service;
+            case Config::class:
+                $this->config = $service;
                 break;
             case CacheInterface::class:
                 $this->cache = $service;
                 break;
+            case Cookies::class:
+                $this->cookies = $service;
+                break;
+            case DatabaseManager::class:
+                $this->dbManager = $service;
+                break;
+            case Dispatcher::class:
+                $this->dispatcher = $service;
+                break;
+            case EventDispatcherInterface::class:
+                $this->events = $service;
+                break;
+            case HttpRequest::class:
+                $this->request = $service;
+                break;
+            case LoggerInterface::class:
+                $this->logger = $service;
+                break;
             case QueueInterface::class:
                 $this->queue = $service;
                 break;
-            case Config::class:
-                $this->config = $service;
+            case Router::class:
+                $this->router = $service;
+                break;
+            case Session::class:
+                $this->session = $service;
+                break;
+            case ViewEngine::class:
+                $this->view = $service;
                 break;
         }
     }
