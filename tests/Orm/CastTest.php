@@ -11,6 +11,7 @@ use Azera\AppContext;
 use Azera\Db\DatabaseManager;
 use Azera\Orm\Attribute\Column;
 use Azera\Orm\Casting\Casts;
+use Azera\Orm\Casting\DateTimeCast;
 use Azera\Orm\EntityManager;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
@@ -49,6 +50,10 @@ class CastedArticle extends Model
     /** Custom-cast target (registered per-test). */
     #[Column(type: 'upper')]
     public $slug;
+
+    /** Builtin datetime cast (registered since the extractData() merge). */
+    #[Column(type: 'datetime')]
+    public $published_at;
 }
 
 class PlainArticle extends Model
@@ -106,14 +111,15 @@ final class CastTest extends TestCase
     private function fullRow(array $overrides = []): array
     {
         return array_merge([
-            'id'          => '7',
-            'title'       => 'T',
-            'tags'        => null,
-            'price_cents' => null,
-            'rating'      => null,
-            'published'   => null,
-            'labels'      => null,
-            'slug'        => null,
+            'id'           => '7',
+            'title'        => 'T',
+            'tags'         => null,
+            'price_cents'  => null,
+            'rating'       => null,
+            'published'    => null,
+            'labels'       => null,
+            'slug'         => null,
+            'published_at' => null,
         ], $overrides);
     }
 
@@ -357,6 +363,74 @@ final class CastTest extends TestCase
         $this->assertSame('HELLO', $e->slug);
     }
 
+    /* ------------------------------------------------------- datetime */
+
+    public function testDateTimeEncodeFormatsInterfaceAndDecodeGivesImmutable(): void
+    {
+        $e = new CastedArticle();
+        $e->id           = 1;
+        $e->published_at = new \DateTimeImmutable('2026-09-05 12:30:45');
+
+        $this->em->persist($e);
+        $this->em->flush();
+
+        $q = $this->dataQueries()[0];
+        $this->assertSame('2026-09-05 12:30:45', $q['params'][1]);
+
+        // Hydration decodes the stored text back to an immutable instance.
+        $h = $this->hydratedCasted($this->fullRow(['published_at' => '2026-09-05 12:30:45']));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $h->published_at);
+        $this->assertSame('2026-09-05 12:30:45', $h->published_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testDateTimeHydratedUnchangedEntityPersistsNothing(): void
+    {
+        $e = $this->hydratedCasted($this->fullRow(['published_at' => '2026-09-05 12:30:45']));
+
+        $this->em->persist($e);
+        $this->em->flush();
+
+        $this->assertSame([], $this->dataQueries(), 'unchanged hydrated datetime must not UPDATE');
+    }
+
+    public function testDateTimeDecodeThrowsOnUnparseableValue(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        $this->hydratedCasted($this->fullRow(['published_at' => 'not-a-date']));
+    }
+
+    public function testDateTimeCastIsReplaceable(): void
+    {
+        Casts::register('datetime', new class implements \Azera\Orm\Casting\Cast
+        {
+            public function encode(mixed $value): mixed
+            {
+                return $value instanceof \DateTimeInterface ? $value->format('Y-m-d') : $value;
+            }
+            public function decode(mixed $value): mixed
+            {
+                if ($value === null || !\is_string($value)) {
+                    return $value;
+                }
+                $parsed = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+                return $parsed === false ? null : $parsed;
+            }
+        });
+
+        FastHydrator::clear(); // recompile plan with the replacement
+
+        $e = new CastedArticle();
+        $e->id           = 1;
+        $e->published_at = new \DateTimeImmutable('2026-09-05 12:30:45');
+
+        $this->em->persist($e);
+        $this->em->flush();
+
+        $this->assertSame('2026-09-05', $this->dataQueries()[0]['params'][1]);
+    }
+
     /* ------------------------------------------ cast-free fast path */
 
     public function testPlainClassKeepsRawValues(): void
@@ -372,10 +446,10 @@ final class CastTest extends TestCase
     public function testCastsRegistryBuiltins(): void
     {
         $this->assertSame(
-            ['int', 'float', 'bool', 'json', 'pgarray'],
+            ['int', 'float', 'bool', 'json', 'pgarray', 'datetime'],
             Casts::types()
         );
 
-        $this->assertNull(Casts::for('datetime'), 'datetime decode stays opt-in later');
+        $this->assertInstanceOf(DateTimeCast::class, Casts::for('datetime'));
     }
 }

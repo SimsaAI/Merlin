@@ -169,6 +169,7 @@
 - [BoolCast](Orm_Casting_BoolCast.md) `Azera\Orm\Casting\BoolCast`
 - [Cast](Orm_Casting_Cast.md) `Azera\Orm\Casting\Cast`
 - [Casts](Orm_Casting_Casts.md) `Azera\Orm\Casting\Casts`
+- [DateTimeCast](Orm_Casting_DateTimeCast.md) `Azera\Orm\Casting\DateTimeCast`
 - [FloatCast](Orm_Casting_FloatCast.md) `Azera\Orm\Casting\FloatCast`
 - [IntCast](Orm_Casting_IntCast.md) `Azera\Orm\Casting\IntCast`
 - [JsonCast](Orm_Casting_JsonCast.md) `Azera\Orm\Casting\JsonCast`

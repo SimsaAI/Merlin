@@ -18,6 +18,9 @@ namespace Azera\Orm\Casting;
  *   'bool'     decode coerces '1'/'0'/'t'/'f'/... -> bool
  *   'json'     encode json_encode, decode json_decode(..., true)
  *   'pgarray'  PostgreSQL native array literal <-> 1-D scalar PHP array
+ *   'datetime' DateTimeInterface <-> 'Y-m-d H:i:s' (decode yields
+ *              DateTimeImmutable; replace the registration for a
+ *              custom shape)
  *
  * Semantics:
  *
@@ -99,5 +102,6 @@ final class Casts
         self::$casts['bool'] = new BoolCast();
         self::$casts['json'] = new JsonCast();
         self::$casts['pgarray'] = new PgArrayCast();
+        self::$casts['datetime'] = new DateTimeCast();
     }
 }

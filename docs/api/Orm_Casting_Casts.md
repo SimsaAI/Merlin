@@ -17,6 +17,11 @@ Registered built-ins (registered in [`Casts::boot()`](Orm_Casting_Casts.md#boot)
   'bool'     decode coerces '1'/'0'/'t'/'f'/... -> bool
   'json'     encode json_encode, decode json_decode(..., true)
   'pgarray'  PostgreSQL native array literal <-> 1-D scalar PHP array
+  'datetime' DateTimeInterface <-> 'Y-m-d H:i:s' (decode yields
+             DateTimeImmutable; replace the registration for a
+             custom shape)
+  'datetime' DateTimeInterface <-> 'Y-m-d H:i:s' (DateTimeImmutable on
+             decode; replace the registration for a custom shape)
 
 Semantics:
 
@@ -35,7 +40,7 @@ Semantics:
 
 ## 🚀 Public methods
 
-### register() · [source](../../src/Orm/Casting/Casts.php#L48)
+### register() · [source](../../src/Orm/Casting/Casts.php#L53)
 
 `public static function register(string $type, Azera\Orm\Casting\Cast $cast): void`
 
@@ -55,7 +60,7 @@ Register (or replace) a cast for a column type.
 
 ---
 
-### for() · [source](../../src/Orm/Casting/Casts.php#L59)
+### for() · [source](../../src/Orm/Casting/Casts.php#L64)
 
 `public static function for(string $type): Azera\Orm\Casting\Cast|null`
 
@@ -75,7 +80,7 @@ transformation (values pass through raw in both directions).
 
 ---
 
-### types() · [source](../../src/Orm/Casting/Casts.php#L71)
+### types() · [source](../../src/Orm/Casting/Casts.php#L76)
 
 `public static function types(): array`
 
@@ -88,7 +93,7 @@ Registered type names (tests).
 
 ---
 
-### clear() · [source](../../src/Orm/Casting/Casts.php#L81)
+### clear() · [source](../../src/Orm/Casting/Casts.php#L86)
 
 `public static function clear(): void`
 

@@ -141,7 +141,9 @@ class EntityManagerTest extends TestCase
         $this->em->flush();
 
         $this->assertStringContainsString('RETURNING *', $this->lastDataSql());
-        $this->assertSame('2026-09-05 00:00:00', $a->created_at);
+        // RETURNING * rows decode 'datetime' columns onto the entity.
+        $this->assertInstanceOf(\DateTimeImmutable::class, $a->created_at);
+        $this->assertSame('2026-09-05 00:00:00', $a->created_at->format('Y-m-d H:i:s'));
         $this->assertSame(Node::MANAGED, $this->heapNode($a)->state);
     }
 
@@ -352,8 +354,9 @@ class EntityManagerTest extends TestCase
         $this->assertCount(2, $q);
         $this->assertSame('First', $q[0]['params'][0] ?? null);
         $this->assertSame('Second', $q[1]['params'][0] ?? null);
-        $this->assertSame('1', $a->id);
-        $this->assertSame('2', $b->id);
+        // int-cast PK: backfill decodes like hydration (find() coerces too).
+        $this->assertSame(1, $a->id);
+        $this->assertSame(2, $b->id);
     }
 
     public function testPersistFlushInsertsThroughStore(): void
@@ -645,7 +648,7 @@ class EntityManagerTest extends TestCase
         $doc->tags  = ['a', 'b'];
 
         $this->assertTrue($doc->save());
-        $this->assertSame('1', $doc->_id); // driver-generated id backfilled
+        $this->assertSame(1, $doc->_id); // driver-generated id backfilled (int cast decodes)
 
         $articles = $fakes->for('articles'); // #[Entity(name)] → collection
         $this->assertCount(1, $articles->docs);

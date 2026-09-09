@@ -889,8 +889,6 @@ final class EntityManager implements RequestScoped
             if ($native) {
                 // Raw pass-through: the store owns value mapping (mongo:
                 // the driver maps PHP arrays/DateTime to BSON natively).
-            } elseif (\is_object($value) && $value instanceof \DateTimeInterface) {
-                $value = $value->format('Y-m-d H:i:s');
             } elseif (($cast = Casts::for($col['type'])) !== null) {
                 $value = $cast->encode($value);
             }
@@ -950,7 +948,12 @@ final class EntityManager implements RequestScoped
     }
 
     /**
-     * Write identity values back onto the entity + node.
+     * Write values back onto the entity + node. Casted columns DECODE for
+     * the entity (hydration's PHP representation — the id backfill of a
+     * casted PK and RETURNING * columns land as PHP values, not raw store
+     * strings); the snapshot keeps the canonical store form
+     * (encode(decode(raw)), the same normalization hydration applies) so
+     * diff() compares like with like.
      */
     private function backfill(Node $node, object $entity, array $values): void
     {
@@ -959,8 +962,15 @@ final class EntityManager implements RequestScoped
         foreach ($values as $colName => $value) {
             foreach ($meta['columns'] as $field => $col) {
                 if ($col['name'] === $colName) {
-                    $entity->{$field} = $value;
-                    $node->data[$colName] = $value;
+                    $cast = Casts::for($col['type']);
+                    if ($cast !== null) {
+                        $decoded = $cast->decode($value);
+                        $entity->{$field} = $decoded;
+                        $values[$colName] = $cast->encode($decoded);
+                    } else {
+                        $entity->{$field} = $value;
+                    }
+                    $node->data[$colName] = $values[$colName];
                 }
             }
         }
@@ -988,24 +998,17 @@ final class EntityManager implements RequestScoped
     {
         $meta = Metadata::for($node->class);
 
-        $byCol = [];
-        foreach ($meta['columns'] as $field => $col) {
-            $byCol[$col['name']] = $field;
-            // Decode raw store values for casted columns before they land
-            // on the entity (RETURNING * rows are store representation).
+        foreach ($meta['columns'] as $col) {
+            // Warm decode errors early: validate ALL row values before any
+            // assignment mutates the entity (RETURNING * rows are store
+            // representation).
             if (($cast = Casts::for($col['type'])) !== null) {
-                $cast->decode($row[$col['name']] ?? null); // warm errors early
+                $cast->decode($row[$col['name']] ?? null);
             }
         }
 
-        foreach ($row as $colName => $value) {
-            $field = $byCol[$colName] ?? null;
-            if ($field !== null) {
-                $cast = Casts::for($meta['columns'][$field]['type']);
-                $entity->{$field} = $cast === null ? $value : $cast->decode($value);
-            }
-        }
-
+        // Assignment + snapshot sync happen in backfill() — it decodes
+        // casted columns for the entity and canonicalizes the snapshot.
         $this->backfill($node, $entity, $row);
     }
 

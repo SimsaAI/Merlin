@@ -118,6 +118,7 @@ class Article extends Model
 | `bool`    | `'1'`/`'t'`/`'true'` → `true`, unknown → throw    | passthrough                                   |
 | `json`    | JSON text → array (assoc), invalid → throw        | `json_encode`, scalars pass through           |
 | `pgarray` | pg array literal → scalar array (nested → nested) | pg literal, nested supported, >6 dims → throw |
+| `datetime`| datetime text → `DateTimeImmutable`, unparsable → throw | `DateTimeInterface` → `'Y-m-d H:i:s'`, strings pass through |
 
 Why the scalar casts exist: `pdo_mysql` (emulated prepares) and
 `pdo_pgsql` return numerics as strings. Without them the typed property
@@ -139,10 +140,14 @@ Register before the first `Metadata::for()` of the affected class (or call
 Semantics: the snapshot (`node->data`) always holds the **store
 representation** (encoded strings) so the diff engine compares stable
 scalars; `dirtyData()` therefore returns encoded values too. Mongo
-documents bypass value shaping entirely (BSON owns encoding — `json` is
-inert there). `datetime` decode (string → `DateTimeImmutable` on
-hydration) is deliberately **not** built-in: it would change the entity
-surface for every existing model; register a `Cast` yourself when wanted.
+documents bypass value shaping entirely (BSON owns encoding — `json` and
+`datetime` are inert there). The `datetime` decode puts a
+`DateTimeImmutable` on the entity; to keep strings (or use a mutable
+`DateTime` / Carbon), **replace** the registration:
+
+```php
+Azera\Orm\Casting\Casts::register('datetime', new MyDateTimeCast());
+```
 
 ### Mongo Documents (MongoStore)
 

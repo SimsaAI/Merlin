@@ -489,7 +489,7 @@ rebuilds it from the then-current manager.
 
 ---
 
-### setStore() · [source](../../src/Orm/EntityManager.php#L1082)
+### setStore() · [source](../../src/Orm/EntityManager.php#L1085)
 
 `public function setStore(string $type, Azera\Orm\Storage\Store $store): static`
 
