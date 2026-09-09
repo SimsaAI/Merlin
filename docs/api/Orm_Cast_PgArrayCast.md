@@ -1,6 +1,6 @@
 # 🧩 Class: PgArrayCast
 
-**Full name:** [Azera\Orm\Cast\PgArrayCast](../../src/Orm/Cast/PgArrayCast.php)
+**Full name:** [Azera\Orm\Casting\PgArrayCast](../../src/Orm/Cast/PgArrayCast.php)
 
 'pgarray' cast: PHP 1-D scalar array <-> PostgreSQL native array
 literal (the string form PDO returns for array columns: `{1,2,3}`,

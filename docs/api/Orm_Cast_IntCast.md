@@ -1,6 +1,6 @@
 # 🧩 Class: IntCast
 
-**Full name:** [Azera\Orm\Cast\IntCast](../../src/Orm/Cast/IntCast.php)
+**Full name:** [Azera\Orm\Casting\IntCast](../../src/Orm/Cast/IntCast.php)
 
 ## 🚀 Public methods
 

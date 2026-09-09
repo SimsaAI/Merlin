@@ -1,6 +1,6 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
 /**
  * 'pgarray' cast: PHP 1-D scalar array <-> PostgreSQL native array
@@ -73,7 +73,7 @@ final class PgArrayCast implements Cast
             if ($depth >= self::MAX_DIMENSIONS) {
                 throw new \RuntimeException(
                     'pg array nesting deeper than '
-                    . self::MAX_DIMENSIONS . ' dimensions'
+                        . self::MAX_DIMENSIONS . ' dimensions'
                 );
             }
 
@@ -184,7 +184,7 @@ final class PgArrayCast implements Cast
         if ($depth > self::MAX_DIMENSIONS) {
             throw new \RuntimeException(
                 'pg array literal nests deeper than '
-                . self::MAX_DIMENSIONS . ' dimensions'
+                    . self::MAX_DIMENSIONS . ' dimensions'
             );
         }
 
@@ -257,7 +257,7 @@ final class PgArrayCast implements Cast
             $buf = '';
             while (
                 $pos < $len
-                && !\in_array($s[$pos], [',', '}', ' ', "\t", "\n", "\r"])
+                    && !\in_array($s[$pos], [',', '}', ' ', "\t", "\n", "\r"])
             ) {
                 if ($s[$pos] === '\\' && $pos + 1 < $len) {
                     $pos++;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
-use Azera\Orm\Cast\Cast;
+use Azera\Orm\Casting\Cast;
 
 /**
  * Scalar float cast — see IntCast for the shared rationale.

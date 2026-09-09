@@ -1,6 +1,6 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
 /**
  * Scalar bool cast — see IntCast for the shared rationale.

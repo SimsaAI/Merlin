@@ -4,7 +4,7 @@ namespace Azera\Orm;
 
 use Azera\AppContext;
 use Azera\Lifecycle\RequestScoped;
-use Azera\Orm\Cast\Casts;
+use Azera\Orm\Casting\Casts;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
 use Azera\Orm\Storage\PdoStore;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
 /**
  * 'json' cast: PHP arrays/objects <-> JSON text in a TEXT/JSON column.
@@ -41,7 +41,7 @@ final class JsonCast implements Cast
         if ($json === false) {
             throw new \RuntimeException(
                 'Cannot encode value as JSON for storage: '
-                . \json_last_error_msg()
+                    . \json_last_error_msg()
             );
         }
 
@@ -59,7 +59,7 @@ final class JsonCast implements Cast
         if (\json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException(
                 'Stored JSON is NOT valid: ' .
-                \json_last_error_msg()
+                    \json_last_error_msg()
             );
         }
 

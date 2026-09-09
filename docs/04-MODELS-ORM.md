@@ -32,14 +32,13 @@ All model configuration can be declared with attributes, compiled once into
 cached metadata:
 
 ```php
-use Azera\Orm\Model;
 use Azera\Orm\Attribute\Column;
 use Azera\Orm\Attribute\Connection;
 use Azera\Orm\Attribute\Entity;
 
 #[Entity(name: 'admin_users', schema: 'sales')]
 #[Connection(read: 'replica', write: 'primary')]
-class AdminUser extends Model
+class AdminUser
 {
     #[Column(type: 'int', pk: true)]
     public $tenant_id;
@@ -98,11 +97,11 @@ coerces to `int` while the heap snapshot keeps `"5"` — diffing compares
 phantom UPDATE per numeric column. The casts coerce **both** the property
 and the snapshot so diff compares like with like.
 
-Custom types — implement `Azera\Orm\Cast\Cast` (encode/decode) and
+Custom types — implement `Azera\Orm\Casting\Cast` (encode/decode) and
 register before first use:
 
 ```php
-Azera\Orm\Cast\Casts::register('encrypted', new EncryptedCast());
+Azera\Orm\Casting\Casts::register('encrypted', new EncryptedCast());
 ```
 
 Register before the first `Metadata::for()` of the affected class (or call

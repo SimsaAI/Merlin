@@ -1,6 +1,6 @@
 # 🧩 Class: FloatCast
 
-**Full name:** [Azera\Orm\Cast\FloatCast](../../src/Orm/Cast/FloatCast.php)
+**Full name:** [Azera\Orm\Casting\FloatCast](../../src/Orm/Cast/FloatCast.php)
 
 Scalar float cast — see IntCast for the shared rationale.
 

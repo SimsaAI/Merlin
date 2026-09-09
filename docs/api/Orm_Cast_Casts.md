@@ -1,6 +1,6 @@
 # 🧩 Class: Casts
 
-**Full name:** [Azera\Orm\Cast\Casts](../../src/Orm/Cast/Casts.php)
+**Full name:** [Azera\Orm\Casting\Casts](../../src/Orm/Cast/Casts.php)
 
 Registry mapping metadata column types to [`Cast`](Orm_Cast_Cast.md) transformations.
 
@@ -37,7 +37,7 @@ Semantics:
 
 ### register() · [source](../../src/Orm/Cast/Casts.php#L48)
 
-`public static function register(string $type, Azera\Orm\Cast\Cast $cast): void`
+`public static function register(string $type, Azera\Orm\Casting\Cast $cast): void`
 
 Register (or replace) a cast for a column type.
 
@@ -57,7 +57,7 @@ Register (or replace) a cast for a column type.
 
 ### for() · [source](../../src/Orm/Cast/Casts.php#L59)
 
-`public static function for(string $type): Azera\Orm\Cast\Cast|null`
+`public static function for(string $type): Azera\Orm\Casting\Cast|null`
 
 The cast for a column type, or null when the type has no
 transformation (values pass through raw in both directions).

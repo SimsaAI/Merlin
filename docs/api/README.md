@@ -166,13 +166,13 @@
 
 ### `Azera\Orm\Cast`
 
-- [BoolCast](Orm_Cast_BoolCast.md) `Azera\Orm\Cast\BoolCast`
-- [Cast](Orm_Cast_Cast.md) `Azera\Orm\Cast\Cast`
-- [Casts](Orm_Cast_Casts.md) `Azera\Orm\Cast\Casts`
-- [FloatCast](Orm_Cast_FloatCast.md) `Azera\Orm\Cast\FloatCast`
-- [IntCast](Orm_Cast_IntCast.md) `Azera\Orm\Cast\IntCast`
-- [JsonCast](Orm_Cast_JsonCast.md) `Azera\Orm\Cast\JsonCast`
-- [PgArrayCast](Orm_Cast_PgArrayCast.md) `Azera\Orm\Cast\PgArrayCast`
+- [BoolCast](Orm_Cast_BoolCast.md) `Azera\Orm\Casting\BoolCast`
+- [Cast](Orm_Cast_Cast.md) `Azera\Orm\Casting\Cast`
+- [Casts](Orm_Cast_Casts.md) `Azera\Orm\Casting\Casts`
+- [FloatCast](Orm_Cast_FloatCast.md) `Azera\Orm\Casting\FloatCast`
+- [IntCast](Orm_Cast_IntCast.md) `Azera\Orm\Casting\IntCast`
+- [JsonCast](Orm_Cast_JsonCast.md) `Azera\Orm\Casting\JsonCast`
+- [PgArrayCast](Orm_Cast_PgArrayCast.md) `Azera\Orm\Casting\PgArrayCast`
 
 ### `Azera\Orm`
 

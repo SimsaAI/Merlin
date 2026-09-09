@@ -1,6 +1,6 @@
 # 🔌 Interface: Cast
 
-**Full name:** [Azera\Orm\Cast\Cast](../../src/Orm/Cast/Cast.php)
+**Full name:** [Azera\Orm\Casting\Cast](../../src/Orm/Cast/Cast.php)
 
 A value transformation between the PHP entity representation and the
 raw store representation.

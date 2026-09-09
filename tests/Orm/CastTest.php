@@ -10,7 +10,7 @@ require_once __DIR__ . '/../Db/TestDatabase.php';
 use Azera\AppContext;
 use Azera\Db\DatabaseManager;
 use Azera\Orm\Attribute\Column;
-use Azera\Orm\Cast\Casts;
+use Azera\Orm\Casting\Casts;
 use Azera\Orm\EntityManager;
 use Azera\Orm\FastHydrator;
 use Azera\Orm\Metadata;
@@ -338,7 +338,7 @@ final class CastTest extends TestCase
 
     public function testCustomCastRegistrationAndDecode(): void
     {
-        Casts::register('upper', new class implements \Azera\Orm\Cast\Cast
+        Casts::register('upper', new class implements \Azera\Orm\Casting\Cast
         {
             public function encode(mixed $value): mixed
             {

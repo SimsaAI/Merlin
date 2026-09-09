@@ -2,8 +2,8 @@
 
 namespace Azera\Orm;
 
-use Azera\Orm\Cast\Cast;
-use Azera\Orm\Cast\Casts;
+use Azera\Orm\Casting\Cast;
+use Azera\Orm\Casting\Casts;
 
 /**
  * Per-class compiled hydration plan.

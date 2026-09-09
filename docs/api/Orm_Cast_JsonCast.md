@@ -1,6 +1,6 @@
 # 🧩 Class: JsonCast
 
-**Full name:** [Azera\Orm\Cast\JsonCast](../../src/Orm/Cast/JsonCast.php)
+**Full name:** [Azera\Orm\Casting\JsonCast](../../src/Orm/Cast/JsonCast.php)
 
 'json' cast: PHP arrays/objects <-> JSON text in a TEXT/JSON column.
 

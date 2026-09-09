@@ -1,6 +1,6 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
 /**
  * Registry mapping metadata column types to {@see Cast} transformations.

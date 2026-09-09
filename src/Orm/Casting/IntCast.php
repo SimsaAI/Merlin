@@ -1,6 +1,6 @@
 <?php
 
-namespace Azera\Orm\Cast;
+namespace Azera\Orm\Casting;
 
 /**
  * Scalar casts: decode the strings stringifying drivers return

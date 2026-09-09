@@ -1,6 +1,6 @@
 # 🧩 Class: BoolCast
 
-**Full name:** [Azera\Orm\Cast\BoolCast](../../src/Orm/Cast/BoolCast.php)
+**Full name:** [Azera\Orm\Casting\BoolCast](../../src/Orm/Cast/BoolCast.php)
 
 Scalar bool cast — see IntCast for the shared rationale.
 

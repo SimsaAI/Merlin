@@ -10,7 +10,7 @@ A lightweight, fast PHP framework for building modern Web applications and CLI t
 
 **Lightweight & Fast** - Minimal dependencies and overhead. No bloat, just what you need.
 
-**Modern PHP** - Built for PHP 8.1+, embracing type hints, named arguments, and modern patterns.
+**Modern PHP** - Built for PHP 8.2+, embracing type hints, named arguments, and modern patterns.
 
 **Unified Query Builder** - One consistent, fluent API for all database operations, whether you're using models or raw queries.
 
@@ -67,10 +67,10 @@ A lightweight, fast PHP framework for building modern Web applications and CLI t
 
 ## Requirements
 
-- PHP >= 8.1
+- PHP >= 8.2
 - PDO extension (`ext-pdo`)
 - Multibyte String extension (`ext-mbstring`)
-- Optional: Sodium or OpenSSL extension for advanced encryption features
+- Optional: Sodium or OpenSSL extension for advanced encryption features, MongoDB extension for MongoDB ORM support
 
 (PDO driver support is implemented for MySQL, PostgreSQL and SQLite. Other drivers may work but are not officially tested.)
 
