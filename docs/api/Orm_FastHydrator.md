@@ -27,7 +27,7 @@ L1-cached per class like Metadata; nothing else to configure.
 
 ## 🚀 Public methods
 
-### for() · [source](../../src/Orm/FastHydrator.php#L71)
+### for() · [source](../../src/Orm/FastHydrator.php#L75)
 
 `public static function for(string $class): self`
 
@@ -46,7 +46,7 @@ Per-class singleton plan (mirrors Metadata::for semantics).
 
 ---
 
-### hydrate() · [source](../../src/Orm/FastHydrator.php#L100)
+### hydrate() · [source](../../src/Orm/FastHydrator.php#L104)
 
 `public function hydrate(Azera\Orm\Heap $heap, array $row, bool $fresh = false): array`
 
@@ -81,7 +81,7 @@ attach once.
 
 ---
 
-### apply() · [source](../../src/Orm/FastHydrator.php#L188)
+### apply() · [source](../../src/Orm/FastHydrator.php#L192)
 
 `public function apply(object $entity, Azera\Orm\Node $node, array $row): void`
 
@@ -114,7 +114,7 @@ guarantee the entity is not scheduled.
 
 ---
 
-### attach() · [source](../../src/Orm/FastHydrator.php#L219)
+### attach() · [source](../../src/Orm/FastHydrator.php#L223)
 
 `public function attach(Azera\Orm\Heap $heap, object $entity, array $id, array $data): Azera\Orm\Node`
 
@@ -136,7 +136,7 @@ Attach a hydrated entity to the heap as MANAGED.
 
 ---
 
-### clear() · [source](../../src/Orm/FastHydrator.php#L229)
+### clear() · [source](../../src/Orm/FastHydrator.php#L233)
 
 `public static function clear(): void`
 

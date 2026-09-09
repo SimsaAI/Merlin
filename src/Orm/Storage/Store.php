@@ -16,14 +16,6 @@ namespace Azera\Orm\Storage;
 interface Store
 {
     /**
-     * Capability flag: TRUE when this store wants values passed through
-     * RAW (no DateTime formatting, no cast encoding) — the backend owns
-     * value mapping (mongo: the driver owns BSON encoding). FALSE for
-     * SQL-shaped stores (DateTime -> 'Y-m-d H:i:s', cast->encode()).
-     */
-    public function wantsNativeValues(): bool;
-
-    /**
      * Connection identity for the class described by $meta: two classes
      * sharing one txTarget share one transaction target in flush().
      * Borrowing stores (SQL) derive it from the write role; owning stores
@@ -125,6 +117,17 @@ interface Store
     /**
      * Return $meta enriched (or throw for dishonorable attribute combos).
      * MUST stay JSON-serializable — the result feeds the L2 metadata cache.
+     *
+     * Beyond pkMode, a store may contribute the recognized key
+     * `castExclusions`: a list<string> of column TYPES whose registered
+     * cast ({@see \Azera\Orm\Casting\Casts}) is SUPPRESSED by default —
+     * wire formats the backend owns natively (mongo: 'json', 'pgarray',
+     * 'datetime' — BSON maps PHP arrays and DateTimeInterface itself).
+     * Per-column overrides: #[Column(cast: true)] forces the cast where
+     * the store excluded it; #[Column(cast: false)] suppresses it where
+     * the store would apply it. Resolved per column at compile time
+     * (metadata 'cast' => bool) — the write pipeline stays metadata-driven
+     * like everything else the EM consumes.
      *
      * @param array<string, mixed> $meta the freshly compiled generic metadata
      * @param \ReflectionClass<object> $class reflection of the compiled class

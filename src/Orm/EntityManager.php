@@ -574,8 +574,9 @@ final class EntityManager implements RequestScoped
             $field = $byCol[$colName] ?? null;
             if ($field !== null) {
                 // node->data holds the raw store representation — decode
-                // casted columns before assigning onto the entity.
-                $cast = Casts::for($meta['columns'][$field]['type']);
+                // casted columns before assigning onto the entity (the
+                // column's resolved cast policy gates the cast).
+                $cast = Casts::forColumn($meta['columns'][$field]);
                 $entity->{$field} = $cast === null ? $value : $cast->decode($value);
             }
         }
@@ -640,7 +641,7 @@ final class EntityManager implements RequestScoped
         // Identity guard.
         foreach ($this->currentIdentity($entity, $meta) as $field => $value) {
             $snapshot = $node->id[$field] ?? null;
-            $cast     = Casts::for($meta['columns'][$field]['type']);
+            $cast     = Casts::forColumn($meta['columns'][$field]);
             if ($value !== ($cast === null ? $snapshot : $cast->decode($snapshot))) {
                 throw new \LogicException(
                     "Cannot mutate the identity (PK field '{$field}') of a tracked {$node->class}: "
@@ -866,12 +867,13 @@ final class EntityManager implements RequestScoped
 
     /**
      * Entity -> raw store row keyed by COLUMN NAME (store representation).
-     * Values with a registered cast are ENCODED here (json -> text, pg
-     * array -> literal; scalar casts are encode no-ops); null stays null;
+     * Values whose column RESOLVES to a cast are ENCODED here (json -> text,
+     * pg array -> literal; scalar casts are encode no-ops); null stays null;
      * isset() (never a bare read) so uninitialized typed properties don't
-     * throw. Stores declaring wantsNativeValues() (e.g. mongo) bypass ALL
-     * value shaping — arrays/objects pass raw, the driver owns the wire
-     * format (a 'json' cast is inert there by design).
+     * throw. The cast policy is per-column METADATA (resolved at compile
+     * time from #[Column(cast:)] vs the store's castExclusions — e.g. mongo
+     * excludes 'json'/'datetime' because BSON owns those wire formats):
+     * excluded columns pass values through RAW, the driver owns the mapping.
      *
      * This is the single encode choke point: every write path (schedule,
      * diff, adopt, track, dirtyData) funnels through it, so node->data and
@@ -880,16 +882,11 @@ final class EntityManager implements RequestScoped
      */
     private function extractData(object $entity, array $meta): array
     {
-        $native = $this->storeFor($meta['class'])->wantsNativeValues();
-
         $data = [];
         foreach ($meta['columns'] as $field => $col) {
             $value = isset($entity->{$field}) ? $entity->{$field} : null;
 
-            if ($native) {
-                // Raw pass-through: the store owns value mapping (mongo:
-                // the driver maps PHP arrays/DateTime to BSON natively).
-            } elseif (($cast = Casts::for($col['type'])) !== null) {
+            if (($cast = Casts::forColumn($col)) !== null) {
                 $value = $cast->encode($value);
             }
 
@@ -916,7 +913,7 @@ final class EntityManager implements RequestScoped
                 continue;
             }
             $value = isset($entity->{$field}) ? $entity->{$field} : null;
-            $cast  = Casts::for($col['type']);
+            $cast  = Casts::forColumn($col);
             $id[$field] = $cast === null ? $value : $cast->decode($value);
         }
 
@@ -962,7 +959,7 @@ final class EntityManager implements RequestScoped
         foreach ($values as $colName => $value) {
             foreach ($meta['columns'] as $field => $col) {
                 if ($col['name'] === $colName) {
-                    $cast = Casts::for($col['type']);
+                    $cast = Casts::forColumn($col);
                     if ($cast !== null) {
                         $decoded = $cast->decode($value);
                         $entity->{$field} = $decoded;
@@ -1001,8 +998,8 @@ final class EntityManager implements RequestScoped
         foreach ($meta['columns'] as $col) {
             // Warm decode errors early: validate ALL row values before any
             // assignment mutates the entity (RETURNING * rows are store
-            // representation).
-            if (($cast = Casts::for($col['type'])) !== null) {
+            // representation; the column's resolved cast policy gates it).
+            if (($cast = Casts::forColumn($col)) !== null) {
                 $cast->decode($row[$col['name']] ?? null);
             }
         }

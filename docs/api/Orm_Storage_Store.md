@@ -14,23 +14,7 @@ implement this interface, register under a name, annotate #[Entity].
 
 ## 🚀 Public methods
 
-### wantsNativeValues() · [source](../../src/Orm/Storage/Store.php#L24)
-
-`public function wantsNativeValues(): bool`
-
-Capability flag: TRUE when this store wants values passed through
-RAW (no DateTime formatting, no cast encoding) — the backend owns
-value mapping (mongo: the driver owns BSON encoding). FALSE for
-SQL-shaped stores (DateTime -> 'Y-m-d H:i:s', cast->encode()).
-
-**➡️ Return value**
-
-- Type: bool
-
-
----
-
-### txTarget() · [source](../../src/Orm/Storage/Store.php#L32)
+### txTarget() · [source](../../src/Orm/Storage/Store.php#L24)
 
 `public function txTarget(array $meta): string`
 
@@ -53,7 +37,7 @@ return a constant token (their connection is fixed per instance).
 
 ---
 
-### insertOne() · [source](../../src/Orm/Storage/Store.php#L40)
+### insertOne() · [source](../../src/Orm/Storage/Store.php#L32)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -75,7 +59,7 @@ Returns raw row(s) for backfill: ['row' => ?array, 'id' => int|string|null].
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/Store.php#L49)
+### updateOne() · [source](../../src/Orm/Storage/Store.php#L41)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -96,7 +80,7 @@ Update one entity by PK values.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/Store.php#L62)
+### upsertOne() · [source](../../src/Orm/Storage/Store.php#L54)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -122,7 +106,7 @@ Returns raw row(s) for backfill, same contract as insertOne
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/Store.php#L68)
+### deleteOne() · [source](../../src/Orm/Storage/Store.php#L60)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -142,7 +126,7 @@ Delete one entity by PK values.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/Store.php#L77)
+### findBy() · [source](../../src/Orm/Storage/Store.php#L69)
 
 `public function findBy(string $class, array $where): array`
 
@@ -162,7 +146,7 @@ Read raw rows. Returns plain assoc rows (no ResultSet).
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/Store.php#L85)
+### findByPk() · [source](../../src/Orm/Storage/Store.php#L77)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -182,7 +166,7 @@ Read one raw row by PK values (null when missing).
 
 ---
 
-### count() · [source](../../src/Orm/Storage/Store.php#L91)
+### count() · [source](../../src/Orm/Storage/Store.php#L83)
 
 `public function count(string $class, array $where = []): int`
 
@@ -202,7 +186,7 @@ Count matching rows.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/Store.php#L103)
+### begin() · [source](../../src/Orm/Storage/Store.php#L95)
 
 `public function begin(array|null $meta = null): void`
 
@@ -227,7 +211,7 @@ Null = the store's default target.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/Store.php#L111)
+### commit() · [source](../../src/Orm/Storage/Store.php#L103)
 
 `public function commit(array|null $meta = null): void`
 
@@ -249,7 +233,7 @@ store began (the legacy bare-call semantic, generalized to the map).
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/Store.php#L116)
+### rollback() · [source](../../src/Orm/Storage/Store.php#L108)
 
 `public function rollback(array|null $meta = null): void`
 
@@ -268,7 +252,7 @@ Rollback — same target addressing as [`Store::commit()`](Orm_Storage_Store.md#
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/Store.php#L123)
+### inTransaction() · [source](../../src/Orm/Storage/Store.php#L115)
 
 `public function inTransaction(array|null $meta = null): bool`
 
@@ -289,13 +273,24 @@ instead of double-beginning). Null meta: any of the store's targets.
 
 ---
 
-### enrichMetadata() · [source](../../src/Orm/Storage/Store.php#L133)
+### enrichMetadata() · [source](../../src/Orm/Storage/Store.php#L136)
 
 `public function enrichMetadata(array $meta, ReflectionClass $class): array`
 
 Return $meta enriched (or throw for dishonorable attribute combos).
 
 MUST stay JSON-serializable — the result feeds the L2 metadata cache.
+
+Beyond pkMode, a store may contribute the recognized key
+`castExclusions`: a list<string> of column TYPES whose registered
+cast ([`Casts`](Orm_Casting_Casts.md)) is SUPPRESSED by default —
+wire formats the backend owns natively (mongo: 'json', 'pgarray',
+'datetime' — BSON maps PHP arrays and DateTimeInterface itself).
+Per-column overrides: #[Column(cast: true)] forces the cast where
+the store excluded it; #[Column(cast: false)] suppresses it where
+the store would apply it. Resolved per column at compile time
+(metadata 'cast' => bool) — the write pipeline stays metadata-driven
+like everything else the EM consumes.
 
 **🧭 Parameters**
 

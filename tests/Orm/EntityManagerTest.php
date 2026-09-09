@@ -648,12 +648,68 @@ class EntityManagerTest extends TestCase
         $doc->tags  = ['a', 'b'];
 
         $this->assertTrue($doc->save());
-        $this->assertSame(1, $doc->_id); // driver-generated id backfilled (int cast decodes)
+        // driver-generated id backfilled RAW (cast suppressed — mongo owns
+        // identity; no int-decode coercion on the '1' string).
+        $this->assertSame('1', $doc->_id);
 
         $articles = $fakes->for('articles'); // #[Entity(name)] → collection
         $this->assertCount(1, $articles->docs);
         $this->assertSame(['a', 'b'], $articles->docs[0]['tags']); // RAW array, not JSON
         $this->assertSame('Doc One', $articles->docs[0]['title']);
+    }
+
+    /**
+     * #[Column(cast: true)] on a mongo document FORCES the json cast over
+     * the store's castExclusions: the stored value is a JSON TEXT string
+     * and hydration decodes it back to the array (cross-backend parity).
+     */
+    public function testCastTrueForcesJsonEncodingOnMongo(): void
+    {
+        $fakes = new FakeMongoFactory();
+        $this->em->setStore('mongo', new MongoStore(fn($name) => $fakes->for($name)));
+
+        $doc = new \Azera\Tests\Orm\Fixtures\CastForcedDocument();
+        $doc->title = 'Forced';
+        $doc->tags  = ['a', 'b'];
+
+        $this->assertTrue($doc->save());
+
+        $articles = $fakes->for('casted_articles'); // #[Entity(name)] → collection
+        $this->assertCount(1, $articles->docs);
+        $this->assertSame('["a","b"]', $articles->docs[0]['tags'], 'JSON TEXT, not a BSON array');
+
+        // Hydration decodes the text back onto the array property.
+        $found = $this->em->find(\Azera\Tests\Orm\Fixtures\CastForcedDocument::class, ['_id' => '1']);
+        $this->assertNotNull($found);
+        $this->assertSame(['a', 'b'], $found->tags);
+    }
+
+    /**
+     * #[Column(cast: false)] on a SQL model SUPPRESSES the json cast: no
+     * json_encode on write (raw value bound), no decode on read (raw
+     * stored text on the property), snapshot keeps the raw form.
+     */
+    public function testCastFalseSuppressesJsonOnSql(): void
+    {
+        $e = new \Azera\Tests\Orm\Fixtures\CastSuppressedArticle();
+        $e->id   = 1;
+        $e->tags = ['a', 'b'];
+
+        $this->em->persist($e);
+        $this->em->flush();
+
+        $q = $this->dataQueries()[0];
+        $this->assertStringContainsString('INSERT INTO', $q['sql']);
+        $this->assertSame(['a', 'b'], $q['params'][1], 'raw array bound, NOT json-encoded');
+
+        // Hydration: the raw stored text passes through UNdecoded.
+        [$entity] = FastHydrator::for(\Azera\Tests\Orm\Fixtures\CastSuppressedArticle::class)
+            ->hydrate($this->em->heap(), ['id' => '7', 'tags' => '{stored:raw}']);
+        $this->assertSame('{stored:raw}', $entity->tags);
+
+        // Snapshot mirrors the raw form — diff stays like-with-like.
+        $node = $this->em->heap()->find($entity);
+        $this->assertSame('{stored:raw}', $node->data['tags']);
     }
 
     /**

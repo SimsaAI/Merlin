@@ -42,9 +42,13 @@ final class FastHydrator
 
     /**
      * Compiled decode plan: field POSITION -> Cast, for columns whose
-     * metadata type has a registered cast. Empty for the (common)
-     * cast-free class — hydrate() keeps the plain tight loops with zero
-     * overhead. Built ONCE per class from metadata.
+     * RESOLVED cast policy applies ({@see Casts::forColumn} — the
+     * metadata 'cast' flag: mongo's castExclusions or an explicit
+     * #[Column(cast: false)] suppress the cast, #[Column(cast: true)]
+     * forces it). Empty for the (common) cast-free class — hydrate()
+     * keeps the plain tight loops with zero overhead. Built ONCE per
+     * class from metadata (which already folded in the store's
+     * castExclusions at compile time).
      *
      * @var array<int, Cast>
      */
@@ -61,7 +65,7 @@ final class FastHydrator
                 $this->pkFields[]  = $field;
                 $this->pkColumns[] = $col['name'];
             }
-            if (($cast = Casts::for($col['type'])) !== null) {
+            if (($cast = Casts::forColumn($col)) !== null) {
                 $this->decoders[\count($this->fields) - 1] = $cast;
             }
         }

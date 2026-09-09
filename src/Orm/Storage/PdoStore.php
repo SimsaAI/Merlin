@@ -53,18 +53,6 @@ final class PdoStore implements Store
         $this->dbm ??= AppContext::instance()->dbManager();
     }
 
-    /* ------------------------------------------------- capabilities */
-
-    /**
-     * SQL shaping applies: DateTime objects are formatted and cast values
-     * are ENCODED before the row hits the connection (the EM's
-     * extractData() consults this via the Store seam).
-     */
-    public function wantsNativeValues(): bool
-    {
-        return false;
-    }
-
     /**
      * Connection identity for tx grouping in flush(): the class's write
      * role (#[Connection] override wins over the constructor default) —

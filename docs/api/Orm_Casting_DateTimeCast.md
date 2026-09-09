@@ -29,9 +29,9 @@ class (or FastHydrator::clear() after) — the decode plan is compiled
 per class. Write-side shaping (EntityManager::extractData) picks the
 replacement up immediately.
 
-On native-value stores (mongo) this cast is inert by design: values
-bypass cast encoding entirely and the driver maps DateTimeInterface to
-BSON dates itself.
+On mongo documents this cast is EXCLUDED by default (the store's
+castExclusions — BSON maps DateTimeInterface to BSON dates itself);
+#[Column(cast: true)] forces the SQL text shape onto a mongo column.
 
 Snapshot contract: the property holds the decoded DateTimeImmutable,
 node->data holds the canonical string (encode(decode(raw)) round-trip)

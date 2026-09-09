@@ -212,6 +212,13 @@ final class MongoStore implements Store
      *   NAME convention (not the SQL Model chain) — this is what keeps
      *   `_id` resolving as the PK. Model-ness alone cannot decide (mongo
      *   documents may extend Model too); only the store knows.
+     * - castExclusions = ['json', 'pgarray', 'datetime']: the wire formats
+     *   BSON owns natively — the driver maps PHP arrays and
+     *   DateTimeInterface itself, so those casts are SUPPRESSED by default
+     *   (metadata 'cast' => false per column; #[Column(cast: true)] forces
+     *   one back). Scalar casts (int/float/bool) stay ACTIVE: their decode
+     *   is a no-op on native BSON values, and custom user-registered casts
+     *   keep working unless explicitly opted out.
      * - #[Connection] rejected: this store OWNS its client (the inverse
      *   of PdoStore's borrow model) — multiple mongo connections are
      *   modeled as multiple registered store types ('mongo-eu', …),
@@ -231,7 +238,8 @@ final class MongoStore implements Store
             );
         }
 
-        $meta['pkMode'] = 'convention';
+        $meta['pkMode']         = 'convention';
+        $meta['castExclusions'] = ['json', 'datetime'];
 
         return $meta;
     }
@@ -267,16 +275,6 @@ final class MongoStore implements Store
             : $this->client->selectCollection($this->database, $name);
 
         return $this->collections[$class] = $collection;
-    }
-
-    /**
-     * Wants RAW values: the mongodb driver maps PHP arrays and
-     * DateTimeInterface to BSON natively — no DateTime formatting, no
-     * cast encoding (a 'json' cast is inert here by design).
-     */
-    public function wantsNativeValues(): bool
-    {
-        return true;
     }
 
     /**

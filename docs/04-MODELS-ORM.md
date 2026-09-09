@@ -139,15 +139,54 @@ Register before the first `Metadata::for()` of the affected class (or call
 
 Semantics: the snapshot (`node->data`) always holds the **store
 representation** (encoded strings) so the diff engine compares stable
-scalars; `dirtyData()` therefore returns encoded values too. Mongo
-documents bypass value shaping entirely (BSON owns encoding — `json` and
-`datetime` are inert there). The `datetime` decode puts a
+scalars; `dirtyData()` therefore returns encoded values too. The
+`datetime` decode puts a
 `DateTimeImmutable` on the entity; to keep strings (or use a mutable
 `DateTime` / Carbon), **replace** the registration:
 
 ```php
 Azera\Orm\Casting\Casts::register('datetime', new MyDateTimeCast());
 ```
+
+### Cast control per column (#\[Column(cast:)])
+
+Every column resolves a cast policy at compile time — the ONE authority
+both write and read paths consult:
+
+- **`cast: null` (default, AUTO)** — the class's STORE decides. Stores
+  declare wire formats they own natively via the `castExclusions`
+  metadata key contributed in `enrichMetadata()`. MongoStore excludes
+  `'json'`, `'datetime'` (BSON maps PHP arrays and
+  `DateTimeInterface` itself); SQL excludes nothing. Scalar casts
+  (`int`/`float`/`bool`) and custom casts stay ACTIVE on mongo — their
+  decode is a no-op on native BSON values.
+- **`cast: true` (FORCE)** — apply the cast even where the store excluded
+  it: a mongo `json` column then stores a JSON **text** string instead of
+  a BSON array (cross-backend parity), a `datetime` column a formatted
+  string instead of a BSON date.
+- **`cast: false` (SUPPRESS)** — raw pass-through both directions, even on
+  SQL: no encode on write, no decode on read, the snapshot keeps raw
+  values. Use it for columns another tool owns (hand-written JSON), or to
+  say "don't touch my identity" (e.g. a mongo `_id` carrying ObjectId
+  strings under a numeric-declared type).
+
+```php
+class Article extends Document
+{
+    #[Column(cast: false)]
+    public $_id;              // mongo identity — ObjectId string, never decoded
+
+    #[Column(type: 'json')]
+    public $tags;             // AUTO: raw on mongo (BSON), JSON text on SQL
+
+    #[Column(type: 'json', cast: true)]
+    public $config;           // FORCE: JSON text even on mongo
+}
+```
+
+Third-party stores adopt the same convention: contribute
+`$meta['castExclusions'] = ['json', …]` in `Store::enrichMetadata()` for
+every type whose registered cast your wire format makes redundant.
 
 ### Mongo Documents (MongoStore)
 
@@ -166,10 +205,11 @@ use MongoDB\Client;
 #[Entity(store: 'mongo', name: 'articles')]
 class Article extends Document
 {
-    public $_id;              // mongo's PK; ObjectId string after insert
+    #[Column(cast: false)]
+    public $_id;              // mongo's PK; ObjectId string after insert — never decoded
     public $title;
     #[Column(type: 'json')]
-    public $tags;             // arrays pass through raw — BSON owns encoding
+    public $tags;             // AUTO: raw pass-through — BSON owns encoding
 }
 
 // bootstrap: register the mongo store under its type name
@@ -193,7 +233,7 @@ $found->delete();                 // deleteOne by _id
 | Collection name | `#[Entity(name:)]` (the generic `source`) — falls back to the snake/plural convention   |
 | Primary key     | `_id`; omitted at insert = driver-generated ObjectId, backfilled as string              |
 | `_id` filters   | the store casts 24-hex-char string `_id`s back to ObjectId automatically                |
-| Values          | arrays/dates pass through raw; the driver maps BSON                                     |
+| Values          | `json`/`datetime`/`pgarray` excluded by default (BSON owns encoding) — `#[Column(cast: true)]` forces, `cast: false` suppresses anywhere |
 | Transactions    | begin/commit/rollback are no-ops (multi-doc ACID needs replica-set sessions — deferred) |
 
 Store routing is keyed **per type name** (one axis, no roles): a document

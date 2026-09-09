@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/Fixtures/Article.php';
 require_once __DIR__ . '/Fixtures/Relations.php';
 require_once __DIR__ . '/Fixtures/ArticleDocument.php';
+require_once __DIR__ . '/Fixtures/CastSuppressedArticle.php';
 require_once __DIR__ . '/Fixtures/InventoryItem.php';
 require_once __DIR__ . '/Fixtures/TypedColumns.php';
 
@@ -17,6 +18,8 @@ use Azera\Orm\Storage\Stores;
 use Azera\Tests\Orm\Fixtures\Article;
 use Azera\Tests\Orm\Fixtures\ArticleDocument;
 use Azera\Tests\Orm\Fixtures\ArticleWithRelations;
+use Azera\Tests\Orm\Fixtures\CastForcedDocument;
+use Azera\Tests\Orm\Fixtures\CastSuppressedArticle;
 use Azera\Tests\Orm\Fixtures\Comment;
 use Azera\Tests\Orm\Fixtures\InventoryItem;
 use Azera\Tests\Orm\Fixtures\TypedColumns;
@@ -194,6 +197,38 @@ class MetadataTest extends TestCase
         $this->assertSame(['_id'], $meta['pkFields']);
     }
 
+    public function testStoreExclusionsSuppressCastsByDefault(): void
+    {
+        $meta = Metadata::for(ArticleDocument::class);
+
+        // MongoStore contributes castExclusions — resolved per column:
+        // 'json' excluded (BSON owns array encoding), 'string' cast-free
+        // anyway (no registered cast, flag true is inert), the PK forced
+        // off by #[Column(cast: false)].
+        $this->assertSame(['json', 'pgarray', 'datetime'], $meta['castExclusions']);
+        $this->assertFalse($meta['columns']['tags']['cast']);
+        $this->assertTrue($meta['columns']['title']['cast']);
+        $this->assertFalse($meta['columns']['_id']['cast']);
+    }
+
+    public function testCastTrueForcesCastOverStoreExclusion(): void
+    {
+        $meta = Metadata::for(CastForcedDocument::class);
+
+        // #[Column(cast: true)] wins over the store's exclusion.
+        $this->assertTrue($meta['columns']['tags']['cast']);
+    }
+
+    public function testCastFalseSuppressesCastOnSql(): void
+    {
+        $meta = Metadata::for(CastSuppressedArticle::class);
+
+        // SQL store excludes nothing (no castExclusions key) — the flag
+        // comes from the explicit #[Column(cast: false)].
+        $this->assertArrayNotHasKey('castExclusions', $meta);
+        $this->assertFalse($meta['columns']['tags']['cast']);
+    }
+
     public function testConnectionOnMongoDocumentThrowsViaStoreEnrichment(): void
     {
         $this->expectException(\LogicException::class);
@@ -234,7 +269,7 @@ class MetadataTest extends TestCase
     /** Mirrors Metadata::cacheKey(): 'azera_orm_meta_' . md5(v5\0salt\0class). */
     private static function metaKey(string $class, string $salt = ''): string
     {
-        return 'azera_orm_meta_' . md5("v5\0{$salt}\0{$class}");
+        return 'azera_orm_meta_' . md5("v6\0{$salt}\0{$class}");
     }
 
     /** All azera_orm_meta_* keys currently present in an ArrayCache backend. */

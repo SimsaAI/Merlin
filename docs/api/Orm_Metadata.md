@@ -15,7 +15,12 @@ Compiled shape (all values JSON-serializable — required for the L2 cache):
   'readRole'   => ?string,             // #[Connection(read|role)] — null = unset
   'writeRole'  => ?string,             // #[Connection(write|role)] — null = unset
   'pkFields'   => list<string>,        // resolved PK fields, declaration order (['id'] fallback)
-  'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool]],
+  'castExclusions' => list<string>,    // types whose cast the STORE suppresses by default
+                                       // (store-contributed during enrichment; absent = cast all)
+  'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool, 'cast' => bool]],
+                                       // 'cast': resolved AUTO/FORCE/SUPPRESS decision (#[Column(cast:)]
+                                       //   vs the store's castExclusions) — the ONE cast authority
+                                       //   every write/read site consults
   'relations'  => [name => ['type'=>.., 'target'=>.., 'foreignKey'=>.., 'ownerKey'=>.., 'strategy' => 'join'|'second_query']],
 ]
 ```
@@ -59,7 +64,7 @@ dynamic — they sit ABOVE the #[Connection] attribute in precedence.
 
 ## 🚀 Public methods
 
-### useCache() · [source](../../src/Orm/Metadata.php#L113)
+### useCache() · [source](../../src/Orm/Metadata.php#L118)
 
 `public static function useCache(Psr\SimpleCache\CacheInterface|null $cache, int|null $ttl = null): void`
 
@@ -87,7 +92,7 @@ typically `cacheSalt()` with a deploy hash, or a TTL:
 
 ---
 
-### cacheSalt() · [source](../../src/Orm/Metadata.php#L125)
+### cacheSalt() · [source](../../src/Orm/Metadata.php#L130)
 
 `public static function cacheSalt(string|null $salt): void`
 
@@ -110,7 +115,7 @@ requested again (TTL or backend eviction reclaims their space).
 
 ---
 
-### for() · [source](../../src/Orm/Metadata.php#L135)
+### for() · [source](../../src/Orm/Metadata.php#L140)
 
 `public static function for(string $class): array`
 
@@ -129,7 +134,7 @@ Compile (or fetch from cache) metadata for a class.
 
 ---
 
-### clear() · [source](../../src/Orm/Metadata.php#L156)
+### clear() · [source](../../src/Orm/Metadata.php#L161)
 
 `public static function clear(): void`
 
@@ -147,7 +152,7 @@ application may be using for unrelated data.
 
 ---
 
-### isCompiling() · [source](../../src/Orm/Metadata.php#L178)
+### isCompiling() · [source](../../src/Orm/Metadata.php#L183)
 
 `public static function isCompiling(string $class): bool`
 

@@ -45,6 +45,19 @@ final class MongoStoreTest extends TestCase
         $this->assertSame('1', $docs[0]['_id']);
     }
 
+    public function testInsertStoresRawArrayForExcludedCastType(): void
+    {
+        // Store-level: EM delivers RAW values for castExclusions types —
+        // the EM's metadata 'cast' => false on tags (mongo exclusion) is
+        // what keeps the array un-JSON-encoded upstream.
+        $this->store->insertOne(ArticleDocument::class, [
+            'title' => 'Raw',
+            'tags'  => ['x', 'y'],
+        ]);
+
+        $this->assertSame(['x', 'y'], $this->fakes->for('articles')->docs[0]['tags']);
+    }
+
     public function testInsertKeepsCallerProvidedId(): void
     {
         $result = $this->store->insertOne(ArticleDocument::class, [

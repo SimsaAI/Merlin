@@ -29,7 +29,12 @@ use ReflectionProperty;
  *   'readRole'   => ?string,             // #[Connection(read|role)] — null = unset
  *   'writeRole'  => ?string,             // #[Connection(write|role)] — null = unset
  *   'pkFields'   => list<string>,        // resolved PK fields, declaration order (['id'] fallback)
- *   'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool]],
+ *   'castExclusions' => list<string>,    // types whose cast the STORE suppresses by default
+ *                                        // (store-contributed during enrichment; absent = cast all)
+ *   'columns'    => [name => ['name' =>.., 'type' =>.., 'nullable' =>.., 'pk' => bool, 'cast' => bool]],
+ *                                        // 'cast': resolved AUTO/FORCE/SUPPRESS decision (#[Column(cast:)]
+ *                                        //   vs the store's castExclusions) — the ONE cast authority
+ *                                        //   every write/read site consults
  *   'relations'  => [name => ['type'=>.., 'target'=>.., 'foreignKey'=>.., 'ownerKey'=>.., 'strategy' => 'join'|'second_query']],
  * ]
  * ```
@@ -74,7 +79,7 @@ use ReflectionProperty;
 final class Metadata
 {
     /** Bump when compiler output changes shape — invalidates L2 entries. */
-    private const VERSION = 'v5';
+    private const VERSION = 'v6';
 
     /** @var array<class-string, array> */
     private static array $l1 = [];
@@ -351,9 +356,14 @@ final class Metadata
                 continue;
             }
 
+            // Effective type: explicit #[Column(type:)] or the PHP-type
+            // inference — needed by BOTH the metadata entry and the cast
+            // policy resolution below.
+            $type = $column?->type ?? self::inferType($prop);
+
             $meta['columns'][$prop->name] = [
                 'name'     => $column?->name ?? $prop->name,
-                'type'     => $column?->type ?? self::inferType($prop),
+                'type'     => $type,
                 'nullable' => $column?->nullable ?? false,
                 // Baseline: convention guess (id / *_id) for unnamed
                 // columns; renamed columns are no longer convention-matched.
@@ -361,6 +371,11 @@ final class Metadata
                 'pk' => $column?->name === null
                     ? ($prop->name === 'id' || str_ends_with($prop->name, '_id'))
                     : false,
+                // Cast policy, resolved HERE (compile time) against the
+                // store-contributed castExclusions: true/false = explicit
+                // #[Column(cast:)] override; null = AUTO (cast unless the
+                // store excluded this type — its native wire format).
+                'cast' => $column?->cast ?? !in_array($type, $meta['castExclusions'] ?? [], true),
             ];
 
             if ($column?->pk !== null) {

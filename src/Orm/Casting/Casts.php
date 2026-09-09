@@ -67,6 +67,26 @@ final class Casts
     }
 
     /**
+     * The ONE cast-resolution choke point: registry lookup GATED by the
+     * per-column policy flag resolved at compile time
+     * ({@see \Azera\Orm\Metadata} 'columns[].cast'). Null = no cast
+     * applies — either the type has none registered, or the column's
+     * resolved policy says suppress (mongo's castExclusions, or an
+     * explicit #[Column(cast: false)]). Every write AND read site goes
+     * through this, so encode/decode always agree on what is shaped.
+     *
+     * @param array<string, mixed> $col the metadata column entry
+     */
+    public static function forColumn(array $col): ?Cast
+    {
+        if (($col['cast'] ?? true) === false) {
+            return null;
+        }
+
+        return self::for($col['type']);
+    }
+
+    /**
      * Registered type names (tests).
      *
      * @return list<string>

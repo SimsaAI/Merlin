@@ -19,9 +19,10 @@ namespace Azera\Orm\Casting;
  *   ORM and silently coercing would hide the corruption.
  * - null-transparent both directions.
  *
- * On mongo documents this cast is a no-op in practice: the metadata type
- * is still 'json', but EntityManager passes values raw to MongoStore and
- * BSON owns the encoding — node->data already holds arrays there.
+ * On mongo documents this cast is SUPPRESSED by default (the store's
+ * castExclusions — BSON owns array/object encoding natively);
+ * #[Column(cast: true)] forces the text shape (values stored as a JSON
+ * string) for cross-backend parity. The metadata type is still 'json'.
  *
  * Snapshot contract: the property holds the DECODED array, node->data
  * holds the RAW JSON string — diff() compares the stable string form.

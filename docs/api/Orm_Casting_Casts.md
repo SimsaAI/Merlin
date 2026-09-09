@@ -20,8 +20,6 @@ Registered built-ins (registered in [`Casts::boot()`](Orm_Casting_Casts.md#boot)
   'datetime' DateTimeInterface <-> 'Y-m-d H:i:s' (decode yields
              DateTimeImmutable; replace the registration for a
              custom shape)
-  'datetime' DateTimeInterface <-> 'Y-m-d H:i:s' (DateTimeImmutable on
-             decode; replace the registration for a custom shape)
 
 Semantics:
 
@@ -40,7 +38,7 @@ Semantics:
 
 ## 🚀 Public methods
 
-### register() · [source](../../src/Orm/Casting/Casts.php#L53)
+### register() · [source](../../src/Orm/Casting/Casts.php#L51)
 
 `public static function register(string $type, Azera\Orm\Casting\Cast $cast): void`
 
@@ -60,7 +58,7 @@ Register (or replace) a cast for a column type.
 
 ---
 
-### for() · [source](../../src/Orm/Casting/Casts.php#L64)
+### for() · [source](../../src/Orm/Casting/Casts.php#L62)
 
 `public static function for(string $type): Azera\Orm\Casting\Cast|null`
 
@@ -80,7 +78,32 @@ transformation (values pass through raw in both directions).
 
 ---
 
-### types() · [source](../../src/Orm/Casting/Casts.php#L76)
+### forColumn() · [source](../../src/Orm/Casting/Casts.php#L80)
+
+`public static function forColumn(array $col): Azera\Orm\Casting\Cast|null`
+
+The ONE cast-resolution choke point: registry lookup GATED by the
+per-column policy flag resolved at compile time
+([`Metadata`](Orm_Metadata.md) 'columns[].cast'). Null = no cast
+applies — either the type has none registered, or the column's
+resolved policy says suppress (mongo's castExclusions, or an
+explicit #[Column(cast: false)]). Every write AND read site goes
+through this, so encode/decode always agree on what is shaped.
+
+**🧭 Parameters**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `$col` | array | - | the metadata column entry |
+
+**➡️ Return value**
+
+- Type: [Cast](Orm_Casting_Cast.md)|null
+
+
+---
+
+### types() · [source](../../src/Orm/Casting/Casts.php#L94)
 
 `public static function types(): array`
 
@@ -93,7 +116,7 @@ Registered type names (tests).
 
 ---
 
-### clear() · [source](../../src/Orm/Casting/Casts.php#L86)
+### clear() · [source](../../src/Orm/Casting/Casts.php#L104)
 
 `public static function clear(): void`
 

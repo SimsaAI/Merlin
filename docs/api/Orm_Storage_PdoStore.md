@@ -48,22 +48,7 @@ Database instance.
 
 ---
 
-### wantsNativeValues() · [source](../../src/Orm/Storage/PdoStore.php#L63)
-
-`public function wantsNativeValues(): bool`
-
-SQL shaping applies: DateTime objects are formatted and cast values
-are ENCODED before the row hits the connection (the EM's
-extractData() consults this via the Store seam).
-
-**➡️ Return value**
-
-- Type: bool
-
-
----
-
-### txTarget() · [source](../../src/Orm/Storage/PdoStore.php#L73)
+### txTarget() · [source](../../src/Orm/Storage/PdoStore.php#L61)
 
 `public function txTarget(array $meta): string`
 
@@ -84,7 +69,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L103)
+### insertOne() · [source](../../src/Orm/Storage/PdoStore.php#L91)
 
 `public function insertOne(string $class, array $data): array`
 
@@ -102,7 +87,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L149)
+### updateOne() · [source](../../src/Orm/Storage/PdoStore.php#L137)
 
 `public function updateOne(string $class, array $data, array $id): array`
 
@@ -121,7 +106,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L160)
+### upsertOne() · [source](../../src/Orm/Storage/PdoStore.php#L148)
 
 `public function upsertOne(string $class, array $data): array`
 
@@ -139,7 +124,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L194)
+### deleteOne() · [source](../../src/Orm/Storage/PdoStore.php#L182)
 
 `public function deleteOne(string $class, array $id): void`
 
@@ -157,7 +142,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L202)
+### findBy() · [source](../../src/Orm/Storage/PdoStore.php#L190)
 
 `public function findBy(string $class, array $where): array`
 
@@ -175,7 +160,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L211)
+### findByPk() · [source](../../src/Orm/Storage/PdoStore.php#L199)
 
 `public function findByPk(string $class, array $id): array|null`
 
@@ -193,7 +178,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### count() · [source](../../src/Orm/Storage/PdoStore.php#L217)
+### count() · [source](../../src/Orm/Storage/PdoStore.php#L205)
 
 `public function count(string $class, array $where = []): int`
 
@@ -211,7 +196,7 @@ two classes sharing a write role share one transaction target.
 
 ---
 
-### begin() · [source](../../src/Orm/Storage/PdoStore.php#L235)
+### begin() · [source](../../src/Orm/Storage/PdoStore.php#L223)
 
 `public function begin(array|null $meta = null): void`
 
@@ -236,7 +221,7 @@ implicitly by routing and never committed/rolled back by this store.
 
 ---
 
-### commit() · [source](../../src/Orm/Storage/PdoStore.php#L252)
+### commit() · [source](../../src/Orm/Storage/PdoStore.php#L240)
 
 `public function commit(array|null $meta = null): void`
 
@@ -253,7 +238,7 @@ implicitly by routing and never committed/rolled back by this store.
 
 ---
 
-### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L260)
+### rollback() · [source](../../src/Orm/Storage/PdoStore.php#L248)
 
 `public function rollback(array|null $meta = null): void`
 
@@ -270,7 +255,7 @@ implicitly by routing and never committed/rolled back by this store.
 
 ---
 
-### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L274)
+### inTransaction() · [source](../../src/Orm/Storage/PdoStore.php#L262)
 
 `public function inTransaction(array|null $meta = null): bool`
 
@@ -292,7 +277,7 @@ store began, else the constructor-default write connection.
 
 ---
 
-### enrichMetadata() · [source](../../src/Orm/Storage/PdoStore.php#L521)
+### enrichMetadata() · [source](../../src/Orm/Storage/PdoStore.php#L509)
 
 `public function enrichMetadata(array $meta, ReflectionClass $class): array`
 

@@ -458,7 +458,7 @@ entities — nothing to revert to.
 
 ---
 
-### clear() · [source](../../src/Orm/EntityManager.php#L588)
+### clear() · [source](../../src/Orm/EntityManager.php#L589)
 
 `public function clear(): void`
 
@@ -472,7 +472,7 @@ work is dropped, NOT flushed — explicit clear means "forget".
 
 ---
 
-### resetState() · [source](../../src/Orm/EntityManager.php#L600)
+### resetState() · [source](../../src/Orm/EntityManager.php#L601)
 
 `public function resetState(): void`
 
@@ -489,7 +489,7 @@ rebuilds it from the then-current manager.
 
 ---
 
-### setStore() · [source](../../src/Orm/EntityManager.php#L1085)
+### setStore() · [source](../../src/Orm/EntityManager.php#L1082)
 
 `public function setStore(string $type, Azera\Orm\Storage\Store $store): static`
 
